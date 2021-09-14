@@ -24,6 +24,12 @@ namespace JAR
 
         static void Main(string[] args)
         {
+            /*
+            if (args.Count() != 2 || args[0] != "filepath" || File.Exists(args[1]))
+                return;
+
+            var lines = File.ReadAllLines(args[1]);
+            */
             var lines = File.ReadAllLines(@"G:\Dropbox\JAR\jar_test_map.vmf");
 
             vmf = new VMF(lines);
