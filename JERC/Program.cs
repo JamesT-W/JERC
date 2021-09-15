@@ -24,13 +24,13 @@ namespace JERC
 
         private static readonly string visgroupIdJercLayoutName = "jerc_layout";
         private static readonly string visgroupIdJercCoverName = "jerc_cover";
-        private static readonly string visgroupIdJercNegativeName = "jerc_negative";
         private static readonly string visgroupIdJercOverlapName = "jerc_overlap";
+        private static readonly string visgroupIdJercNegativeName = "jerc_negative";
 
         private static string visgroupIdJercLayoutId;
         private static string visgroupIdJercCoverId;
-        private static string visgroupIdJercNegativeId;
         private static string visgroupIdJercOverlapId;
+        private static string visgroupIdJercNegativeId;
 
         private static string mapName;
 
@@ -111,19 +111,19 @@ namespace JERC
                                     select x.Body.FirstOrDefault(y => y.Name == "visgroupid").Value)
                                     .FirstOrDefault();
 
+            visgroupIdJercOverlapId = (from x in vmf.VisGroups.Body
+                                       from y in x.Body
+                                       where y.Name == "name"
+                                       where y.Value == visgroupIdJercOverlapName
+                                       select x.Body.FirstOrDefault(y => y.Name == "visgroupid").Value)
+                                      .FirstOrDefault();
+
             visgroupIdJercNegativeId = (from x in vmf.VisGroups.Body
                                        from y in x.Body
                                        where y.Name == "name"
                                        where y.Value == visgroupIdJercNegativeName
                                        select x.Body.FirstOrDefault(y => y.Name == "visgroupid").Value)
                                        .FirstOrDefault();
-
-            visgroupIdJercOverlapId = (from x in vmf.VisGroups.Body
-                                      from y in x.Body
-                                      where y.Name == "name"
-                                      where y.Value == visgroupIdJercOverlapName
-                                      select x.Body.FirstOrDefault(y => y.Name == "visgroupid").Value)
-                                      .FirstOrDefault();
         }
 
 
@@ -134,13 +134,13 @@ namespace JERC
 
             var propsLayout = GetPropsLayout(allEntities);
             var propsCover = GetPropsCover(allEntities);
-            var propsNegative = GetPropsNegative(allEntities);
             var propsOverlap = GetPropsOverlap(allEntities);
+            var propsNegative = GetPropsNegative(allEntities);
 
             var brushesLayout = GetBrushesLayout(allWorldBrushes);
             var brushesCover = GetBrushesCover(allWorldBrushes);
-            var brushesNegative = GetBrushesNegative(allWorldBrushes);
             var brushesOverlap = GetBrushesOverlap(allWorldBrushes);
+            var brushesNegative = GetBrushesNegative(allWorldBrushes);
 
             var buyzoneBrushEntities = GetBuyzoneBrushEntities(allEntities);
             var bombsiteBrushEntities = GetBombsiteBrushEntities(allEntities);
@@ -148,8 +148,8 @@ namespace JERC
             var hostageEntities = GetHostageEntities(allEntities);
 
             return new VmfRequiredData(
-                propsLayout, propsCover, propsNegative, propsOverlap,
-                brushesLayout, brushesCover, brushesNegative, brushesOverlap,
+                propsLayout, propsCover, propsOverlap, propsNegative,
+                brushesLayout, brushesCover, brushesOverlap, brushesNegative,
                 buyzoneBrushEntities, bombsiteBrushEntities, rescueZoneBrushEntities, hostageEntities
             );
         }
@@ -179,18 +179,6 @@ namespace JERC
         }
 
 
-        private static IEnumerable<IVNode> GetPropsNegative(IEnumerable<IVNode> allEntities)
-        {
-            return from x in allEntities
-                   from y in x.Body
-                   where y.Name == "editor"
-                   from z in y.Body
-                   where z.Name == "visgroupid"
-                   where z.Value == visgroupIdJercNegativeId
-                   select x;
-        }
-
-
         private static IEnumerable<IVNode> GetPropsOverlap(IEnumerable<IVNode> allEntities)
         {
             return from x in allEntities
@@ -199,6 +187,18 @@ namespace JERC
                    from z in y.Body
                    where z.Name == "visgroupid"
                    where z.Value == visgroupIdJercOverlapId
+                   select x;
+        }
+
+
+        private static IEnumerable<IVNode> GetPropsNegative(IEnumerable<IVNode> allEntities)
+        {
+            return from x in allEntities
+                   from y in x.Body
+                   where y.Name == "editor"
+                   from z in y.Body
+                   where z.Name == "visgroupid"
+                   where z.Value == visgroupIdJercNegativeId
                    select x;
         }
 
@@ -227,18 +227,6 @@ namespace JERC
         }
 
 
-        private static IEnumerable<IVNode> GetBrushesNegative(IEnumerable<IVNode> allWorldBrushes)
-        {
-            return from x in allWorldBrushes
-                   from y in x.Body
-                   where y.Name == "editor"
-                   from z in y.Body
-                   where z.Name == "visgroupid"
-                   where z.Value == visgroupIdJercNegativeId
-                   select x;
-        }
-
-
         private static IEnumerable<IVNode> GetBrushesOverlap(IEnumerable<IVNode> allWorldBrushes)
         {
             return from x in allWorldBrushes
@@ -247,6 +235,18 @@ namespace JERC
                    from z in y.Body
                    where z.Name == "visgroupid"
                    where z.Value == visgroupIdJercOverlapId
+                   select x;
+        }
+
+
+        private static IEnumerable<IVNode> GetBrushesNegative(IEnumerable<IVNode> allWorldBrushes)
+        {
+            return from x in allWorldBrushes
+                   from y in x.Body
+                   where y.Name == "editor"
+                   from z in y.Body
+                   where z.Name == "visgroupid"
+                   where z.Value == visgroupIdJercNegativeId
                    select x;
         }
 
@@ -324,8 +324,8 @@ namespace JERC
 
             verticesAndWorldHeightRangesList.AddRange(GetBrushLayoutVerticesList());
             verticesAndWorldHeightRangesList.AddRange(GetBrushCoverVerticesList());
-            verticesAndWorldHeightRangesList.AddRange(GetBrushNegativeVerticesList());
             verticesAndWorldHeightRangesList.AddRange(GetBrushOverlapVerticesList());
+            verticesAndWorldHeightRangesList.AddRange(GetBrushNegativeVerticesList());
 
             boundingBox.minX = verticesAndWorldHeightRangesList.SelectMany(x => x.vertices.Select(y => y.X)).Min();
             boundingBox.maxX = verticesAndWorldHeightRangesList.SelectMany(x => x.vertices.Select(y => y.X)).Max();
@@ -382,29 +382,6 @@ namespace JERC
         }
 
 
-        private static List<BrushVerticesAndWorldHeight> GetBrushNegativeVerticesList()
-        {
-            var verticesAndWorldHeightRangesList = new List<BrushVerticesAndWorldHeight>();
-
-            foreach (var side in vmfRequiredData.brushesSidesNegative)
-            {
-                var verticesAndWorldHeight = new BrushVerticesAndWorldHeight(side.vertices_plus.Count());
-                for (int i = 0; i < side.vertices_plus.Count(); i++)
-                {
-                    var vert = side.vertices_plus[i];
-
-                    verticesAndWorldHeight.vertices[i] = new PointF(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier);
-                    verticesAndWorldHeight.worldHeight = vert.z;
-                    verticesAndWorldHeight.jercType = JercTypes.Negative;
-                }
-
-                verticesAndWorldHeightRangesList.Add(verticesAndWorldHeight);
-            }
-
-            return verticesAndWorldHeightRangesList;
-        }
-
-
         private static List<BrushVerticesAndWorldHeight> GetBrushOverlapVerticesList()
         {
             var verticesAndWorldHeightRangesList = new List<BrushVerticesAndWorldHeight>();
@@ -419,6 +396,29 @@ namespace JERC
                     verticesAndWorldHeight.vertices[i] = new PointF(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier);
                     verticesAndWorldHeight.worldHeight = vert.z;
                     verticesAndWorldHeight.jercType = JercTypes.Overlap;
+                }
+
+                verticesAndWorldHeightRangesList.Add(verticesAndWorldHeight);
+            }
+
+            return verticesAndWorldHeightRangesList;
+        }
+
+
+        private static List<BrushVerticesAndWorldHeight> GetBrushNegativeVerticesList()
+        {
+            var verticesAndWorldHeightRangesList = new List<BrushVerticesAndWorldHeight>();
+
+            foreach (var side in vmfRequiredData.brushesSidesNegative)
+            {
+                var verticesAndWorldHeight = new BrushVerticesAndWorldHeight(side.vertices_plus.Count());
+                for (int i = 0; i < side.vertices_plus.Count(); i++)
+                {
+                    var vert = side.vertices_plus[i];
+
+                    verticesAndWorldHeight.vertices[i] = new PointF(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier);
+                    verticesAndWorldHeight.worldHeight = vert.z;
+                    verticesAndWorldHeight.jercType = JercTypes.Negative;
                 }
 
                 verticesAndWorldHeightRangesList.Add(verticesAndWorldHeight);
@@ -465,8 +465,8 @@ namespace JERC
                 {
                     JercTypes.Layout => PenColours.PenLayout(gradientValue),
                     JercTypes.Cover => PenColours.PenCover(gradientValue),
-                    JercTypes.Negative => PenColours.PenNegative(gradientValue),
                     JercTypes.Overlap => PenColours.PenOverlap(gradientValue),
+                    JercTypes.Negative => PenColours.PenNegative(gradientValue),
                     _ => throw new NotImplementedException(),
                 };
 
@@ -474,11 +474,11 @@ namespace JERC
                 {
                     JercTypes.Layout => BrushColours.BrushLayout(gradientValue),
                     JercTypes.Cover => BrushColours.BrushCover(gradientValue),
-                    JercTypes.Negative => BrushColours.BrushNegative(gradientValue),
                     JercTypes.Overlap => BrushColours.BrushOverlap(gradientValue),
+                    JercTypes.Negative => BrushColours.BrushNegative(gradientValue),
                     _ => throw new NotImplementedException(),
                 };
-                
+
                 DrawFilledPolygonObjective(graphics, solidBrush, pen, verticesAndWorldHeightRanges.vertices);
             }
 

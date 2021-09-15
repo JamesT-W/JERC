@@ -10,7 +10,7 @@ namespace JERC.Enums
     {
         Layout = 1,
         Cover = 2,
-        Negative = 4,
-        Overlap = 8
+        Overlap = 4,
+        Negative = 8
     }
 }
