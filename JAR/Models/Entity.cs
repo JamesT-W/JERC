@@ -6,7 +6,7 @@ using VMFParser;
 
 namespace JAR.Models
 {
-    public class Prop
+    public class Entity
     {
         public int id;
         public string classname;
@@ -16,9 +16,9 @@ namespace JAR.Models
         public string origin;
         public Editor editor;
 
-        public Prop(IVNode prop)
+        public Entity(IVNode prop)
         {
-            //// ignoring a lot of other values
+            // ignoring a lot of other values
 
             id = int.Parse(prop.Body.FirstOrDefault(x => x.Name == "id")?.Value);
             classname = prop.Body.FirstOrDefault(x => x.Name == "classname")?.Value;

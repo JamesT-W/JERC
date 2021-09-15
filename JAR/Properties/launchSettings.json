@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "JAR": {
+      "commandName": "Project",
+      "commandLineArgs": "-filepath G:\\Dropbox\\JAR\\maps\\jar_test_map.vmf"
+    }
+  }
+}

@@ -24,19 +24,22 @@ namespace JAR
         private static string visgroupIdJarNegativeId;
         private static string visgroupIdJarOverlapId;
 
+        private static string mapName;
+
         private static VMF vmf;
         private static VmfRequiredData vmfRequiredData;
+
+        private static OverviewTxt overviewTxt = new OverviewTxt();
 
 
         static void Main(string[] args)
         {
-            /*
-            if (args.Count() != 2 || args[0] != "filepath" || File.Exists(args[1]))
+            if (args.Count() != 2 || args[0].ToLower() != "-filepath" || !File.Exists(args[1]))
                 return;
 
             var lines = File.ReadAllLines(args[1]);
-            */
-            var lines = File.ReadAllLines(@"G:\Dropbox\JAR\jar_test_map.vmf");
+
+            mapName = Path.GetFileNameWithoutExtension(args[1]);
 
             vmf = new VMF(lines);
 
@@ -45,6 +48,8 @@ namespace JAR
             vmfRequiredData = GetVmfRequiredData();
 
             GenerateRadar();
+
+            GenerateTxt();
         }
 
 
@@ -84,26 +89,35 @@ namespace JAR
 
         private static VmfRequiredData GetVmfRequiredData()
         {
-            var allProps = vmf.Body.Where(x => x.Name == "entity");
-            var allBrushes = vmf.World.Body.Where(x => x.Name == "solid");
+            var allEntities = vmf.Body.Where(x => x.Name == "entity");
+            var allWorldBrushes = vmf.World.Body.Where(x => x.Name == "solid");
 
-            var propsLayout = GetPropsLayout(allProps);
-            var propsCover = GetPropsCover(allProps);
-            var propsNegative = GetPropsNegative(allProps);
-            var propsOverlap = GetPropsOverlap(allProps);
+            var propsLayout = GetPropsLayout(allEntities);
+            var propsCover = GetPropsCover(allEntities);
+            var propsNegative = GetPropsNegative(allEntities);
+            var propsOverlap = GetPropsOverlap(allEntities);
 
-            var brushesLayout = GetBrushesLayout(allBrushes);
-            var brushesCover = GetBrushesCover(allBrushes);
-            var brushesNegative = GetBrushesNegative(allBrushes);
-            var brushesOverlap = GetBrushesOverlap(allBrushes);
+            var brushesLayout = GetBrushesLayout(allWorldBrushes);
+            var brushesCover = GetBrushesCover(allWorldBrushes);
+            var brushesNegative = GetBrushesNegative(allWorldBrushes);
+            var brushesOverlap = GetBrushesOverlap(allWorldBrushes);
 
-            return new VmfRequiredData(propsLayout, propsCover, propsNegative, propsOverlap, brushesLayout, brushesCover, brushesNegative, brushesOverlap);
+            var buyzoneBrushEntities = GetBuyzoneBrushEntities(allEntities);
+            var bombsiteBrushEntities = GetBombsiteBrushEntities(allEntities);
+            var rescueZoneBrushEntities = GetRescueZoneBrushEntities(allEntities);
+            var hostageEntities = GetHostageEntities(allEntities);
+
+            return new VmfRequiredData(
+                propsLayout, propsCover, propsNegative, propsOverlap,
+                brushesLayout, brushesCover, brushesNegative, brushesOverlap,
+                buyzoneBrushEntities, bombsiteBrushEntities, rescueZoneBrushEntities, hostageEntities
+            );
         }
 
 
-        private static IEnumerable<IVNode> GetPropsLayout(IEnumerable<IVNode> allProps)
+        private static IEnumerable<IVNode> GetPropsLayout(IEnumerable<IVNode> allEntities)
         {
-            return from x in allProps
+            return from x in allEntities
                    from y in x.Body
                    where y.Name == "editor"
                    from z in y.Body
@@ -113,9 +127,9 @@ namespace JAR
         }
 
 
-        private static IEnumerable<IVNode> GetPropsCover(IEnumerable<IVNode> allProps)
+        private static IEnumerable<IVNode> GetPropsCover(IEnumerable<IVNode> allEntities)
         {
-            return from x in allProps
+            return from x in allEntities
                    from y in x.Body
                    where y.Name == "editor"
                    from z in y.Body
@@ -125,9 +139,9 @@ namespace JAR
         }
 
 
-        private static IEnumerable<IVNode> GetPropsNegative(IEnumerable<IVNode> allProps)
+        private static IEnumerable<IVNode> GetPropsNegative(IEnumerable<IVNode> allEntities)
         {
-            return from x in allProps
+            return from x in allEntities
                    from y in x.Body
                    where y.Name == "editor"
                    from z in y.Body
@@ -137,9 +151,9 @@ namespace JAR
         }
 
 
-        private static IEnumerable<IVNode> GetPropsOverlap(IEnumerable<IVNode> allProps)
+        private static IEnumerable<IVNode> GetPropsOverlap(IEnumerable<IVNode> allEntities)
         {
-            return from x in allProps
+            return from x in allEntities
                    from y in x.Body
                    where y.Name == "editor"
                    from z in y.Body
@@ -149,9 +163,9 @@ namespace JAR
         }
 
 
-        private static IEnumerable<IVNode> GetBrushesLayout(IEnumerable<IVNode> allBrushes)
+        private static IEnumerable<IVNode> GetBrushesLayout(IEnumerable<IVNode> allWorldBrushes)
         {
-            return from x in allBrushes
+            return from x in allWorldBrushes
                    from y in x.Body
                    where y.Name == "editor"
                    from z in y.Body
@@ -161,9 +175,9 @@ namespace JAR
         }
 
 
-        private static IEnumerable<IVNode> GetBrushesCover(IEnumerable<IVNode> allBrushes)
+        private static IEnumerable<IVNode> GetBrushesCover(IEnumerable<IVNode> allWorldBrushes)
         {
-            return from x in allBrushes
+            return from x in allWorldBrushes
                    from y in x.Body
                    where y.Name == "editor"
                    from z in y.Body
@@ -173,9 +187,9 @@ namespace JAR
         }
 
 
-        private static IEnumerable<IVNode> GetBrushesNegative(IEnumerable<IVNode> allBrushes)
+        private static IEnumerable<IVNode> GetBrushesNegative(IEnumerable<IVNode> allWorldBrushes)
         {
-            return from x in allBrushes
+            return from x in allWorldBrushes
                    from y in x.Body
                    where y.Name == "editor"
                    from z in y.Body
@@ -185,14 +199,54 @@ namespace JAR
         }
 
 
-        private static IEnumerable<IVNode> GetBrushesOverlap(IEnumerable<IVNode> allBrushes)
+        private static IEnumerable<IVNode> GetBrushesOverlap(IEnumerable<IVNode> allWorldBrushes)
         {
-            return from x in allBrushes
+            return from x in allWorldBrushes
                    from y in x.Body
                    where y.Name == "editor"
                    from z in y.Body
                    where z.Name == "visgroupid"
                    where z.Value == visgroupIdJarOverlapId
+                   select x;
+        }
+
+
+        private static IEnumerable<IVNode> GetBuyzoneBrushEntities(IEnumerable<IVNode> allEntities)
+        {
+            return from x in allEntities
+                   from y in x.Body
+                   where y.Name == "classname"
+                   where y.Value == Classnames.ClassnameBuyzone
+                   select x;
+        }
+
+
+        private static IEnumerable<IVNode> GetBombsiteBrushEntities(IEnumerable<IVNode> allEntities)
+        {
+            return from x in allEntities
+                   from y in x.Body
+                   where y.Name == "classname"
+                   where y.Value == Classnames.ClassnameBombsite
+                   select x;
+        }
+
+
+        private static IEnumerable<IVNode> GetRescueZoneBrushEntities(IEnumerable<IVNode> allEntities)
+        {
+            return from x in allEntities
+                   from y in x.Body
+                   where y.Name == "classname"
+                   where y.Value == Classnames.ClassnameRescueZone
+                   select x;
+        }
+
+
+        private static IEnumerable<IVNode> GetHostageEntities(IEnumerable<IVNode> allEntities)
+        {
+            return from x in allEntities
+                   from y in x.Body
+                   where y.Name == "classname"
+                   where y.Value == Classnames.ClassnameHostage
                    select x;
         }
 
@@ -208,13 +262,13 @@ namespace JAR
 
                 graphics.SmoothingMode = SmoothingMode.AntiAlias;
 
-                var verticesAndWorldHeightRangesList = GetBrushVerticesList();
+                var boundingBox = new BoundingBox();
+
+                var verticesAndWorldHeightRangesList = GetBrushVerticesList(boundingBox);
                 //var verticesPerPropList = GetPropVerticesList();
 
-                var worldHeightRanges = CalculateWorldHeightRanges(verticesAndWorldHeightRangesList.Select(x => x.worldHeight).ToList()); ////, verticesPerPropList
-
-                RenderBrushSides(graphics, worldHeightRanges, verticesAndWorldHeightRangesList);
-                //RenderProps(graphics, worldHeightRanges); //// verticesPerPropList
+                RenderBrushSides(graphics, boundingBox, verticesAndWorldHeightRangesList);
+                //RenderProps(graphics, boundingBox); //// verticesPerPropList
 
                 graphics.Save();
 
@@ -227,7 +281,7 @@ namespace JAR
         }
 
 
-        private static List<BrushVerticesAndWorldHeight> GetBrushVerticesList()
+        private static List<BrushVerticesAndWorldHeight> GetBrushVerticesList(BoundingBox boundingBox)
         {
             var verticesAndWorldHeightRangesList = new List<BrushVerticesAndWorldHeight>();
 
@@ -237,6 +291,21 @@ namespace JAR
                 for (int i = 0; i < side.vertices_plus.Count(); i++)
                 {
                     var vert = side.vertices_plus[i];
+
+                    if (vert.x < boundingBox.minX)
+                        boundingBox.minX = vert.x;
+                    else if (vert.x > boundingBox.maxX)
+                        boundingBox.maxX = vert.x;
+
+                    if (vert.y < boundingBox.minY)
+                        boundingBox.minY = vert.y;
+                    else if (vert.y > boundingBox.maxY)
+                        boundingBox.maxY = vert.y;
+
+                    if (vert.z < boundingBox.minZ)
+                        boundingBox.minZ = vert.z;
+                    else if (vert.z > boundingBox.maxZ)
+                        boundingBox.maxZ = vert.z;
 
                     verticesAndWorldHeight.vertices[i] = new PointF(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier);
                     verticesAndWorldHeight.worldHeight = vert.z;
@@ -249,28 +318,19 @@ namespace JAR
         }
 
 
-        private static WorldHeightRanges CalculateWorldHeightRanges(List<float> worldHeightBrushSidesList)
-        {
-            var min = worldHeightBrushSidesList.Min();
-            var max = worldHeightBrushSidesList.Max();
-
-            return new WorldHeightRanges(min, max);
-        }
-
-
-        private static void RenderBrushSides(Graphics graphics, WorldHeightRanges worldHeightRanges, List<BrushVerticesAndWorldHeight> verticesAndWorldHeightRangesList)
+        private static void RenderBrushSides(Graphics graphics, BoundingBox boundingBox, List<BrushVerticesAndWorldHeight> verticesAndWorldHeightRangesList)
         {
             Pen pen = null;
             SolidBrush brush = null;
 
             foreach (var verticesAndWorldHeightRanges in verticesAndWorldHeightRangesList)
             {
-                var heightAboveMin = verticesAndWorldHeightRanges.worldHeight - worldHeightRanges.min;
+                var heightAboveMin = verticesAndWorldHeightRanges.worldHeight - boundingBox.minZ;
                 
                 var percentageAboveMin = -1.00f;
                 if (heightAboveMin == 0)
                 {
-                    if (worldHeightRanges.min == worldHeightRanges.max)
+                    if (boundingBox.minZ == boundingBox.maxZ)
                     {
                         percentageAboveMin = 255;
                     }
@@ -281,7 +341,7 @@ namespace JAR
                 }
                 else
                 {
-                    percentageAboveMin = heightAboveMin / (worldHeightRanges.max - worldHeightRanges.min);
+                    percentageAboveMin = heightAboveMin / (boundingBox.maxZ - boundingBox.minZ);
                 }
 
                 var gradientValue = (int)Math.Round(percentageAboveMin * 255, 0);
@@ -417,6 +477,12 @@ namespace JAR
         private static void FlipImage(Image img)
         {
             img.RotateFlip(RotateFlipType.RotateNoneFlipY);
+        }
+
+
+        private static void GenerateTxt()
+        {
+            overviewTxt.GetInExportableFormat(mapName);
         }
     }
 }
