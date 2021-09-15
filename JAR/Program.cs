@@ -14,6 +14,13 @@ namespace JAR
 {
     class Program
     {
+        private static readonly string gameBinDirectoryPath = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), @"..\"));
+
+        private static readonly string outputImageFilepath = @"F:\Coding Stuff\GitHub Files\JAR\jar_test_map_radar.jpg";
+        //private static readonly string outputImageFilepath = string.Concat(overviewsFolder, vmfName, "_radar.jpg");
+        private static readonly string outputTxtFilepath = @"F:\Coding Stuff\GitHub Files\JAR\jar_test_map.txt";
+        //private static readonly string outputTxtFilepath = string.Concat(overviewsFolder, vmfName, ".txt");
+
         private static readonly string visgroupIdJarLayoutName = "jar_layout";
         private static readonly string visgroupIdJarCoverName = "jar_cover";
         private static readonly string visgroupIdJarNegativeName = "jar_negative";
@@ -35,7 +42,16 @@ namespace JAR
         static void Main(string[] args)
         {
             if (args.Count() != 2 || args[0].ToLower() != "-filepath" || !File.Exists(args[1]))
+            {
+                Console.WriteLine("Incorrect arguments. Reinstalling JERC recommended.");
                 return;
+            }
+
+            if (gameBinDirectoryPath.Split(@"\").LastOrDefault() != "bin")
+            {
+                Console.WriteLine(@"JERC's folder should be placed in ...\Counter-Strike Global Offensive\bin");
+                return;
+            }
 
             var lines = File.ReadAllLines(args[1]);
 
@@ -257,9 +273,6 @@ namespace JAR
             
             using (var graphics = Graphics.FromImage(bmp))
             {
-                string outputFilepath = @"F:\Coding Stuff\GitHub Files\JAR\testradar.jpg";
-                //string outputFilepath = string.Concat(overviewsFolder, vmfName, ".jpg");
-
                 graphics.SmoothingMode = SmoothingMode.AntiAlias;
 
                 var boundingBox = new BoundingBox();
@@ -274,7 +287,7 @@ namespace JAR
 
                 FlipImage(bmp);
 
-                SaveImage(bmp, outputFilepath);
+                SaveImage(outputImageFilepath, bmp);
             }
 
             DisposeImage(bmp);
@@ -381,7 +394,7 @@ namespace JAR
         }
 
 
-        private static void SaveImage(Image img, string filepath)
+        private static void SaveImage(string filepath, Image img)
         {
             var canSave = false;
 
@@ -482,7 +495,36 @@ namespace JAR
 
         private static void GenerateTxt()
         {
-            overviewTxt.GetInExportableFormat(mapName);
+            var lines = overviewTxt.GetInExportableFormat(mapName);
+
+            SaveOutputTxtFile(outputTxtFilepath, lines);
+        }
+
+
+        private static void SaveOutputTxtFile(string filepath, List<string> lines)
+        {
+            var canSave = false;
+
+            // check if the files are locked
+            if (File.Exists(filepath))
+            {
+                var fileAccessible = CheckFileIsNotLocked(filepath, true, true);
+
+                if (fileAccessible)
+                {
+                    canSave = true;
+                }
+            }
+            else
+            {
+                canSave = true;
+            }
+
+            // only create the heatmaps if the files are not locked
+            if (canSave)
+            {
+                File.WriteAllLines(filepath, lines);
+            }
         }
     }
 }
