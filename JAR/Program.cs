@@ -36,20 +36,7 @@ namespace JAR
 
             SetVisgroupIds();
 
-            var allProps = vmf.Body.Where(x => x.Name == "entity");
-            var allBrushes = vmf.World.Body.Where(x => x.Name == "solid");
-
-            var propsLayout = GetPropsLayout(allProps);
-            var propsCover = GetPropsCover(allProps);
-            var propsNegative = GetPropsNegative(allProps);
-            var propsOverlap = GetPropsOverlap(allProps);
-
-            var brushesLayout = GetBrushesLayout(allBrushes);
-            var brushesCover = GetBrushesCover(allBrushes);
-            var brushesNegative = GetBrushesNegative(allBrushes);
-            var brushesOverlap = GetBrushesOverlap(allBrushes);
-
-            var vmfRequiredData = new VmfRequiredData(propsLayout, propsCover, propsNegative, propsOverlap, brushesLayout, brushesCover, brushesNegative, brushesOverlap);
+            var vmfRequiredData = GetVmfRequiredData();
         }
 
 
@@ -84,6 +71,25 @@ namespace JAR
                                       where y.Value == visgroupIdJarOverlapName
                                       select x.Body.FirstOrDefault(y => y.Name == "visgroupid").Value)
                                       .FirstOrDefault();
+        }
+
+
+        public static VmfRequiredData GetVmfRequiredData()
+        {
+            var allProps = vmf.Body.Where(x => x.Name == "entity");
+            var allBrushes = vmf.World.Body.Where(x => x.Name == "solid");
+
+            var propsLayout = GetPropsLayout(allProps);
+            var propsCover = GetPropsCover(allProps);
+            var propsNegative = GetPropsNegative(allProps);
+            var propsOverlap = GetPropsOverlap(allProps);
+
+            var brushesLayout = GetBrushesLayout(allBrushes);
+            var brushesCover = GetBrushesCover(allBrushes);
+            var brushesNegative = GetBrushesNegative(allBrushes);
+            var brushesOverlap = GetBrushesOverlap(allBrushes);
+
+            return new VmfRequiredData(propsLayout, propsCover, propsNegative, propsOverlap, brushesLayout, brushesCover, brushesNegative, brushesOverlap);
         }
 
 
