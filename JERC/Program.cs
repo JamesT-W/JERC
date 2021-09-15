@@ -1,4 +1,5 @@
 ﻿using JERC.Constants;
+using JERC.Enums;
 using JERC.Models;
 using System;
 using System.Collections.Generic;
@@ -15,28 +16,26 @@ namespace JERC
     class Program
     {
         private static readonly string gameBinDirectoryPath = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), @"..\"));
+        private static readonly string gameCsgoDirectoryPath = Path.GetFullPath(Path.Combine(Path.Combine(gameBinDirectoryPath, @"..\"), @"csgo\"));
+        private static readonly string gameOverviewsDirectoryPath = Path.GetFullPath(Path.Combine(gameCsgoDirectoryPath, @"resource\overviews\"));
 
-        private static readonly string outputImageFilepath = @"F:\Coding Stuff\GitHub Files\JERC\jerc_test_map_radar.jpg";
-        //private static readonly string outputImageFilepath = string.Concat(overviewsFolder, vmfName, "_radar.jpg");
-        private static readonly string outputTxtFilepath = @"F:\Coding Stuff\GitHub Files\JERC\jerc_test_map.txt";
-        //private static readonly string outputTxtFilepath = string.Concat(overviewsFolder, vmfName, ".txt");
+        private static string outputImageFilepath;
+        private static string outputTxtFilepath;
 
-        private static readonly string visgroupIdjercLayoutName = "jerc_layout";
-        private static readonly string visgroupIdjercCoverName = "jerc_cover";
-        private static readonly string visgroupIdjercNegativeName = "jerc_negative";
-        private static readonly string visgroupIdjercOverlapName = "jerc_overlap";
+        private static readonly string visgroupIdJercLayoutName = "jerc_layout";
+        private static readonly string visgroupIdJercCoverName = "jerc_cover";
+        private static readonly string visgroupIdJercNegativeName = "jerc_negative";
+        private static readonly string visgroupIdJercOverlapName = "jerc_overlap";
 
-        private static string visgroupIdjercLayoutId;
-        private static string visgroupIdjercCoverId;
-        private static string visgroupIdjercNegativeId;
-        private static string visgroupIdjercOverlapId;
+        private static string visgroupIdJercLayoutId;
+        private static string visgroupIdJercCoverId;
+        private static string visgroupIdJercNegativeId;
+        private static string visgroupIdJercOverlapId;
 
         private static string mapName;
 
         private static VMF vmf;
         private static VmfRequiredData vmfRequiredData;
-
-        private static OverviewTxt overviewTxt = new OverviewTxt();
 
 
         static void Main(string[] args)
@@ -47,15 +46,40 @@ namespace JERC
                 return;
             }
 
+            // TODO: uncomment for release
+            /*
             if (gameBinDirectoryPath.Split(@"\").LastOrDefault() != "bin")
             {
                 Console.WriteLine(@"JERC's folder should be placed in ...\Counter-Strike Global Offensive\bin");
                 return;
             }
 
+            if (csgoBinDirectoryPath.Split(@"\").LastOrDefault() != "csgo")
+            {
+                Console.WriteLine(@"JERC's folder should be placed in ...\Counter-Strike Global Offensive\bin");
+                return;
+            }
+
+            if (gameOverviewsDirectoryPath.Split(@"\").LastOrDefault() != "overviews")
+            {
+                Console.WriteLine(@"JERC's folder should be placed in ...\Counter-Strike Global Offensive\bin");
+                return;
+            }
+            */
+
             var lines = File.ReadAllLines(args[1]);
 
             mapName = Path.GetFileNameWithoutExtension(args[1]);
+
+
+            // TODO: uncomment for release
+            /*
+            outputImageFilepath = string.Concat(gameOverviewsDirectoryPath, mapName, "_radar.jpg");
+            outputTxtFilepath = string.Concat(gameOverviewsDirectoryPath, mapName, ".txt");
+            */
+            outputImageFilepath = @"F:\Coding Stuff\GitHub Files\JERC\jerc_test_map_radar.jpg";
+            outputTxtFilepath = @"F:\Coding Stuff\GitHub Files\JERC\jerc_test_map.txt";
+
 
             vmf = new VMF(lines);
 
@@ -71,33 +95,33 @@ namespace JERC
 
         private static void SetVisgroupIds()
         {
-            //var visgroupLayout = vmf.VisGroups.Body.Where(x => x.Body.Any(y => y.Name == "name" && y.Value == visgroupIdjercLayoutName));
+            //var visgroupLayout = vmf.VisGroups.Body.Where(x => x.Body.Any(y => y.Name == "name" && y.Value == visgroupIdJercLayoutName));
 
-            visgroupIdjercLayoutId = (from x in vmf.VisGroups.Body
+            visgroupIdJercLayoutId = (from x in vmf.VisGroups.Body
                                      from y in x.Body
                                      where y.Name == "name"
-                                     where y.Value == visgroupIdjercLayoutName
+                                     where y.Value == visgroupIdJercLayoutName
                                      select x.Body.FirstOrDefault(y => y.Name == "visgroupid").Value)
                                      .FirstOrDefault();
 
-            visgroupIdjercCoverId = (from x in vmf.VisGroups.Body
+            visgroupIdJercCoverId = (from x in vmf.VisGroups.Body
                                     from y in x.Body
                                     where y.Name == "name"
-                                    where y.Value == visgroupIdjercCoverName
+                                    where y.Value == visgroupIdJercCoverName
                                     select x.Body.FirstOrDefault(y => y.Name == "visgroupid").Value)
                                     .FirstOrDefault();
 
-            visgroupIdjercNegativeId = (from x in vmf.VisGroups.Body
+            visgroupIdJercNegativeId = (from x in vmf.VisGroups.Body
                                        from y in x.Body
                                        where y.Name == "name"
-                                       where y.Value == visgroupIdjercNegativeName
+                                       where y.Value == visgroupIdJercNegativeName
                                        select x.Body.FirstOrDefault(y => y.Name == "visgroupid").Value)
                                        .FirstOrDefault();
 
-            visgroupIdjercOverlapId = (from x in vmf.VisGroups.Body
+            visgroupIdJercOverlapId = (from x in vmf.VisGroups.Body
                                       from y in x.Body
                                       where y.Name == "name"
-                                      where y.Value == visgroupIdjercOverlapName
+                                      where y.Value == visgroupIdJercOverlapName
                                       select x.Body.FirstOrDefault(y => y.Name == "visgroupid").Value)
                                       .FirstOrDefault();
         }
@@ -138,7 +162,7 @@ namespace JERC
                    where y.Name == "editor"
                    from z in y.Body
                    where z.Name == "visgroupid"
-                   where z.Value == visgroupIdjercLayoutId
+                   where z.Value == visgroupIdJercLayoutId
                    select x;
         }
 
@@ -150,7 +174,7 @@ namespace JERC
                    where y.Name == "editor"
                    from z in y.Body
                    where z.Name == "visgroupid"
-                   where z.Value == visgroupIdjercCoverId
+                   where z.Value == visgroupIdJercCoverId
                    select x;
         }
 
@@ -162,7 +186,7 @@ namespace JERC
                    where y.Name == "editor"
                    from z in y.Body
                    where z.Name == "visgroupid"
-                   where z.Value == visgroupIdjercNegativeId
+                   where z.Value == visgroupIdJercNegativeId
                    select x;
         }
 
@@ -174,7 +198,7 @@ namespace JERC
                    where y.Name == "editor"
                    from z in y.Body
                    where z.Name == "visgroupid"
-                   where z.Value == visgroupIdjercOverlapId
+                   where z.Value == visgroupIdJercOverlapId
                    select x;
         }
 
@@ -186,7 +210,7 @@ namespace JERC
                    where y.Name == "editor"
                    from z in y.Body
                    where z.Name == "visgroupid"
-                   where z.Value == visgroupIdjercLayoutId
+                   where z.Value == visgroupIdJercLayoutId
                    select x;
         }
 
@@ -198,7 +222,7 @@ namespace JERC
                    where y.Name == "editor"
                    from z in y.Body
                    where z.Name == "visgroupid"
-                   where z.Value == visgroupIdjercCoverId
+                   where z.Value == visgroupIdJercCoverId
                    select x;
         }
 
@@ -210,7 +234,7 @@ namespace JERC
                    where y.Name == "editor"
                    from z in y.Body
                    where z.Name == "visgroupid"
-                   where z.Value == visgroupIdjercNegativeId
+                   where z.Value == visgroupIdJercNegativeId
                    select x;
         }
 
@@ -222,7 +246,7 @@ namespace JERC
                    where y.Name == "editor"
                    from z in y.Body
                    where z.Name == "visgroupid"
-                   where z.Value == visgroupIdjercOverlapId
+                   where z.Value == visgroupIdJercOverlapId
                    select x;
         }
 
@@ -270,7 +294,7 @@ namespace JERC
         private static void GenerateRadar()
         {
             Image bmp = new Bitmap(Sizes.OutputFileResolution, Sizes.OutputFileResolution);
-            
+
             using (var graphics = Graphics.FromImage(bmp))
             {
                 graphics.SmoothingMode = SmoothingMode.AntiAlias;
@@ -298,6 +322,24 @@ namespace JERC
         {
             var verticesAndWorldHeightRangesList = new List<BrushVerticesAndWorldHeight>();
 
+            verticesAndWorldHeightRangesList.AddRange(GetBrushLayoutVerticesList());
+            verticesAndWorldHeightRangesList.AddRange(GetBrushCoverVerticesList());
+            verticesAndWorldHeightRangesList.AddRange(GetBrushNegativeVerticesList());
+            verticesAndWorldHeightRangesList.AddRange(GetBrushOverlapVerticesList());
+
+            boundingBox.minX = verticesAndWorldHeightRangesList.SelectMany(x => x.vertices.Select(y => y.X)).Min();
+            boundingBox.maxX = verticesAndWorldHeightRangesList.SelectMany(x => x.vertices.Select(y => y.X)).Max();
+            boundingBox.minY = verticesAndWorldHeightRangesList.SelectMany(x => x.vertices.Select(y => y.Y)).Min();
+            boundingBox.maxY = verticesAndWorldHeightRangesList.SelectMany(x => x.vertices.Select(y => y.Y)).Max();
+
+            return verticesAndWorldHeightRangesList;
+        }
+
+
+        private static List<BrushVerticesAndWorldHeight> GetBrushLayoutVerticesList()
+        {
+            var verticesAndWorldHeightRangesList = new List<BrushVerticesAndWorldHeight>();
+
             foreach (var side in vmfRequiredData.brushesSidesLayout)
             {
                 var verticesAndWorldHeight = new BrushVerticesAndWorldHeight(side.vertices_plus.Count());
@@ -305,23 +347,78 @@ namespace JERC
                 {
                     var vert = side.vertices_plus[i];
 
-                    if (vert.x < boundingBox.minX)
-                        boundingBox.minX = vert.x;
-                    else if (vert.x > boundingBox.maxX)
-                        boundingBox.maxX = vert.x;
+                    verticesAndWorldHeight.vertices[i] = new PointF(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier);
+                    verticesAndWorldHeight.worldHeight = vert.z;
+                    verticesAndWorldHeight.jercType = JercTypes.Layout;
+                }
 
-                    if (vert.y < boundingBox.minY)
-                        boundingBox.minY = vert.y;
-                    else if (vert.y > boundingBox.maxY)
-                        boundingBox.maxY = vert.y;
+                verticesAndWorldHeightRangesList.Add(verticesAndWorldHeight);
+            }
 
-                    if (vert.z < boundingBox.minZ)
-                        boundingBox.minZ = vert.z;
-                    else if (vert.z > boundingBox.maxZ)
-                        boundingBox.maxZ = vert.z;
+            return verticesAndWorldHeightRangesList;
+        }
+
+
+        private static List<BrushVerticesAndWorldHeight> GetBrushCoverVerticesList()
+        {
+            var verticesAndWorldHeightRangesList = new List<BrushVerticesAndWorldHeight>();
+
+            foreach (var side in vmfRequiredData.brushesSidesCover)
+            {
+                var verticesAndWorldHeight = new BrushVerticesAndWorldHeight(side.vertices_plus.Count());
+                for (int i = 0; i < side.vertices_plus.Count(); i++)
+                {
+                    var vert = side.vertices_plus[i];
 
                     verticesAndWorldHeight.vertices[i] = new PointF(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier);
                     verticesAndWorldHeight.worldHeight = vert.z;
+                    verticesAndWorldHeight.jercType = JercTypes.Cover;
+                }
+
+                verticesAndWorldHeightRangesList.Add(verticesAndWorldHeight);
+            }
+
+            return verticesAndWorldHeightRangesList;
+        }
+
+
+        private static List<BrushVerticesAndWorldHeight> GetBrushNegativeVerticesList()
+        {
+            var verticesAndWorldHeightRangesList = new List<BrushVerticesAndWorldHeight>();
+
+            foreach (var side in vmfRequiredData.brushesSidesNegative)
+            {
+                var verticesAndWorldHeight = new BrushVerticesAndWorldHeight(side.vertices_plus.Count());
+                for (int i = 0; i < side.vertices_plus.Count(); i++)
+                {
+                    var vert = side.vertices_plus[i];
+
+                    verticesAndWorldHeight.vertices[i] = new PointF(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier);
+                    verticesAndWorldHeight.worldHeight = vert.z;
+                    verticesAndWorldHeight.jercType = JercTypes.Negative;
+                }
+
+                verticesAndWorldHeightRangesList.Add(verticesAndWorldHeight);
+            }
+
+            return verticesAndWorldHeightRangesList;
+        }
+
+
+        private static List<BrushVerticesAndWorldHeight> GetBrushOverlapVerticesList()
+        {
+            var verticesAndWorldHeightRangesList = new List<BrushVerticesAndWorldHeight>();
+
+            foreach (var side in vmfRequiredData.brushesSidesOverlap)
+            {
+                var verticesAndWorldHeight = new BrushVerticesAndWorldHeight(side.vertices_plus.Count());
+                for (int i = 0; i < side.vertices_plus.Count(); i++)
+                {
+                    var vert = side.vertices_plus[i];
+
+                    verticesAndWorldHeight.vertices[i] = new PointF(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier);
+                    verticesAndWorldHeight.worldHeight = vert.z;
+                    verticesAndWorldHeight.jercType = JercTypes.Overlap;
                 }
 
                 verticesAndWorldHeightRangesList.Add(verticesAndWorldHeight);
@@ -334,12 +431,12 @@ namespace JERC
         private static void RenderBrushSides(Graphics graphics, BoundingBox boundingBox, List<BrushVerticesAndWorldHeight> verticesAndWorldHeightRangesList)
         {
             Pen pen = null;
-            SolidBrush brush = null;
+            SolidBrush solidBrush = null;
 
             foreach (var verticesAndWorldHeightRanges in verticesAndWorldHeightRangesList)
             {
                 var heightAboveMin = verticesAndWorldHeightRanges.worldHeight - boundingBox.minZ;
-                
+
                 var percentageAboveMin = -1.00f;
                 if (heightAboveMin == 0)
                 {
@@ -364,14 +461,29 @@ namespace JERC
                 else if (gradientValue > 255)
                     gradientValue = 255;
 
-                pen = PenColours.PenLayout(gradientValue);
-                brush = BrushColours.BrushLayout(gradientValue);
+                pen = verticesAndWorldHeightRanges.jercType switch
+                {
+                    JercTypes.Layout => PenColours.PenLayout(gradientValue),
+                    JercTypes.Cover => PenColours.PenCover(gradientValue),
+                    JercTypes.Negative => PenColours.PenNegative(gradientValue),
+                    JercTypes.Overlap => PenColours.PenOverlap(gradientValue),
+                    _ => throw new NotImplementedException(),
+                };
 
-                DrawFilledPolygonObjective(graphics, brush, pen, verticesAndWorldHeightRanges.vertices);
+                solidBrush = verticesAndWorldHeightRanges.jercType switch
+                {
+                    JercTypes.Layout => BrushColours.BrushLayout(gradientValue),
+                    JercTypes.Cover => BrushColours.BrushCover(gradientValue),
+                    JercTypes.Negative => BrushColours.BrushNegative(gradientValue),
+                    JercTypes.Overlap => BrushColours.BrushOverlap(gradientValue),
+                    _ => throw new NotImplementedException(),
+                };
+                
+                DrawFilledPolygonObjective(graphics, solidBrush, pen, verticesAndWorldHeightRanges.vertices);
             }
 
             pen?.Dispose();
-            brush?.Dispose();
+            solidBrush?.Dispose();
         }
 
 
@@ -387,10 +499,10 @@ namespace JERC
         }
 
 
-        private static void DrawFilledPolygonObjective(Graphics graphics, SolidBrush brush, Pen pen, PointF[] vertices)
+        private static void DrawFilledPolygonObjective(Graphics graphics, SolidBrush solidBrush, Pen pen, PointF[] vertices)
         {
             graphics.DrawPolygon(pen, vertices);
-            graphics.FillPolygon(brush, vertices);
+            graphics.FillPolygon(solidBrush, vertices);
         }
 
 
@@ -413,7 +525,7 @@ namespace JERC
                 canSave = true;
             }
 
-            // only create the heatmaps if the files are not locked
+            // only create the image if the file is not locked
             if (canSave)
             {
                 img.Save(filepath, ImageFormat.Png);
@@ -495,6 +607,24 @@ namespace JERC
 
         private static void GenerateTxt()
         {
+            // TODO: uncomment
+            /*
+            var overviewTxt = new OverviewTxt(
+                mapName, pos_x, pos_y, scale, rotate, zoom,
+                inset_left, inset_top, inset_right, inset_bottom,
+                CTSpawn_x, CTSpawn_y, TSpawn_x, TSpawn_y,
+                bombA_x, bombA_y, bombB_x, bombB_y,
+                Hostage1_x, Hostage1_y, Hostage2_x, Hostage2_y
+            );
+            */
+            var overviewTxt = new OverviewTxt(
+                null, null, null, null, null, null,
+                null, null, null, null,
+                null, null, null, null,
+                null, null, null, null,
+                null, null, null, null
+            );
+
             var lines = overviewTxt.GetInExportableFormat(mapName);
 
             SaveOutputTxtFile(outputTxtFilepath, lines);
@@ -520,7 +650,7 @@ namespace JERC
                 canSave = true;
             }
 
-            // only create the heatmaps if the files are not locked
+            // only create the image if the file is not locked
             if (canSave)
             {
                 File.WriteAllLines(filepath, lines);
