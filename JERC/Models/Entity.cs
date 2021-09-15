@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using VMFParser;
 
-namespace JAR.Models
+namespace JERC.Models
 {
     public class Entity
     {

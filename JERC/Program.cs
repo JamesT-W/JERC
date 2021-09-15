@@ -1,5 +1,5 @@
-﻿using JAR.Constants;
-using JAR.Models;
+﻿using JERC.Constants;
+using JERC.Models;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -10,26 +10,26 @@ using System.Linq;
 using System.Threading;
 using VMFParser;
 
-namespace JAR
+namespace JERC
 {
     class Program
     {
         private static readonly string gameBinDirectoryPath = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), @"..\"));
 
-        private static readonly string outputImageFilepath = @"F:\Coding Stuff\GitHub Files\JAR\jar_test_map_radar.jpg";
+        private static readonly string outputImageFilepath = @"F:\Coding Stuff\GitHub Files\JERC\jerc_test_map_radar.jpg";
         //private static readonly string outputImageFilepath = string.Concat(overviewsFolder, vmfName, "_radar.jpg");
-        private static readonly string outputTxtFilepath = @"F:\Coding Stuff\GitHub Files\JAR\jar_test_map.txt";
+        private static readonly string outputTxtFilepath = @"F:\Coding Stuff\GitHub Files\JERC\jerc_test_map.txt";
         //private static readonly string outputTxtFilepath = string.Concat(overviewsFolder, vmfName, ".txt");
 
-        private static readonly string visgroupIdJarLayoutName = "jar_layout";
-        private static readonly string visgroupIdJarCoverName = "jar_cover";
-        private static readonly string visgroupIdJarNegativeName = "jar_negative";
-        private static readonly string visgroupIdJarOverlapName = "jar_overlap";
+        private static readonly string visgroupIdjercLayoutName = "jerc_layout";
+        private static readonly string visgroupIdjercCoverName = "jerc_cover";
+        private static readonly string visgroupIdjercNegativeName = "jerc_negative";
+        private static readonly string visgroupIdjercOverlapName = "jerc_overlap";
 
-        private static string visgroupIdJarLayoutId;
-        private static string visgroupIdJarCoverId;
-        private static string visgroupIdJarNegativeId;
-        private static string visgroupIdJarOverlapId;
+        private static string visgroupIdjercLayoutId;
+        private static string visgroupIdjercCoverId;
+        private static string visgroupIdjercNegativeId;
+        private static string visgroupIdjercOverlapId;
 
         private static string mapName;
 
@@ -71,33 +71,33 @@ namespace JAR
 
         private static void SetVisgroupIds()
         {
-            //var visgroupLayout = vmf.VisGroups.Body.Where(x => x.Body.Any(y => y.Name == "name" && y.Value == visgroupIdJarLayoutName));
+            //var visgroupLayout = vmf.VisGroups.Body.Where(x => x.Body.Any(y => y.Name == "name" && y.Value == visgroupIdjercLayoutName));
 
-            visgroupIdJarLayoutId = (from x in vmf.VisGroups.Body
+            visgroupIdjercLayoutId = (from x in vmf.VisGroups.Body
                                      from y in x.Body
                                      where y.Name == "name"
-                                     where y.Value == visgroupIdJarLayoutName
+                                     where y.Value == visgroupIdjercLayoutName
                                      select x.Body.FirstOrDefault(y => y.Name == "visgroupid").Value)
                                      .FirstOrDefault();
 
-            visgroupIdJarCoverId = (from x in vmf.VisGroups.Body
+            visgroupIdjercCoverId = (from x in vmf.VisGroups.Body
                                     from y in x.Body
                                     where y.Name == "name"
-                                    where y.Value == visgroupIdJarCoverName
+                                    where y.Value == visgroupIdjercCoverName
                                     select x.Body.FirstOrDefault(y => y.Name == "visgroupid").Value)
                                     .FirstOrDefault();
 
-            visgroupIdJarNegativeId = (from x in vmf.VisGroups.Body
+            visgroupIdjercNegativeId = (from x in vmf.VisGroups.Body
                                        from y in x.Body
                                        where y.Name == "name"
-                                       where y.Value == visgroupIdJarNegativeName
+                                       where y.Value == visgroupIdjercNegativeName
                                        select x.Body.FirstOrDefault(y => y.Name == "visgroupid").Value)
                                        .FirstOrDefault();
 
-            visgroupIdJarOverlapId = (from x in vmf.VisGroups.Body
+            visgroupIdjercOverlapId = (from x in vmf.VisGroups.Body
                                       from y in x.Body
                                       where y.Name == "name"
-                                      where y.Value == visgroupIdJarOverlapName
+                                      where y.Value == visgroupIdjercOverlapName
                                       select x.Body.FirstOrDefault(y => y.Name == "visgroupid").Value)
                                       .FirstOrDefault();
         }
@@ -138,7 +138,7 @@ namespace JAR
                    where y.Name == "editor"
                    from z in y.Body
                    where z.Name == "visgroupid"
-                   where z.Value == visgroupIdJarLayoutId
+                   where z.Value == visgroupIdjercLayoutId
                    select x;
         }
 
@@ -150,7 +150,7 @@ namespace JAR
                    where y.Name == "editor"
                    from z in y.Body
                    where z.Name == "visgroupid"
-                   where z.Value == visgroupIdJarCoverId
+                   where z.Value == visgroupIdjercCoverId
                    select x;
         }
 
@@ -162,7 +162,7 @@ namespace JAR
                    where y.Name == "editor"
                    from z in y.Body
                    where z.Name == "visgroupid"
-                   where z.Value == visgroupIdJarNegativeId
+                   where z.Value == visgroupIdjercNegativeId
                    select x;
         }
 
@@ -174,7 +174,7 @@ namespace JAR
                    where y.Name == "editor"
                    from z in y.Body
                    where z.Name == "visgroupid"
-                   where z.Value == visgroupIdJarOverlapId
+                   where z.Value == visgroupIdjercOverlapId
                    select x;
         }
 
@@ -186,7 +186,7 @@ namespace JAR
                    where y.Name == "editor"
                    from z in y.Body
                    where z.Name == "visgroupid"
-                   where z.Value == visgroupIdJarLayoutId
+                   where z.Value == visgroupIdjercLayoutId
                    select x;
         }
 
@@ -198,7 +198,7 @@ namespace JAR
                    where y.Name == "editor"
                    from z in y.Body
                    where z.Name == "visgroupid"
-                   where z.Value == visgroupIdJarCoverId
+                   where z.Value == visgroupIdjercCoverId
                    select x;
         }
 
@@ -210,7 +210,7 @@ namespace JAR
                    where y.Name == "editor"
                    from z in y.Body
                    where z.Name == "visgroupid"
-                   where z.Value == visgroupIdJarNegativeId
+                   where z.Value == visgroupIdjercNegativeId
                    select x;
         }
 
@@ -222,7 +222,7 @@ namespace JAR
                    where y.Name == "editor"
                    from z in y.Body
                    where z.Name == "visgroupid"
-                   where z.Value == visgroupIdJarOverlapId
+                   where z.Value == visgroupIdjercOverlapId
                    select x;
         }
 

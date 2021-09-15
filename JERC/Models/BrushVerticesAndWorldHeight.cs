@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Text;
 
-namespace JAR.Models
+namespace JERC.Models
 {
     public class BrushVerticesAndWorldHeight
     {

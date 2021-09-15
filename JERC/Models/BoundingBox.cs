@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace JAR.Models
+namespace JERC.Models
 {
     public class BoundingBox
     {

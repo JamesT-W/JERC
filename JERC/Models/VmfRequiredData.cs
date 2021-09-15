@@ -1,11 +1,11 @@
-﻿using JAR.Constants;
+﻿using JERC.Constants;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using VMFParser;
 
-namespace JAR.Models
+namespace JERC.Models
 {
     public class VmfRequiredData
     {

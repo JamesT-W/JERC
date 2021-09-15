@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Text;
 
-namespace JAR.Constants
+namespace JERC.Constants
 {
     public static class BrushColours
     {

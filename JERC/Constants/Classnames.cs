@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace JAR.Constants
+namespace JERC.Constants
 {
     public static class Classnames
     {
