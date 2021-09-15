@@ -9,7 +9,7 @@ namespace JAR
 {
     class Program
     {
-        private static readonly string visgroupIdJarLayoutName = "visgroup1";
+        private static readonly string visgroupIdJarLayoutName = "jar_layout";
         private static readonly string visgroupIdJarCoverName = "jar_cover";
         private static readonly string visgroupIdJarNegativeName = "jar_negative";
         private static readonly string visgroupIdJarOverlapName = "jar_overlap";
@@ -36,12 +36,13 @@ namespace JAR
 
             SetVisgroupIds();
 
+            var allProps = vmf.Body.Where(x => x.Name == "entity");
             var allBrushes = vmf.World.Body.Where(x => x.Name == "solid");
 
-            var propsLayout = GetPropsLayout();
-            var propsCover = GetPropsCover();
-            var propsNegative = GetPropsNegative();
-            var propsOverlap = GetPropsOverlap();
+            var propsLayout = GetPropsLayout(allProps);
+            var propsCover = GetPropsCover(allProps);
+            var propsNegative = GetPropsNegative(allProps);
+            var propsOverlap = GetPropsOverlap(allProps);
 
             var brushesLayout = GetBrushesLayout(allBrushes);
             var brushesCover = GetBrushesCover(allBrushes);
@@ -86,46 +87,50 @@ namespace JAR
         }
 
 
-        public static IEnumerable<IVNode> GetPropsLayout()
+        public static IEnumerable<IVNode> GetPropsLayout(IEnumerable<IVNode> allProps)
         {
-            return from x in vmf.Body
-                   where x.Name == "editor"
+            return from x in allProps
                    from y in x.Body
-                   where y.Name == "visgroupid"
-                   where y.Value == visgroupIdJarLayoutId
+                   where y.Name == "editor"
+                   from z in y.Body
+                   where z.Name == "visgroupid"
+                   where z.Value == visgroupIdJarLayoutId
                    select x;
         }
 
 
-        public static IEnumerable<IVNode> GetPropsCover()
+        public static IEnumerable<IVNode> GetPropsCover(IEnumerable<IVNode> allProps)
         {
-            return from x in vmf.Body
-                   where x.Name == "editor"
+            return from x in allProps
                    from y in x.Body
-                   where y.Name == "visgroupid"
-                   where y.Value == visgroupIdJarCoverId
+                   where y.Name == "editor"
+                   from z in y.Body
+                   where z.Name == "visgroupid"
+                   where z.Value == visgroupIdJarCoverId
                    select x;
         }
 
 
-        public static IEnumerable<IVNode> GetPropsNegative()
+        public static IEnumerable<IVNode> GetPropsNegative(IEnumerable<IVNode> allProps)
         {
-            return from x in vmf.Body
-                   where x.Name == "editor"
+            return from x in allProps
                    from y in x.Body
-                   where y.Name == "visgroupid"
-                   where y.Value == visgroupIdJarNegativeId
+                   where y.Name == "editor"
+                   from z in y.Body
+                   where z.Name == "visgroupid"
+                   where z.Value == visgroupIdJarNegativeId
                    select x;
         }
 
 
-        public static IEnumerable<IVNode> GetPropsOverlap()
+        public static IEnumerable<IVNode> GetPropsOverlap(IEnumerable<IVNode> allProps)
         {
-            return from x in vmf.Body
-                   where x.Name == "editor"
+            return from x in allProps
                    from y in x.Body
-                   where y.Name == "visgroupid"
-                   where y.Value == visgroupIdJarOverlapId
+                   where y.Name == "editor"
+                   from z in y.Body
+                   where z.Name == "visgroupid"
+                   where z.Value == visgroupIdJarOverlapId
                    select x;
         }
 
