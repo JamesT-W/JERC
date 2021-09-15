@@ -10,7 +10,7 @@ namespace JAR.Models
     {
         public int id;
         public string plane;
-        public List<string> vertices_plus;
+        public List<Vertices> vertices_plus;
         public string material;
         public string uaxis;
         public string vaxis;
@@ -21,7 +21,7 @@ namespace JAR.Models
         {
             id = int.Parse(side.Body.FirstOrDefault(x => x.Name == "id")?.Value);
             plane = side.Body.FirstOrDefault(x => x.Name == "plane")?.Value;
-            vertices_plus = side.Body.FirstOrDefault(x => x.Name == "vertices_plus")?.Body.Select(x => x.Value).ToList();
+            vertices_plus = side.Body.FirstOrDefault(x => x.Name == "vertices_plus")?.Body.Select(x => new Vertices(x.Value)).ToList();
             material = side.Body.FirstOrDefault(x => x.Name == "material")?.Value;
             uaxis = side.Body.FirstOrDefault(x => x.Name == "uaxis")?.Value;
             vaxis = side.Body.FirstOrDefault(x => x.Name == "vaxis")?.Value;
