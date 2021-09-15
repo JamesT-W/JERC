@@ -1,4 +1,4 @@
-﻿using JAR.Constants;
+using JAR.Constants;
 using JAR.Models;
 using System;
 using System.Collections.Generic;
@@ -48,7 +48,7 @@ namespace JAR
         }
 
 
-        public static void SetVisgroupIds()
+        private static void SetVisgroupIds()
         {
             //var visgroupLayout = vmf.VisGroups.Body.Where(x => x.Body.Any(y => y.Name == "name" && y.Value == visgroupIdJarLayoutName));
 
@@ -82,7 +82,7 @@ namespace JAR
         }
 
 
-        public static VmfRequiredData GetVmfRequiredData()
+        private static VmfRequiredData GetVmfRequiredData()
         {
             var allProps = vmf.Body.Where(x => x.Name == "entity");
             var allBrushes = vmf.World.Body.Where(x => x.Name == "solid");
@@ -101,7 +101,7 @@ namespace JAR
         }
 
 
-        public static IEnumerable<IVNode> GetPropsLayout(IEnumerable<IVNode> allProps)
+        private static IEnumerable<IVNode> GetPropsLayout(IEnumerable<IVNode> allProps)
         {
             return from x in allProps
                    from y in x.Body
@@ -113,7 +113,7 @@ namespace JAR
         }
 
 
-        public static IEnumerable<IVNode> GetPropsCover(IEnumerable<IVNode> allProps)
+        private static IEnumerable<IVNode> GetPropsCover(IEnumerable<IVNode> allProps)
         {
             return from x in allProps
                    from y in x.Body
@@ -125,7 +125,7 @@ namespace JAR
         }
 
 
-        public static IEnumerable<IVNode> GetPropsNegative(IEnumerable<IVNode> allProps)
+        private static IEnumerable<IVNode> GetPropsNegative(IEnumerable<IVNode> allProps)
         {
             return from x in allProps
                    from y in x.Body
@@ -137,7 +137,7 @@ namespace JAR
         }
 
 
-        public static IEnumerable<IVNode> GetPropsOverlap(IEnumerable<IVNode> allProps)
+        private static IEnumerable<IVNode> GetPropsOverlap(IEnumerable<IVNode> allProps)
         {
             return from x in allProps
                    from y in x.Body
@@ -149,7 +149,7 @@ namespace JAR
         }
 
 
-        public static IEnumerable<IVNode> GetBrushesLayout(IEnumerable<IVNode> allBrushes)
+        private static IEnumerable<IVNode> GetBrushesLayout(IEnumerable<IVNode> allBrushes)
         {
             return from x in allBrushes
                    from y in x.Body
@@ -161,7 +161,7 @@ namespace JAR
         }
 
 
-        public static IEnumerable<IVNode> GetBrushesCover(IEnumerable<IVNode> allBrushes)
+        private static IEnumerable<IVNode> GetBrushesCover(IEnumerable<IVNode> allBrushes)
         {
             return from x in allBrushes
                    from y in x.Body
@@ -173,7 +173,7 @@ namespace JAR
         }
 
 
-        public static IEnumerable<IVNode> GetBrushesNegative(IEnumerable<IVNode> allBrushes)
+        private static IEnumerable<IVNode> GetBrushesNegative(IEnumerable<IVNode> allBrushes)
         {
             return from x in allBrushes
                    from y in x.Body
@@ -185,7 +185,7 @@ namespace JAR
         }
 
 
-        public static IEnumerable<IVNode> GetBrushesOverlap(IEnumerable<IVNode> allBrushes)
+        private static IEnumerable<IVNode> GetBrushesOverlap(IEnumerable<IVNode> allBrushes)
         {
             return from x in allBrushes
                    from y in x.Body
@@ -197,7 +197,7 @@ namespace JAR
         }
 
 
-        public static void GenerateRadar()
+        private static void GenerateRadar()
         {
             Image bmp = new Bitmap(Sizes.OutputFileResolution, Sizes.OutputFileResolution);
             
@@ -218,6 +218,8 @@ namespace JAR
 
                 graphics.Save();
 
+                FlipImage(bmp);
+
                 SaveImage(bmp, outputFilepath);
             }
 
@@ -225,7 +227,7 @@ namespace JAR
         }
 
 
-        public static List<BrushVerticesAndWorldHeight> GetBrushVerticesList()
+        private static List<BrushVerticesAndWorldHeight> GetBrushVerticesList()
         {
             var verticesAndWorldHeightRangesList = new List<BrushVerticesAndWorldHeight>();
 
@@ -247,7 +249,7 @@ namespace JAR
         }
 
 
-        public static WorldHeightRanges CalculateWorldHeightRanges(List<float> worldHeightBrushSidesList)
+        private static WorldHeightRanges CalculateWorldHeightRanges(List<float> worldHeightBrushSidesList)
         {
             var min = worldHeightBrushSidesList.Min();
             var max = worldHeightBrushSidesList.Max();
@@ -256,7 +258,7 @@ namespace JAR
         }
 
 
-        public static void RenderBrushSides(Graphics graphics, WorldHeightRanges worldHeightRanges, List<BrushVerticesAndWorldHeight> verticesAndWorldHeightRangesList)
+        private static void RenderBrushSides(Graphics graphics, WorldHeightRanges worldHeightRanges, List<BrushVerticesAndWorldHeight> verticesAndWorldHeightRangesList)
         {
             Pen pen = null;
             SolidBrush brush = null;
@@ -300,7 +302,7 @@ namespace JAR
         }
 
 
-        public static void RenderProps(Graphics graphics)
+        private static void RenderProps(Graphics graphics)
         {
             
         }
@@ -312,14 +314,14 @@ namespace JAR
         }
 
 
-        public static void DrawFilledPolygonObjective(Graphics graphics, SolidBrush brush, Pen pen, PointF[] vertices)
+        private static void DrawFilledPolygonObjective(Graphics graphics, SolidBrush brush, Pen pen, PointF[] vertices)
         {
             graphics.DrawPolygon(pen, vertices);
             graphics.FillPolygon(brush, vertices);
         }
 
 
-        public static void SaveImage(Image img, string filepath)
+        private static void SaveImage(Image img, string filepath)
         {
             var canSave = false;
 
@@ -401,6 +403,7 @@ namespace JAR
 
             return false;
         }
+
 
         private static void CreateFileIfDoesntExist(string filepath)
         {
