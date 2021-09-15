@@ -1,4 +1,4 @@
-using JAR.Constants;
+﻿using JAR.Constants;
 using JAR.Models;
 using System;
 using System.Collections.Generic;
@@ -411,6 +411,12 @@ namespace JAR
             {
                 File.Create(filepath).Close();
             }
+        }
+
+
+        private static void FlipImage(Image img)
+        {
+            img.RotateFlip(RotateFlipType.RotateNoneFlipY);
         }
     }
 }
