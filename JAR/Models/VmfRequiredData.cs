@@ -1,4 +1,5 @@
-﻿using System;
+﻿using JAR.Constants;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,10 +14,10 @@ namespace JAR.Models
         public List<Prop> propsNegative;
         public List<Prop> propsOverlap;
 
-        public List<Brush> brushesLayout;
-        public List<Brush> brushesCover;
-        public List<Brush> brushesNegative;
-        public List<Brush> brushesOverlap;
+        public List<Side> brushesSidesLayout;
+        public List<Side> brushesSidesCover;
+        public List<Side> brushesSidesNegative;
+        public List<Side> brushesSidesOverlap;
 
         public VmfRequiredData(IEnumerable<IVNode> propsLayout, IEnumerable<IVNode> propsCover, IEnumerable<IVNode> propsNegative, IEnumerable<IVNode> propsOverlap, IEnumerable<IVNode> brushesLayout, IEnumerable<IVNode> brushesCover, IEnumerable<IVNode> brushesNegative, IEnumerable<IVNode> brushesOverlap)
         {
@@ -25,10 +26,15 @@ namespace JAR.Models
             this.propsNegative = propsNegative.Select(x => new Prop(x)).ToList();
             this.propsOverlap = propsOverlap.Select(x => new Prop(x)).ToList();
 
-            this.brushesLayout = brushesLayout.Select(x => new Brush(x)).ToList();
-            this.brushesCover = brushesCover.Select(x => new Brush(x)).ToList();
-            this.brushesNegative = brushesNegative.Select(x => new Brush(x)).ToList();
-            this.brushesOverlap = brushesOverlap.Select(x => new Brush(x)).ToList();
+            var brushesLayoutModelled = brushesLayout.Select(x => new Brush(x)).ToList();
+            var brushesCoverModelled = brushesCover.Select(x => new Brush(x)).ToList();
+            var brushesNegativeModelled = brushesNegative.Select(x => new Brush(x)).ToList();
+            var brushesOverlapModelled = brushesOverlap.Select(x => new Brush(x)).ToList();
+
+            brushesSidesLayout = brushesLayoutModelled.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.LayoutTextureName)).ToList();
+            brushesSidesCover = brushesCoverModelled.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.CoverTextureName)).ToList();
+            brushesSidesNegative = brushesNegativeModelled.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.NegativeTextureName)).ToList();
+            brushesSidesOverlap = brushesOverlapModelled.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.OverlapTextureName)).ToList();
         }
     }
 }
