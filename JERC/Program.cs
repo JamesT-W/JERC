@@ -1,4 +1,4 @@
-﻿using JERC.Constants;
+using JERC.Constants;
 using JERC.Enums;
 using JERC.Models;
 using System;
@@ -87,9 +87,11 @@ namespace JERC
 
             vmfRequiredData = GetVmfRequiredData();
 
-            GenerateRadar();
+            var overviewPositionValues = SortScaleStuff();
 
-            GenerateTxt();
+            GenerateRadar(overviewPositionValues);
+
+            GenerateTxt(overviewPositionValues);
         }
 
 
@@ -291,9 +293,40 @@ namespace JERC
         }
 
 
-        private static void GenerateRadar()
+        private static OverviewPositionValues SortScaleStuff()
         {
-            Image bmp = new Bitmap(Sizes.OutputFileResolution, Sizes.OutputFileResolution);
+            var allWorldBrushes = vmfRequiredData.brushesSidesLayout.Concat(vmfRequiredData.brushesSidesCover).Concat(vmfRequiredData.brushesSidesOverlap).Concat(vmfRequiredData.brushesSidesNegative);
+
+            var minX = allWorldBrushes.Min(x => x.vertices_plus.Min(y => y.x));
+            var maxX = allWorldBrushes.Max(x => x.vertices_plus.Max(y => y.x));
+            var minY = allWorldBrushes.Min(x => x.vertices_plus.Min(y => y.y));
+            var maxY = allWorldBrushes.Max(x => x.vertices_plus.Max(y => y.y));
+
+            var sizeX = maxX - minX;
+            var sizeY = maxY - minY;
+
+            /*var scaleX = (sizeX - 1024) <= 0 ? 1 : ((sizeX - 1024) / OverviewOffsets.OverviewIncreasedUnitsShownPerScaleIntegerPosX) + 1;
+            var scaleY = (sizeY - 1024) <= 0 ? 1 : ((sizeY - 1024) / OverviewOffsets.OverviewIncreasedUnitsShownPerScaleIntegerPosY) + 1;*/
+            var scaleX = sizeX / OverviewOffsets.OverviewScaleDivider;
+            var scaleY = sizeY / OverviewOffsets.OverviewScaleDivider;
+
+            var scale = scaleX >= scaleY ? scaleX : scaleY;
+
+            var overviewPositionValues = new OverviewPositionValues(minX, maxX, minY, maxY, scale);
+
+            var pixelsPerUnitX = overviewPositionValues.outputResolution / sizeX;
+            var pixelsPerUnitY = overviewPositionValues.outputResolution / sizeY;
+
+            var unitsPerPixelX = sizeX / overviewPositionValues.outputResolution;
+            var unitsPerPixelY = sizeY / overviewPositionValues.outputResolution;
+
+            return overviewPositionValues;
+        }
+
+
+        private static void GenerateRadar(OverviewPositionValues overviewPositionValues)
+        {
+            Image bmp = new Bitmap(overviewPositionValues.outputResolution, overviewPositionValues.outputResolution);
 
             using (var graphics = Graphics.FromImage(bmp))
             {
@@ -304,7 +337,7 @@ namespace JERC
                 var verticesAndWorldHeightRangesList = GetBrushVerticesList(boundingBox);
                 //var verticesPerPropList = GetPropVerticesList();
 
-                RenderBrushSides(graphics, boundingBox, verticesAndWorldHeightRangesList);
+                RenderBrushSides(graphics, boundingBox, overviewPositionValues, verticesAndWorldHeightRangesList);
                 //RenderProps(graphics, boundingBox); //// verticesPerPropList
 
                 graphics.Save();
@@ -428,7 +461,7 @@ namespace JERC
         }
 
 
-        private static void RenderBrushSides(Graphics graphics, BoundingBox boundingBox, List<BrushVerticesAndWorldHeight> verticesAndWorldHeightRangesList)
+        private static void RenderBrushSides(Graphics graphics, BoundingBox boundingBox, OverviewPositionValues overviewPositionValues, List<BrushVerticesAndWorldHeight> verticesAndWorldHeightRangesList)
         {
             Pen pen = null;
             SolidBrush solidBrush = null;
@@ -479,7 +512,16 @@ namespace JERC
                     _ => throw new NotImplementedException(),
                 };
 
-                DrawFilledPolygonObjective(graphics, solidBrush, pen, verticesAndWorldHeightRanges.vertices);
+
+                // corrects the verts to tax into account the movement from space in world to the space in the image (which starts at (0,0))
+                var verticesOffset = verticesAndWorldHeightRanges.vertices;
+                for (var i = 0; i < verticesOffset.Count(); i++)
+                {
+                    verticesOffset[i].X = verticesOffset[i].X - overviewPositionValues.brushVerticesPosMinX;
+                    verticesOffset[i].Y = verticesOffset[i].Y - overviewPositionValues.brushVerticesPosMinY;
+                }
+
+                DrawFilledPolygonObjective(graphics, solidBrush, pen, verticesOffset);
             }
 
             pen?.Dispose();
@@ -605,7 +647,17 @@ namespace JERC
         }
 
 
-        private static void GenerateTxt()
+        private static void GenerateTxt(OverviewPositionValues overviewPositionValues)
+        {
+            var overviewTxt = GetOverviewTxt(overviewPositionValues);
+
+            var lines = overviewTxt.GetInExportableFormat(mapName);
+
+            SaveOutputTxtFile(outputTxtFilepath, lines);
+        }
+
+
+        private static OverviewTxt GetOverviewTxt(OverviewPositionValues overviewPositionValues)
         {
             // TODO: uncomment
             /*
@@ -617,17 +669,13 @@ namespace JERC
                 Hostage1_x, Hostage1_y, Hostage2_x, Hostage2_y
             );
             */
-            var overviewTxt = new OverviewTxt(
-                null, null, null, null, null, null,
+            return new OverviewTxt(
+                mapName, overviewPositionValues.posX.ToString(), overviewPositionValues.posY.ToString(), overviewPositionValues.scale.ToString(), null, null,
                 null, null, null, null,
                 null, null, null, null,
                 null, null, null, null,
                 null, null, null, null
             );
-
-            var lines = overviewTxt.GetInExportableFormat(mapName);
-
-            SaveOutputTxtFile(outputTxtFilepath, lines);
         }
 
 
