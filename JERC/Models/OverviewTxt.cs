@@ -121,8 +121,7 @@ namespace JERC.Models
 
             lines.AddRange(new List<string>()
             {
-                "}",
-                string.Empty
+                "}"
             });
 
             return lines;
