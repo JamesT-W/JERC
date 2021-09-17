@@ -74,10 +74,10 @@ namespace JERC
 
             // TODO: uncomment for release
             /*
-            outputImageFilepath = string.Concat(gameOverviewsDirectoryPath, mapName, "_radar.jpg");
+            outputImageFilepath = string.Concat(gameOverviewsDirectoryPath, mapName, "_radar");
             outputTxtFilepath = string.Concat(gameOverviewsDirectoryPath, mapName, ".txt");
             */
-            outputImageFilepath = @"F:\Coding Stuff\GitHub Files\JERC\jerc_test_map_radar.jpg";
+            outputImageFilepath = @"F:\Coding Stuff\GitHub Files\JERC\jerc_test_map_radar";
             outputTxtFilepath = @"F:\Coding Stuff\GitHub Files\JERC\jerc_test_map.txt";
 
 
@@ -344,7 +344,11 @@ namespace JERC
 
                 FlipImage(bmp);
 
-                SaveImage(outputImageFilepath, bmp);
+                Image bmpNew = new Bitmap(bmp, 1024, 1024);
+
+                SaveImage(outputImageFilepath, bmpNew);
+
+                DisposeImage(bmpNew);
             }
 
             DisposeImage(bmp);
@@ -570,7 +574,8 @@ namespace JERC
             // only create the image if the file is not locked
             if (canSave)
             {
-                img.Save(filepath, ImageFormat.Png);
+                img.Save(filepath + ".png", ImageFormat.Png);
+                img.Save(filepath + ".dds");
             }
         }
 
