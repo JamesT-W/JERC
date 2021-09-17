@@ -274,13 +274,11 @@ namespace JERC
 
                 graphics.SetClip(Rectangle.FromLTRB(0, 0, overviewPositionValues.outputResolution, overviewPositionValues.outputResolution));
 
-                var boundingBox = new BoundingBox();
+                var brushSideList = GetBrushVerticesList(boundingBox);
+                RenderBrushSides(bmp, graphics, boundingBox, overviewPositionValues, brushSideList);
 
-                var brushVerticesAndWorldHeightRangesList = GetBrushVerticesList(boundingBox);
-                RenderBrushSides(bmp, graphics, boundingBox, overviewPositionValues, brushVerticesAndWorldHeightRangesList);
-
-                var entityVerticesAndWorldHeightList = GetEntityVerticesList();
-                RenderEntities(bmp, graphics, boundingBox, overviewPositionValues, entityVerticesAndWorldHeightList);
+                var entityBrushSideList = GetEntityVerticesList();
+                RenderEntities(bmp, graphics, boundingBox, overviewPositionValues, entityBrushSideList);
 
                 graphics.Save();
 
@@ -297,208 +295,208 @@ namespace JERC
         }
 
 
-        private static List<BrushVerticesAndWorldHeight> GetBrushVerticesList(BoundingBox boundingBox)
+        private static List<BrushSide> GetBrushVerticesList(BoundingBox boundingBox)
         {
-            var verticesAndWorldHeightRangesList = new List<BrushVerticesAndWorldHeight>();
+            var brushSideList = new List<BrushSide>();
 
-            verticesAndWorldHeightRangesList.AddRange(GetBrushNegativeVerticesList()); // add negative first to set to graphics' clip
-            verticesAndWorldHeightRangesList.AddRange(GetBrushLayoutVerticesList());
-            verticesAndWorldHeightRangesList.AddRange(GetBrushCoverVerticesList());
-            verticesAndWorldHeightRangesList.AddRange(GetBrushOverlapVerticesList());
+            brushSideList.AddRange(GetBrushNegativeVerticesList()); // add negative first to set to graphics' clip
+            brushSideList.AddRange(GetBrushLayoutVerticesList());
+            brushSideList.AddRange(GetBrushCoverVerticesList());
+            brushSideList.AddRange(GetBrushOverlapVerticesList());
 
-            boundingBox.minX = verticesAndWorldHeightRangesList.SelectMany(x => x.vertices.Select(y => y.X)).Min();
-            boundingBox.maxX = verticesAndWorldHeightRangesList.SelectMany(x => x.vertices.Select(y => y.X)).Max();
-            boundingBox.minY = verticesAndWorldHeightRangesList.SelectMany(x => x.vertices.Select(y => y.Y)).Min();
-            boundingBox.maxY = verticesAndWorldHeightRangesList.SelectMany(x => x.vertices.Select(y => y.Y)).Max();
+            boundingBox.minX = brushSideList.SelectMany(x => x.vertices.Select(y => y.X)).Min();
+            boundingBox.maxX = brushSideList.SelectMany(x => x.vertices.Select(y => y.X)).Max();
+            boundingBox.minY = brushSideList.SelectMany(x => x.vertices.Select(y => y.Y)).Min();
+            boundingBox.maxY = brushSideList.SelectMany(x => x.vertices.Select(y => y.Y)).Max();
 
-            boundingBox.minZ = verticesAndWorldHeightRangesList.Select(x => x.worldHeight).Min();
-            boundingBox.maxZ = verticesAndWorldHeightRangesList.Select(x => x.worldHeight).Max();
+            boundingBox.minZ = brushSideList.Select(x => x.worldHeight).Min();
+            boundingBox.maxZ = brushSideList.Select(x => x.worldHeight).Max();
 
-            return verticesAndWorldHeightRangesList;
+            return brushSideList;
         }
 
 
-        private static List<EntityVerticesAndWorldHeight> GetEntityVerticesList()
+        private static List<EntityBrushSide> GetEntityVerticesList()
         {
-            var verticesList = new List<EntityVerticesAndWorldHeight>();
+            var entityBrushSideList = new List<EntityBrushSide>();
 
-            verticesList.AddRange(GetEntityBuyzoneVerticesList());
-            verticesList.AddRange(GetEntityBombsiteVerticesList());
-            verticesList.AddRange(GetEntityRescueZoneVerticesList());
+            entityBrushSideList.AddRange(GetEntityBuyzoneVerticesList());
+            entityBrushSideList.AddRange(GetEntityBombsiteVerticesList());
+            entityBrushSideList.AddRange(GetEntityRescueZoneVerticesList());
 
-            return verticesList;
+            return entityBrushSideList;
         }
 
 
-        private static List<BrushVerticesAndWorldHeight> GetBrushNegativeVerticesList()
+        private static List<BrushSide> GetBrushNegativeVerticesList()
         {
-            var verticesAndWorldHeightRangesList = new List<BrushVerticesAndWorldHeight>();
+            var brushSideList = new List<BrushSide>();
 
             foreach (var side in vmfRequiredData.brushesSidesNegative)
             {
-                var verticesAndWorldHeight = new BrushVerticesAndWorldHeight(side.vertices_plus.Count());
+                var brushSide = new BrushSide(side.vertices_plus.Count());
                 for (int i = 0; i < side.vertices_plus.Count(); i++)
                 {
                     var vert = side.vertices_plus[i];
 
-                    verticesAndWorldHeight.vertices[i] = new PointF(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier);
-                    verticesAndWorldHeight.worldHeight = vert.z;
-                    verticesAndWorldHeight.jercType = JercTypes.Negative;
+                    brushSide.vertices[i] = new PointF(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier);
+                    brushSide.worldHeight = vert.z;
+                    brushSide.jercType = JercTypes.Negative;
                 }
 
-                verticesAndWorldHeightRangesList.Add(verticesAndWorldHeight);
+                brushSideList.Add(brushSide);
             }
 
-            return verticesAndWorldHeightRangesList;
+            return brushSideList;
         }
 
 
-        private static List<BrushVerticesAndWorldHeight> GetBrushLayoutVerticesList()
+        private static List<BrushSide> GetBrushLayoutVerticesList()
         {
-            var verticesAndWorldHeightRangesList = new List<BrushVerticesAndWorldHeight>();
+            var brushSideList = new List<BrushSide>();
 
             foreach (var side in vmfRequiredData.brushesSidesLayout)
             {
-                var verticesAndWorldHeight = new BrushVerticesAndWorldHeight(side.vertices_plus.Count());
+                var brushSide = new BrushSide(side.vertices_plus.Count());
                 for (int i = 0; i < side.vertices_plus.Count(); i++)
                 {
                     var vert = side.vertices_plus[i];
 
-                    verticesAndWorldHeight.vertices[i] = new PointF(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier);
-                    verticesAndWorldHeight.worldHeight = vert.z;
-                    verticesAndWorldHeight.jercType = JercTypes.Layout;
+                    brushSide.vertices[i] = new PointF(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier);
+                    brushSide.worldHeight = vert.z;
+                    brushSide.jercType = JercTypes.Layout;
                 }
 
-                verticesAndWorldHeightRangesList.Add(verticesAndWorldHeight);
+                brushSideList.Add(brushSide);
             }
 
-            return verticesAndWorldHeightRangesList;
+            return brushSideList;
         }
 
 
-        private static List<BrushVerticesAndWorldHeight> GetBrushCoverVerticesList()
+        private static List<BrushSide> GetBrushCoverVerticesList()
         {
-            var verticesAndWorldHeightRangesList = new List<BrushVerticesAndWorldHeight>();
+            var brushSideList = new List<BrushSide>();
 
             foreach (var side in vmfRequiredData.brushesSidesCover)
             {
-                var verticesAndWorldHeight = new BrushVerticesAndWorldHeight(side.vertices_plus.Count());
+                var brushSide = new BrushSide(side.vertices_plus.Count());
                 for (int i = 0; i < side.vertices_plus.Count(); i++)
                 {
                     var vert = side.vertices_plus[i];
 
-                    verticesAndWorldHeight.vertices[i] = new PointF(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier);
-                    verticesAndWorldHeight.worldHeight = vert.z;
-                    verticesAndWorldHeight.jercType = JercTypes.Cover;
+                    brushSide.vertices[i] = new PointF(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier);
+                    brushSide.worldHeight = vert.z;
+                    brushSide.jercType = JercTypes.Cover;
                 }
 
-                verticesAndWorldHeightRangesList.Add(verticesAndWorldHeight);
+                brushSideList.Add(brushSide);
             }
 
-            return verticesAndWorldHeightRangesList;
+            return brushSideList;
         }
 
 
-        private static List<BrushVerticesAndWorldHeight> GetBrushOverlapVerticesList()
+        private static List<BrushSide> GetBrushOverlapVerticesList()
         {
-            var verticesAndWorldHeightRangesList = new List<BrushVerticesAndWorldHeight>();
+            var brushSideList = new List<BrushSide>();
 
             foreach (var side in vmfRequiredData.brushesSidesOverlap)
             {
-                var verticesAndWorldHeight = new BrushVerticesAndWorldHeight(side.vertices_plus.Count());
+                var brushSide = new BrushSide(side.vertices_plus.Count());
                 for (int i = 0; i < side.vertices_plus.Count(); i++)
                 {
                     var vert = side.vertices_plus[i];
 
-                    verticesAndWorldHeight.vertices[i] = new PointF(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier);
-                    verticesAndWorldHeight.worldHeight = vert.z;
-                    verticesAndWorldHeight.jercType = JercTypes.Overlap;
+                    brushSide.vertices[i] = new PointF(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier);
+                    brushSide.worldHeight = vert.z;
+                    brushSide.jercType = JercTypes.Overlap;
                 }
 
-                verticesAndWorldHeightRangesList.Add(verticesAndWorldHeight);
+                brushSideList.Add(brushSide);
             }
 
-            return verticesAndWorldHeightRangesList;
+            return brushSideList;
         }
 
 
-        private static List<EntityVerticesAndWorldHeight> GetEntityBuyzoneVerticesList()
+        private static List<EntityBrushSide> GetEntityBuyzoneVerticesList()
         {
-            var verticesAndWorldHeightRangesList = new List<EntityVerticesAndWorldHeight>();
+            var entityBrushSideList = new List<EntityBrushSide>();
 
             foreach (var side in vmfRequiredData.entitiesSidesBuyzone)
             {
-                var verticesAndWorldHeight = new EntityVerticesAndWorldHeight(side.vertices_plus.Count());
+                var entityBrushSide = new EntityBrushSide(side.vertices_plus.Count());
                 for (int i = 0; i < side.vertices_plus.Count(); i++)
                 {
                     var vert = side.vertices_plus[i];
 
-                    verticesAndWorldHeight.vertices[i] = new PointF(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier);
-                    verticesAndWorldHeight.worldHeight = vert.z;
-                    verticesAndWorldHeight.entityType = EntityTypes.Buyzone;
+                    entityBrushSide.vertices[i] = new PointF(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier);
+                    entityBrushSide.worldHeight = vert.z;
+                    entityBrushSide.entityType = EntityTypes.Buyzone;
                 }
 
-                verticesAndWorldHeightRangesList.Add(verticesAndWorldHeight);
+                entityBrushSideList.Add(entityBrushSide);
             }
 
-            return verticesAndWorldHeightRangesList;
+            return entityBrushSideList;
         }
 
 
-        private static List<EntityVerticesAndWorldHeight> GetEntityBombsiteVerticesList()
+        private static List<EntityBrushSide> GetEntityBombsiteVerticesList()
         {
-            var verticesAndWorldHeightRangesList = new List<EntityVerticesAndWorldHeight>();
+            var entityBrushSideList = new List<EntityBrushSide>();
 
             foreach (var side in vmfRequiredData.entitiesSidesBombsite)
             {
-                var verticesAndWorldHeight = new EntityVerticesAndWorldHeight(side.vertices_plus.Count());
+                var entityBrushSide = new EntityBrushSide(side.vertices_plus.Count());
                 for (int i = 0; i < side.vertices_plus.Count(); i++)
                 {
                     var vert = side.vertices_plus[i];
 
-                    verticesAndWorldHeight.vertices[i] = new PointF(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier);
-                    verticesAndWorldHeight.worldHeight = vert.z;
-                    verticesAndWorldHeight.entityType = EntityTypes.Bombsite;
+                    entityBrushSide.vertices[i] = new PointF(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier);
+                    entityBrushSide.worldHeight = vert.z;
+                    entityBrushSide.entityType = EntityTypes.Bombsite;
                 }
 
-                verticesAndWorldHeightRangesList.Add(verticesAndWorldHeight);
+                entityBrushSideList.Add(entityBrushSide);
             }
 
-            return verticesAndWorldHeightRangesList;
+            return entityBrushSideList;
         }
 
 
-        private static List<EntityVerticesAndWorldHeight> GetEntityRescueZoneVerticesList()
+        private static List<EntityBrushSide> GetEntityRescueZoneVerticesList()
         {
-            var verticesAndWorldHeightRangesList = new List<EntityVerticesAndWorldHeight>();
+            var entityBrushSideList = new List<EntityBrushSide>();
 
             foreach (var side in vmfRequiredData.entitiesSidesRescueZone)
             {
-                var verticesAndWorldHeight = new EntityVerticesAndWorldHeight(side.vertices_plus.Count());
+                var entityBrushSide = new EntityBrushSide(side.vertices_plus.Count());
                 for (int i = 0; i < side.vertices_plus.Count(); i++)
                 {
                     var vert = side.vertices_plus[i];
 
-                    verticesAndWorldHeight.vertices[i] = new PointF(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier);
-                    verticesAndWorldHeight.worldHeight = vert.z;
-                    verticesAndWorldHeight.entityType = EntityTypes.RescueZone;
+                    entityBrushSide.vertices[i] = new PointF(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier);
+                    entityBrushSide.worldHeight = vert.z;
+                    entityBrushSide.entityType = EntityTypes.RescueZone;
                 }
 
-                verticesAndWorldHeightRangesList.Add(verticesAndWorldHeight);
+                entityBrushSideList.Add(entityBrushSide);
             }
 
-            return verticesAndWorldHeightRangesList;
+            return entityBrushSideList;
         }
 
 
-        private static void RenderBrushSides(Bitmap bmp, Graphics graphics, BoundingBox boundingBox, OverviewPositionValues overviewPositionValues, List<BrushVerticesAndWorldHeight> verticesAndWorldHeightRangesList)
+        private static void RenderBrushSides(Bitmap bmp, Graphics graphics, BoundingBox boundingBox, OverviewPositionValues overviewPositionValues, List<BrushSide> brushSideList)
         {
             Pen pen = null;
             SolidBrush solidBrush = null;
 
-            foreach (var verticesAndWorldHeightRanges in verticesAndWorldHeightRangesList)
+            foreach (var brushSide in brushSideList)
             {
-                var heightAboveMin = verticesAndWorldHeightRanges.worldHeight - boundingBox.minZ;
+                var heightAboveMin = brushSide.worldHeight - boundingBox.minZ;
 
                 var percentageAboveMin = -1.00f;
                 if (heightAboveMin == 0)
@@ -524,7 +522,7 @@ namespace JERC
                 else if (gradientValue > 255)
                     gradientValue = 255;
 
-                pen = verticesAndWorldHeightRanges.jercType switch
+                pen = brushSide.jercType switch
                 {
                     //JercTypes.Negative => PenColours.PenNegative(gradientValue),
                     JercTypes.Layout => PenColours.PenLayout(TEMPORARYrgbColourLayout, gradientValue),
@@ -533,7 +531,7 @@ namespace JERC
                     _ => null,
                 };
 
-                solidBrush = verticesAndWorldHeightRanges.jercType switch
+                solidBrush = brushSide.jercType switch
                 {
                     //JercTypes.Negative => BrushColours.SolidBrushNegative(gradientValue),
                     JercTypes.Layout => BrushColours.SolidBrushLayout(TEMPORARYrgbColourLayout, gradientValue),
@@ -544,16 +542,16 @@ namespace JERC
 
 
                 // corrects the verts to tax into account the movement from space in world to the space in the image (which starts at (0,0))
-                var verticesOffset = verticesAndWorldHeightRanges.vertices;
+                var verticesOffset = brushSide.vertices;
                 for (var i = 0; i < verticesOffset.Count(); i++)
                 {
                     verticesOffset[i].X = verticesOffset[i].X - overviewPositionValues.brushVerticesPosMinX + overviewPositionValues.brushVerticesOffsetX;
                     verticesOffset[i].Y = verticesOffset[i].Y - overviewPositionValues.brushVerticesPosMinY + overviewPositionValues.brushVerticesOffsetY;
                 }
 
-                if (verticesAndWorldHeightRanges.jercType == JercTypes.Negative)
+                if (brushSide.jercType == JercTypes.Negative)
                 {
-                    AddNegativeRegion(bmp, graphics, verticesAndWorldHeightRanges);
+                    AddNegativeRegion(bmp, graphics, brushSide);
                 }
                 else
                 {
@@ -566,14 +564,14 @@ namespace JERC
         }
 
 
-        private static void RenderEntities(Bitmap bmp, Graphics graphics, BoundingBox boundingBox, OverviewPositionValues overviewPositionValues, List<EntityVerticesAndWorldHeight> verticesList)
+        private static void RenderEntities(Bitmap bmp, Graphics graphics, BoundingBox boundingBox, OverviewPositionValues overviewPositionValues, List<EntityBrushSide> entityBrushSideList)
         {
             Pen pen = null;
             SolidBrush solidBrush = null;
 
-            foreach (var vertices in verticesList)
+            foreach (var entityBrushSide in entityBrushSideList)
             {
-                pen = vertices.entityType switch
+                pen = entityBrushSide.entityType switch
                 {
                     EntityTypes.Buyzone => PenColours.PenBuyzones(),
                     EntityTypes.Bombsite => PenColours.PenBombsites(),
@@ -581,7 +579,7 @@ namespace JERC
                     _ => null,
                 };
 
-                solidBrush = vertices.entityType switch
+                solidBrush = entityBrushSide.entityType switch
                 {
                     EntityTypes.Buyzone => BrushColours.SolidBrushBuyzones(),
                     EntityTypes.Bombsite => BrushColours.SolidBrushBombsites(),
@@ -591,7 +589,7 @@ namespace JERC
 
 
                 // corrects the verts to tax into account the movement from space in world to the space in the image (which starts at (0,0))
-                var verticesOffset = vertices.vertices;
+                var verticesOffset = entityBrushSide.vertices;
                 for (var i = 0; i < verticesOffset.Count(); i++)
                 {
                     verticesOffset[i].X = verticesOffset[i].X - overviewPositionValues.brushVerticesPosMinX + overviewPositionValues.brushVerticesOffsetX;
@@ -612,9 +610,9 @@ namespace JERC
         }
 
 
-        private static void AddNegativeRegion(Bitmap bmp, Graphics graphics, BrushVerticesAndWorldHeight verticesAndWorldHeightRanges)
+        private static void AddNegativeRegion(Bitmap bmp, Graphics graphics, BrushSide brushSide)
         {
-            var verticesToUse = verticesAndWorldHeightRanges.vertices;
+            var verticesToUse = brushSide.vertices;
             if (verticesToUse.Length < 3)
             {
                 return;
