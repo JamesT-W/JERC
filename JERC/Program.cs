@@ -274,9 +274,11 @@ namespace JERC
 
                 var boundingBox = new BoundingBox();
 
-                var verticesAndWorldHeightRangesList = GetBrushVerticesList(boundingBox);
+                var brushVerticesAndWorldHeightRangesList = GetBrushVerticesList(boundingBox);
+                RenderBrushSides(bmp, graphics, boundingBox, overviewPositionValues, brushVerticesAndWorldHeightRangesList);
 
-                RenderBrushSides(bmp, graphics, boundingBox, overviewPositionValues, verticesAndWorldHeightRangesList);
+                var entityVerticesAndWorldHeightList = GetEntityVerticesList();
+                RenderEntities(bmp, graphics, boundingBox, overviewPositionValues, entityVerticesAndWorldHeightList);
 
                 graphics.Save();
 
@@ -311,6 +313,18 @@ namespace JERC
             boundingBox.maxZ = verticesAndWorldHeightRangesList.Select(x => x.worldHeight).Max();
 
             return verticesAndWorldHeightRangesList;
+        }
+
+
+        private static List<EntityVerticesAndWorldHeight> GetEntityVerticesList()
+        {
+            var verticesList = new List<EntityVerticesAndWorldHeight>();
+
+            verticesList.AddRange(GetEntityBuyzoneVerticesList());
+            verticesList.AddRange(GetEntityBombsiteVerticesList());
+            verticesList.AddRange(GetEntityRescueZoneVerticesList());
+
+            return verticesList;
         }
 
 
@@ -406,6 +420,75 @@ namespace JERC
         }
 
 
+        private static List<EntityVerticesAndWorldHeight> GetEntityBuyzoneVerticesList()
+        {
+            var verticesAndWorldHeightRangesList = new List<EntityVerticesAndWorldHeight>();
+
+            foreach (var side in vmfRequiredData.entitiesSidesBuyzone)
+            {
+                var verticesAndWorldHeight = new EntityVerticesAndWorldHeight(side.vertices_plus.Count());
+                for (int i = 0; i < side.vertices_plus.Count(); i++)
+                {
+                    var vert = side.vertices_plus[i];
+
+                    verticesAndWorldHeight.vertices[i] = new PointF(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier);
+                    verticesAndWorldHeight.worldHeight = vert.z;
+                    verticesAndWorldHeight.entityType = EntityTypes.Buyzone;
+                }
+
+                verticesAndWorldHeightRangesList.Add(verticesAndWorldHeight);
+            }
+
+            return verticesAndWorldHeightRangesList;
+        }
+
+
+        private static List<EntityVerticesAndWorldHeight> GetEntityBombsiteVerticesList()
+        {
+            var verticesAndWorldHeightRangesList = new List<EntityVerticesAndWorldHeight>();
+
+            foreach (var side in vmfRequiredData.entitiesSidesBombsite)
+            {
+                var verticesAndWorldHeight = new EntityVerticesAndWorldHeight(side.vertices_plus.Count());
+                for (int i = 0; i < side.vertices_plus.Count(); i++)
+                {
+                    var vert = side.vertices_plus[i];
+
+                    verticesAndWorldHeight.vertices[i] = new PointF(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier);
+                    verticesAndWorldHeight.worldHeight = vert.z;
+                    verticesAndWorldHeight.entityType = EntityTypes.Bombsite;
+                }
+
+                verticesAndWorldHeightRangesList.Add(verticesAndWorldHeight);
+            }
+
+            return verticesAndWorldHeightRangesList;
+        }
+
+
+        private static List<EntityVerticesAndWorldHeight> GetEntityRescueZoneVerticesList()
+        {
+            var verticesAndWorldHeightRangesList = new List<EntityVerticesAndWorldHeight>();
+
+            foreach (var side in vmfRequiredData.entitiesSidesRescueZone)
+            {
+                var verticesAndWorldHeight = new EntityVerticesAndWorldHeight(side.vertices_plus.Count());
+                for (int i = 0; i < side.vertices_plus.Count(); i++)
+                {
+                    var vert = side.vertices_plus[i];
+
+                    verticesAndWorldHeight.vertices[i] = new PointF(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier);
+                    verticesAndWorldHeight.worldHeight = vert.z;
+                    verticesAndWorldHeight.entityType = EntityTypes.RescueZone;
+                }
+
+                verticesAndWorldHeightRangesList.Add(verticesAndWorldHeight);
+            }
+
+            return verticesAndWorldHeightRangesList;
+        }
+
+
         private static void RenderBrushSides(Bitmap bmp, Graphics graphics, BoundingBox boundingBox, OverviewPositionValues overviewPositionValues, List<BrushVerticesAndWorldHeight> verticesAndWorldHeightRangesList)
         {
             Pen pen = null;
@@ -474,6 +557,46 @@ namespace JERC
                 {
                     DrawFilledPolygonObject(graphics, solidBrush, pen, verticesOffset);
                 }
+            }
+
+            pen?.Dispose();
+            solidBrush?.Dispose();
+        }
+
+
+        private static void RenderEntities(Bitmap bmp, Graphics graphics, BoundingBox boundingBox, OverviewPositionValues overviewPositionValues, List<EntityVerticesAndWorldHeight> verticesList)
+        {
+            Pen pen = null;
+            SolidBrush solidBrush = null;
+
+            foreach (var vertices in verticesList)
+            {
+                pen = vertices.entityType switch
+                {
+                    EntityTypes.Buyzone => PenColours.PenBuyzones(),
+                    EntityTypes.Bombsite => PenColours.PenBombsites(),
+                    EntityTypes.RescueZone => PenColours.PenRescueZones(),
+                    _ => null,
+                };
+
+                solidBrush = vertices.entityType switch
+                {
+                    EntityTypes.Buyzone => BrushColours.SolidBrushBuyzones(),
+                    EntityTypes.Bombsite => BrushColours.SolidBrushBombsites(),
+                    EntityTypes.RescueZone => BrushColours.SolidBrushRescueZones(),
+                    _ => null,
+                };
+
+
+                // corrects the verts to tax into account the movement from space in world to the space in the image (which starts at (0,0))
+                var verticesOffset = vertices.vertices;
+                for (var i = 0; i < verticesOffset.Count(); i++)
+                {
+                    verticesOffset[i].X = verticesOffset[i].X - overviewPositionValues.brushVerticesPosMinX + overviewPositionValues.brushVerticesOffsetX;
+                    verticesOffset[i].Y = verticesOffset[i].Y - overviewPositionValues.brushVerticesPosMinY + overviewPositionValues.brushVerticesOffsetY;
+                }
+
+                DrawFilledPolygonObject(graphics, solidBrush, pen, verticesOffset);
             }
 
             pen?.Dispose();

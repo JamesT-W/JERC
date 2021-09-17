@@ -14,8 +14,10 @@ namespace JERC.Models
         public List<Side> brushesSidesOverlap;
         public List<Side> brushesSidesNegative;
         
-        public List<Entity> buyzoneBrushes;
-        public List<Entity> bombsiteBrushes;
+        public List<Side> entitiesSidesBuyzone;
+        public List<Side> entitiesSidesBombsite;
+        public List<Side> entitiesSidesRescueZone;
+
         public List<Entity> rescueZoneBrushes;
         public List<Entity> hostageEntities;
 
@@ -34,9 +36,16 @@ namespace JERC.Models
             brushesSidesOverlap = brushesOverlapModelled.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.OverlapTextureName)).ToList();
             brushesSidesNegative = brushesNegativeModelled.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.NegativeTextureName)).ToList();
 
-            this.buyzoneBrushes = buyzoneBrushEntities.Any() ? buyzoneBrushEntities.Select(x => new Entity(x)).ToList() : new List<Entity>();
-            this.bombsiteBrushes = bombsiteBrushEntities.Any() ? bombsiteBrushEntities.Select(x => new Entity(x)).ToList() : new List<Entity>();
-            this.rescueZoneBrushes = RescueZoneBrushEntities.Any() ? RescueZoneBrushEntities.Select(x => new Entity(x)).ToList() : new List<Entity>();
+
+            var entitiesBuyzoneModelled = buyzoneBrushEntities.Any() ? buyzoneBrushEntities.Select(x => new Entity(x)).ToList() : new List<Entity>();
+            var entitiesBombsiteModelled = bombsiteBrushEntities.Any() ? bombsiteBrushEntities.Select(x => new Entity(x)).ToList() : new List<Entity>();
+            var entitiesRescueZoneModelled = RescueZoneBrushEntities.Any() ? RescueZoneBrushEntities.Select(x => new Entity(x)).ToList() : new List<Entity>();
+
+            entitiesSidesBuyzone = entitiesBuyzoneModelled.SelectMany(x => x.brush.side).ToList();
+            entitiesSidesBombsite = entitiesBombsiteModelled.SelectMany(x => x.brush.side).ToList();
+            entitiesSidesRescueZone = entitiesRescueZoneModelled.SelectMany(x => x.brush.side).ToList();
+
+
             this.hostageEntities = hostageEntities.Any() ? hostageEntities.Select(x => new Entity(x)).ToList() : new List<Entity>();
         }
     }

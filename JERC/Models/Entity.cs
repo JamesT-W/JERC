@@ -16,6 +16,8 @@ namespace JERC.Models
         public string origin;
         public Editor editor;
 
+        public Brush brush;
+
         public Entity(IVNode entity)
         {
             // ignoring a lot of other values
@@ -27,6 +29,8 @@ namespace JERC.Models
             uniformscale = entity.Body.Any(x => x.Name == "uniformscale") ? int.Parse(entity.Body.FirstOrDefault(x => x.Name == "uniformscale")?.Value) : null;
             origin = entity.Body.FirstOrDefault(x => x.Name == "origin")?.Value;
             editor = new Editor(entity.Body.FirstOrDefault(x => x.Name == "editor"));
+
+            brush = entity.Body.Any(x => x.Name == "solid") ? new Brush(entity.Body.FirstOrDefault(x => x.Name == "solid")) : null;
         }
     }
 }
