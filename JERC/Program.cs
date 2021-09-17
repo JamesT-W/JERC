@@ -468,7 +468,7 @@ namespace JERC
 
                 if (verticesAndWorldHeightRanges.jercType == JercTypes.Negative)
                 {
-                    DrawTransparency(bmp, graphics, verticesAndWorldHeightRanges);
+                    AddNegativeRegion(bmp, graphics, verticesAndWorldHeightRanges);
                 }
                 else
                 {
@@ -487,12 +487,10 @@ namespace JERC
         }
 
 
-        private static void DrawTransparency(Bitmap bmp, Graphics graphics, BrushVerticesAndWorldHeight verticesAndWorldHeightRanges)
+        private static void AddNegativeRegion(Bitmap bmp, Graphics graphics, BrushVerticesAndWorldHeight verticesAndWorldHeightRanges)
         {
-            var rectangles = new List<RectangleF>();
-
             var verticesToUse = verticesAndWorldHeightRanges.vertices;
-            if (verticesToUse.Count() < 3)
+            if (verticesToUse.Length < 3)
             {
                 return;
             }
