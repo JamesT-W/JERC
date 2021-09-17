@@ -10,8 +10,8 @@ namespace JERC.Constants
     {
         public static readonly float OverviewScaleDivider = 1024;
 
-        public static readonly float OverviewIncreasedUnitsShownPerScaleIntegerPosX = 1280;
-        public static readonly float OverviewIncreasedUnitsShownPerScaleIntegerPosY = 1024;
+        //public static readonly float OverviewIncreasedUnitsShownPerScaleIntegerPosX = 1280;
+        //public static readonly float OverviewIncreasedUnitsShownPerScaleIntegerPosY = 1024;
 
         private static readonly float OverviewCenteredOffsetPerScaleIntegerPosX = -640;
         private static readonly float OverviewCenteredOffsetPerScaleIntegerPosY = 512;
