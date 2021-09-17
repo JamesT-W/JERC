@@ -125,10 +125,10 @@ namespace JERC
                                             where z.Value == visgroupId
                                             select x;
 
+            var brushesNegative = GetBrushesNegative(allWorldBrushesInVisgroup);
             var brushesLayout = GetBrushesLayout(allWorldBrushesInVisgroup);
             var brushesCover = GetBrushesCover(allWorldBrushesInVisgroup);
             var brushesOverlap = GetBrushesOverlap(allWorldBrushesInVisgroup);
-            var brushesNegative = GetBrushesNegative(allWorldBrushesInVisgroup);
 
             var buyzoneBrushEntities = GetBuyzoneBrushEntities(allEntities);
             var bombsiteBrushEntities = GetBombsiteBrushEntities(allEntities);
@@ -136,9 +136,21 @@ namespace JERC
             var hostageEntities = GetHostageEntities(allEntities);
 
             return new VmfRequiredData(
-                brushesLayout, brushesCover, brushesOverlap, brushesNegative,
+                brushesNegative, brushesLayout, brushesCover, brushesOverlap,
                 buyzoneBrushEntities, bombsiteBrushEntities, rescueZoneBrushEntities, hostageEntities
             );
+        }
+
+
+        private static IEnumerable<IVNode> GetBrushesNegative(IEnumerable<IVNode> allWorldBrushesInVisgroup)
+        {
+            return from x in allWorldBrushesInVisgroup
+                   from y in x.Body
+                   where y.Name == "side"
+                   from z in y.Body
+                   where z.Name == "material"
+                   where z.Value.ToLower() == TextureNames.NegativeTextureName.ToLower()
+                   select x;
         }
 
 
@@ -174,18 +186,6 @@ namespace JERC
                    from z in y.Body
                    where z.Name == "material"
                    where z.Value.ToLower() == TextureNames.OverlapTextureName.ToLower()
-                   select x;
-        }
-
-
-        private static IEnumerable<IVNode> GetBrushesNegative(IEnumerable<IVNode> allWorldBrushesInVisgroup)
-        {
-            return from x in allWorldBrushesInVisgroup
-                   from y in x.Body
-                   where y.Name == "side"
-                   from z in y.Body
-                   where z.Name == "material"
-                   where z.Value.ToLower() == TextureNames.NegativeTextureName.ToLower()
                    select x;
         }
 
@@ -328,6 +328,29 @@ namespace JERC
         }
 
 
+        private static List<BrushVerticesAndWorldHeight> GetBrushNegativeVerticesList()
+        {
+            var verticesAndWorldHeightRangesList = new List<BrushVerticesAndWorldHeight>();
+
+            foreach (var side in vmfRequiredData.brushesSidesNegative)
+            {
+                var verticesAndWorldHeight = new BrushVerticesAndWorldHeight(side.vertices_plus.Count());
+                for (int i = 0; i < side.vertices_plus.Count(); i++)
+                {
+                    var vert = side.vertices_plus[i];
+
+                    verticesAndWorldHeight.vertices[i] = new PointF(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier);
+                    verticesAndWorldHeight.worldHeight = vert.z;
+                    verticesAndWorldHeight.jercType = JercTypes.Negative;
+                }
+
+                verticesAndWorldHeightRangesList.Add(verticesAndWorldHeight);
+            }
+
+            return verticesAndWorldHeightRangesList;
+        }
+
+
         private static List<BrushVerticesAndWorldHeight> GetBrushLayoutVerticesList()
         {
             var verticesAndWorldHeightRangesList = new List<BrushVerticesAndWorldHeight>();
@@ -388,29 +411,6 @@ namespace JERC
                     verticesAndWorldHeight.vertices[i] = new PointF(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier);
                     verticesAndWorldHeight.worldHeight = vert.z;
                     verticesAndWorldHeight.jercType = JercTypes.Overlap;
-                }
-
-                verticesAndWorldHeightRangesList.Add(verticesAndWorldHeight);
-            }
-
-            return verticesAndWorldHeightRangesList;
-        }
-
-
-        private static List<BrushVerticesAndWorldHeight> GetBrushNegativeVerticesList()
-        {
-            var verticesAndWorldHeightRangesList = new List<BrushVerticesAndWorldHeight>();
-
-            foreach (var side in vmfRequiredData.brushesSidesNegative)
-            {
-                var verticesAndWorldHeight = new BrushVerticesAndWorldHeight(side.vertices_plus.Count());
-                for (int i = 0; i < side.vertices_plus.Count(); i++)
-                {
-                    var vert = side.vertices_plus[i];
-
-                    verticesAndWorldHeight.vertices[i] = new PointF(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier);
-                    verticesAndWorldHeight.worldHeight = vert.z;
-                    verticesAndWorldHeight.jercType = JercTypes.Negative;
                 }
 
                 verticesAndWorldHeightRangesList.Add(verticesAndWorldHeight);
@@ -524,19 +524,19 @@ namespace JERC
 
                 pen = verticesAndWorldHeightRanges.jercType switch
                 {
+                    //JercTypes.Negative => PenColours.PenNegative(gradientValue),
                     JercTypes.Layout => PenColours.PenLayout(TEMPORARYrgbColourLayout, gradientValue),
                     JercTypes.Cover => PenColours.PenCover(TEMPORARYrgbColourCover, gradientValue),
                     JercTypes.Overlap => PenColours.PenOverlap(TEMPORARYrgbColourOverlap, gradientValue),
-                    //JercTypes.Negative => PenColours.PenNegative(gradientValue),
                     _ => null,
                 };
 
                 solidBrush = verticesAndWorldHeightRanges.jercType switch
                 {
+                    //JercTypes.Negative => BrushColours.SolidBrushNegative(gradientValue),
                     JercTypes.Layout => BrushColours.SolidBrushLayout(TEMPORARYrgbColourLayout, gradientValue),
                     JercTypes.Cover => BrushColours.SolidBrushCover(TEMPORARYrgbColourCover, gradientValue),
                     JercTypes.Overlap => BrushColours.SolidBrushOverlap(TEMPORARYrgbColourOverlap, gradientValue),
-                    //JercTypes.Negative => BrushColours.SolidBrushNegative(gradientValue),
                     _ => null,
                 };
 
@@ -620,7 +620,7 @@ namespace JERC
 
             var graphicsPath = new GraphicsPath();
             graphicsPath.AddPolygon(verticesToUse);
-            
+
             var region = new Region(graphicsPath);
             graphics.ExcludeClip(region);
 

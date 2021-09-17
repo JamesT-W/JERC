@@ -8,9 +8,9 @@ namespace JERC.Enums
 {
     public enum JercTypes
     {
-        Layout = 1,
-        Cover = 2,
-        Overlap = 4,
-        Negative = 8
+        Negative = 1,
+        Layout = 2,
+        Cover = 4,
+        Overlap = 8,
     }
 }

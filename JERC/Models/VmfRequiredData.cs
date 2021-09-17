@@ -9,11 +9,11 @@ namespace JERC.Models
 {
     public class VmfRequiredData
     {
+        public List<Side> brushesSidesNegative;
         public List<Side> brushesSidesLayout;
         public List<Side> brushesSidesCover;
         public List<Side> brushesSidesOverlap;
-        public List<Side> brushesSidesNegative;
-        
+
         public List<Side> entitiesSidesBuyzone;
         public List<Side> entitiesSidesBombsite;
         public List<Side> entitiesSidesRescueZone;
@@ -22,19 +22,19 @@ namespace JERC.Models
         public List<Entity> hostageEntities;
 
         public VmfRequiredData(
-            IEnumerable<IVNode> brushesLayout, IEnumerable<IVNode> brushesCover, IEnumerable<IVNode> brushesOverlap, IEnumerable<IVNode> brushesNegative,
+            IEnumerable<IVNode> brushesNegative, IEnumerable<IVNode> brushesLayout, IEnumerable<IVNode> brushesCover, IEnumerable<IVNode> brushesOverlap,
             IEnumerable<IVNode> buyzoneBrushEntities, IEnumerable<IVNode> bombsiteBrushEntities, IEnumerable<IVNode> RescueZoneBrushEntities, IEnumerable<IVNode> hostageEntities
         )
         {
+            var brushesNegativeModelled = brushesNegative.Any() ? brushesNegative.Select(x => new Brush(x)).ToList() : new List<Brush>();
             var brushesLayoutModelled = brushesLayout.Any() ? brushesLayout.Select(x => new Brush(x)).ToList() : new List<Brush>();
             var brushesCoverModelled = brushesCover.Any() ? brushesCover.Select(x => new Brush(x)).ToList() : new List<Brush>();
             var brushesOverlapModelled = brushesOverlap.Any() ? brushesOverlap.Select(x => new Brush(x)).ToList() : new List<Brush>();
-            var brushesNegativeModelled = brushesNegative.Any() ? brushesNegative.Select(x => new Brush(x)).ToList() : new List<Brush>();
 
+            brushesSidesNegative = brushesNegativeModelled.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.NegativeTextureName)).ToList();
             brushesSidesLayout = brushesLayoutModelled.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.LayoutTextureName)).ToList();
             brushesSidesCover = brushesCoverModelled.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.CoverTextureName)).ToList();
             brushesSidesOverlap = brushesOverlapModelled.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.OverlapTextureName)).ToList();
-            brushesSidesNegative = brushesNegativeModelled.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.NegativeTextureName)).ToList();
 
 
             var entitiesBuyzoneModelled = buyzoneBrushEntities.Any() ? buyzoneBrushEntities.Select(x => new Entity(x)).ToList() : new List<Entity>();
