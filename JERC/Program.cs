@@ -92,11 +92,11 @@ namespace JERC
         private static void SetVisgroupId()
         {
             visgroupId = (from x in vmf.VisGroups.Body
-                                     from y in x.Body
-                                     where y.Name == "name"
-                                     where y.Value == visgroupName
-                                     select x.Body.FirstOrDefault(y => y.Name == "visgroupid").Value)
-                                     .FirstOrDefault();
+                          from y in x.Body
+                          where y.Name == "name"
+                          where y.Value.ToLower() == visgroupName.ToLower()
+                          select x.Body.FirstOrDefault(y => y.Name == "visgroupid").Value)
+                          .FirstOrDefault();
         }
 
 
