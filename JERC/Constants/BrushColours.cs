@@ -7,10 +7,10 @@ namespace JERC.Constants
 {
     public static class BrushColours
     {
-        public static SolidBrush BrushLayout(int gradientValue) => new SolidBrush(Color.FromArgb(255, ClampGradientValue(gradientValue), ClampGradientValue(gradientValue), ClampGradientValue(gradientValue)));
-        public static SolidBrush BrushCover(int gradientValue) => new SolidBrush(Color.FromArgb(255, 255, 0, 0));
-        public static SolidBrush BrushOverlap(int gradientValue) => new SolidBrush(Color.FromArgb(255, 0, 255, 0));
-        public static SolidBrush BrushNegative(int gradientValue) => new SolidBrush(Color.FromArgb(255, 0, 0, 255));
+        public static SolidBrush SolidBrushLayout(int gradientValue) => new SolidBrush(Color.FromArgb(255, ClampGradientValue(gradientValue), ClampGradientValue(gradientValue), ClampGradientValue(gradientValue)));
+        public static SolidBrush SolidBrushCover(int gradientValue) => new SolidBrush(Color.FromArgb(255, 255, 0, 0));
+        public static SolidBrush SolidBrushOverlap(int gradientValue) => new SolidBrush(Color.FromArgb(255, 0, 255, 0));
+        //public static SolidBrush SolidBrushNegative(int gradientValue) => new SolidBrush(Color.Transparent);
 
 
         private static int ClampGradientValue(int gradientValue)

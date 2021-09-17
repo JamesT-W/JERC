@@ -220,12 +220,13 @@ namespace JERC
 
         private static OverviewPositionValues SortScaleStuff()
         {
-            var allWorldBrushes = vmfRequiredData.brushesSidesLayout.Concat(vmfRequiredData.brushesSidesCover).Concat(vmfRequiredData.brushesSidesOverlap).Concat(vmfRequiredData.brushesSidesNegative);
+            var allWorldBrushesExceptNegative = vmfRequiredData.brushesSidesLayout.Concat(vmfRequiredData.brushesSidesCover).Concat(vmfRequiredData.brushesSidesOverlap);
+            //var allWorldBrushes = vmfRequiredData.brushesSidesNegative.Concat(allWorldBrushesExceptNegative);
 
-            var minX = allWorldBrushes.Min(x => x.vertices_plus.Min(y => y.x));
-            var maxX = allWorldBrushes.Max(x => x.vertices_plus.Max(y => y.x));
-            var minY = allWorldBrushes.Min(x => x.vertices_plus.Min(y => y.y));
-            var maxY = allWorldBrushes.Max(x => x.vertices_plus.Max(y => y.y));
+            var minX = allWorldBrushesExceptNegative.Min(x => x.vertices_plus.Min(y => y.x));
+            var maxX = allWorldBrushesExceptNegative.Max(x => x.vertices_plus.Max(y => y.x));
+            var minY = allWorldBrushesExceptNegative.Min(x => x.vertices_plus.Min(y => y.y));
+            var maxY = allWorldBrushesExceptNegative.Max(x => x.vertices_plus.Max(y => y.y));
 
             var sizeX = maxX - minX;
             var sizeY = maxY - minY;
@@ -251,23 +252,25 @@ namespace JERC
 
         private static void GenerateRadar(OverviewPositionValues overviewPositionValues)
         {
-            Image bmp = new Bitmap(overviewPositionValues.outputResolution, overviewPositionValues.outputResolution);
+            Bitmap bmp = new Bitmap(overviewPositionValues.outputResolution, overviewPositionValues.outputResolution);
 
             using (var graphics = Graphics.FromImage(bmp))
             {
                 graphics.SmoothingMode = SmoothingMode.AntiAlias;
 
+                graphics.SetClip(Rectangle.FromLTRB(0, 0, overviewPositionValues.outputResolution, overviewPositionValues.outputResolution));
+
                 var boundingBox = new BoundingBox();
 
                 var verticesAndWorldHeightRangesList = GetBrushVerticesList(boundingBox);
 
-                RenderBrushSides(graphics, boundingBox, overviewPositionValues, verticesAndWorldHeightRangesList);
+                RenderBrushSides(bmp, graphics, boundingBox, overviewPositionValues, verticesAndWorldHeightRangesList);
 
                 graphics.Save();
 
                 FlipImage(bmp);
 
-                Image bmpNew = new Bitmap(bmp, 1024, 1024);
+                Bitmap bmpNew = new Bitmap(bmp, 1024, 1024);
 
                 SaveImage(outputImageFilepath, bmpNew);
 
@@ -282,10 +285,10 @@ namespace JERC
         {
             var verticesAndWorldHeightRangesList = new List<BrushVerticesAndWorldHeight>();
 
+            verticesAndWorldHeightRangesList.AddRange(GetBrushNegativeVerticesList()); // add negative first to set to graphics' clip
             verticesAndWorldHeightRangesList.AddRange(GetBrushLayoutVerticesList());
             verticesAndWorldHeightRangesList.AddRange(GetBrushCoverVerticesList());
             verticesAndWorldHeightRangesList.AddRange(GetBrushOverlapVerticesList());
-            verticesAndWorldHeightRangesList.AddRange(GetBrushNegativeVerticesList());
 
             boundingBox.minX = verticesAndWorldHeightRangesList.SelectMany(x => x.vertices.Select(y => y.X)).Min();
             boundingBox.maxX = verticesAndWorldHeightRangesList.SelectMany(x => x.vertices.Select(y => y.X)).Max();
@@ -388,7 +391,7 @@ namespace JERC
         }
 
 
-        private static void RenderBrushSides(Graphics graphics, BoundingBox boundingBox, OverviewPositionValues overviewPositionValues, List<BrushVerticesAndWorldHeight> verticesAndWorldHeightRangesList)
+        private static void RenderBrushSides(Bitmap bmp, Graphics graphics, BoundingBox boundingBox, OverviewPositionValues overviewPositionValues, List<BrushVerticesAndWorldHeight> verticesAndWorldHeightRangesList)
         {
             Pen pen = null;
             SolidBrush solidBrush = null;
@@ -426,17 +429,17 @@ namespace JERC
                     JercTypes.Layout => PenColours.PenLayout(gradientValue),
                     JercTypes.Cover => PenColours.PenCover(gradientValue),
                     JercTypes.Overlap => PenColours.PenOverlap(gradientValue),
-                    JercTypes.Negative => PenColours.PenNegative(gradientValue),
-                    _ => throw new NotImplementedException(),
+                    //JercTypes.Negative => PenColours.PenNegative(gradientValue),
+                    _ => null,
                 };
 
                 solidBrush = verticesAndWorldHeightRanges.jercType switch
                 {
-                    JercTypes.Layout => BrushColours.BrushLayout(gradientValue),
-                    JercTypes.Cover => BrushColours.BrushCover(gradientValue),
-                    JercTypes.Overlap => BrushColours.BrushOverlap(gradientValue),
-                    JercTypes.Negative => BrushColours.BrushNegative(gradientValue),
-                    _ => throw new NotImplementedException(),
+                    JercTypes.Layout => BrushColours.SolidBrushLayout(gradientValue),
+                    JercTypes.Cover => BrushColours.SolidBrushCover(gradientValue),
+                    JercTypes.Overlap => BrushColours.SolidBrushOverlap(gradientValue),
+                    //JercTypes.Negative => BrushColours.SolidBrushNegative(gradientValue),
+                    _ => null,
                 };
 
 
@@ -448,7 +451,14 @@ namespace JERC
                     verticesOffset[i].Y = verticesOffset[i].Y - overviewPositionValues.brushVerticesPosMinY + overviewPositionValues.brushVerticesOffsetY;
                 }
 
-                DrawFilledPolygonObjective(graphics, solidBrush, pen, verticesOffset);
+                if (verticesAndWorldHeightRanges.jercType == JercTypes.Negative)
+                {
+                    DrawTransparency(bmp, graphics, verticesAndWorldHeightRanges);
+                }
+                else
+                {
+                    DrawFilledPolygonObject(graphics, solidBrush, pen, verticesOffset);
+                }
             }
 
             pen?.Dispose();
@@ -456,20 +466,40 @@ namespace JERC
         }
 
 
-        private static void DisposeImage(Image img)
+        private static void DisposeImage(Bitmap bmp)
         {
-            img.Dispose();
+            bmp.Dispose();
         }
 
 
-        private static void DrawFilledPolygonObjective(Graphics graphics, SolidBrush solidBrush, Pen pen, PointF[] vertices)
+        private static void DrawTransparency(Bitmap bmp, Graphics graphics, BrushVerticesAndWorldHeight verticesAndWorldHeightRanges)
+        {
+            var rectangles = new List<RectangleF>();
+
+            var verticesToUse = verticesAndWorldHeightRanges.vertices;
+            if (verticesToUse.Count() < 3)
+            {
+                return;
+            }
+
+            var graphicsPath = new GraphicsPath();
+            graphicsPath.AddPolygon(verticesToUse);
+            
+            var region = new Region(graphicsPath);
+            graphics.ExcludeClip(region);
+
+            graphicsPath.CloseFigure();
+        }
+
+
+        private static void DrawFilledPolygonObject(Graphics graphics, SolidBrush solidBrush, Pen pen, PointF[] vertices)
         {
             graphics.DrawPolygon(pen, vertices);
             graphics.FillPolygon(solidBrush, vertices);
         }
 
 
-        private static void SaveImage(string filepath, Image img)
+        private static void SaveImage(string filepath, Bitmap bmp)
         {
             var canSave = false;
 
@@ -491,8 +521,8 @@ namespace JERC
             // only create the image if the file is not locked
             if (canSave)
             {
-                img.Save(filepath + ".png", ImageFormat.Png);
-                img.Save(filepath + ".dds");
+                bmp.Save(filepath + ".png", ImageFormat.Png);
+                bmp.Save(filepath + ".dds");
             }
         }
 
@@ -563,9 +593,9 @@ namespace JERC
         }
 
 
-        private static void FlipImage(Image img)
+        private static void FlipImage(Bitmap bmp)
         {
-            img.RotateFlip(RotateFlipType.RotateNoneFlipY);
+            bmp.RotateFlip(RotateFlipType.RotateNoneFlipY);
         }
 
 
