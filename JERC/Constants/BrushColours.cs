@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Text;
@@ -7,15 +7,15 @@ namespace JERC.Constants
 {
     public static class BrushColours
     {
-        public static SolidBrush SolidBrushLayout(int gradientValue) => new SolidBrush(Color.FromArgb(255, ClampGradientValue(gradientValue), ClampGradientValue(gradientValue), ClampGradientValue(gradientValue)));
-        public static SolidBrush SolidBrushCover(int gradientValue) => new SolidBrush(Color.FromArgb(255, 255, 0, 0));
-        public static SolidBrush SolidBrushOverlap(int gradientValue) => new SolidBrush(Color.FromArgb(255, 0, 255, 0));
-        //public static SolidBrush SolidBrushNegative(int gradientValue) => new SolidBrush(Color.Transparent);
+        public static SolidBrush SolidBrushLayout(int[] rgb, int gradientValue) => new SolidBrush(Color.FromArgb(255, ClampGradientValue(((float)rgb[0] / 255) * gradientValue), ClampGradientValue(((float)rgb[1] / 255) * gradientValue), ClampGradientValue(((float)rgb[2] / 255) * gradientValue)));
+        public static SolidBrush SolidBrushCover(int[] rgb, int gradientValue) => new SolidBrush(Color.FromArgb(255, ClampGradientValue((rgb[0] / 255) * gradientValue), ClampGradientValue((rgb[1] / 255) * gradientValue), ClampGradientValue((rgb[2] / 255) * gradientValue)));
+        public static SolidBrush SolidBrushOverlap(int[] rgb, int gradientValue) => new SolidBrush(Color.FromArgb(255, ClampGradientValue((rgb[0] / 255) * gradientValue), ClampGradientValue((rgb[1] / 255) * gradientValue), ClampGradientValue((rgb[2] / 255) * gradientValue)));
+        //public static SolidBrush SolidBrushNegative() => new SolidBrush(Color.Transparent);
 
 
-        private static int ClampGradientValue(int gradientValue)
+        private static int ClampGradientValue(float gradientValue)
         {
-            return Math.Clamp(gradientValue, 50, 200);
+            return (int)Math.Ceiling(Math.Clamp(gradientValue, 50, 200));
         }
     }
 }

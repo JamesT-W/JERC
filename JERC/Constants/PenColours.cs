@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Text;
@@ -7,15 +7,15 @@ namespace JERC.Constants
 {
     public static class PenColours
     {
-        public static Pen PenLayout(int gradientValue) => new Pen(Color.FromArgb(255, ClampGradientValue(gradientValue), ClampGradientValue(gradientValue), ClampGradientValue(gradientValue)), 1);
-        public static Pen PenCover(int gradientValue) => new Pen(Color.FromArgb(255, 255, 0, 0), 1);
-        public static Pen PenOverlap(int gradientValue) => new Pen(Color.FromArgb(255, 0, 255, 0), 1);
-        //public static Pen PenNegative(int gradientValue) => new Pen(Color.Transparent, 1);
+        public static Pen PenLayout(int[] rgb, int gradientValue) => new Pen(Color.FromArgb(255, ClampGradientValue(((float)rgb[0] / 255) * gradientValue), ClampGradientValue(((float)rgb[1] / 255) * gradientValue), ClampGradientValue(((float)rgb[2] / 255) * gradientValue)), 1);
+        public static Pen PenCover(int[] rgb, int gradientValue) => new Pen(Color.FromArgb(255, ClampGradientValue(((float)rgb[0] / 255) * gradientValue), ClampGradientValue(((float)rgb[1] / 255) * gradientValue), ClampGradientValue(((float)rgb[2] / 255) * gradientValue)), 1);
+        public static Pen PenOverlap(int[] rgb, int gradientValue) => new Pen(Color.FromArgb(255, ClampGradientValue(((float)rgb[0] / 255) * gradientValue), ClampGradientValue(((float)rgb[1] / 255) * gradientValue), ClampGradientValue(((float)rgb[2] / 255) * gradientValue)), 1);
+        //public static Pen PenNegative() => new Pen(Color.Transparent, 1);
 
 
-        private static int ClampGradientValue(int gradientValue)
+        private static int ClampGradientValue(float gradientValue)
         {
-            return Math.Clamp(gradientValue, 50, 200);
+            return (int)Math.Ceiling(Math.Clamp(gradientValue, 50, 200));
         }
     }
 }

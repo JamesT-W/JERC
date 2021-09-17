@@ -15,6 +15,18 @@ namespace JERC
 {
     class Program
     {
+
+
+        // TODO: this should be configured by hammer entities
+        private static readonly int[] TEMPORARYrgbColourLayout = new int[3] { 127, 127, 127 };
+        private static readonly int[] TEMPORARYrgbColourCover = new int[3] { 225, 225, 225 };
+        private static readonly int[] TEMPORARYrgbColourOverlap = new int[3] { 0, 127, 127 };
+
+
+
+
+
+
         private static readonly string gameBinDirectoryPath = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), @"..\"));
         private static readonly string gameCsgoDirectoryPath = Path.GetFullPath(Path.Combine(Path.Combine(gameBinDirectoryPath, @"..\"), @"csgo\"));
         private static readonly string gameOverviewsDirectoryPath = Path.GetFullPath(Path.Combine(gameCsgoDirectoryPath, @"resource\overviews\"));
@@ -426,18 +438,18 @@ namespace JERC
 
                 pen = verticesAndWorldHeightRanges.jercType switch
                 {
-                    JercTypes.Layout => PenColours.PenLayout(gradientValue),
-                    JercTypes.Cover => PenColours.PenCover(gradientValue),
-                    JercTypes.Overlap => PenColours.PenOverlap(gradientValue),
+                    JercTypes.Layout => PenColours.PenLayout(TEMPORARYrgbColourLayout, gradientValue),
+                    JercTypes.Cover => PenColours.PenCover(TEMPORARYrgbColourCover, gradientValue),
+                    JercTypes.Overlap => PenColours.PenOverlap(TEMPORARYrgbColourOverlap, gradientValue),
                     //JercTypes.Negative => PenColours.PenNegative(gradientValue),
                     _ => null,
                 };
 
                 solidBrush = verticesAndWorldHeightRanges.jercType switch
                 {
-                    JercTypes.Layout => BrushColours.SolidBrushLayout(gradientValue),
-                    JercTypes.Cover => BrushColours.SolidBrushCover(gradientValue),
-                    JercTypes.Overlap => BrushColours.SolidBrushOverlap(gradientValue),
+                    JercTypes.Layout => BrushColours.SolidBrushLayout(TEMPORARYrgbColourLayout, gradientValue),
+                    JercTypes.Cover => BrushColours.SolidBrushCover(TEMPORARYrgbColourCover, gradientValue),
+                    JercTypes.Overlap => BrushColours.SolidBrushOverlap(TEMPORARYrgbColourOverlap, gradientValue),
                     //JercTypes.Negative => BrushColours.SolidBrushNegative(gradientValue),
                     _ => null,
                 };
