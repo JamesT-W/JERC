@@ -22,15 +22,9 @@ namespace JERC
         private static string outputImageFilepath;
         private static string outputTxtFilepath;
 
-        private static readonly string visgroupIdJercLayoutName = "jerc_layout";
-        private static readonly string visgroupIdJercCoverName = "jerc_cover";
-        private static readonly string visgroupIdJercOverlapName = "jerc_overlap";
-        private static readonly string visgroupIdJercNegativeName = "jerc_negative";
+        private static readonly string visgroupName = "JERC";
 
-        private static string visgroupIdJercLayoutId;
-        private static string visgroupIdJercCoverId;
-        private static string visgroupIdJercOverlapId;
-        private static string visgroupIdJercNegativeId;
+        private static string visgroupId;
 
         private static string mapName;
 
@@ -83,7 +77,7 @@ namespace JERC
 
             vmf = new VMF(lines);
 
-            SetVisgroupIds();
+            SetVisgroupId();
 
             vmfRequiredData = GetVmfRequiredData();
 
@@ -95,54 +89,34 @@ namespace JERC
         }
 
 
-        private static void SetVisgroupIds()
+        private static void SetVisgroupId()
         {
-            //var visgroupLayout = vmf.VisGroups.Body.Where(x => x.Body.Any(y => y.Name == "name" && y.Value == visgroupIdJercLayoutName));
-
-            visgroupIdJercLayoutId = (from x in vmf.VisGroups.Body
+            visgroupId = (from x in vmf.VisGroups.Body
                                      from y in x.Body
                                      where y.Name == "name"
-                                     where y.Value == visgroupIdJercLayoutName
+                                     where y.Value == visgroupName
                                      select x.Body.FirstOrDefault(y => y.Name == "visgroupid").Value)
                                      .FirstOrDefault();
-
-            visgroupIdJercCoverId = (from x in vmf.VisGroups.Body
-                                    from y in x.Body
-                                    where y.Name == "name"
-                                    where y.Value == visgroupIdJercCoverName
-                                    select x.Body.FirstOrDefault(y => y.Name == "visgroupid").Value)
-                                    .FirstOrDefault();
-
-            visgroupIdJercOverlapId = (from x in vmf.VisGroups.Body
-                                       from y in x.Body
-                                       where y.Name == "name"
-                                       where y.Value == visgroupIdJercOverlapName
-                                       select x.Body.FirstOrDefault(y => y.Name == "visgroupid").Value)
-                                      .FirstOrDefault();
-
-            visgroupIdJercNegativeId = (from x in vmf.VisGroups.Body
-                                       from y in x.Body
-                                       where y.Name == "name"
-                                       where y.Value == visgroupIdJercNegativeName
-                                       select x.Body.FirstOrDefault(y => y.Name == "visgroupid").Value)
-                                       .FirstOrDefault();
         }
 
 
         private static VmfRequiredData GetVmfRequiredData()
         {
-            var allEntities = vmf.Body.Where(x => x.Name == "entity");
             var allWorldBrushes = vmf.World.Body.Where(x => x.Name == "solid");
+            var allEntities = vmf.Body.Where(x => x.Name == "entity");
 
-            var propsLayout = GetPropsLayout(allEntities);
-            var propsCover = GetPropsCover(allEntities);
-            var propsOverlap = GetPropsOverlap(allEntities);
-            var propsNegative = GetPropsNegative(allEntities);
+            var allWorldBrushesInVisgroup = from x in allWorldBrushes
+                                            from y in x.Body
+                                            where y.Name == "editor"
+                                            from z in y.Body
+                                            where z.Name == "visgroupid"
+                                            where z.Value == visgroupId
+                                            select x;
 
-            var brushesLayout = GetBrushesLayout(allWorldBrushes);
-            var brushesCover = GetBrushesCover(allWorldBrushes);
-            var brushesOverlap = GetBrushesOverlap(allWorldBrushes);
-            var brushesNegative = GetBrushesNegative(allWorldBrushes);
+            var brushesLayout = GetBrushesLayout(allWorldBrushesInVisgroup);
+            var brushesCover = GetBrushesCover(allWorldBrushesInVisgroup);
+            var brushesOverlap = GetBrushesOverlap(allWorldBrushesInVisgroup);
+            var brushesNegative = GetBrushesNegative(allWorldBrushesInVisgroup);
 
             var buyzoneBrushEntities = GetBuyzoneBrushEntities(allEntities);
             var bombsiteBrushEntities = GetBombsiteBrushEntities(allEntities);
@@ -150,105 +124,56 @@ namespace JERC
             var hostageEntities = GetHostageEntities(allEntities);
 
             return new VmfRequiredData(
-                propsLayout, propsCover, propsOverlap, propsNegative,
                 brushesLayout, brushesCover, brushesOverlap, brushesNegative,
                 buyzoneBrushEntities, bombsiteBrushEntities, rescueZoneBrushEntities, hostageEntities
             );
         }
 
 
-        private static IEnumerable<IVNode> GetPropsLayout(IEnumerable<IVNode> allEntities)
+        private static IEnumerable<IVNode> GetBrushesLayout(IEnumerable<IVNode> allWorldBrushesInVisgroup)
         {
-            return from x in allEntities
+            return from x in allWorldBrushesInVisgroup
                    from y in x.Body
-                   where y.Name == "editor"
+                   where y.Name == "side"
                    from z in y.Body
-                   where z.Name == "visgroupid"
-                   where z.Value == visgroupIdJercLayoutId
+                   where z.Name == "material"
+                   where z.Value.ToLower() == TextureNames.LayoutTextureName.ToLower()
                    select x;
         }
 
 
-        private static IEnumerable<IVNode> GetPropsCover(IEnumerable<IVNode> allEntities)
+        private static IEnumerable<IVNode> GetBrushesCover(IEnumerable<IVNode> allWorldBrushesInVisgroup)
         {
-            return from x in allEntities
+            return from x in allWorldBrushesInVisgroup
                    from y in x.Body
-                   where y.Name == "editor"
+                   where y.Name == "side"
                    from z in y.Body
-                   where z.Name == "visgroupid"
-                   where z.Value == visgroupIdJercCoverId
+                   where z.Name == "material"
+                   where z.Value.ToLower() == TextureNames.CoverTextureName.ToLower()
                    select x;
         }
 
 
-        private static IEnumerable<IVNode> GetPropsOverlap(IEnumerable<IVNode> allEntities)
+        private static IEnumerable<IVNode> GetBrushesOverlap(IEnumerable<IVNode> allWorldBrushesInVisgroup)
         {
-            return from x in allEntities
+            return from x in allWorldBrushesInVisgroup
                    from y in x.Body
-                   where y.Name == "editor"
+                   where y.Name == "side"
                    from z in y.Body
-                   where z.Name == "visgroupid"
-                   where z.Value == visgroupIdJercOverlapId
+                   where z.Name == "material"
+                   where z.Value.ToLower() == TextureNames.OverlapTextureName.ToLower()
                    select x;
         }
 
 
-        private static IEnumerable<IVNode> GetPropsNegative(IEnumerable<IVNode> allEntities)
+        private static IEnumerable<IVNode> GetBrushesNegative(IEnumerable<IVNode> allWorldBrushesInVisgroup)
         {
-            return from x in allEntities
+            return from x in allWorldBrushesInVisgroup
                    from y in x.Body
-                   where y.Name == "editor"
+                   where y.Name == "side"
                    from z in y.Body
-                   where z.Name == "visgroupid"
-                   where z.Value == visgroupIdJercNegativeId
-                   select x;
-        }
-
-
-        private static IEnumerable<IVNode> GetBrushesLayout(IEnumerable<IVNode> allWorldBrushes)
-        {
-            return from x in allWorldBrushes
-                   from y in x.Body
-                   where y.Name == "editor"
-                   from z in y.Body
-                   where z.Name == "visgroupid"
-                   where z.Value == visgroupIdJercLayoutId
-                   select x;
-        }
-
-
-        private static IEnumerable<IVNode> GetBrushesCover(IEnumerable<IVNode> allWorldBrushes)
-        {
-            return from x in allWorldBrushes
-                   from y in x.Body
-                   where y.Name == "editor"
-                   from z in y.Body
-                   where z.Name == "visgroupid"
-                   where z.Value == visgroupIdJercCoverId
-                   select x;
-        }
-
-
-        private static IEnumerable<IVNode> GetBrushesOverlap(IEnumerable<IVNode> allWorldBrushes)
-        {
-            return from x in allWorldBrushes
-                   from y in x.Body
-                   where y.Name == "editor"
-                   from z in y.Body
-                   where z.Name == "visgroupid"
-                   where z.Value == visgroupIdJercOverlapId
-                   select x;
-        }
-
-
-        private static IEnumerable<IVNode> GetBrushesNegative(IEnumerable<IVNode> allWorldBrushes)
-        {
-            return from x in allWorldBrushes
-                   from y in x.Body
-                   where y.Name == "editor"
-                   from z in y.Body
-                   where z.Name == "visgroupid"
-                   where z.Value == visgroupIdJercNegativeId
+                   where z.Name == "material"
+                   where z.Value.ToLower() == TextureNames.NegativeTextureName.ToLower()
                    select x;
         }
 
@@ -335,10 +260,8 @@ namespace JERC
                 var boundingBox = new BoundingBox();
 
                 var verticesAndWorldHeightRangesList = GetBrushVerticesList(boundingBox);
-                //var verticesPerPropList = GetPropVerticesList();
 
                 RenderBrushSides(graphics, boundingBox, overviewPositionValues, verticesAndWorldHeightRangesList);
-                //RenderProps(graphics, boundingBox); //// verticesPerPropList
 
                 graphics.Save();
 
@@ -530,12 +453,6 @@ namespace JERC
 
             pen?.Dispose();
             solidBrush?.Dispose();
-        }
-
-
-        private static void RenderProps(Graphics graphics)
-        {
-            
         }
 
 
