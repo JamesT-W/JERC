@@ -17,6 +17,10 @@ namespace JERC.Models
         public int width;
         public int height;
 
+        //  used to align the image to center if the width != height
+        public float brushVerticesOffsetX;
+        public float brushVerticesOffsetY;
+
         public int outputResolution;
 
         public float posX;
@@ -33,12 +37,15 @@ namespace JERC.Models
             width = (int)Math.Ceiling(brushVerticesPosMaxX - brushVerticesPosMinX);
             height = (int)Math.Ceiling(brushVerticesPosMaxY - brushVerticesPosMinY);
 
+            brushVerticesOffsetX = width < height ? ((height - width) / 2) : 0;
+            brushVerticesOffsetY = height < width ? ((width - height) / 2) : 0;
+
             outputResolution = width >= height ? width : height;
 
             /*posX = ((brushVerticesPosMaxX - brushVerticesPosMinX) + OverviewOffsets.GetCenteredValueByScalePosX(scale)) - 1024 + 256; // - 1024 for resolution, + 256 for offset (because cl_leveloverview is used at 1280x1024)
             posY = ((brushVerticesPosMaxY - brushVerticesPosMinY) + OverviewOffsets.GetCenteredValueByScalePosY(scale)) - 1024;*/ // - 1024 for resolution
-            posX = brushVerticesPosMinX;
-            posY = brushVerticesPosMinY + (scale * 1024);
+            posX = brushVerticesPosMinX - brushVerticesOffsetX;
+            posY = brushVerticesPosMinY + (scale * 1024) - brushVerticesOffsetY;
 
             this.scale = scale;
         }

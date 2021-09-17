@@ -444,8 +444,8 @@ namespace JERC
                 var verticesOffset = verticesAndWorldHeightRanges.vertices;
                 for (var i = 0; i < verticesOffset.Count(); i++)
                 {
-                    verticesOffset[i].X = verticesOffset[i].X - overviewPositionValues.brushVerticesPosMinX;
-                    verticesOffset[i].Y = verticesOffset[i].Y - overviewPositionValues.brushVerticesPosMinY;
+                    verticesOffset[i].X = verticesOffset[i].X - overviewPositionValues.brushVerticesPosMinX + overviewPositionValues.brushVerticesOffsetX;
+                    verticesOffset[i].Y = verticesOffset[i].Y - overviewPositionValues.brushVerticesPosMinY + overviewPositionValues.brushVerticesOffsetY;
                 }
 
                 DrawFilledPolygonObjective(graphics, solidBrush, pen, verticesOffset);
