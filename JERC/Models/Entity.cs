@@ -16,7 +16,7 @@ namespace JERC.Models
         public string origin;
         public Editor editor;
 
-        public Brush brush;
+        public List<Brush> brushes;
 
         public Entity(IVNode entity)
         {
@@ -30,7 +30,7 @@ namespace JERC.Models
             origin = entity.Body.FirstOrDefault(x => x.Name == "origin")?.Value;
             editor = new Editor(entity.Body.FirstOrDefault(x => x.Name == "editor"));
 
-            brush = entity.Body.Any(x => x.Name == "solid") ? new Brush(entity.Body.FirstOrDefault(x => x.Name == "solid")) : null;
+            brushes = entity.Body.Any(x => x.Name == "solid") ? entity.Body.Where(x => x.Name == "solid").Select(x => new Brush(x)).ToList() : null;
         }
     }
 }

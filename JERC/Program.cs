@@ -268,6 +268,8 @@ namespace JERC
 
             using (var graphics = Graphics.FromImage(bmp))
             {
+                var boundingBox = new BoundingBox();
+
                 graphics.SmoothingMode = SmoothingMode.AntiAlias;
 
                 graphics.SetClip(Rectangle.FromLTRB(0, 0, overviewPositionValues.outputResolution, overviewPositionValues.outputResolution));

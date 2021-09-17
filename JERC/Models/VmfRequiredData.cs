@@ -41,9 +41,9 @@ namespace JERC.Models
             var entitiesBombsiteModelled = bombsiteBrushEntities.Any() ? bombsiteBrushEntities.Select(x => new Entity(x)).ToList() : new List<Entity>();
             var entitiesRescueZoneModelled = RescueZoneBrushEntities.Any() ? RescueZoneBrushEntities.Select(x => new Entity(x)).ToList() : new List<Entity>();
 
-            entitiesSidesBuyzone = entitiesBuyzoneModelled.SelectMany(x => x.brush.side).ToList();
-            entitiesSidesBombsite = entitiesBombsiteModelled.SelectMany(x => x.brush.side).ToList();
-            entitiesSidesRescueZone = entitiesRescueZoneModelled.SelectMany(x => x.brush.side).ToList();
+            entitiesSidesBuyzone = entitiesBuyzoneModelled.SelectMany(x => x.brushes.SelectMany(x => x.side)).ToList();
+            entitiesSidesBombsite = entitiesBombsiteModelled.SelectMany(x => x.brushes.SelectMany(x => x.side)).ToList();
+            entitiesSidesRescueZone = entitiesRescueZoneModelled.SelectMany(x => x.brushes.SelectMany(x => x.side)).ToList();
 
 
             this.hostageEntities = hostageEntities.Any() ? hostageEntities.Select(x => new Entity(x)).ToList() : new List<Entity>();
