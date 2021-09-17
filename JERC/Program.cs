@@ -307,6 +307,9 @@ namespace JERC
             boundingBox.minY = verticesAndWorldHeightRangesList.SelectMany(x => x.vertices.Select(y => y.Y)).Min();
             boundingBox.maxY = verticesAndWorldHeightRangesList.SelectMany(x => x.vertices.Select(y => y.Y)).Max();
 
+            boundingBox.minZ = verticesAndWorldHeightRangesList.Select(x => x.worldHeight).Min();
+            boundingBox.maxZ = verticesAndWorldHeightRangesList.Select(x => x.worldHeight).Max();
+
             return verticesAndWorldHeightRangesList;
         }
 
