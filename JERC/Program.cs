@@ -277,8 +277,8 @@ namespace JERC
                 var brushSideList = GetBrushVerticesList(boundingBox);
                 RenderBrushSides(bmp, graphics, boundingBox, overviewPositionValues, brushSideList);
 
-                var entityBrushSideList = GetEntityVerticesList();
-                RenderEntities(bmp, graphics, boundingBox, overviewPositionValues, entityBrushSideList);
+                var entityBrushSideListById = GetEntityVerticesListById();
+                RenderEntities(bmp, graphics, boundingBox, overviewPositionValues, entityBrushSideListById);
 
                 graphics.Save();
 
@@ -316,15 +316,37 @@ namespace JERC
         }
 
 
-        private static List<EntityBrushSide> GetEntityVerticesList()
+        private static Dictionary<int, List<EntityBrushSide>> GetEntityVerticesListById()
         {
-            var entityBrushSideList = new List<EntityBrushSide>();
+            var entityBrushSideListById = new Dictionary<int, List<EntityBrushSide>>();
 
-            entityBrushSideList.AddRange(GetEntityBuyzoneVerticesList());
-            entityBrushSideList.AddRange(GetEntityBombsiteVerticesList());
-            entityBrushSideList.AddRange(GetEntityRescueZoneVerticesList());
+            var entityBuyzoneVerticesListById = GetEntityBuyzoneVerticesList();
+            var entityBombsiteVerticesListById = GetEntityBombsiteVerticesList();
+            var entityRescueZoneVerticesListById = GetEntityRescueZoneVerticesList();
 
-            return entityBrushSideList;
+            if (entityBuyzoneVerticesListById != null && entityBuyzoneVerticesListById.Any())
+            {
+                foreach (var list in entityBuyzoneVerticesListById)
+                {
+                    entityBrushSideListById.Add(list.Key, list.Value);
+                }
+            }
+            if (entityBombsiteVerticesListById != null && entityBombsiteVerticesListById.Any())
+            {
+                foreach (var list in entityBombsiteVerticesListById)
+                {
+                    entityBrushSideListById.Add(list.Key, list.Value);
+                }
+            }
+            if (entityRescueZoneVerticesListById != null && entityRescueZoneVerticesListById.Any())
+            {
+                foreach (var list in entityRescueZoneVerticesListById)
+                {
+                    entityBrushSideListById.Add(list.Key, list.Value);
+                }
+            }
+
+            return entityBrushSideListById;
         }
 
 
@@ -420,72 +442,90 @@ namespace JERC
         }
 
 
-        private static List<EntityBrushSide> GetEntityBuyzoneVerticesList()
+        private static Dictionary<int, List<EntityBrushSide>> GetEntityBuyzoneVerticesList()
         {
-            var entityBrushSideList = new List<EntityBrushSide>();
+            var entityBrushSideListById = new Dictionary<int, List<EntityBrushSide>>();
 
-            foreach (var side in vmfRequiredData.entitiesSidesBuyzone)
+            foreach (var entitySides in vmfRequiredData.entitiesSidesByEntityBuyzoneId)
             {
-                var entityBrushSide = new EntityBrushSide(side.vertices_plus.Count());
-                for (int i = 0; i < side.vertices_plus.Count(); i++)
+                foreach (var side in entitySides.Value)
                 {
-                    var vert = side.vertices_plus[i];
+                    var entityBrushSide = new EntityBrushSide(side.vertices_plus.Count());
+                    for (int i = 0; i < side.vertices_plus.Count(); i++)
+                    {
+                        var vert = side.vertices_plus[i];
 
-                    entityBrushSide.vertices[i] = new PointF(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier);
-                    entityBrushSide.worldHeight = vert.z;
-                    entityBrushSide.entityType = EntityTypes.Buyzone;
+                        entityBrushSide.vertices[i] = new PointF(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier);
+                        entityBrushSide.worldHeight = vert.z;
+                        entityBrushSide.entityType = EntityTypes.Buyzone;
+                    }
+
+                    if (entityBrushSideListById.ContainsKey(entitySides.Key))
+                        entityBrushSideListById[entitySides.Key].Add(entityBrushSide);
+                    else
+                        entityBrushSideListById.Add(entitySides.Key, new List<EntityBrushSide>() { entityBrushSide });
                 }
-
-                entityBrushSideList.Add(entityBrushSide);
             }
 
-            return entityBrushSideList;
+            return entityBrushSideListById;
         }
 
 
-        private static List<EntityBrushSide> GetEntityBombsiteVerticesList()
+        private static Dictionary<int, List<EntityBrushSide>> GetEntityBombsiteVerticesList()
         {
-            var entityBrushSideList = new List<EntityBrushSide>();
+            var entityBrushSideListById = new Dictionary<int, List<EntityBrushSide>>();
 
-            foreach (var side in vmfRequiredData.entitiesSidesBombsite)
+            foreach (var entitySides in vmfRequiredData.entitiesSidesByEntityBombsiteId)
             {
-                var entityBrushSide = new EntityBrushSide(side.vertices_plus.Count());
-                for (int i = 0; i < side.vertices_plus.Count(); i++)
+                foreach (var side in entitySides.Value)
                 {
-                    var vert = side.vertices_plus[i];
+                    var entityBrushSide = new EntityBrushSide(side.vertices_plus.Count());
+                    for (int i = 0; i < side.vertices_plus.Count(); i++)
+                    {
+                        var vert = side.vertices_plus[i];
 
-                    entityBrushSide.vertices[i] = new PointF(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier);
-                    entityBrushSide.worldHeight = vert.z;
-                    entityBrushSide.entityType = EntityTypes.Bombsite;
+                        entityBrushSide.vertices[i] = new PointF(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier);
+                        entityBrushSide.worldHeight = vert.z;
+                        entityBrushSide.entityType = EntityTypes.Bombsite;
+                    }
+
+                    if (entityBrushSideListById.ContainsKey(entitySides.Key))
+                        entityBrushSideListById[entitySides.Key].Add(entityBrushSide);
+                    else
+                        entityBrushSideListById.Add(entitySides.Key, new List<EntityBrushSide>() { entityBrushSide });
                 }
-
-                entityBrushSideList.Add(entityBrushSide);
             }
 
-            return entityBrushSideList;
+            return entityBrushSideListById;
         }
 
 
-        private static List<EntityBrushSide> GetEntityRescueZoneVerticesList()
+        private static Dictionary<int, List<EntityBrushSide>> GetEntityRescueZoneVerticesList()
         {
-            var entityBrushSideList = new List<EntityBrushSide>();
+            var entityBrushSideListById = new Dictionary<int, List<EntityBrushSide>>();
 
-            foreach (var side in vmfRequiredData.entitiesSidesRescueZone)
+            foreach (var entitySides in vmfRequiredData.entitiesSidesByEntityRescueZoneId)
             {
-                var entityBrushSide = new EntityBrushSide(side.vertices_plus.Count());
-                for (int i = 0; i < side.vertices_plus.Count(); i++)
+                foreach (var side in entitySides.Value)
                 {
-                    var vert = side.vertices_plus[i];
+                    var entityBrushSide = new EntityBrushSide(side.vertices_plus.Count());
+                    for (int i = 0; i < side.vertices_plus.Count(); i++)
+                    {
+                        var vert = side.vertices_plus[i];
 
-                    entityBrushSide.vertices[i] = new PointF(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier);
-                    entityBrushSide.worldHeight = vert.z;
-                    entityBrushSide.entityType = EntityTypes.RescueZone;
+                        entityBrushSide.vertices[i] = new PointF(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier);
+                        entityBrushSide.worldHeight = vert.z;
+                        entityBrushSide.entityType = EntityTypes.RescueZone;
+                    }
+
+                    if (entityBrushSideListById.ContainsKey(entitySides.Key))
+                        entityBrushSideListById[entitySides.Key].Add(entityBrushSide);
+                    else
+                        entityBrushSideListById.Add(entitySides.Key, new List<EntityBrushSide>() { entityBrushSide });
                 }
-
-                entityBrushSideList.Add(entityBrushSide);
             }
 
-            return entityBrushSideList;
+            return entityBrushSideListById;
         }
 
 
@@ -564,39 +604,42 @@ namespace JERC
         }
 
 
-        private static void RenderEntities(Bitmap bmp, Graphics graphics, BoundingBox boundingBox, OverviewPositionValues overviewPositionValues, List<EntityBrushSide> entityBrushSideList)
+        private static void RenderEntities(Bitmap bmp, Graphics graphics, BoundingBox boundingBox, OverviewPositionValues overviewPositionValues, Dictionary<int, List<EntityBrushSide>> entityBrushSideListById)
         {
             Pen pen = null;
             SolidBrush solidBrush = null;
 
-            foreach (var entityBrushSide in entityBrushSideList)
+            foreach (var entityBrushSideByBrush in entityBrushSideListById.Values)
             {
-                pen = entityBrushSide.entityType switch
+                foreach (var entityBrushSide in entityBrushSideByBrush)
                 {
-                    EntityTypes.Buyzone => PenColours.PenBuyzones(),
-                    EntityTypes.Bombsite => PenColours.PenBombsites(),
-                    EntityTypes.RescueZone => PenColours.PenRescueZones(),
-                    _ => null,
-                };
+                    pen = entityBrushSide.entityType switch
+                    {
+                        EntityTypes.Buyzone => PenColours.PenBuyzones(),
+                        EntityTypes.Bombsite => PenColours.PenBombsites(),
+                        EntityTypes.RescueZone => PenColours.PenRescueZones(),
+                        _ => null,
+                    };
 
-                solidBrush = entityBrushSide.entityType switch
-                {
-                    EntityTypes.Buyzone => BrushColours.SolidBrushBuyzones(),
-                    EntityTypes.Bombsite => BrushColours.SolidBrushBombsites(),
-                    EntityTypes.RescueZone => BrushColours.SolidBrushRescueZones(),
-                    _ => null,
-                };
+                    solidBrush = entityBrushSide.entityType switch
+                    {
+                        EntityTypes.Buyzone => BrushColours.SolidBrushBuyzones(),
+                        EntityTypes.Bombsite => BrushColours.SolidBrushBombsites(),
+                        EntityTypes.RescueZone => BrushColours.SolidBrushRescueZones(),
+                        _ => null,
+                    };
 
 
-                // corrects the verts to tax into account the movement from space in world to the space in the image (which starts at (0,0))
-                var verticesOffset = entityBrushSide.vertices;
-                for (var i = 0; i < verticesOffset.Count(); i++)
-                {
-                    verticesOffset[i].X = verticesOffset[i].X - overviewPositionValues.brushVerticesPosMinX + overviewPositionValues.brushVerticesOffsetX;
-                    verticesOffset[i].Y = verticesOffset[i].Y - overviewPositionValues.brushVerticesPosMinY + overviewPositionValues.brushVerticesOffsetY;
+                    // corrects the verts to tax into account the movement from space in world to the space in the image (which starts at (0,0))
+                    var verticesOffset = entityBrushSide.vertices;
+                    for (var i = 0; i < verticesOffset.Count(); i++)
+                    {
+                        verticesOffset[i].X = verticesOffset[i].X - overviewPositionValues.brushVerticesPosMinX + overviewPositionValues.brushVerticesOffsetX;
+                        verticesOffset[i].Y = verticesOffset[i].Y - overviewPositionValues.brushVerticesPosMinY + overviewPositionValues.brushVerticesOffsetY;
+                    }
+
+                    DrawFilledPolygonObject(graphics, solidBrush, pen, verticesOffset);
                 }
-
-                DrawFilledPolygonObject(graphics, solidBrush, pen, verticesOffset);
             }
 
             pen?.Dispose();

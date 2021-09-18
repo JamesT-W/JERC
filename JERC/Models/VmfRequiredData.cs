@@ -1,4 +1,5 @@
 ﻿using JERC.Constants;
+using JERC.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,9 +15,9 @@ namespace JERC.Models
         public List<Side> brushesSidesCover;
         public List<Side> brushesSidesOverlap;
 
-        public List<Side> entitiesSidesBuyzone;
-        public List<Side> entitiesSidesBombsite;
-        public List<Side> entitiesSidesRescueZone;
+        public Dictionary<int, List<Side>> entitiesSidesByEntityBuyzoneId = new Dictionary<int, List<Side>>();
+        public Dictionary<int, List<Side>> entitiesSidesByEntityBombsiteId = new Dictionary<int, List<Side>>();
+        public Dictionary<int, List<Side>> entitiesSidesByEntityRescueZoneId = new Dictionary<int, List<Side>>();
 
         public List<Entity> rescueZoneBrushes;
         public List<Entity> hostageEntities;
@@ -36,15 +37,22 @@ namespace JERC.Models
             brushesSidesCover = brushesCoverModelled.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.CoverTextureName)).ToList();
             brushesSidesOverlap = brushesOverlapModelled.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.OverlapTextureName)).ToList();
 
-
             var entitiesBuyzoneModelled = buyzoneBrushEntities.Any() ? buyzoneBrushEntities.Select(x => new Entity(x)).ToList() : new List<Entity>();
             var entitiesBombsiteModelled = bombsiteBrushEntities.Any() ? bombsiteBrushEntities.Select(x => new Entity(x)).ToList() : new List<Entity>();
             var entitiesRescueZoneModelled = RescueZoneBrushEntities.Any() ? RescueZoneBrushEntities.Select(x => new Entity(x)).ToList() : new List<Entity>();
 
-            entitiesSidesBuyzone = entitiesBuyzoneModelled.SelectMany(x => x.brushes.SelectMany(x => x.side)).ToList();
-            entitiesSidesBombsite = entitiesBombsiteModelled.SelectMany(x => x.brushes.SelectMany(x => x.side)).ToList();
-            entitiesSidesRescueZone = entitiesRescueZoneModelled.SelectMany(x => x.brushes.SelectMany(x => x.side)).ToList();
-
+            foreach (var entity in entitiesBuyzoneModelled)
+            {
+                entitiesSidesByEntityBuyzoneId.Add(entity.id, entity.brushes.SelectMany(x => x.side).ToList());
+            }
+            foreach (var entity in entitiesBombsiteModelled)
+            {
+                entitiesSidesByEntityBombsiteId.Add(entity.id, entity.brushes.SelectMany(x => x.side).ToList());
+            }
+            foreach (var entity in entitiesRescueZoneModelled)
+            {
+                entitiesSidesByEntityRescueZoneId.Add(entity.id, entity.brushes.SelectMany(x => x.side).ToList());
+            }
 
             this.hostageEntities = hostageEntities.Any() ? hostageEntities.Select(x => new Entity(x)).ToList() : new List<Entity>();
         }
