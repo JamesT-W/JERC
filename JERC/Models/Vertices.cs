@@ -22,5 +22,12 @@ namespace JERC.Models
             float.TryParse(verticesSplit[1], out y);
             float.TryParse(verticesSplit[2], out z);
         }
+
+        public Vertices(float x, float y, float z)
+        {
+            this.x = x;
+            this.y = y;
+            this.z = z;
+        }
     }
 }

@@ -1,4 +1,4 @@
-using JERC.Constants;
+﻿using JERC.Constants;
 using JERC.Enums;
 using JERC.Models;
 using System;
@@ -320,9 +320,16 @@ namespace JERC
         {
             var entityBrushSideList = new List<EntityBrushSide>();
 
-            entityBrushSideList.AddRange(GetEntityBuyzoneVerticesList());
-            entityBrushSideList.AddRange(GetEntityBombsiteVerticesList());
-            entityBrushSideList.AddRange(GetEntityRescueZoneVerticesList());
+            var entityBuyzoneVerticesList = GetEntityBuyzoneVerticesList();
+            var entityBombsiteVerticesList = GetEntityBombsiteVerticesList();
+            var entityRescueZoneVerticesList = GetEntityRescueZoneVerticesList();
+
+            if (entityBuyzoneVerticesList != null && entityBuyzoneVerticesList.Any())
+                entityBrushSideList.AddRange(entityBuyzoneVerticesList);
+            if (entityBombsiteVerticesList != null && entityBombsiteVerticesList.Any())
+                entityBrushSideList.AddRange(entityBombsiteVerticesList);
+            if (entityRescueZoneVerticesList != null && entityRescueZoneVerticesList.Any())
+                entityBrushSideList.AddRange(entityRescueZoneVerticesList);
 
             return entityBrushSideList;
         }
@@ -424,19 +431,22 @@ namespace JERC
         {
             var entityBrushSideList = new List<EntityBrushSide>();
 
-            foreach (var side in vmfRequiredData.entitiesSidesBuyzone)
+            foreach (var entitySides in vmfRequiredData.entitiesSidesByEntityBuyzoneId.Values)
             {
-                var entityBrushSide = new EntityBrushSide(side.vertices_plus.Count());
-                for (int i = 0; i < side.vertices_plus.Count(); i++)
+                foreach (var side in entitySides)
                 {
-                    var vert = side.vertices_plus[i];
+                    var entityBrushSide = new EntityBrushSide(side.vertices_plus.Count());
+                    for (int i = 0; i < side.vertices_plus.Count(); i++)
+                    {
+                        var vert = side.vertices_plus[i];
 
-                    entityBrushSide.vertices[i] = new PointF(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier);
-                    entityBrushSide.worldHeight = vert.z;
-                    entityBrushSide.entityType = EntityTypes.Buyzone;
+                        entityBrushSide.vertices[i] = new PointF(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier);
+                        entityBrushSide.worldHeight = vert.z;
+                        entityBrushSide.entityType = EntityTypes.Buyzone;
+                    }
+
+                    entityBrushSideList.Add(entityBrushSide);
                 }
-
-                entityBrushSideList.Add(entityBrushSide);
             }
 
             return entityBrushSideList;
@@ -447,19 +457,22 @@ namespace JERC
         {
             var entityBrushSideList = new List<EntityBrushSide>();
 
-            foreach (var side in vmfRequiredData.entitiesSidesBombsite)
+            foreach (var entitySides in vmfRequiredData.entitiesSidesByEntityBombsiteId.Values)
             {
-                var entityBrushSide = new EntityBrushSide(side.vertices_plus.Count());
-                for (int i = 0; i < side.vertices_plus.Count(); i++)
+                foreach (var side in entitySides)
                 {
-                    var vert = side.vertices_plus[i];
+                    var entityBrushSide = new EntityBrushSide(side.vertices_plus.Count());
+                    for (int i = 0; i < side.vertices_plus.Count(); i++)
+                    {
+                        var vert = side.vertices_plus[i];
 
-                    entityBrushSide.vertices[i] = new PointF(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier);
-                    entityBrushSide.worldHeight = vert.z;
-                    entityBrushSide.entityType = EntityTypes.Bombsite;
+                        entityBrushSide.vertices[i] = new PointF(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier);
+                        entityBrushSide.worldHeight = vert.z;
+                        entityBrushSide.entityType = EntityTypes.Bombsite;
+                    }
+
+                    entityBrushSideList.Add(entityBrushSide);
                 }
-
-                entityBrushSideList.Add(entityBrushSide);
             }
 
             return entityBrushSideList;
@@ -470,19 +483,22 @@ namespace JERC
         {
             var entityBrushSideList = new List<EntityBrushSide>();
 
-            foreach (var side in vmfRequiredData.entitiesSidesRescueZone)
+            foreach (var entitySides in vmfRequiredData.entitiesSidesByEntityRescueZoneId.Values)
             {
-                var entityBrushSide = new EntityBrushSide(side.vertices_plus.Count());
-                for (int i = 0; i < side.vertices_plus.Count(); i++)
+                foreach (var side in entitySides)
                 {
-                    var vert = side.vertices_plus[i];
+                    var entityBrushSide = new EntityBrushSide(side.vertices_plus.Count());
+                    for (int i = 0; i < side.vertices_plus.Count(); i++)
+                    {
+                        var vert = side.vertices_plus[i];
 
-                    entityBrushSide.vertices[i] = new PointF(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier);
-                    entityBrushSide.worldHeight = vert.z;
-                    entityBrushSide.entityType = EntityTypes.RescueZone;
+                        entityBrushSide.vertices[i] = new PointF(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier);
+                        entityBrushSide.worldHeight = vert.z;
+                        entityBrushSide.entityType = EntityTypes.RescueZone;
+                    }
+
+                    entityBrushSideList.Add(entityBrushSide);
                 }
-
-                entityBrushSideList.Add(entityBrushSide);
             }
 
             return entityBrushSideList;
@@ -596,11 +612,41 @@ namespace JERC
                     verticesOffset[i].Y = verticesOffset[i].Y - overviewPositionValues.brushVerticesPosMinY + overviewPositionValues.brushVerticesOffsetY;
                 }
 
+
+                var allPointsInPolygon = GetAllPointsInPolygon(overviewPositionValues, verticesOffset);
+
+                foreach (var vertices in allPointsInPolygon)
+                {
+                    bmp.SetPixel(vertices.X, vertices.Y, Color.DarkGreen);
+                }
+
+
                 DrawFilledPolygonObject(graphics, solidBrush, pen, verticesOffset);
             }
 
             pen?.Dispose();
             solidBrush?.Dispose();
+        }
+
+
+        public static List<Point> GetAllPointsInPolygon(OverviewPositionValues overviewPositionValues, PointF[] vertices)
+        {
+            var allPointsInPolygon = new List<Point>();
+
+            for (var i = 0; i < overviewPositionValues.width; i++)
+            {
+                for (var j = 0; j < overviewPositionValues.width; j++)
+                {
+                    var polygonIsInside = PolygonLogic.GetIsInside(vertices.Select(x => new Point((int)x.X, (int)x.Y)).ToArray(), new Point(i, j));
+
+                    if (polygonIsInside)
+                    {
+                        allPointsInPolygon.Add(new Point(i, j));
+                    }
+                }
+            }
+
+            return allPointsInPolygon;
         }
 
 
@@ -620,7 +666,6 @@ namespace JERC
 
             var graphicsPath = new GraphicsPath();
             graphicsPath.AddPolygon(verticesToUse);
-
             var region = new Region(graphicsPath);
             graphics.ExcludeClip(region);
 
