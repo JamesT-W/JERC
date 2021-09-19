@@ -117,6 +117,7 @@ namespace JERC
             var allWorldBrushes = vmf.World.Body.Where(x => x.Name == "solid");
             var allEntities = vmf.Body.Where(x => x.Name == "entity");
 
+            // used for both world brushes and displacements
             var allWorldBrushesInVisgroup = from x in allWorldBrushes
                                             from y in x.Body
                                             where y.Name == "editor"
@@ -130,6 +131,11 @@ namespace JERC
             var brushesCover = GetBrushesCover(allWorldBrushesInVisgroup);
             var brushesOverlap = GetBrushesOverlap(allWorldBrushesInVisgroup);
 
+            var displacementsNegative = GetDisplacementsNegative(allWorldBrushesInVisgroup);
+            var displacementsLayout = GetDisplacementsLayout(allWorldBrushesInVisgroup);
+            var displacementsCover = GetDisplacementsCover(allWorldBrushesInVisgroup);
+            var displacementsOverlap = GetDisplacementsOverlap(allWorldBrushesInVisgroup);
+
             var buyzoneBrushEntities = GetBuyzoneBrushEntities(allEntities);
             var bombsiteBrushEntities = GetBombsiteBrushEntities(allEntities);
             var rescueZoneBrushEntities = GetRescueZoneBrushEntities(allEntities);
@@ -137,6 +143,7 @@ namespace JERC
 
             return new VmfRequiredData(
                 brushesNegative, brushesLayout, brushesCover, brushesOverlap,
+                displacementsNegative, displacementsLayout, displacementsCover, displacementsOverlap,
                 buyzoneBrushEntities, bombsiteBrushEntities, rescueZoneBrushEntities, hostageEntities
             );
         }
@@ -147,6 +154,7 @@ namespace JERC
             return from x in allWorldBrushesInVisgroup
                    from y in x.Body
                    where y.Name == "side"
+                   where !y.Body.Any(z => z.Name == "dispinfo")
                    from z in y.Body
                    where z.Name == "material"
                    where z.Value.ToLower() == TextureNames.NegativeTextureName.ToLower()
@@ -159,6 +167,7 @@ namespace JERC
             return from x in allWorldBrushesInVisgroup
                    from y in x.Body
                    where y.Name == "side"
+                   where !y.Body.Any(z => z.Name == "dispinfo")
                    from z in y.Body
                    where z.Name == "material"
                    where z.Value.ToLower() == TextureNames.LayoutTextureName.ToLower()
@@ -171,6 +180,7 @@ namespace JERC
             return from x in allWorldBrushesInVisgroup
                    from y in x.Body
                    where y.Name == "side"
+                   where !y.Body.Any(z => z.Name == "dispinfo")
                    from z in y.Body
                    where z.Name == "material"
                    where z.Value.ToLower() == TextureNames.CoverTextureName.ToLower()
@@ -183,6 +193,59 @@ namespace JERC
             return from x in allWorldBrushesInVisgroup
                    from y in x.Body
                    where y.Name == "side"
+                   where !y.Body.Any(z => z.Name == "dispinfo")
+                   from z in y.Body
+                   where z.Name == "material"
+                   where z.Value.ToLower() == TextureNames.OverlapTextureName.ToLower()
+                   select x;
+        }
+
+
+        private static IEnumerable<IVNode> GetDisplacementsNegative(IEnumerable<IVNode> allWorldBrushesInVisgroup)
+        {
+            return from x in allWorldBrushesInVisgroup
+                   from y in x.Body
+                   where y.Name == "side"
+                   where y.Body.Any(z => z.Name == "dispinfo")
+                   from z in y.Body
+                   where z.Name == "material"
+                   where z.Value.ToLower() == TextureNames.NegativeTextureName.ToLower()
+                   select x;
+        }
+
+
+        private static IEnumerable<IVNode> GetDisplacementsLayout(IEnumerable<IVNode> allWorldBrushesInVisgroup)
+        {
+            return from x in allWorldBrushesInVisgroup
+                   from y in x.Body
+                   where y.Name == "side"
+                   where y.Body.Any(z => z.Name == "dispinfo")
+                   from z in y.Body
+                   where z.Name == "material"
+                   where z.Value.ToLower() == TextureNames.LayoutTextureName.ToLower()
+                   select x;
+        }
+
+
+        private static IEnumerable<IVNode> GetDisplacementsCover(IEnumerable<IVNode> allWorldBrushesInVisgroup)
+        {
+            return from x in allWorldBrushesInVisgroup
+                   from y in x.Body
+                   where y.Name == "side"
+                   where y.Body.Any(z => z.Name == "dispinfo")
+                   from z in y.Body
+                   where z.Name == "material"
+                   where z.Value.ToLower() == TextureNames.CoverTextureName.ToLower()
+                   select x;
+        }
+
+
+        private static IEnumerable<IVNode> GetDisplacementsOverlap(IEnumerable<IVNode> allWorldBrushesInVisgroup)
+        {
+            return from x in allWorldBrushesInVisgroup
+                   from y in x.Body
+                   where y.Name == "side"
+                   where y.Body.Any(z => z.Name == "dispinfo")
                    from z in y.Body
                    where z.Name == "material"
                    where z.Value.ToLower() == TextureNames.OverlapTextureName.ToLower()
@@ -232,13 +295,18 @@ namespace JERC
 
         private static OverviewPositionValues SortScaleStuff()
         {
-            var allWorldBrushesExceptNegative = vmfRequiredData.brushesSidesLayout.Concat(vmfRequiredData.brushesSidesCover).Concat(vmfRequiredData.brushesSidesOverlap);
-            //var allWorldBrushes = vmfRequiredData.brushesSidesNegative.Concat(allWorldBrushesExceptNegative);
+            var allWorldBrushesAndDisplacementsExceptNegative = vmfRequiredData.brushesSidesLayout
+                .Concat(vmfRequiredData.brushesSidesCover)
+                .Concat(vmfRequiredData.brushesSidesOverlap)
+                .Concat(vmfRequiredData.displacementsSidesLayout)
+                .Concat(vmfRequiredData.displacementsSidesCover)
+                .Concat(vmfRequiredData.displacementsSidesOverlap);
+            //var allWorldBrushes = vmfRequiredData.brushesSidesNegative.Concat(vmfRequiredData.displacementsSidesNegative).Concat(allWorldBrushesAndDisplacementsExceptNegative);
 
-            var minX = allWorldBrushesExceptNegative.Min(x => x.vertices_plus.Min(y => y.x));
-            var maxX = allWorldBrushesExceptNegative.Max(x => x.vertices_plus.Max(y => y.x));
-            var minY = allWorldBrushesExceptNegative.Min(x => x.vertices_plus.Min(y => y.y));
-            var maxY = allWorldBrushesExceptNegative.Max(x => x.vertices_plus.Max(y => y.y));
+            var minX = allWorldBrushesAndDisplacementsExceptNegative.Min(x => x.vertices_plus.Min(y => y.x));
+            var maxX = allWorldBrushesAndDisplacementsExceptNegative.Max(x => x.vertices_plus.Max(y => y.x));
+            var minY = allWorldBrushesAndDisplacementsExceptNegative.Min(x => x.vertices_plus.Min(y => y.y));
+            var maxY = allWorldBrushesAndDisplacementsExceptNegative.Max(x => x.vertices_plus.Max(y => y.y));
 
             var sizeX = maxX - minX;
             var sizeY = maxY - minY;
@@ -274,9 +342,21 @@ namespace JERC
 
                 graphics.SetClip(Rectangle.FromLTRB(0, 0, overviewPositionValues.outputResolution, overviewPositionValues.outputResolution));
 
-                var brushSideList = GetBrushVerticesList(boundingBox);
-                RenderBrushSides(bmp, graphics, boundingBox, overviewPositionValues, brushSideList);
+                // add negative first to set to graphics' clip
+                var brushNegativeSideList = GetBrushNegativeOnlyVerticesList(boundingBox);
+                RenderBrushSides(bmp, graphics, boundingBox, overviewPositionValues, brushNegativeSideList);
 
+                var displacementNegativeSideList = GetDisplacementNegativeOnlyVerticesList(boundingBox);
+                RenderDisplacementSides(bmp, graphics, boundingBox, overviewPositionValues, displacementNegativeSideList);
+
+                // non negatives next
+                var brushExceptNegativeSideList = GetBrushExceptNegativeOnlyVerticesList(boundingBox);
+                RenderBrushSides(bmp, graphics, boundingBox, overviewPositionValues, brushExceptNegativeSideList);
+
+                var displacementExceptNegativeSideList = GetDisplacementExceptNegativeOnlyVerticesList(boundingBox);
+                RenderDisplacementSides(bmp, graphics, boundingBox, overviewPositionValues, displacementExceptNegativeSideList);
+
+                // entities next
                 var entityBrushSideListById = GetEntityVerticesListById();
                 RenderEntities(bmp, graphics, boundingBox, overviewPositionValues, entityBrushSideListById);
 
@@ -292,6 +372,90 @@ namespace JERC
             }
 
             DisposeImage(bmp);
+        }
+
+
+        private static List<BrushSide> GetBrushNegativeOnlyVerticesList(BoundingBox boundingBox)
+        {
+            var brushSideList = GetBrushNegativeVerticesList();
+
+            if (brushSideList.Count() == 0)
+                return brushSideList;
+
+            boundingBox.minX = brushSideList.SelectMany(x => x.vertices.Select(y => y.X)).Min();
+            boundingBox.maxX = brushSideList.SelectMany(x => x.vertices.Select(y => y.X)).Max();
+            boundingBox.minY = brushSideList.SelectMany(x => x.vertices.Select(y => y.Y)).Min();
+            boundingBox.maxY = brushSideList.SelectMany(x => x.vertices.Select(y => y.Y)).Max();
+
+            boundingBox.minZ = brushSideList.Select(x => x.worldHeight).Min();
+            boundingBox.maxZ = brushSideList.Select(x => x.worldHeight).Max();
+
+            return brushSideList;
+        }
+
+
+        private static List<BrushSide> GetDisplacementNegativeOnlyVerticesList(BoundingBox boundingBox)
+        {
+            var displacementSideList = GetDisplacementNegativeVerticesList();
+
+            if (displacementSideList.Count() == 0)
+                return displacementSideList;
+
+            boundingBox.minX = displacementSideList.SelectMany(x => x.vertices.Select(y => y.X)).Min();
+            boundingBox.maxX = displacementSideList.SelectMany(x => x.vertices.Select(y => y.X)).Max();
+            boundingBox.minY = displacementSideList.SelectMany(x => x.vertices.Select(y => y.Y)).Min();
+            boundingBox.maxY = displacementSideList.SelectMany(x => x.vertices.Select(y => y.Y)).Max();
+
+            boundingBox.minZ = displacementSideList.Select(x => x.worldHeight).Min();
+            boundingBox.maxZ = displacementSideList.Select(x => x.worldHeight).Max();
+
+            return displacementSideList;
+        }
+
+
+        private static List<BrushSide> GetBrushExceptNegativeOnlyVerticesList(BoundingBox boundingBox)
+        {
+            var brushSideList = new List<BrushSide>();
+
+            brushSideList.AddRange(GetBrushLayoutVerticesList());
+            brushSideList.AddRange(GetBrushCoverVerticesList());
+            brushSideList.AddRange(GetBrushOverlapVerticesList());
+
+            if (brushSideList.Count() == 0)
+                return brushSideList;
+
+            boundingBox.minX = brushSideList.SelectMany(x => x.vertices.Select(y => y.X)).Min();
+            boundingBox.maxX = brushSideList.SelectMany(x => x.vertices.Select(y => y.X)).Max();
+            boundingBox.minY = brushSideList.SelectMany(x => x.vertices.Select(y => y.Y)).Min();
+            boundingBox.maxY = brushSideList.SelectMany(x => x.vertices.Select(y => y.Y)).Max();
+
+            boundingBox.minZ = brushSideList.Select(x => x.worldHeight).Min();
+            boundingBox.maxZ = brushSideList.Select(x => x.worldHeight).Max();
+
+            return brushSideList;
+        }
+
+
+        private static List<BrushSide> GetDisplacementExceptNegativeOnlyVerticesList(BoundingBox boundingBox)
+        {
+            var displacementSideList = new List<BrushSide>();
+
+            displacementSideList.AddRange(GetDisplacementLayoutVerticesList());
+            displacementSideList.AddRange(GetDisplacementCoverVerticesList());
+            displacementSideList.AddRange(GetDisplacementOverlapVerticesList());
+
+            if (displacementSideList.Count() == 0)
+                return displacementSideList;
+
+            boundingBox.minX = displacementSideList.SelectMany(x => x.vertices.Select(y => y.X)).Min();
+            boundingBox.maxX = displacementSideList.SelectMany(x => x.vertices.Select(y => y.X)).Max();
+            boundingBox.minY = displacementSideList.SelectMany(x => x.vertices.Select(y => y.Y)).Min();
+            boundingBox.maxY = displacementSideList.SelectMany(x => x.vertices.Select(y => y.Y)).Max();
+
+            boundingBox.minZ = displacementSideList.Select(x => x.worldHeight).Min();
+            boundingBox.maxZ = displacementSideList.Select(x => x.worldHeight).Max();
+
+            return displacementSideList;
         }
 
 
@@ -439,6 +603,98 @@ namespace JERC
             }
 
             return brushSideList;
+        }
+
+
+        private static List<BrushSide> GetDisplacementNegativeVerticesList()
+        {
+            var displacementSideList = new List<BrushSide>();
+
+            foreach (var side in vmfRequiredData.displacementsSidesNegative)
+            {
+                var displacementSide = new BrushSide(side.vertices_plus.Count());
+                for (int i = 0; i < side.vertices_plus.Count(); i++)
+                {
+                    var vert = side.vertices_plus[i];
+
+                    displacementSide.vertices[i] = new PointF(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier);
+                    displacementSide.worldHeight = vert.z;
+                    displacementSide.jercType = JercTypes.Negative;
+                }
+
+                displacementSideList.Add(displacementSide);
+            }
+
+            return displacementSideList;
+        }
+
+
+        private static List<BrushSide> GetDisplacementLayoutVerticesList()
+        {
+            var displacementSideList = new List<BrushSide>();
+
+            foreach (var side in vmfRequiredData.displacementsSidesLayout)
+            {
+                var displacementSide = new BrushSide(side.vertices_plus.Count());
+                for (int i = 0; i < side.vertices_plus.Count(); i++)
+                {
+                    var vert = side.vertices_plus[i];
+
+                    displacementSide.vertices[i] = new PointF(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier);
+                    displacementSide.worldHeight = vert.z;
+                    displacementSide.jercType = JercTypes.Layout;
+                }
+
+                displacementSideList.Add(displacementSide);
+            }
+
+            return displacementSideList;
+        }
+
+
+        private static List<BrushSide> GetDisplacementCoverVerticesList()
+        {
+            var displacementSideList = new List<BrushSide>();
+
+            foreach (var side in vmfRequiredData.displacementsSidesCover)
+            {
+                var displacementSide = new BrushSide(side.vertices_plus.Count());
+                for (int i = 0; i < side.vertices_plus.Count(); i++)
+                {
+                    var vert = side.vertices_plus[i];
+
+                    displacementSide.vertices[i] = new PointF(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier);
+                    displacementSide.worldHeight = vert.z;
+                    displacementSide.jercType = JercTypes.Cover;
+                }
+
+                displacementSideList.Add(displacementSide);
+            }
+
+            return displacementSideList;
+        }
+
+
+        private static List<BrushSide> GetDisplacementOverlapVerticesList()
+        {
+            var displacementSideList = new List<BrushSide>();
+
+            foreach (var side in vmfRequiredData.displacementsSidesOverlap)
+            {
+                var displacementSide = new BrushSide(side.vertices_plus.Count());
+                for (int i = 0; i < side.vertices_plus.Count(); i++)
+                {
+                    var vert = side.vertices_plus[i];
+
+                    displacementSide.vertices[i] = new PointF(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier);
+                    displacementSide.worldHeight = vert.z;
+                    displacementSide.jercType = JercTypes.Overlap;
+                }
+
+                displacementSideList.Add(displacementSide);
+            }
+
+            return displacementSideList;
         }
 
 
@@ -592,6 +848,81 @@ namespace JERC
                 if (brushSide.jercType == JercTypes.Negative)
                 {
                     AddNegativeRegion(bmp, graphics, brushSide);
+                }
+                else
+                {
+                    DrawFilledPolygonObjectBrushes(graphics, solidBrush, pen, verticesOffset);
+                }
+            }
+
+            pen?.Dispose();
+            solidBrush?.Dispose();
+        }
+
+
+        private static void RenderDisplacementSides(Bitmap bmp, Graphics graphics, BoundingBox boundingBox, OverviewPositionValues overviewPositionValues, List<BrushSide> displacementSideList)
+        {
+            Pen pen = null;
+            SolidBrush solidBrush = null;
+
+            foreach (var displacementSide in displacementSideList)
+            {
+                var heightAboveMin = displacementSide.worldHeight - boundingBox.minZ;
+
+                var percentageAboveMin = -1.00f;
+                if (heightAboveMin == 0)
+                {
+                    if (boundingBox.minZ == boundingBox.maxZ)
+                    {
+                        percentageAboveMin = 255;
+                    }
+                    else
+                    {
+                        percentageAboveMin = 1;
+                    }
+                }
+                else
+                {
+                    percentageAboveMin = heightAboveMin / (boundingBox.maxZ - boundingBox.minZ);
+                }
+
+                var gradientValue = (int)Math.Round(percentageAboveMin * 255, 0);
+
+                if (gradientValue < 1)
+                    gradientValue = 1;
+                else if (gradientValue > 255)
+                    gradientValue = 255;
+
+                pen = displacementSide.jercType switch
+                {
+                    //JercTypes.Negative => PenColours.PenNegative(gradientValue),
+                    JercTypes.Layout => PenColours.PenLayout(TEMPORARYrgbColourLayout, gradientValue),
+                    JercTypes.Cover => PenColours.PenCover(TEMPORARYrgbColourCover, gradientValue),
+                    JercTypes.Overlap => PenColours.PenOverlap(TEMPORARYrgbColourOverlap, gradientValue),
+                    _ => null,
+                };
+
+                solidBrush = displacementSide.jercType switch
+                {
+                    //JercTypes.Negative => BrushColours.SolidBrushNegative(gradientValue),
+                    JercTypes.Layout => BrushColours.SolidBrushLayout(TEMPORARYrgbColourLayout, gradientValue),
+                    JercTypes.Cover => BrushColours.SolidBrushCover(TEMPORARYrgbColourCover, gradientValue),
+                    JercTypes.Overlap => BrushColours.SolidBrushOverlap(TEMPORARYrgbColourOverlap, gradientValue),
+                    _ => null,
+                };
+
+
+                // corrects the verts to tax into account the movement from space in world to the space in the image (which starts at (0,0))
+                var verticesOffset = displacementSide.vertices;
+                for (var i = 0; i < verticesOffset.Count(); i++)
+                {
+                    verticesOffset[i].X = verticesOffset[i].X - overviewPositionValues.brushVerticesPosMinX + overviewPositionValues.brushVerticesOffsetX;
+                    verticesOffset[i].Y = verticesOffset[i].Y - overviewPositionValues.brushVerticesPosMinY + overviewPositionValues.brushVerticesOffsetY;
+                }
+
+                if (displacementSide.jercType == JercTypes.Negative)
+                {
+                    AddNegativeRegion(bmp, graphics, displacementSide);
                 }
                 else
                 {

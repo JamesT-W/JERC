@@ -16,6 +16,7 @@ namespace JERC.Models
         public string vaxis;
         public int rotation;
         public int smoothing_groups;
+        public DispInfo dispinfo;
 
         public Side(IVNode side)
         {
@@ -27,6 +28,10 @@ namespace JERC.Models
             vaxis = side.Body.FirstOrDefault(x => x.Name == "vaxis")?.Value;
             rotation = int.Parse(side.Body.FirstOrDefault(x => x.Name == "rotation")?.Value);
             smoothing_groups = int.Parse(side.Body.FirstOrDefault(x => x.Name == "smoothing_groups")?.Value);
+
+            var displacementsStuff = side.Body.FirstOrDefault(x => x.Name == "dispinfo");
+            if (displacementsStuff != null)
+                dispinfo = new DispInfo(displacementsStuff);
         }
     }
 }
