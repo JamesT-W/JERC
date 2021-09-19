@@ -595,7 +595,7 @@ namespace JERC
                 }
                 else
                 {
-                    DrawFilledPolygonObject(graphics, solidBrush, pen, verticesOffset);
+                    DrawFilledPolygonObjectBrushes(graphics, solidBrush, pen, verticesOffset);
                 }
             }
 
@@ -638,7 +638,7 @@ namespace JERC
                         verticesOffset[i].Y = verticesOffset[i].Y - overviewPositionValues.brushVerticesPosMinY + overviewPositionValues.brushVerticesOffsetY;
                     }
 
-                    DrawFilledPolygonObject(graphics, solidBrush, pen, verticesOffset);
+                    DrawFilledPolygonObjectEntities(graphics, solidBrush, pen, verticesOffset);
                 }
             }
 
@@ -671,9 +671,16 @@ namespace JERC
         }
 
 
-        private static void DrawFilledPolygonObject(Graphics graphics, SolidBrush solidBrush, Pen pen, PointF[] vertices)
+        private static void DrawFilledPolygonObjectBrushes(Graphics graphics, SolidBrush solidBrush, Pen pen, PointF[] vertices)
         {
             graphics.DrawPolygon(pen, vertices);
+            graphics.FillPolygon(solidBrush, vertices);
+        }
+
+
+        private static void DrawFilledPolygonObjectEntities(Graphics graphics, SolidBrush solidBrush, Pen pen, PointF[] vertices)
+        {
+            //graphics.DrawPolygon(pen, vertices);
             graphics.FillPolygon(solidBrush, vertices);
         }
 
