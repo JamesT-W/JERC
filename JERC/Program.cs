@@ -926,7 +926,7 @@ namespace JERC
                 }
                 else
                 {
-                    DrawFilledPolygonObjectBrushes(graphics, solidBrush, pen, verticesOffset);
+                    DrawFilledPolygonObjectDisplacements(graphics, solidBrush, pen, verticesOffset);
                 }
             }
 
@@ -1003,6 +1003,13 @@ namespace JERC
 
 
         private static void DrawFilledPolygonObjectBrushes(Graphics graphics, SolidBrush solidBrush, Pen pen, PointF[] vertices)
+        {
+            graphics.DrawPolygon(pen, vertices);
+            graphics.FillPolygon(solidBrush, vertices);
+        }
+
+
+        private static void DrawFilledPolygonObjectDisplacements(Graphics graphics, SolidBrush solidBrush, Pen pen, PointF[] vertices)
         {
             graphics.DrawPolygon(pen, vertices);
             graphics.FillPolygon(solidBrush, vertices);
