@@ -43,6 +43,10 @@ namespace JERC
         private static VMF vmf;
         private static VmfRequiredData vmfRequiredData;
 
+        public static List<ObjectToDraw> brushesToDraw = new List<ObjectToDraw>();
+        public static List<ObjectToDraw> displacementsToDraw = new List<ObjectToDraw>();
+        public static List<ObjectToDraw> entitiesToDraw = new List<ObjectToDraw>();
+
 
         static void Main(string[] args)
         {
@@ -344,21 +348,39 @@ namespace JERC
 
                 // add negative first to set to graphics' clip
                 var brushNegativeSideList = GetBrushNegativeOnlyVerticesList(boundingBox);
-                RenderBrushSides(bmp, graphics, boundingBox, overviewPositionValues, brushNegativeSideList);
+                SetBrushesToDrawOrAddNegativeRegion(bmp, graphics, boundingBox, overviewPositionValues, brushNegativeSideList);
 
                 var displacementNegativeSideList = GetDisplacementNegativeOnlyVerticesList(boundingBox);
-                RenderDisplacementSides(bmp, graphics, boundingBox, overviewPositionValues, displacementNegativeSideList);
+                SetDisplacementsToDrawOrAddNegativeRegion(bmp, graphics, boundingBox, overviewPositionValues, displacementNegativeSideList);
 
                 // non negatives next
                 var brushExceptNegativeSideList = GetBrushExceptNegativeOnlyVerticesList(boundingBox);
-                RenderBrushSides(bmp, graphics, boundingBox, overviewPositionValues, brushExceptNegativeSideList);
+                SetBrushesToDrawOrAddNegativeRegion(bmp, graphics, boundingBox, overviewPositionValues, brushExceptNegativeSideList);
+
+                foreach (var brushToRender in brushesToDraw)
+                {
+                    DrawFilledPolygonObjectBrushes(graphics, brushToRender.solidBrush, brushToRender.pen, brushToRender.vertices);
+                }
 
                 var displacementExceptNegativeSideList = GetDisplacementExceptNegativeOnlyVerticesList(boundingBox);
-                RenderDisplacementSides(bmp, graphics, boundingBox, overviewPositionValues, displacementExceptNegativeSideList);
+                SetDisplacementsToDrawOrAddNegativeRegion(bmp, graphics, boundingBox, overviewPositionValues, displacementExceptNegativeSideList);
+
+                foreach (var displacementToRender in displacementsToDraw)
+                {
+                    DrawFilledPolygonObjectDisplacements(graphics, displacementToRender.solidBrush, displacementToRender.pen, displacementToRender.vertices);
+                }
+
+                // reset the clip so that entity brushes can render anywhere
+                graphics.ResetClip();
 
                 // entities next
                 var entityBrushSideListById = GetEntityVerticesListById();
-                RenderEntities(bmp, graphics, boundingBox, overviewPositionValues, entityBrushSideListById);
+                SetEntitiesToDraw(bmp, graphics, boundingBox, overviewPositionValues, entityBrushSideListById);
+
+                foreach (var entityToDraw in entitiesToDraw)
+                {
+                    DrawFilledPolygonObjectEntities(graphics, entityToDraw.solidBrush, entityToDraw.pen, entityToDraw.vertices);
+                }
 
                 graphics.Save();
 
@@ -785,11 +807,8 @@ namespace JERC
         }
 
 
-        private static void RenderBrushSides(Bitmap bmp, Graphics graphics, BoundingBox boundingBox, OverviewPositionValues overviewPositionValues, List<BrushSide> brushSideList)
+        private static void SetBrushesToDrawOrAddNegativeRegion(Bitmap bmp, Graphics graphics, BoundingBox boundingBox, OverviewPositionValues overviewPositionValues, List<BrushSide> brushSideList)
         {
-            Pen pen = null;
-            SolidBrush solidBrush = null;
-
             foreach (var brushSide in brushSideList)
             {
                 var heightAboveMin = brushSide.worldHeight - boundingBox.minZ;
@@ -818,25 +837,6 @@ namespace JERC
                 else if (gradientValue > 255)
                     gradientValue = 255;
 
-                pen = brushSide.jercType switch
-                {
-                    //JercTypes.Negative => PenColours.PenNegative(gradientValue),
-                    JercTypes.Layout => PenColours.PenLayout(TEMPORARYrgbColourLayout, gradientValue),
-                    JercTypes.Cover => PenColours.PenCover(TEMPORARYrgbColourCover, gradientValue),
-                    JercTypes.Overlap => PenColours.PenOverlap(TEMPORARYrgbColourOverlap, gradientValue),
-                    _ => null,
-                };
-
-                solidBrush = brushSide.jercType switch
-                {
-                    //JercTypes.Negative => BrushColours.SolidBrushNegative(gradientValue),
-                    JercTypes.Layout => BrushColours.SolidBrushLayout(TEMPORARYrgbColourLayout, gradientValue),
-                    JercTypes.Cover => BrushColours.SolidBrushCover(TEMPORARYrgbColourCover, gradientValue),
-                    JercTypes.Overlap => BrushColours.SolidBrushOverlap(TEMPORARYrgbColourOverlap, gradientValue),
-                    _ => null,
-                };
-
-
                 // corrects the verts to tax into account the movement from space in world to the space in the image (which starts at (0,0))
                 var verticesOffset = brushSide.vertices;
                 for (var i = 0; i < verticesOffset.Count(); i++)
@@ -845,26 +845,39 @@ namespace JERC
                     verticesOffset[i].Y = verticesOffset[i].Y - overviewPositionValues.brushVerticesPosMinY + overviewPositionValues.brushVerticesOffsetY;
                 }
 
-                if (brushSide.jercType == JercTypes.Negative)
+                if (brushSide.jercType == JercTypes.Negative) // shouldn't be used as long as SetBrushesToDraw() is not called with negative brushes in brushSideList
                 {
                     AddNegativeRegion(bmp, graphics, brushSide);
                 }
                 else
                 {
-                    DrawFilledPolygonObjectBrushes(graphics, solidBrush, pen, verticesOffset);
+                    Pen pen = brushSide.jercType switch
+                    {
+                        //JercTypes.Negative => PenColours.PenNegative(gradientValue),
+                        JercTypes.Layout => PenColours.PenLayout(TEMPORARYrgbColourLayout, gradientValue),
+                        JercTypes.Cover => PenColours.PenCover(TEMPORARYrgbColourCover, gradientValue),
+                        JercTypes.Overlap => PenColours.PenOverlap(TEMPORARYrgbColourOverlap, gradientValue),
+                        _ => null,
+                    };
+
+                    SolidBrush solidBrush = brushSide.jercType switch
+                    {
+                        //JercTypes.Negative => BrushColours.SolidBrushNegative(gradientValue),
+                        JercTypes.Layout => SolidBrushColours.SolidBrushLayout(TEMPORARYrgbColourLayout, gradientValue),
+                        JercTypes.Cover => SolidBrushColours.SolidBrushCover(TEMPORARYrgbColourCover, gradientValue),
+                        JercTypes.Overlap => SolidBrushColours.SolidBrushOverlap(TEMPORARYrgbColourOverlap, gradientValue),
+                        _ => null,
+                    };
+                    
+                    
+                    brushesToDraw.Add(new ObjectToDraw(verticesOffset, pen, solidBrush));
                 }
             }
-
-            pen?.Dispose();
-            solidBrush?.Dispose();
         }
 
 
-        private static void RenderDisplacementSides(Bitmap bmp, Graphics graphics, BoundingBox boundingBox, OverviewPositionValues overviewPositionValues, List<BrushSide> displacementSideList)
+        private static void SetDisplacementsToDrawOrAddNegativeRegion(Bitmap bmp, Graphics graphics, BoundingBox boundingBox, OverviewPositionValues overviewPositionValues, List<BrushSide> displacementSideList)
         {
-            Pen pen = null;
-            SolidBrush solidBrush = null;
-
             foreach (var displacementSide in displacementSideList)
             {
                 var heightAboveMin = displacementSide.worldHeight - boundingBox.minZ;
@@ -893,25 +906,6 @@ namespace JERC
                 else if (gradientValue > 255)
                     gradientValue = 255;
 
-                pen = displacementSide.jercType switch
-                {
-                    //JercTypes.Negative => PenColours.PenNegative(gradientValue),
-                    JercTypes.Layout => PenColours.PenLayout(TEMPORARYrgbColourLayout, gradientValue),
-                    JercTypes.Cover => PenColours.PenCover(TEMPORARYrgbColourCover, gradientValue),
-                    JercTypes.Overlap => PenColours.PenOverlap(TEMPORARYrgbColourOverlap, gradientValue),
-                    _ => null,
-                };
-
-                solidBrush = displacementSide.jercType switch
-                {
-                    //JercTypes.Negative => BrushColours.SolidBrushNegative(gradientValue),
-                    JercTypes.Layout => BrushColours.SolidBrushLayout(TEMPORARYrgbColourLayout, gradientValue),
-                    JercTypes.Cover => BrushColours.SolidBrushCover(TEMPORARYrgbColourCover, gradientValue),
-                    JercTypes.Overlap => BrushColours.SolidBrushOverlap(TEMPORARYrgbColourOverlap, gradientValue),
-                    _ => null,
-                };
-
-
                 // corrects the verts to tax into account the movement from space in world to the space in the image (which starts at (0,0))
                 var verticesOffset = displacementSide.vertices;
                 for (var i = 0; i < verticesOffset.Count(); i++)
@@ -920,47 +914,43 @@ namespace JERC
                     verticesOffset[i].Y = verticesOffset[i].Y - overviewPositionValues.brushVerticesPosMinY + overviewPositionValues.brushVerticesOffsetY;
                 }
 
-                if (displacementSide.jercType == JercTypes.Negative)
+                if (displacementSide.jercType == JercTypes.Negative) // shouldn't be used as long as SetDisplacementsToDraw() is not called with negative displacements in brushSideList
                 {
                     AddNegativeRegion(bmp, graphics, displacementSide);
                 }
                 else
                 {
-                    DrawFilledPolygonObjectDisplacements(graphics, solidBrush, pen, verticesOffset);
+                    Pen pen = displacementSide.jercType switch
+                    {
+                        //JercTypes.Negative => PenColours.PenNegative(gradientValue),
+                        JercTypes.Layout => PenColours.PenLayout(TEMPORARYrgbColourLayout, gradientValue),
+                        JercTypes.Cover => PenColours.PenCover(TEMPORARYrgbColourCover, gradientValue),
+                        JercTypes.Overlap => PenColours.PenOverlap(TEMPORARYrgbColourOverlap, gradientValue),
+                        _ => null,
+                    };
+
+                    SolidBrush solidBrush = displacementSide.jercType switch
+                    {
+                        //JercTypes.Negative => BrushColours.SolidBrushNegative(gradientValue),
+                        JercTypes.Layout => SolidBrushColours.SolidBrushLayout(TEMPORARYrgbColourLayout, gradientValue),
+                        JercTypes.Cover => SolidBrushColours.SolidBrushCover(TEMPORARYrgbColourCover, gradientValue),
+                        JercTypes.Overlap => SolidBrushColours.SolidBrushOverlap(TEMPORARYrgbColourOverlap, gradientValue),
+                        _ => null,
+                    };
+                    
+                    
+                    displacementsToDraw.Add(new ObjectToDraw(verticesOffset, pen, solidBrush));
                 }
             }
-
-            pen?.Dispose();
-            solidBrush?.Dispose();
         }
 
 
-        private static void RenderEntities(Bitmap bmp, Graphics graphics, BoundingBox boundingBox, OverviewPositionValues overviewPositionValues, Dictionary<int, List<EntityBrushSide>> entityBrushSideListById)
+        private static void SetEntitiesToDraw(Bitmap bmp, Graphics graphics, BoundingBox boundingBox, OverviewPositionValues overviewPositionValues, Dictionary<int, List<EntityBrushSide>> entityBrushSideListById)
         {
-            Pen pen = null;
-            SolidBrush solidBrush = null;
-
             foreach (var entityBrushSideByBrush in entityBrushSideListById.Values)
             {
                 foreach (var entityBrushSide in entityBrushSideByBrush)
                 {
-                    pen = entityBrushSide.entityType switch
-                    {
-                        EntityTypes.Buyzone => PenColours.PenBuyzones(),
-                        EntityTypes.Bombsite => PenColours.PenBombsites(),
-                        EntityTypes.RescueZone => PenColours.PenRescueZones(),
-                        _ => null,
-                    };
-
-                    solidBrush = entityBrushSide.entityType switch
-                    {
-                        EntityTypes.Buyzone => BrushColours.SolidBrushBuyzones(),
-                        EntityTypes.Bombsite => BrushColours.SolidBrushBombsites(),
-                        EntityTypes.RescueZone => BrushColours.SolidBrushRescueZones(),
-                        _ => null,
-                    };
-
-
                     // corrects the verts to tax into account the movement from space in world to the space in the image (which starts at (0,0))
                     var verticesOffset = entityBrushSide.vertices;
                     for (var i = 0; i < verticesOffset.Count(); i++)
@@ -969,12 +959,26 @@ namespace JERC
                         verticesOffset[i].Y = verticesOffset[i].Y - overviewPositionValues.brushVerticesPosMinY + overviewPositionValues.brushVerticesOffsetY;
                     }
 
-                    DrawFilledPolygonObjectEntities(graphics, solidBrush, pen, verticesOffset);
+                    Pen pen = entityBrushSide.entityType switch
+                    {
+                        EntityTypes.Buyzone => PenColours.PenBuyzones(),
+                        EntityTypes.Bombsite => PenColours.PenBombsites(),
+                        EntityTypes.RescueZone => PenColours.PenRescueZones(),
+                        _ => null,
+                    };
+
+                    SolidBrush solidBrush = entityBrushSide.entityType switch
+                    {
+                        EntityTypes.Buyzone => SolidBrushColours.SolidBrushBuyzones(),
+                        EntityTypes.Bombsite => SolidBrushColours.SolidBrushBombsites(),
+                        EntityTypes.RescueZone => SolidBrushColours.SolidBrushRescueZones(),
+                        _ => null,
+                    };
+                    
+                    
+                    entitiesToDraw.Add(new ObjectToDraw(verticesOffset, pen, solidBrush));
                 }
             }
-
-            pen?.Dispose();
-            solidBrush?.Dispose();
         }
 
 
@@ -1006,6 +1010,9 @@ namespace JERC
         {
             graphics.DrawPolygon(pen, vertices);
             graphics.FillPolygon(solidBrush, vertices);
+
+            pen?.Dispose();
+            solidBrush?.Dispose();
         }
 
 
@@ -1013,6 +1020,9 @@ namespace JERC
         {
             graphics.DrawPolygon(pen, vertices);
             graphics.FillPolygon(solidBrush, vertices);
+
+            pen?.Dispose();
+            solidBrush?.Dispose();
         }
 
 
@@ -1020,6 +1030,9 @@ namespace JERC
         {
             //graphics.DrawPolygon(pen, vertices);
             graphics.FillPolygon(solidBrush, vertices);
+
+            pen?.Dispose();
+            solidBrush?.Dispose();
         }
 
 
