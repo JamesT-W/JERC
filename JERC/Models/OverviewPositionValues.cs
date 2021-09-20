@@ -34,11 +34,11 @@ namespace JERC.Models
             this.brushVerticesPosMinY = brushVerticesPosMinY;
             this.brushVerticesPosMaxY = brushVerticesPosMaxY;
 
-            width = (int)Math.Ceiling(brushVerticesPosMaxX - brushVerticesPosMinX);
-            height = (int)Math.Ceiling(brushVerticesPosMaxY - brushVerticesPosMinY);
+            width = (int)Math.Ceiling(brushVerticesPosMaxX - brushVerticesPosMinX) + (Sizes.StrokeWidthMultiplier * 2); // adds the stroke width mutliplier value as a margin at left and right
+            height = (int)Math.Ceiling(brushVerticesPosMaxY - brushVerticesPosMinY) + (Sizes.StrokeWidthMultiplier * 2); // adds the stroke width mutliplier value as a margin at top and bottom
 
-            brushVerticesOffsetX = width < height ? ((height - width) / 2) : 0;
-            brushVerticesOffsetY = height < width ? ((width - height) / 2) : 0;
+            brushVerticesOffsetX = width < height ? ((height - width) / 2) + Sizes.StrokeWidthMultiplier : 0 + Sizes.StrokeWidthMultiplier;
+            brushVerticesOffsetY = height < width ? ((width - height) / 2) + Sizes.StrokeWidthMultiplier : 0 + Sizes.StrokeWidthMultiplier;
 
             outputResolution = width >= height ? width : height;
 
