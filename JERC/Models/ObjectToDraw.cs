@@ -9,13 +9,13 @@ namespace JERC.Models
 {
     public class ObjectToDraw
     {
-        public PointF[] vertices;
+        public Point[] vertices;
         public Pen pen;
         public SolidBrush solidBrush;
 
         public ObjectToDraw(PointF[] vertices, Pen pen, SolidBrush solidBrush)
         {
-            this.vertices = vertices;
+            this.vertices = vertices.Select(x => new Point((int)x.X, (int)x.Y)).ToArray();
             this.pen = pen;
             this.solidBrush = solidBrush;
         }

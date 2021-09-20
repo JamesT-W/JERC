@@ -43,10 +43,6 @@ namespace JERC
         private static VMF vmf;
         private static VmfRequiredData vmfRequiredData;
 
-        public static List<ObjectToDraw> brushesToDraw = new List<ObjectToDraw>();
-        public static List<ObjectToDraw> displacementsToDraw = new List<ObjectToDraw>();
-        public static List<ObjectToDraw> entitiesToDraw = new List<ObjectToDraw>();
-
 
         static void Main(string[] args)
         {
@@ -355,24 +351,45 @@ namespace JERC
 
                 graphics.SetClip(Rectangle.FromLTRB(0, 0, overviewPositionValues.outputResolution, overviewPositionValues.outputResolution));
 
-                // add remove stuff first to set to graphics' clip
+                // get all brushes, displacements and entities to draw
                 var brushRemoveSideList = GetBrushRemoveOnlyVerticesList(boundingBox);
-                SetBrushesToDrawOrAddRemoveRegion(bmp, graphics, boundingBox, overviewPositionValues, brushRemoveSideList);
-
                 var displacementRemoveSideList = GetDisplacementRemoveOnlyVerticesList(boundingBox);
-                SetDisplacementsToDrawOrAddRemoveRegion(bmp, graphics, boundingBox, overviewPositionValues, displacementRemoveSideList);
+                var brushExceptRemoveSideList = GetBrushExceptRemoveOnlyVerticesList(boundingBox);
+                var displacementExceptRemoveSideList = GetDisplacementExceptRemoveOnlyVerticesList(boundingBox);
+                var entityBrushSideListById = GetEntityVerticesListById();
+
+                // add remove stuff first to set to graphics' clip
+                GetBrushesToDrawOrAddRemoveRegion(bmp, graphics, boundingBox, overviewPositionValues, brushRemoveSideList);
+                GetDisplacementsToDrawOrAddRemoveRegion(bmp, graphics, boundingBox, overviewPositionValues, displacementRemoveSideList);
+
+                // non-remove stuff (for stroke)
+                var brushesToDraw = GetBrushesToDrawOrAddRemoveRegion(bmp, graphics, boundingBox, overviewPositionValues, brushExceptRemoveSideList);
+                foreach (var brushToRender in brushesToDraw)
+                {
+                    var strokeSolidBrush = new SolidBrush(Color.Transparent);
+                    var strokePen = (Pen)brushToRender.pen.Clone();
+                    strokePen.Color = Color.White;
+                    strokePen.Width *= Sizes.StrokeWidthMultiplier;
+
+                    DrawFilledPolygonObjectBrushes(graphics, strokeSolidBrush, strokePen, brushToRender.vertices);
+                }
+
+                var displacementsToDraw = GetDisplacementsToDrawOrAddRemoveRegion(bmp, graphics, boundingBox, overviewPositionValues, displacementExceptRemoveSideList);
+                foreach (var displacementToRender in displacementsToDraw)
+                {
+                    var strokeSolidBrush = new SolidBrush(Color.Transparent);
+                    var strokePen = (Pen)displacementToRender.pen.Clone();
+                    strokePen.Color = Color.White;
+                    strokePen.Width *= Sizes.StrokeWidthMultiplier;
+
+                    DrawFilledPolygonObjectDisplacements(graphics, strokeSolidBrush, strokePen, displacementToRender.vertices);
+                }
 
                 // non-remove stuff next
-                var brushExceptRemoveSideList = GetBrushExceptRemoveOnlyVerticesList(boundingBox);
-                SetBrushesToDrawOrAddRemoveRegion(bmp, graphics, boundingBox, overviewPositionValues, brushExceptRemoveSideList);
-
                 foreach (var brushToRender in brushesToDraw)
                 {
                     DrawFilledPolygonObjectBrushes(graphics, brushToRender.solidBrush, brushToRender.pen, brushToRender.vertices);
                 }
-
-                var displacementExceptRemoveSideList = GetDisplacementExceptRemoveOnlyVerticesList(boundingBox);
-                SetDisplacementsToDrawOrAddRemoveRegion(bmp, graphics, boundingBox, overviewPositionValues, displacementExceptRemoveSideList);
 
                 foreach (var displacementToRender in displacementsToDraw)
                 {
@@ -383,9 +400,7 @@ namespace JERC
                 graphics.ResetClip();
 
                 // entities next
-                var entityBrushSideListById = GetEntityVerticesListById();
-                SetEntitiesToDraw(bmp, graphics, boundingBox, overviewPositionValues, entityBrushSideListById);
-
+                var entitiesToDraw = GetEntitiesToDraw(bmp, graphics, boundingBox, overviewPositionValues, entityBrushSideListById);
                 foreach (var entityToDraw in entitiesToDraw)
                 {
                     DrawFilledPolygonObjectEntities(graphics, entityToDraw.solidBrush, entityToDraw.pen, entityToDraw.vertices);
@@ -795,8 +810,10 @@ namespace JERC
         }
 
 
-        private static void SetBrushesToDrawOrAddRemoveRegion(Bitmap bmp, Graphics graphics, BoundingBox boundingBox, OverviewPositionValues overviewPositionValues, List<BrushSide> brushSideList)
+        private static List<ObjectToDraw> GetBrushesToDrawOrAddRemoveRegion(Bitmap bmp, Graphics graphics, BoundingBox boundingBox, OverviewPositionValues overviewPositionValues, List<BrushSide> brushSideList)
         {
+            var brushesToDraw = new List<ObjectToDraw>();
+
             foreach (var brushSide in brushSideList)
             {
                 var heightAboveMin = brushSide.worldHeight - boundingBox.minZ;
@@ -856,16 +873,20 @@ namespace JERC
                         JercTypes.Overlap => SolidBrushColours.SolidBrushOverlap(TEMPORARYrgbColourOverlap, gradientValue),
                         _ => null,
                     };
-                    
-                    
+
+
                     brushesToDraw.Add(new ObjectToDraw(verticesOffset, pen, solidBrush));
                 }
             }
+
+            return brushesToDraw;
         }
 
 
-        private static void SetDisplacementsToDrawOrAddRemoveRegion(Bitmap bmp, Graphics graphics, BoundingBox boundingBox, OverviewPositionValues overviewPositionValues, List<BrushSide> displacementSideList)
+        private static List<ObjectToDraw> GetDisplacementsToDrawOrAddRemoveRegion(Bitmap bmp, Graphics graphics, BoundingBox boundingBox, OverviewPositionValues overviewPositionValues, List<BrushSide> displacementSideList)
         {
+            var displacementsToDraw = new List<ObjectToDraw>();
+
             foreach (var displacementSide in displacementSideList)
             {
                 var heightAboveMin = displacementSide.worldHeight - boundingBox.minZ;
@@ -925,16 +946,20 @@ namespace JERC
                         JercTypes.Overlap => SolidBrushColours.SolidBrushOverlap(TEMPORARYrgbColourOverlap, gradientValue),
                         _ => null,
                     };
-                    
-                    
+
+
                     displacementsToDraw.Add(new ObjectToDraw(verticesOffset, pen, solidBrush));
                 }
             }
+
+            return displacementsToDraw;
         }
 
 
-        private static void SetEntitiesToDraw(Bitmap bmp, Graphics graphics, BoundingBox boundingBox, OverviewPositionValues overviewPositionValues, Dictionary<int, List<EntityBrushSide>> entityBrushSideListById)
+        private static List<ObjectToDraw> GetEntitiesToDraw(Bitmap bmp, Graphics graphics, BoundingBox boundingBox, OverviewPositionValues overviewPositionValues, Dictionary<int, List<EntityBrushSide>> entityBrushSideListById)
         {
+            var entitiesToDraw = new List<ObjectToDraw>();
+
             foreach (var entityBrushSideByBrush in entityBrushSideListById.Values)
             {
                 foreach (var entityBrushSide in entityBrushSideByBrush)
@@ -962,11 +987,13 @@ namespace JERC
                         EntityTypes.RescueZone => SolidBrushColours.SolidBrushRescueZones(),
                         _ => null,
                     };
-                    
-                    
+
+
                     entitiesToDraw.Add(new ObjectToDraw(verticesOffset, pen, solidBrush));
                 }
             }
+
+            return entitiesToDraw;
         }
 
 
@@ -994,7 +1021,7 @@ namespace JERC
         }
 
 
-        private static void DrawFilledPolygonObjectBrushes(Graphics graphics, SolidBrush solidBrush, Pen pen, PointF[] vertices)
+        private static void DrawFilledPolygonObjectBrushes(Graphics graphics, SolidBrush solidBrush, Pen pen, Point[] vertices)
         {
             graphics.DrawPolygon(pen, vertices);
             graphics.FillPolygon(solidBrush, vertices);
@@ -1004,7 +1031,7 @@ namespace JERC
         }
 
 
-        private static void DrawFilledPolygonObjectDisplacements(Graphics graphics, SolidBrush solidBrush, Pen pen, PointF[] vertices)
+        private static void DrawFilledPolygonObjectDisplacements(Graphics graphics, SolidBrush solidBrush, Pen pen, Point[] vertices)
         {
             graphics.DrawPolygon(pen, vertices);
             graphics.FillPolygon(solidBrush, vertices);
@@ -1014,7 +1041,7 @@ namespace JERC
         }
 
 
-        private static void DrawFilledPolygonObjectEntities(Graphics graphics, SolidBrush solidBrush, Pen pen, PointF[] vertices)
+        private static void DrawFilledPolygonObjectEntities(Graphics graphics, SolidBrush solidBrush, Pen pen, Point[] vertices)
         {
             //graphics.DrawPolygon(pen, vertices);
             graphics.FillPolygon(solidBrush, vertices);
