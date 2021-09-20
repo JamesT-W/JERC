@@ -307,6 +307,9 @@ namespace JERC
                 .Concat(vmfRequiredData.displacementsSidesOverlap);
             //var allWorldBrushes = vmfRequiredData.brushesSidesNegative.Concat(vmfRequiredData.displacementsSidesNegative).Concat(allWorldBrushesAndDisplacementsExceptNegative);
 
+            if (allWorldBrushesAndDisplacementsExceptNegative == null || allWorldBrushesAndDisplacementsExceptNegative.Count() == 0)
+                return;
+
             var minX = allWorldBrushesAndDisplacementsExceptNegative.Min(x => x.vertices_plus.Min(y => y.x));
             var maxX = allWorldBrushesAndDisplacementsExceptNegative.Max(x => x.vertices_plus.Max(y => y.x));
             var minY = allWorldBrushesAndDisplacementsExceptNegative.Min(x => x.vertices_plus.Min(y => y.y));
