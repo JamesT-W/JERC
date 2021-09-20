@@ -481,27 +481,6 @@ namespace JERC
         }
 
 
-        private static List<BrushSide> GetBrushVerticesList(BoundingBox boundingBox)
-        {
-            var brushSideList = new List<BrushSide>();
-
-            brushSideList.AddRange(GetBrushNegativeVerticesList()); // add negative first to set to graphics' clip
-            brushSideList.AddRange(GetBrushLayoutVerticesList());
-            brushSideList.AddRange(GetBrushCoverVerticesList());
-            brushSideList.AddRange(GetBrushOverlapVerticesList());
-
-            boundingBox.minX = brushSideList.SelectMany(x => x.vertices.Select(y => y.X)).Min();
-            boundingBox.maxX = brushSideList.SelectMany(x => x.vertices.Select(y => y.X)).Max();
-            boundingBox.minY = brushSideList.SelectMany(x => x.vertices.Select(y => y.Y)).Min();
-            boundingBox.maxY = brushSideList.SelectMany(x => x.vertices.Select(y => y.Y)).Max();
-
-            boundingBox.minZ = brushSideList.Select(x => x.worldHeight).Min();
-            boundingBox.maxZ = brushSideList.Select(x => x.worldHeight).Max();
-
-            return brushSideList;
-        }
-
-
         private static Dictionary<int, List<EntityBrushSide>> GetEntityVerticesListById()
         {
             var entityBrushSideListById = new Dictionary<int, List<EntityBrushSide>>();
