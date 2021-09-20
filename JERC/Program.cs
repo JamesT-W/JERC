@@ -99,6 +99,12 @@ namespace JERC
 
             var overviewPositionValues = SortScaleStuff();
 
+            if (overviewPositionValues == null)
+            {
+                Console.WriteLine("---- No brushes or displacements found, exiting. ----");
+                return;
+            }
+
             GenerateRadar(overviewPositionValues);
 
             GenerateTxt(overviewPositionValues);
