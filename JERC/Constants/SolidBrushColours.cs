@@ -5,7 +5,7 @@ using System.Text;
 
 namespace JERC.Constants
 {
-    public static class BrushColours
+    public static class SolidBrushColours
     {
         //public static SolidBrush SolidBrushNegative() => new SolidBrush(Color.Transparent);
         public static SolidBrush SolidBrushLayout(int[] rgb, int gradientValue) => new SolidBrush(Color.FromArgb(255, ClampGradientValue(((float)rgb[0] / 255) * gradientValue), ClampGradientValue(((float)rgb[1] / 255) * gradientValue), ClampGradientValue(((float)rgb[2] / 255) * gradientValue)));
