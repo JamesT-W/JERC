@@ -10,12 +10,12 @@ namespace JERC.Models
 {
     public class VmfRequiredData
     {
-        public List<Side> brushesSidesNegative;
+        public List<Side> brushesSidesRemove;
         public List<Side> brushesSidesPath;
         public List<Side> brushesSidesCover;
         public List<Side> brushesSidesOverlap;
 
-        public List<Side> displacementsSidesNegative;
+        public List<Side> displacementsSidesRemove;
         public List<Side> displacementsSidesPath;
         public List<Side> displacementsSidesCover;
         public List<Side> displacementsSidesOverlap;
@@ -28,29 +28,29 @@ namespace JERC.Models
         public List<Entity> hostageEntities;
 
         public VmfRequiredData(
-            IEnumerable<IVNode> brushesNegative, IEnumerable<IVNode> brushesPath, IEnumerable<IVNode> brushesCover, IEnumerable<IVNode> brushesOverlap,
-            IEnumerable<IVNode> displacementsNegative, IEnumerable<IVNode> displacementsPath, IEnumerable<IVNode> displacementsCover, IEnumerable<IVNode> displacementsOverlap,
+            IEnumerable<IVNode> brushesRemove, IEnumerable<IVNode> brushesPath, IEnumerable<IVNode> brushesCover, IEnumerable<IVNode> brushesOverlap,
+            IEnumerable<IVNode> displacementsRemove, IEnumerable<IVNode> displacementsPath, IEnumerable<IVNode> displacementsCover, IEnumerable<IVNode> displacementsOverlap,
             IEnumerable<IVNode> buyzoneBrushEntities, IEnumerable<IVNode> bombsiteBrushEntities, IEnumerable<IVNode> RescueZoneBrushEntities, IEnumerable<IVNode> hostageEntities
         )
         {
             // world brushes
-            var brushesNegativeModelled = brushesNegative.Any() ? brushesNegative.Select(x => new Brush(x)).ToList() : new List<Brush>();
+            var brushesRemoveModelled = brushesRemove.Any() ? brushesRemove.Select(x => new Brush(x)).ToList() : new List<Brush>();
             var brushesPathModelled = brushesPath.Any() ? brushesPath.Select(x => new Brush(x)).ToList() : new List<Brush>();
             var brushesCoverModelled = brushesCover.Any() ? brushesCover.Select(x => new Brush(x)).ToList() : new List<Brush>();
             var brushesOverlapModelled = brushesOverlap.Any() ? brushesOverlap.Select(x => new Brush(x)).ToList() : new List<Brush>();
 
-            brushesSidesNegative = brushesNegativeModelled.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.NegativeTextureName)).ToList();
+            brushesSidesRemove = brushesRemoveModelled.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.RemoveTextureName)).ToList();
             brushesSidesPath = brushesPathModelled.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.PathTextureName)).ToList();
             brushesSidesCover = brushesCoverModelled.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.CoverTextureName)).ToList();
             brushesSidesOverlap = brushesOverlapModelled.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.OverlapTextureName)).ToList();
 
             // displacements
-            var displacementsNegativeModelled = displacementsNegative.Any() ? displacementsNegative.Select(x => new Brush(x)).ToList() : new List<Brush>();
+            var displacementsRemoveModelled = displacementsRemove.Any() ? displacementsRemove.Select(x => new Brush(x)).ToList() : new List<Brush>();
             var displacementsPathModelled = displacementsPath.Any() ? displacementsPath.Select(x => new Brush(x)).ToList() : new List<Brush>();
             var displacementsCoverModelled = displacementsCover.Any() ? displacementsCover.Select(x => new Brush(x)).ToList() : new List<Brush>();
             var displacementsOverlapModelled = displacementsOverlap.Any() ? displacementsOverlap.Select(x => new Brush(x)).ToList() : new List<Brush>();
 
-            displacementsSidesNegative = displacementsNegativeModelled.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.NegativeTextureName)).ToList();
+            displacementsSidesRemove = displacementsRemoveModelled.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.RemoveTextureName)).ToList();
             displacementsSidesPath = displacementsPathModelled.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.PathTextureName)).ToList();
             displacementsSidesCover = displacementsCoverModelled.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.CoverTextureName)).ToList();
             displacementsSidesOverlap = displacementsOverlapModelled.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.OverlapTextureName)).ToList();

@@ -136,12 +136,12 @@ namespace JERC
                                             where z.Value == visgroupId
                                             select x;
 
-            var brushesNegative = GetBrushesNegative(allWorldBrushesInVisgroup);
+            var brushesRemove = GetBrushesRemove(allWorldBrushesInVisgroup);
             var brushesPath = GetBrushesPath(allWorldBrushesInVisgroup);
             var brushesCover = GetBrushesCover(allWorldBrushesInVisgroup);
             var brushesOverlap = GetBrushesOverlap(allWorldBrushesInVisgroup);
 
-            var displacementsNegative = GetDisplacementsNegative(allWorldBrushesInVisgroup);
+            var displacementsRemove = GetDisplacementsRemove(allWorldBrushesInVisgroup);
             var displacementsPath = GetDisplacementsPath(allWorldBrushesInVisgroup);
             var displacementsCover = GetDisplacementsCover(allWorldBrushesInVisgroup);
             var displacementsOverlap = GetDisplacementsOverlap(allWorldBrushesInVisgroup);
@@ -152,14 +152,14 @@ namespace JERC
             var hostageEntities = GetHostageEntities(allEntities);
 
             return new VmfRequiredData(
-                brushesNegative, brushesPath, brushesCover, brushesOverlap,
-                displacementsNegative, displacementsPath, displacementsCover, displacementsOverlap,
+                brushesRemove, brushesPath, brushesCover, brushesOverlap,
+                displacementsRemove, displacementsPath, displacementsCover, displacementsOverlap,
                 buyzoneBrushEntities, bombsiteBrushEntities, rescueZoneBrushEntities, hostageEntities
             );
         }
 
 
-        private static IEnumerable<IVNode> GetBrushesNegative(IEnumerable<IVNode> allWorldBrushesInVisgroup)
+        private static IEnumerable<IVNode> GetBrushesRemove(IEnumerable<IVNode> allWorldBrushesInVisgroup)
         {
             return from x in allWorldBrushesInVisgroup
                    from y in x.Body
@@ -167,7 +167,7 @@ namespace JERC
                    where !y.Body.Any(z => z.Name == "dispinfo")
                    from z in y.Body
                    where z.Name == "material"
-                   where z.Value.ToLower() == TextureNames.NegativeTextureName.ToLower()
+                   where z.Value.ToLower() == TextureNames.RemoveTextureName.ToLower()
                    select x;
         }
 
@@ -211,7 +211,7 @@ namespace JERC
         }
 
 
-        private static IEnumerable<IVNode> GetDisplacementsNegative(IEnumerable<IVNode> allWorldBrushesInVisgroup)
+        private static IEnumerable<IVNode> GetDisplacementsRemove(IEnumerable<IVNode> allWorldBrushesInVisgroup)
         {
             return from x in allWorldBrushesInVisgroup
                    from y in x.Body
@@ -219,7 +219,7 @@ namespace JERC
                    where y.Body.Any(z => z.Name == "dispinfo")
                    from z in y.Body
                    where z.Name == "material"
-                   where z.Value.ToLower() == TextureNames.NegativeTextureName.ToLower()
+                   where z.Value.ToLower() == TextureNames.RemoveTextureName.ToLower()
                    select x;
         }
 
@@ -305,21 +305,21 @@ namespace JERC
 
         private static OverviewPositionValues SortScaleStuff()
         {
-            var allWorldBrushesAndDisplacementsExceptNegative = vmfRequiredData.brushesSidesPath
+            var allWorldBrushesAndDisplacementsExceptRemove = vmfRequiredData.brushesSidesPath
                 .Concat(vmfRequiredData.brushesSidesCover)
                 .Concat(vmfRequiredData.brushesSidesOverlap)
                 .Concat(vmfRequiredData.displacementsSidesPath)
                 .Concat(vmfRequiredData.displacementsSidesCover)
                 .Concat(vmfRequiredData.displacementsSidesOverlap);
-            //var allWorldBrushes = vmfRequiredData.brushesSidesNegative.Concat(vmfRequiredData.displacementsSidesNegative).Concat(allWorldBrushesAndDisplacementsExceptNegative);
+            //var allWorldBrushes = vmfRequiredData.brushesSidesRemove.Concat(vmfRequiredData.displacementsSidesRemove).Concat(allWorldBrushesAndDisplacementsExceptRemove);
 
-            if (allWorldBrushesAndDisplacementsExceptNegative == null || allWorldBrushesAndDisplacementsExceptNegative.Count() == 0)
+            if (allWorldBrushesAndDisplacementsExceptRemove == null || allWorldBrushesAndDisplacementsExceptRemove.Count() == 0)
                 return null;
 
-            var minX = allWorldBrushesAndDisplacementsExceptNegative.Min(x => x.vertices_plus.Min(y => y.x));
-            var maxX = allWorldBrushesAndDisplacementsExceptNegative.Max(x => x.vertices_plus.Max(y => y.x));
-            var minY = allWorldBrushesAndDisplacementsExceptNegative.Min(x => x.vertices_plus.Min(y => y.y));
-            var maxY = allWorldBrushesAndDisplacementsExceptNegative.Max(x => x.vertices_plus.Max(y => y.y));
+            var minX = allWorldBrushesAndDisplacementsExceptRemove.Min(x => x.vertices_plus.Min(y => y.x));
+            var maxX = allWorldBrushesAndDisplacementsExceptRemove.Max(x => x.vertices_plus.Max(y => y.x));
+            var minY = allWorldBrushesAndDisplacementsExceptRemove.Min(x => x.vertices_plus.Min(y => y.y));
+            var maxY = allWorldBrushesAndDisplacementsExceptRemove.Max(x => x.vertices_plus.Max(y => y.y));
 
             var sizeX = maxX - minX;
             var sizeY = maxY - minY;
@@ -355,24 +355,24 @@ namespace JERC
 
                 graphics.SetClip(Rectangle.FromLTRB(0, 0, overviewPositionValues.outputResolution, overviewPositionValues.outputResolution));
 
-                // add negative first to set to graphics' clip
-                var brushNegativeSideList = GetBrushNegativeOnlyVerticesList(boundingBox);
-                SetBrushesToDrawOrAddNegativeRegion(bmp, graphics, boundingBox, overviewPositionValues, brushNegativeSideList);
+                // add remove stuff first to set to graphics' clip
+                var brushRemoveSideList = GetBrushRemoveOnlyVerticesList(boundingBox);
+                SetBrushesToDrawOrAddRemoveRegion(bmp, graphics, boundingBox, overviewPositionValues, brushRemoveSideList);
 
-                var displacementNegativeSideList = GetDisplacementNegativeOnlyVerticesList(boundingBox);
-                SetDisplacementsToDrawOrAddNegativeRegion(bmp, graphics, boundingBox, overviewPositionValues, displacementNegativeSideList);
+                var displacementRemoveSideList = GetDisplacementRemoveOnlyVerticesList(boundingBox);
+                SetDisplacementsToDrawOrAddRemoveRegion(bmp, graphics, boundingBox, overviewPositionValues, displacementRemoveSideList);
 
-                // non negatives next
-                var brushExceptNegativeSideList = GetBrushExceptNegativeOnlyVerticesList(boundingBox);
-                SetBrushesToDrawOrAddNegativeRegion(bmp, graphics, boundingBox, overviewPositionValues, brushExceptNegativeSideList);
+                // non-remove stuff next
+                var brushExceptRemoveSideList = GetBrushExceptRemoveOnlyVerticesList(boundingBox);
+                SetBrushesToDrawOrAddRemoveRegion(bmp, graphics, boundingBox, overviewPositionValues, brushExceptRemoveSideList);
 
                 foreach (var brushToRender in brushesToDraw)
                 {
                     DrawFilledPolygonObjectBrushes(graphics, brushToRender.solidBrush, brushToRender.pen, brushToRender.vertices);
                 }
 
-                var displacementExceptNegativeSideList = GetDisplacementExceptNegativeOnlyVerticesList(boundingBox);
-                SetDisplacementsToDrawOrAddNegativeRegion(bmp, graphics, boundingBox, overviewPositionValues, displacementExceptNegativeSideList);
+                var displacementExceptRemoveSideList = GetDisplacementExceptRemoveOnlyVerticesList(boundingBox);
+                SetDisplacementsToDrawOrAddRemoveRegion(bmp, graphics, boundingBox, overviewPositionValues, displacementExceptRemoveSideList);
 
                 foreach (var displacementToRender in displacementsToDraw)
                 {
@@ -406,9 +406,9 @@ namespace JERC
         }
 
 
-        private static List<BrushSide> GetBrushNegativeOnlyVerticesList(BoundingBox boundingBox)
+        private static List<BrushSide> GetBrushRemoveOnlyVerticesList(BoundingBox boundingBox)
         {
-            var brushSideList = GetBrushNegativeVerticesList();
+            var brushSideList = GetBrushRemoveVerticesList();
 
             if (brushSideList.Count() == 0)
                 return brushSideList;
@@ -425,9 +425,9 @@ namespace JERC
         }
 
 
-        private static List<BrushSide> GetDisplacementNegativeOnlyVerticesList(BoundingBox boundingBox)
+        private static List<BrushSide> GetDisplacementRemoveOnlyVerticesList(BoundingBox boundingBox)
         {
-            var displacementSideList = GetDisplacementNegativeVerticesList();
+            var displacementSideList = GetDisplacementRemoveVerticesList();
 
             if (displacementSideList.Count() == 0)
                 return displacementSideList;
@@ -444,7 +444,7 @@ namespace JERC
         }
 
 
-        private static List<BrushSide> GetBrushExceptNegativeOnlyVerticesList(BoundingBox boundingBox)
+        private static List<BrushSide> GetBrushExceptRemoveOnlyVerticesList(BoundingBox boundingBox)
         {
             var brushSideList = new List<BrushSide>();
 
@@ -467,7 +467,7 @@ namespace JERC
         }
 
 
-        private static List<BrushSide> GetDisplacementExceptNegativeOnlyVerticesList(BoundingBox boundingBox)
+        private static List<BrushSide> GetDisplacementExceptRemoveOnlyVerticesList(BoundingBox boundingBox)
         {
             var displacementSideList = new List<BrushSide>();
 
@@ -524,11 +524,11 @@ namespace JERC
         }
 
 
-        private static List<BrushSide> GetBrushNegativeVerticesList()
+        private static List<BrushSide> GetBrushRemoveVerticesList()
         {
             var brushSideList = new List<BrushSide>();
 
-            foreach (var side in vmfRequiredData.brushesSidesNegative)
+            foreach (var side in vmfRequiredData.brushesSidesRemove)
             {
                 var brushSide = new BrushSide(side.vertices_plus.Count());
                 for (int i = 0; i < side.vertices_plus.Count(); i++)
@@ -537,7 +537,7 @@ namespace JERC
 
                     brushSide.vertices[i] = new PointF(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier);
                     brushSide.worldHeight = vert.z;
-                    brushSide.jercType = JercTypes.Negative;
+                    brushSide.jercType = JercTypes.Remove;
                 }
 
                 brushSideList.Add(brushSide);
@@ -616,11 +616,11 @@ namespace JERC
         }
 
 
-        private static List<BrushSide> GetDisplacementNegativeVerticesList()
+        private static List<BrushSide> GetDisplacementRemoveVerticesList()
         {
             var displacementSideList = new List<BrushSide>();
 
-            foreach (var side in vmfRequiredData.displacementsSidesNegative)
+            foreach (var side in vmfRequiredData.displacementsSidesRemove)
             {
                 var displacementSide = new BrushSide(side.vertices_plus.Count());
                 for (int i = 0; i < side.vertices_plus.Count(); i++)
@@ -629,7 +629,7 @@ namespace JERC
 
                     displacementSide.vertices[i] = new PointF(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier);
                     displacementSide.worldHeight = vert.z;
-                    displacementSide.jercType = JercTypes.Negative;
+                    displacementSide.jercType = JercTypes.Remove;
                 }
 
                 displacementSideList.Add(displacementSide);
@@ -795,7 +795,7 @@ namespace JERC
         }
 
 
-        private static void SetBrushesToDrawOrAddNegativeRegion(Bitmap bmp, Graphics graphics, BoundingBox boundingBox, OverviewPositionValues overviewPositionValues, List<BrushSide> brushSideList)
+        private static void SetBrushesToDrawOrAddRemoveRegion(Bitmap bmp, Graphics graphics, BoundingBox boundingBox, OverviewPositionValues overviewPositionValues, List<BrushSide> brushSideList)
         {
             foreach (var brushSide in brushSideList)
             {
@@ -833,15 +833,15 @@ namespace JERC
                     verticesOffset[i].Y = verticesOffset[i].Y - overviewPositionValues.brushVerticesPosMinY + overviewPositionValues.brushVerticesOffsetY;
                 }
 
-                if (brushSide.jercType == JercTypes.Negative) // shouldn't be used as long as SetBrushesToDraw() is not called with negative brushes in brushSideList
+                if (brushSide.jercType == JercTypes.Remove) // shouldn't be used as long as SetBrushesToDraw() is not called with remove brushes in brushSideList
                 {
-                    AddNegativeRegion(bmp, graphics, brushSide);
+                    AddRemoveRegion(bmp, graphics, brushSide);
                 }
                 else
                 {
                     Pen pen = brushSide.jercType switch
                     {
-                        //JercTypes.Negative => PenColours.PenNegative(gradientValue),
+                        //JercTypes.Remove => PenColours.PenRemove(gradientValue),
                         JercTypes.Path => PenColours.PenPath(TEMPORARYrgbColourPath, gradientValue),
                         JercTypes.Cover => PenColours.PenCover(TEMPORARYrgbColourCover, gradientValue),
                         JercTypes.Overlap => PenColours.PenOverlap(TEMPORARYrgbColourOverlap, gradientValue),
@@ -850,7 +850,7 @@ namespace JERC
 
                     SolidBrush solidBrush = brushSide.jercType switch
                     {
-                        //JercTypes.Negative => BrushColours.SolidBrushNegative(gradientValue),
+                        //JercTypes.Remove => BrushColours.SolidBrushRemove(gradientValue),
                         JercTypes.Path => SolidBrushColours.SolidBrushPath(TEMPORARYrgbColourPath, gradientValue),
                         JercTypes.Cover => SolidBrushColours.SolidBrushCover(TEMPORARYrgbColourCover, gradientValue),
                         JercTypes.Overlap => SolidBrushColours.SolidBrushOverlap(TEMPORARYrgbColourOverlap, gradientValue),
@@ -864,7 +864,7 @@ namespace JERC
         }
 
 
-        private static void SetDisplacementsToDrawOrAddNegativeRegion(Bitmap bmp, Graphics graphics, BoundingBox boundingBox, OverviewPositionValues overviewPositionValues, List<BrushSide> displacementSideList)
+        private static void SetDisplacementsToDrawOrAddRemoveRegion(Bitmap bmp, Graphics graphics, BoundingBox boundingBox, OverviewPositionValues overviewPositionValues, List<BrushSide> displacementSideList)
         {
             foreach (var displacementSide in displacementSideList)
             {
@@ -902,15 +902,15 @@ namespace JERC
                     verticesOffset[i].Y = verticesOffset[i].Y - overviewPositionValues.brushVerticesPosMinY + overviewPositionValues.brushVerticesOffsetY;
                 }
 
-                if (displacementSide.jercType == JercTypes.Negative) // shouldn't be used as long as SetDisplacementsToDraw() is not called with negative displacements in brushSideList
+                if (displacementSide.jercType == JercTypes.Remove) // shouldn't be used as long as SetDisplacementsToDraw() is not called with remove displacements in brushSideList
                 {
-                    AddNegativeRegion(bmp, graphics, displacementSide);
+                    AddRemoveRegion(bmp, graphics, displacementSide);
                 }
                 else
                 {
                     Pen pen = displacementSide.jercType switch
                     {
-                        //JercTypes.Negative => PenColours.PenNegative(gradientValue),
+                        //JercTypes.Remove => PenColours.PenRemove(gradientValue),
                         JercTypes.Path => PenColours.PenPath(TEMPORARYrgbColourPath, gradientValue),
                         JercTypes.Cover => PenColours.PenCover(TEMPORARYrgbColourCover, gradientValue),
                         JercTypes.Overlap => PenColours.PenOverlap(TEMPORARYrgbColourOverlap, gradientValue),
@@ -919,7 +919,7 @@ namespace JERC
 
                     SolidBrush solidBrush = displacementSide.jercType switch
                     {
-                        //JercTypes.Negative => BrushColours.SolidBrushNegative(gradientValue),
+                        //JercTypes.Remove => BrushColours.SolidBrushRemove(gradientValue),
                         JercTypes.Path => SolidBrushColours.SolidBrushPath(TEMPORARYrgbColourPath, gradientValue),
                         JercTypes.Cover => SolidBrushColours.SolidBrushCover(TEMPORARYrgbColourCover, gradientValue),
                         JercTypes.Overlap => SolidBrushColours.SolidBrushOverlap(TEMPORARYrgbColourOverlap, gradientValue),
@@ -976,7 +976,7 @@ namespace JERC
         }
 
 
-        private static void AddNegativeRegion(Bitmap bmp, Graphics graphics, BrushSide brushSide)
+        private static void AddRemoveRegion(Bitmap bmp, Graphics graphics, BrushSide brushSide)
         {
             var verticesToUse = brushSide.vertices;
             if (verticesToUse.Length < 3)
