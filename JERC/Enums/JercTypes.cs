@@ -9,7 +9,7 @@ namespace JERC.Enums
     public enum JercTypes
     {
         Negative = 1,
-        Layout = 2,
+        Path = 2,
         Cover = 4,
         Overlap = 8,
     }

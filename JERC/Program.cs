@@ -18,7 +18,7 @@ namespace JERC
 
 
         // TODO: this should be configured by hammer entities
-        private static readonly int[] TEMPORARYrgbColourLayout = new int[3] { 127, 127, 127 };
+        private static readonly int[] TEMPORARYrgbColourPath = new int[3] { 127, 127, 127 };
         private static readonly int[] TEMPORARYrgbColourCover = new int[3] { 225, 225, 225 };
         private static readonly int[] TEMPORARYrgbColourOverlap = new int[3] { 0, 127, 127 };
 
@@ -137,12 +137,12 @@ namespace JERC
                                             select x;
 
             var brushesNegative = GetBrushesNegative(allWorldBrushesInVisgroup);
-            var brushesLayout = GetBrushesLayout(allWorldBrushesInVisgroup);
+            var brushesPath = GetBrushesPath(allWorldBrushesInVisgroup);
             var brushesCover = GetBrushesCover(allWorldBrushesInVisgroup);
             var brushesOverlap = GetBrushesOverlap(allWorldBrushesInVisgroup);
 
             var displacementsNegative = GetDisplacementsNegative(allWorldBrushesInVisgroup);
-            var displacementsLayout = GetDisplacementsLayout(allWorldBrushesInVisgroup);
+            var displacementsPath = GetDisplacementsPath(allWorldBrushesInVisgroup);
             var displacementsCover = GetDisplacementsCover(allWorldBrushesInVisgroup);
             var displacementsOverlap = GetDisplacementsOverlap(allWorldBrushesInVisgroup);
 
@@ -152,8 +152,8 @@ namespace JERC
             var hostageEntities = GetHostageEntities(allEntities);
 
             return new VmfRequiredData(
-                brushesNegative, brushesLayout, brushesCover, brushesOverlap,
-                displacementsNegative, displacementsLayout, displacementsCover, displacementsOverlap,
+                brushesNegative, brushesPath, brushesCover, brushesOverlap,
+                displacementsNegative, displacementsPath, displacementsCover, displacementsOverlap,
                 buyzoneBrushEntities, bombsiteBrushEntities, rescueZoneBrushEntities, hostageEntities
             );
         }
@@ -172,7 +172,7 @@ namespace JERC
         }
 
 
-        private static IEnumerable<IVNode> GetBrushesLayout(IEnumerable<IVNode> allWorldBrushesInVisgroup)
+        private static IEnumerable<IVNode> GetBrushesPath(IEnumerable<IVNode> allWorldBrushesInVisgroup)
         {
             return from x in allWorldBrushesInVisgroup
                    from y in x.Body
@@ -180,7 +180,7 @@ namespace JERC
                    where !y.Body.Any(z => z.Name == "dispinfo")
                    from z in y.Body
                    where z.Name == "material"
-                   where z.Value.ToLower() == TextureNames.LayoutTextureName.ToLower()
+                   where z.Value.ToLower() == TextureNames.PathTextureName.ToLower()
                    select x;
         }
 
@@ -224,7 +224,7 @@ namespace JERC
         }
 
 
-        private static IEnumerable<IVNode> GetDisplacementsLayout(IEnumerable<IVNode> allWorldBrushesInVisgroup)
+        private static IEnumerable<IVNode> GetDisplacementsPath(IEnumerable<IVNode> allWorldBrushesInVisgroup)
         {
             return from x in allWorldBrushesInVisgroup
                    from y in x.Body
@@ -232,7 +232,7 @@ namespace JERC
                    where y.Body.Any(z => z.Name == "dispinfo")
                    from z in y.Body
                    where z.Name == "material"
-                   where z.Value.ToLower() == TextureNames.LayoutTextureName.ToLower()
+                   where z.Value.ToLower() == TextureNames.PathTextureName.ToLower()
                    select x;
         }
 
@@ -305,10 +305,10 @@ namespace JERC
 
         private static OverviewPositionValues SortScaleStuff()
         {
-            var allWorldBrushesAndDisplacementsExceptNegative = vmfRequiredData.brushesSidesLayout
+            var allWorldBrushesAndDisplacementsExceptNegative = vmfRequiredData.brushesSidesPath
                 .Concat(vmfRequiredData.brushesSidesCover)
                 .Concat(vmfRequiredData.brushesSidesOverlap)
-                .Concat(vmfRequiredData.displacementsSidesLayout)
+                .Concat(vmfRequiredData.displacementsSidesPath)
                 .Concat(vmfRequiredData.displacementsSidesCover)
                 .Concat(vmfRequiredData.displacementsSidesOverlap);
             //var allWorldBrushes = vmfRequiredData.brushesSidesNegative.Concat(vmfRequiredData.displacementsSidesNegative).Concat(allWorldBrushesAndDisplacementsExceptNegative);
@@ -448,7 +448,7 @@ namespace JERC
         {
             var brushSideList = new List<BrushSide>();
 
-            brushSideList.AddRange(GetBrushLayoutVerticesList());
+            brushSideList.AddRange(GetBrushPathVerticesList());
             brushSideList.AddRange(GetBrushCoverVerticesList());
             brushSideList.AddRange(GetBrushOverlapVerticesList());
 
@@ -471,7 +471,7 @@ namespace JERC
         {
             var displacementSideList = new List<BrushSide>();
 
-            displacementSideList.AddRange(GetDisplacementLayoutVerticesList());
+            displacementSideList.AddRange(GetDisplacementPathVerticesList());
             displacementSideList.AddRange(GetDisplacementCoverVerticesList());
             displacementSideList.AddRange(GetDisplacementOverlapVerticesList());
 
@@ -547,11 +547,11 @@ namespace JERC
         }
 
 
-        private static List<BrushSide> GetBrushLayoutVerticesList()
+        private static List<BrushSide> GetBrushPathVerticesList()
         {
             var brushSideList = new List<BrushSide>();
 
-            foreach (var side in vmfRequiredData.brushesSidesLayout)
+            foreach (var side in vmfRequiredData.brushesSidesPath)
             {
                 var brushSide = new BrushSide(side.vertices_plus.Count());
                 for (int i = 0; i < side.vertices_plus.Count(); i++)
@@ -560,7 +560,7 @@ namespace JERC
 
                     brushSide.vertices[i] = new PointF(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier);
                     brushSide.worldHeight = vert.z;
-                    brushSide.jercType = JercTypes.Layout;
+                    brushSide.jercType = JercTypes.Path;
                 }
 
                 brushSideList.Add(brushSide);
@@ -639,11 +639,11 @@ namespace JERC
         }
 
 
-        private static List<BrushSide> GetDisplacementLayoutVerticesList()
+        private static List<BrushSide> GetDisplacementPathVerticesList()
         {
             var displacementSideList = new List<BrushSide>();
 
-            foreach (var side in vmfRequiredData.displacementsSidesLayout)
+            foreach (var side in vmfRequiredData.displacementsSidesPath)
             {
                 var displacementSide = new BrushSide(side.vertices_plus.Count());
                 for (int i = 0; i < side.vertices_plus.Count(); i++)
@@ -652,7 +652,7 @@ namespace JERC
 
                     displacementSide.vertices[i] = new PointF(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier);
                     displacementSide.worldHeight = vert.z;
-                    displacementSide.jercType = JercTypes.Layout;
+                    displacementSide.jercType = JercTypes.Path;
                 }
 
                 displacementSideList.Add(displacementSide);
@@ -842,7 +842,7 @@ namespace JERC
                     Pen pen = brushSide.jercType switch
                     {
                         //JercTypes.Negative => PenColours.PenNegative(gradientValue),
-                        JercTypes.Layout => PenColours.PenLayout(TEMPORARYrgbColourLayout, gradientValue),
+                        JercTypes.Path => PenColours.PenPath(TEMPORARYrgbColourPath, gradientValue),
                         JercTypes.Cover => PenColours.PenCover(TEMPORARYrgbColourCover, gradientValue),
                         JercTypes.Overlap => PenColours.PenOverlap(TEMPORARYrgbColourOverlap, gradientValue),
                         _ => null,
@@ -851,7 +851,7 @@ namespace JERC
                     SolidBrush solidBrush = brushSide.jercType switch
                     {
                         //JercTypes.Negative => BrushColours.SolidBrushNegative(gradientValue),
-                        JercTypes.Layout => SolidBrushColours.SolidBrushLayout(TEMPORARYrgbColourLayout, gradientValue),
+                        JercTypes.Path => SolidBrushColours.SolidBrushPath(TEMPORARYrgbColourPath, gradientValue),
                         JercTypes.Cover => SolidBrushColours.SolidBrushCover(TEMPORARYrgbColourCover, gradientValue),
                         JercTypes.Overlap => SolidBrushColours.SolidBrushOverlap(TEMPORARYrgbColourOverlap, gradientValue),
                         _ => null,
@@ -911,7 +911,7 @@ namespace JERC
                     Pen pen = displacementSide.jercType switch
                     {
                         //JercTypes.Negative => PenColours.PenNegative(gradientValue),
-                        JercTypes.Layout => PenColours.PenLayout(TEMPORARYrgbColourLayout, gradientValue),
+                        JercTypes.Path => PenColours.PenPath(TEMPORARYrgbColourPath, gradientValue),
                         JercTypes.Cover => PenColours.PenCover(TEMPORARYrgbColourCover, gradientValue),
                         JercTypes.Overlap => PenColours.PenOverlap(TEMPORARYrgbColourOverlap, gradientValue),
                         _ => null,
@@ -920,7 +920,7 @@ namespace JERC
                     SolidBrush solidBrush = displacementSide.jercType switch
                     {
                         //JercTypes.Negative => BrushColours.SolidBrushNegative(gradientValue),
-                        JercTypes.Layout => SolidBrushColours.SolidBrushLayout(TEMPORARYrgbColourLayout, gradientValue),
+                        JercTypes.Path => SolidBrushColours.SolidBrushPath(TEMPORARYrgbColourPath, gradientValue),
                         JercTypes.Cover => SolidBrushColours.SolidBrushCover(TEMPORARYrgbColourCover, gradientValue),
                         JercTypes.Overlap => SolidBrushColours.SolidBrushOverlap(TEMPORARYrgbColourOverlap, gradientValue),
                         _ => null,
