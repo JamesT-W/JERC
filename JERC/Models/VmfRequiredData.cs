@@ -1,4 +1,4 @@
-﻿using JERC.Constants;
+using JERC.Constants;
 using JERC.Enums;
 using System;
 using System.Collections.Generic;
@@ -30,7 +30,7 @@ namespace JERC.Models
         public VmfRequiredData(
             IEnumerable<IVNode> brushesRemove, IEnumerable<IVNode> brushesPath, IEnumerable<IVNode> brushesCover, IEnumerable<IVNode> brushesOverlap,
             IEnumerable<IVNode> displacementsRemove, IEnumerable<IVNode> displacementsPath, IEnumerable<IVNode> displacementsCover, IEnumerable<IVNode> displacementsOverlap,
-            IEnumerable<IVNode> buyzoneBrushEntities, IEnumerable<IVNode> bombsiteBrushEntities, IEnumerable<IVNode> RescueZoneBrushEntities, IEnumerable<IVNode> hostageEntities
+            IEnumerable<IVNode> buyzoneBrushEntities, IEnumerable<IVNode> bombsiteBrushEntities, IEnumerable<IVNode> rescueZoneBrushEntities, IEnumerable<IVNode> hostageEntities
         )
         {
             // world brushes
@@ -58,7 +58,7 @@ namespace JERC.Models
             // entities
             var entitiesBuyzoneModelled = buyzoneBrushEntities.Any() ? buyzoneBrushEntities.Select(x => new Entity(x)).ToList() : new List<Entity>();
             var entitiesBombsiteModelled = bombsiteBrushEntities.Any() ? bombsiteBrushEntities.Select(x => new Entity(x)).ToList() : new List<Entity>();
-            var entitiesRescueZoneModelled = RescueZoneBrushEntities.Any() ? RescueZoneBrushEntities.Select(x => new Entity(x)).ToList() : new List<Entity>();
+            var entitiesRescueZoneModelled = rescueZoneBrushEntities.Any() ? rescueZoneBrushEntities.Select(x => new Entity(x)).ToList() : new List<Entity>();
 
             foreach (var entity in entitiesBuyzoneModelled)
             {
