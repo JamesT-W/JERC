@@ -447,25 +447,33 @@ namespace JERC
 
                 // non-remove stuff (for stroke)
                 var brushesToDraw = GetBrushesToDrawOrAddRemoveRegion(bmp, graphics, boundingBox, brushExceptRemoveSideList);
-                foreach (var brushToRender in brushesToDraw)
-                {
-                    var strokeSolidBrush = new SolidBrush(Color.Transparent);
-                    var strokePen = (Pen)brushToRender.pen.Clone();
-                    strokePen.Color = Color.White;
-                    strokePen.Width *= jercConfigValues.strokeWidth;
 
-                    DrawFilledPolygonObjectBrushes(graphics, strokeSolidBrush, strokePen, brushToRender.vertices);
+                if (jercConfigValues.strokeAroundMainMaterials)
+                {
+                    foreach (var brushToRender in brushesToDraw)
+                    {
+                        var strokeSolidBrush = new SolidBrush(Color.Transparent);
+                        var strokePen = (Pen)brushToRender.pen.Clone();
+                        strokePen.Color = Color.White;
+                        strokePen.Width *= jercConfigValues.strokeWidth;
+
+                        DrawFilledPolygonObjectBrushes(graphics, strokeSolidBrush, strokePen, brushToRender.vertices);
+                    }
                 }
 
                 var displacementsToDraw = GetDisplacementsToDrawOrAddRemoveRegion(bmp, graphics, boundingBox, displacementExceptRemoveSideList);
-                foreach (var displacementToRender in displacementsToDraw)
-                {
-                    var strokeSolidBrush = new SolidBrush(Color.Transparent);
-                    var strokePen = (Pen)displacementToRender.pen.Clone();
-                    strokePen.Color = Color.White;
-                    strokePen.Width *= jercConfigValues.strokeWidth;
 
-                    DrawFilledPolygonObjectDisplacements(graphics, strokeSolidBrush, strokePen, displacementToRender.vertices);
+                if (jercConfigValues.strokeAroundMainMaterials)
+                {
+                    foreach (var displacementToRender in displacementsToDraw)
+                    {
+                        var strokeSolidBrush = new SolidBrush(Color.Transparent);
+                        var strokePen = (Pen)displacementToRender.pen.Clone();
+                        strokePen.Color = Color.White;
+                        strokePen.Width *= jercConfigValues.strokeWidth;
+
+                        DrawFilledPolygonObjectDisplacements(graphics, strokeSolidBrush, strokePen, displacementToRender.vertices);
+                    }
                 }
 
                 // non-remove stuff next
@@ -484,6 +492,7 @@ namespace JERC
 
                 // entities next
                 var entitiesToDraw = GetEntitiesToDraw(bmp, graphics, boundingBox, overviewPositionValues, entityBrushSideListById);
+
                 foreach (var entityToDraw in entitiesToDraw)
                 {
                     DrawFilledPolygonObjectEntities(graphics, entityToDraw.solidBrush, entityToDraw.pen, entityToDraw.vertices);
