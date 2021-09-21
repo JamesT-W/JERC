@@ -1,4 +1,4 @@
-﻿using JERC.Constants;
+using JERC.Constants;
 using JERC.Enums;
 using JERC.Models;
 using System;
@@ -1034,6 +1034,12 @@ namespace JERC
 
             var graphicsPath = new GraphicsPath();
             graphicsPath.AddPolygon(verticesToUse);
+
+            // add stroke
+            var strokeSolidBrush = new SolidBrush(Color.Transparent);
+            var strokePen = new Pen(Color.White, Sizes.StrokeWidthMultiplier);
+            DrawFilledPolygonObjectBrushes(graphics, strokeSolidBrush, strokePen, graphicsPath.PathPoints.Select(x => new Point((int)x.X, (int)x.Y)).ToArray());
+            //
 
             var region = new Region(graphicsPath);
             graphics.ExcludeClip(region);
