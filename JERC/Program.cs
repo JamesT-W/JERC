@@ -38,6 +38,8 @@ namespace JERC
 
         private static GameConfigurationValues gameConfigurationValues;
 
+        private static JercConfigValues jercConfigValues;
+
         private static string visgroupId;
 
         private static string mapName;
@@ -137,16 +139,19 @@ namespace JERC
                                             where z.Value == visgroupId
                                             select x;
 
+            // brushes
             var brushesRemove = GetBrushesRemove(allWorldBrushesInVisgroup);
             var brushesPath = GetBrushesPath(allWorldBrushesInVisgroup);
             var brushesCover = GetBrushesCover(allWorldBrushesInVisgroup);
             var brushesOverlap = GetBrushesOverlap(allWorldBrushesInVisgroup);
 
+            // displacements
             var displacementsRemove = GetDisplacementsRemove(allWorldBrushesInVisgroup);
             var displacementsPath = GetDisplacementsPath(allWorldBrushesInVisgroup);
             var displacementsCover = GetDisplacementsCover(allWorldBrushesInVisgroup);
             var displacementsOverlap = GetDisplacementsOverlap(allWorldBrushesInVisgroup);
 
+            // entities (in game)
             var buyzoneBrushEntities = GetBuyzoneBrushEntities(allEntities);
             var bombsiteBrushEntities = GetBombsiteBrushEntities(allEntities);
             var rescueZoneBrushEntities = GetRescueZoneBrushEntities(allEntities);
@@ -154,11 +159,50 @@ namespace JERC
             var ctSpawnEntities = GetCTSpawnEntities(allEntities);
             var tSpawnEntities = GetTSpawnEntities(allEntities);
 
+            // entities (JERC)
+            var jercEntities = GetJercEntities(allEntities);
+
+            jercConfigValues = new JercConfigValues(GetSettingsValuesFromJercEntities(jercEntities));
+
             return new VmfRequiredData(
                 brushesRemove, brushesPath, brushesCover, brushesOverlap,
                 displacementsRemove, displacementsPath, displacementsCover, displacementsOverlap,
                 buyzoneBrushEntities, bombsiteBrushEntities, rescueZoneBrushEntities, hostageEntities, ctSpawnEntities, tSpawnEntities
             );
+        }
+
+
+        private static Dictionary<string, string> GetSettingsValuesFromJercEntities(IEnumerable<IVNode> jercEntities)
+        {
+            Dictionary<string, string> jercEntitySettingsValues = new Dictionary<string, string>();
+
+            // jerc_configure
+            var jercConfigure = jercEntities.FirstOrDefault(x => x.Body.Any(y => y.Name == "classname" && y.Value == Classnames.JercConfigure)).Body;
+
+            jercEntitySettingsValues.Add("backgroundFilename", jercConfigure.FirstOrDefault(x => x.Name == "backgroundFilename")?.Value ?? string.Empty);
+            jercEntitySettingsValues.Add("alternateOutputPath", jercConfigure.FirstOrDefault(x => x.Name == "alternateOutputPath")?.Value ?? string.Empty);
+            jercEntitySettingsValues.Add("onlyOutputToAlternatePath", jercConfigure.FirstOrDefault(x => x.Name == "onlyOutputToAlternatePath")?.Value);
+            jercEntitySettingsValues.Add("pathColourHigh", jercConfigure.FirstOrDefault(x => x.Name == "pathColourHigh")?.Value);
+            jercEntitySettingsValues.Add("pathColourLow", jercConfigure.FirstOrDefault(x => x.Name == "pathColourLow")?.Value);
+            jercEntitySettingsValues.Add("coverColourHigh", jercConfigure.FirstOrDefault(x => x.Name == "coverColourHigh")?.Value);
+            jercEntitySettingsValues.Add("coverColourLow", jercConfigure.FirstOrDefault(x => x.Name == "coverColourLow")?.Value);
+            jercEntitySettingsValues.Add("overlapColourHigh", jercConfigure.FirstOrDefault(x => x.Name == "overlapColourHigh")?.Value);
+            jercEntitySettingsValues.Add("overlapColourLow", jercConfigure.FirstOrDefault(x => x.Name == "overlapColourLow")?.Value);
+            jercEntitySettingsValues.Add("strokeWidth", jercConfigure.FirstOrDefault(x => x.Name == "strokeWidth")?.Value);
+            jercEntitySettingsValues.Add("strokeColour", jercConfigure.FirstOrDefault(x => x.Name == "strokeColour")?.Value);
+            jercEntitySettingsValues.Add("strokeAroundMainMaterials", jercConfigure.FirstOrDefault(x => x.Name == "strokeAroundMainMaterials")?.Value);
+            jercEntitySettingsValues.Add("strokeAroundRemoveMaterials", jercConfigure.FirstOrDefault(x => x.Name == "strokeAroundRemoveMaterials")?.Value);
+            jercEntitySettingsValues.Add("exportSeparateLevelRadars", jercConfigure.FirstOrDefault(x => x.Name == "exportSeparateLevelRadars")?.Value);
+            jercEntitySettingsValues.Add("exportTxt", jercConfigure.FirstOrDefault(x => x.Name == "exportTxt")?.Value);
+            jercEntitySettingsValues.Add("exportDds", jercConfigure.FirstOrDefault(x => x.Name == "exportDds")?.Value);
+            jercEntitySettingsValues.Add("exportPng", jercConfigure.FirstOrDefault(x => x.Name == "exportPng")?.Value);
+
+
+            // 
+
+
+
+            return jercEntitySettingsValues;
         }
 
 
@@ -326,6 +370,20 @@ namespace JERC
         }
 
 
+        private static IEnumerable<IVNode> GetJercEntities(IEnumerable<IVNode> allEntities)
+        {
+            return from x in allEntities
+                   from y in x.Body
+                   where y.Name == "classname"
+                   where y.Value == Classnames.JercConfigure /*||
+                         y.Value == Classnames.JercConfigure ||
+                         y.Value == Classnames.JercConfigure ||
+                         y.Value == Classnames.JercConfigure ||
+                         y.Value == Classnames.JercConfigure*/
+                   select x;
+        }
+
+
         private static void SortScaleStuff()
         {
             var allWorldBrushesAndDisplacementsExceptRemove = vmfRequiredData.brushesSidesPath
@@ -354,7 +412,7 @@ namespace JERC
 
             var scale = scaleX >= scaleY ? scaleX : scaleY;
 
-            overviewPositionValues = new OverviewPositionValues(minX, maxX, minY, maxY, scale);
+            overviewPositionValues = new OverviewPositionValues(jercConfigValues, minX, maxX, minY, maxY, scale);
 
             var pixelsPerUnitX = overviewPositionValues.outputResolution / sizeX;
             var pixelsPerUnitY = overviewPositionValues.outputResolution / sizeY;
@@ -394,7 +452,7 @@ namespace JERC
                     var strokeSolidBrush = new SolidBrush(Color.Transparent);
                     var strokePen = (Pen)brushToRender.pen.Clone();
                     strokePen.Color = Color.White;
-                    strokePen.Width *= Sizes.StrokeWidthMultiplier;
+                    strokePen.Width *= jercConfigValues.strokeWidth;
 
                     DrawFilledPolygonObjectBrushes(graphics, strokeSolidBrush, strokePen, brushToRender.vertices);
                 }
@@ -405,7 +463,7 @@ namespace JERC
                     var strokeSolidBrush = new SolidBrush(Color.Transparent);
                     var strokePen = (Pen)displacementToRender.pen.Clone();
                     strokePen.Color = Color.White;
-                    strokePen.Width *= Sizes.StrokeWidthMultiplier;
+                    strokePen.Width *= jercConfigValues.strokeWidth;
 
                     DrawFilledPolygonObjectDisplacements(graphics, strokeSolidBrush, strokePen, displacementToRender.vertices);
                 }
@@ -1040,10 +1098,12 @@ namespace JERC
             graphicsPath.AddPolygon(verticesToUse);
 
             // add stroke
-            var strokeSolidBrush = new SolidBrush(Color.Transparent);
-            var strokePen = new Pen(Color.White, Sizes.StrokeWidthMultiplier);
-            DrawFilledPolygonObjectBrushes(graphics, strokeSolidBrush, strokePen, graphicsPath.PathPoints.Select(x => new Point((int)x.X, (int)x.Y)).ToArray());
-            //
+            if (jercConfigValues.strokeAroundRemoveMaterials)
+            {
+                var strokeSolidBrush = new SolidBrush(Color.Transparent);
+                var strokePen = new Pen(Color.White, jercConfigValues.strokeWidth);
+                DrawFilledPolygonObjectBrushes(graphics, strokeSolidBrush, strokePen, graphicsPath.PathPoints.Select(x => new Point((int)x.X, (int)x.Y)).ToArray());
+            }
 
             var region = new Region(graphicsPath);
             graphics.ExcludeClip(region);

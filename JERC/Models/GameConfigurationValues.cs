@@ -26,6 +26,8 @@ namespace JERC.Models
                         break;
                     case "-vmffilepath":
                         vmfFilepath = args[i + 1];
+                        if (!vmfFilepath.Contains(".vmf"))
+                            vmfFilepath += ".vmf";
                         break;
                     default:
                         return;

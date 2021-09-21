@@ -36,15 +36,15 @@ namespace JERC.Models
         public float posY;
         public float scale;
 
-        public OverviewPositionValues(float brushVerticesPosMinX, float brushVerticesPosMaxX, float brushVerticesPosMinY, float brushVerticesPosMaxY, float scale)
+        public OverviewPositionValues(JercConfigValues jercConfigValues, float brushVerticesPosMinX, float brushVerticesPosMaxX, float brushVerticesPosMinY, float brushVerticesPosMaxY, float scale)
         {
             this.brushVerticesPosMinX = brushVerticesPosMinX;
             this.brushVerticesPosMaxX = brushVerticesPosMaxX;
             this.brushVerticesPosMinY = brushVerticesPosMinY;
             this.brushVerticesPosMaxY = brushVerticesPosMaxY;
 
-            width = (int)Math.Ceiling(brushVerticesPosMaxX - brushVerticesPosMinX) + (Sizes.StrokeWidthMultiplier * 2); // adds the stroke width mutliplier value as a padding at left and right
-            height = (int)Math.Ceiling(brushVerticesPosMaxY - brushVerticesPosMinY) + (Sizes.StrokeWidthMultiplier * 2); // adds the stroke width mutliplier value as a padding at top and bottom
+            width = (int)Math.Ceiling(brushVerticesPosMaxX - brushVerticesPosMinX) + (jercConfigValues.strokeWidth * 2); // adds the stroke width mutliplier value as a padding at left and right
+            height = (int)Math.Ceiling(brushVerticesPosMaxY - brushVerticesPosMinY) + (jercConfigValues.strokeWidth * 2); // adds the stroke width mutliplier value as a padding at top and bottom
 
             outputResolution = width >= height ? width : height;
 
@@ -54,8 +54,8 @@ namespace JERC.Models
             paddingPercentageX = (float)paddingSizeX / (float)outputResolution;
             paddingPercentageY = (float)paddingSizeY / (float)outputResolution;
 
-            brushVerticesOffsetX = width < height ? ((height - width) / 2) + Sizes.StrokeWidthMultiplier : 0 + Sizes.StrokeWidthMultiplier;
-            brushVerticesOffsetY = height < width ? ((width - height) / 2) + Sizes.StrokeWidthMultiplier : 0 + Sizes.StrokeWidthMultiplier;
+            brushVerticesOffsetX = width < height ? ((height - width) / 2) + jercConfigValues.strokeWidth : 0 + jercConfigValues.strokeWidth;
+            brushVerticesOffsetY = height < width ? ((width - height) / 2) + jercConfigValues.strokeWidth : 0 + jercConfigValues.strokeWidth;
 
             offsetPercentageX = brushVerticesOffsetX / width;
             offsetPercentageY = brushVerticesOffsetY / height;
