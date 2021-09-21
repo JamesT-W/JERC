@@ -36,6 +36,8 @@ namespace JERC
 
         private static readonly string visgroupName = "JERC";
 
+        private static GameConfigurationValues gameConfigurationValues;
+
         private static string visgroupId;
 
         private static string mapName;
@@ -47,9 +49,11 @@ namespace JERC
 
         static void Main(string[] args)
         {
-            if (args.Count() != 2 || args[0].ToLower() != "-filepath" || !File.Exists(args[1]))
+            gameConfigurationValues = new GameConfigurationValues(args);
+
+            if (gameConfigurationValues == null || !gameConfigurationValues.VerifyAllValuesSet())
             {
-                Console.WriteLine("Incorrect arguments. Reinstalling JERC recommended.");
+                Console.WriteLine("Game configuration files missing. Check the compile configuration's parameters.");
                 return;
             }
 
@@ -74,9 +78,9 @@ namespace JERC
             }
             */
 
-            var lines = File.ReadAllLines(args[1]);
+            var lines = File.ReadAllLines(gameConfigurationValues.vmfFilepath);
 
-            mapName = Path.GetFileNameWithoutExtension(args[1]);
+            mapName = Path.GetFileNameWithoutExtension(gameConfigurationValues.vmfFilepath);
 
 
             // TODO: uncomment for release
