@@ -1276,6 +1276,7 @@ namespace JERC
             string bombA_x = null, bombA_y = null, bombB_x = null, bombB_y = null;
 
             string Hostage1_x = null, Hostage1_y = null, Hostage2_x = null, Hostage2_y = null, Hostage3_x = null, Hostage3_y = null, Hostage4_x = null, Hostage4_y = null;
+            string Hostage5_x = null, Hostage5_y = null, Hostage6_x = null, Hostage6_y = null, Hostage7_x = null, Hostage7_y = null, Hostage8_x = null, Hostage8_y = null;
 
 
             var paddingPercentageEachSideX = overviewPositionValues.paddingPercentageX == 0 ? 0 : (overviewPositionValues.paddingPercentageX / 2);
@@ -1370,6 +1371,46 @@ namespace JERC
 
                             Hostage4_x = FlipOverviewTxtValues(xPercent4, true);
                             Hostage4_y = FlipOverviewTxtValues(yPercent4, false);
+
+                            if (vmfRequiredData.hostageEntities.Count() > 4)
+                            {
+                                var origin5 = new Vertices(vmfRequiredData.hostageEntities.Skip(3).FirstOrDefault().origin);
+                                var xPercent5 = Math.Abs((Math.Abs(Math.Abs(origin5.x) - Math.Abs(overviewPositionValues.brushVerticesPosMinX))) / overviewPositionValues.outputResolution) + paddingPercentageEachSideX;
+                                var yPercent5 = Math.Abs((Math.Abs(Math.Abs(origin5.y) - Math.Abs(overviewPositionValues.brushVerticesPosMinY))) / overviewPositionValues.outputResolution) + paddingPercentageEachSideY;
+
+                                Hostage5_x = FlipOverviewTxtValues(xPercent5, true);
+                                Hostage5_y = FlipOverviewTxtValues(yPercent5, false);
+
+                                if (vmfRequiredData.hostageEntities.Count() > 5)
+                                {
+                                    var origin6 = new Vertices(vmfRequiredData.hostageEntities.Skip(3).FirstOrDefault().origin);
+                                    var xPercent6 = Math.Abs((Math.Abs(Math.Abs(origin6.x) - Math.Abs(overviewPositionValues.brushVerticesPosMinX))) / overviewPositionValues.outputResolution) + paddingPercentageEachSideX;
+                                    var yPercent6 = Math.Abs((Math.Abs(Math.Abs(origin6.y) - Math.Abs(overviewPositionValues.brushVerticesPosMinY))) / overviewPositionValues.outputResolution) + paddingPercentageEachSideY;
+
+                                    Hostage6_x = FlipOverviewTxtValues(xPercent6, true);
+                                    Hostage6_y = FlipOverviewTxtValues(yPercent6, false);
+
+                                    if (vmfRequiredData.hostageEntities.Count() > 6)
+                                    {
+                                        var origin7 = new Vertices(vmfRequiredData.hostageEntities.Skip(3).FirstOrDefault().origin);
+                                        var xPercent7 = Math.Abs((Math.Abs(Math.Abs(origin7.x) - Math.Abs(overviewPositionValues.brushVerticesPosMinX))) / overviewPositionValues.outputResolution) + paddingPercentageEachSideX;
+                                        var yPercent7 = Math.Abs((Math.Abs(Math.Abs(origin7.y) - Math.Abs(overviewPositionValues.brushVerticesPosMinY))) / overviewPositionValues.outputResolution) + paddingPercentageEachSideY;
+
+                                        Hostage7_x = FlipOverviewTxtValues(xPercent7, true);
+                                        Hostage7_y = FlipOverviewTxtValues(yPercent7, false);
+
+                                        if (vmfRequiredData.hostageEntities.Count() > 7)
+                                        {
+                                            var origin8 = new Vertices(vmfRequiredData.hostageEntities.Skip(3).FirstOrDefault().origin);
+                                            var xPercent8 = Math.Abs((Math.Abs(Math.Abs(origin8.x) - Math.Abs(overviewPositionValues.brushVerticesPosMinX))) / overviewPositionValues.outputResolution) + paddingPercentageEachSideX;
+                                            var yPercent8 = Math.Abs((Math.Abs(Math.Abs(origin8.y) - Math.Abs(overviewPositionValues.brushVerticesPosMinY))) / overviewPositionValues.outputResolution) + paddingPercentageEachSideY;
+
+                                            Hostage8_x = FlipOverviewTxtValues(xPercent8, true);
+                                            Hostage8_y = FlipOverviewTxtValues(yPercent8, false);
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -1381,7 +1422,8 @@ namespace JERC
                 inset_left, inset_top, inset_right, inset_bottom,
                 CTSpawn_x, CTSpawn_y, TSpawn_x, TSpawn_y,
                 bombA_x, bombA_y, bombB_x, bombB_y,
-                Hostage1_x, Hostage1_y, Hostage2_x, Hostage2_y, Hostage3_x, Hostage3_y, Hostage4_x, Hostage4_y
+                Hostage1_x, Hostage1_y, Hostage2_x, Hostage2_y, Hostage3_x, Hostage3_y, Hostage4_x, Hostage4_y,
+                Hostage5_x, Hostage5_y, Hostage6_x, Hostage6_y, Hostage7_x, Hostage7_y, Hostage8_x, Hostage8_y
             );
         }
 

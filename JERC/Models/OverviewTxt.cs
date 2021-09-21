@@ -36,6 +36,14 @@ namespace JERC.Models
         public string Hostage3_y;
         public string Hostage4_x;
         public string Hostage4_y;
+        public string Hostage5_x;
+        public string Hostage5_y;
+        public string Hostage6_x;
+        public string Hostage6_y;
+        public string Hostage7_x;
+        public string Hostage7_y;
+        public string Hostage8_x;
+        public string Hostage8_y;
 
 
         public OverviewTxt(
@@ -43,7 +51,8 @@ namespace JERC.Models
             string inset_left, string inset_top, string inset_right, string inset_bottom,
             string CTSpawn_x, string CTSpawn_y, string TSpawn_x, string TSpawn_y,
             string bombA_x, string bombA_y, string bombB_x, string bombB_y,
-            string Hostage1_x, string Hostage1_y, string Hostage2_x, string Hostage2_y, string Hostage3_x, string Hostage3_y, string Hostage4_x, string Hostage4_y
+            string Hostage1_x, string Hostage1_y, string Hostage2_x, string Hostage2_y, string Hostage3_x, string Hostage3_y, string Hostage4_x, string Hostage4_y,
+            string Hostage5_x, string Hostage5_y, string Hostage6_x, string Hostage6_y, string Hostage7_x, string Hostage7_y, string Hostage8_x, string Hostage8_y
         )
         {
             this.material = material;
@@ -76,6 +85,14 @@ namespace JERC.Models
             this.Hostage3_y = Hostage3_y;
             this.Hostage4_x = Hostage4_x;
             this.Hostage4_y = Hostage4_y;
+            this.Hostage5_x = Hostage5_x;
+            this.Hostage5_y = Hostage5_y;
+            this.Hostage6_x = Hostage6_x;
+            this.Hostage6_y = Hostage6_y;
+            this.Hostage7_x = Hostage7_x;
+            this.Hostage7_y = Hostage7_y;
+            this.Hostage8_x = Hostage8_x;
+            this.Hostage8_y = Hostage8_y;
         }
 
 
@@ -142,6 +159,14 @@ namespace JERC.Models
                     string.Concat("\t\"Hostage3_y\"\t\"", Hostage3_y, "\""),
                     string.Concat("\t\"Hostage4_x\"\t\"", Hostage4_x, "\""),
                     string.Concat("\t\"Hostage4_y\"\t\"", Hostage4_y, "\""),
+                    string.Concat("\t\"Hostage5_x\"\t\"", Hostage5_x, "\""),
+                    string.Concat("\t\"Hostage5_y\"\t\"", Hostage5_y, "\""),
+                    string.Concat("\t\"Hostage6_x\"\t\"", Hostage6_x, "\""),
+                    string.Concat("\t\"Hostage6_y\"\t\"", Hostage6_y, "\""),
+                    string.Concat("\t\"Hostage7_x\"\t\"", Hostage7_x, "\""),
+                    string.Concat("\t\"Hostage7_y\"\t\"", Hostage7_y, "\""),
+                    string.Concat("\t\"Hostage8_x\"\t\"", Hostage8_x, "\""),
+                    string.Concat("\t\"Hostage8_y\"\t\"", Hostage8_y, "\""),
                 });
             }
 
