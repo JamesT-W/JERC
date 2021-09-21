@@ -35,7 +35,7 @@ namespace JERC.Models
 
             backgroundFilename = string.IsNullOrWhiteSpace(jercEntitySettingsValues["backgroundFilename"]) ? null : jercEntitySettingsValues["backgroundFilename"];
             alternateOutputPath = string.IsNullOrWhiteSpace(jercEntitySettingsValues["alternateOutputPath"]) ? null : jercEntitySettingsValues["alternateOutputPath"];
-            onlyOutputToAlternatePath = jercEntitySettingsValues["onlyOutputToAlternatePath"] == "1";
+            onlyOutputToAlternatePath = jercEntitySettingsValues["onlyOutputToAlternatePath"] == "0";
             pathColourHigh = GetColourStringAsColour(jercEntitySettingsValues["pathColourHigh"]);
             pathColourLow = GetColourStringAsColour(jercEntitySettingsValues["pathColourLow"]);
             coverColourHigh = GetColourStringAsColour(jercEntitySettingsValues["coverColourHigh"]);
@@ -46,12 +46,12 @@ namespace JERC.Models
                 strokeWidth = defaultStrokeWidthMultiplier;*/
             strokeWidth = int.Parse(jercEntitySettingsValues["strokeWidth"]);
             strokeColour = GetColourStringAsColour(jercEntitySettingsValues["strokeColour"]);
-            strokeAroundMainMaterials = jercEntitySettingsValues["strokeAroundMainMaterials"] == "1";
-            strokeAroundRemoveMaterials = jercEntitySettingsValues["strokeAroundRemoveMaterials"] == "1";
-            exportSeparateLevelRadars = jercEntitySettingsValues["exportSeparateLevelRadars"] == "1";
-            exportTxt = jercEntitySettingsValues["exportTxt"] == "1";
-            exportDds = jercEntitySettingsValues["exportDds"] == "1";
-            exportPng = jercEntitySettingsValues["exportPng"] == "1";
+            strokeAroundMainMaterials = jercEntitySettingsValues["strokeAroundMainMaterials"] == "0";
+            strokeAroundRemoveMaterials = jercEntitySettingsValues["strokeAroundRemoveMaterials"] == "0";
+            exportSeparateLevelRadars = jercEntitySettingsValues["exportSeparateLevelRadars"] == "0";
+            exportTxt = jercEntitySettingsValues["exportTxt"] == "0";
+            exportDds = jercEntitySettingsValues["exportDds"] == "0";
+            exportPng = jercEntitySettingsValues["exportPng"] == "0";
 
 
             // 
