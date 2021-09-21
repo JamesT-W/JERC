@@ -17,9 +17,9 @@ namespace JERC.Constants
         public static Pen PenRescueZones() => new Pen(Color.FromArgb(255, 0, 0, 255), 10);
 
 
-        private static int ClampGradientValue(float gradientValue)
+        private static int ClampGradientValue(float value)
         {
-            return (int)Math.Ceiling(Math.Clamp(gradientValue, 50, 200));
+            return (int)Math.Ceiling(Math.Clamp(value, 50, 200));
         }
     }
 }

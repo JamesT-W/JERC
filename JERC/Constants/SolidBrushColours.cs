@@ -17,9 +17,9 @@ namespace JERC.Constants
         public static SolidBrush SolidBrushRescueZones() => new SolidBrush(Color.FromArgb(40, 0, 0, 255));
 
 
-        private static int ClampGradientValue(float gradientValue)
+        private static int ClampGradientValue(float value)
         {
-            return (int)Math.Ceiling(Math.Clamp(gradientValue, 50, 200));
+            return (int)Math.Ceiling(Math.Clamp(value, 50, 200));
         }
     }
 }
