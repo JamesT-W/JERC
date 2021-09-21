@@ -97,11 +97,25 @@ namespace JERC.Models
                     //string.Concat("\t\"inset_right\"\t\"", inset_right, "\""),
                     //string.Concat("\t\"inset_bottom\"\t\"", inset_bottom, "\""),
                     //string.Empty,
+            };
+
+            if (CTSpawn_x != null)
+            {
+                lines.AddRange(new List<string>()
+                {
                     string.Concat("\t\"CTSpawn_x\"\t\t\"", CTSpawn_x, "\""),
                     string.Concat("\t\"CTSpawn_y\"\t\t\"", CTSpawn_y, "\""),
+                });
+            }
+
+            if (TSpawn_x != null)
+            {
+                lines.AddRange(new List<string>()
+                {
                     string.Concat("\t\"TSpawn_x\"\t\t\"", TSpawn_x, "\""),
                     string.Concat("\t\"TSpawn_y\"\t\t\"", TSpawn_y, "\""),
-            };
+                });
+            }
 
             if (bombA_x != null)
             {
