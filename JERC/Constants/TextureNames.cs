@@ -6,9 +6,9 @@ namespace JERC.Constants
 {
     public static class TextureNames
     {
-        public static string RemoveTextureName = "jerc/remove";
-        public static string PathTextureName = "jerc/path";
-        public static string CoverTextureName = "jerc/cover";
-        public static string OverlapTextureName = "jerc/overlap";
+        public static readonly string RemoveTextureName = "jerc/remove";
+        public static readonly string PathTextureName = "jerc/path";
+        public static readonly string CoverTextureName = "jerc/cover";
+        public static readonly string OverlapTextureName = "jerc/overlap";
     }
 }

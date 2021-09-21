@@ -1,4 +1,4 @@
-using JERC.Constants;
+﻿using JERC.Constants;
 using JERC.Enums;
 using JERC.Models;
 using System;
@@ -42,6 +42,7 @@ namespace JERC
 
         private static VMF vmf;
         private static VmfRequiredData vmfRequiredData;
+        private static OverviewPositionValues overviewPositionValues;
 
 
         static void Main(string[] args)
@@ -93,7 +94,7 @@ namespace JERC
 
             vmfRequiredData = GetVmfRequiredData();
 
-            var overviewPositionValues = SortScaleStuff();
+            SortScaleStuff();
 
             if (overviewPositionValues == null)
             {
@@ -101,9 +102,9 @@ namespace JERC
                 return;
             }
 
-            GenerateRadar(overviewPositionValues);
+            GenerateRadar();
 
-            GenerateTxt(overviewPositionValues);
+            GenerateTxt();
         }
 
 
@@ -146,11 +147,13 @@ namespace JERC
             var bombsiteBrushEntities = GetBombsiteBrushEntities(allEntities);
             var rescueZoneBrushEntities = GetRescueZoneBrushEntities(allEntities);
             var hostageEntities = GetHostageEntities(allEntities);
+            var ctSpawnEntities = GetCTSpawnEntities(allEntities);
+            var tSpawnEntities = GetTSpawnEntities(allEntities);
 
             return new VmfRequiredData(
                 brushesRemove, brushesPath, brushesCover, brushesOverlap,
                 displacementsRemove, displacementsPath, displacementsCover, displacementsOverlap,
-                buyzoneBrushEntities, bombsiteBrushEntities, rescueZoneBrushEntities, hostageEntities
+                buyzoneBrushEntities, bombsiteBrushEntities, rescueZoneBrushEntities, hostageEntities, ctSpawnEntities, tSpawnEntities
             );
         }
 
@@ -299,7 +302,27 @@ namespace JERC
         }
 
 
-        private static OverviewPositionValues SortScaleStuff()
+        private static IEnumerable<IVNode> GetCTSpawnEntities(IEnumerable<IVNode> allEntities)
+        {
+            return from x in allEntities
+                   from y in x.Body
+                   where y.Name == "classname"
+                   where y.Value == Classnames.ClassnameCTSpawn
+                   select x;
+        }
+
+
+        private static IEnumerable<IVNode> GetTSpawnEntities(IEnumerable<IVNode> allEntities)
+        {
+            return from x in allEntities
+                   from y in x.Body
+                   where y.Name == "classname"
+                   where y.Value == Classnames.ClassnameTSpawn
+                   select x;
+        }
+
+
+        private static void SortScaleStuff()
         {
             var allWorldBrushesAndDisplacementsExceptRemove = vmfRequiredData.brushesSidesPath
                 .Concat(vmfRequiredData.brushesSidesCover)
@@ -310,7 +333,7 @@ namespace JERC
             //var allWorldBrushes = vmfRequiredData.brushesSidesRemove.Concat(vmfRequiredData.displacementsSidesRemove).Concat(allWorldBrushesAndDisplacementsExceptRemove);
 
             if (allWorldBrushesAndDisplacementsExceptRemove == null || allWorldBrushesAndDisplacementsExceptRemove.Count() == 0)
-                return null;
+                return;
 
             var minX = allWorldBrushesAndDisplacementsExceptRemove.Min(x => x.vertices_plus.Min(y => y.x));
             var maxX = allWorldBrushesAndDisplacementsExceptRemove.Max(x => x.vertices_plus.Max(y => y.x));
@@ -327,19 +350,17 @@ namespace JERC
 
             var scale = scaleX >= scaleY ? scaleX : scaleY;
 
-            var overviewPositionValues = new OverviewPositionValues(minX, maxX, minY, maxY, scale);
+            overviewPositionValues = new OverviewPositionValues(minX, maxX, minY, maxY, scale);
 
             var pixelsPerUnitX = overviewPositionValues.outputResolution / sizeX;
             var pixelsPerUnitY = overviewPositionValues.outputResolution / sizeY;
 
             var unitsPerPixelX = sizeX / overviewPositionValues.outputResolution;
             var unitsPerPixelY = sizeY / overviewPositionValues.outputResolution;
-
-            return overviewPositionValues;
         }
 
 
-        private static void GenerateRadar(OverviewPositionValues overviewPositionValues)
+        private static void GenerateRadar()
         {
             Bitmap bmp = new Bitmap(overviewPositionValues.outputResolution, overviewPositionValues.outputResolution);
 
@@ -359,11 +380,11 @@ namespace JERC
                 var entityBrushSideListById = GetEntityVerticesListById();
 
                 // add remove stuff first to set to graphics' clip
-                GetBrushesToDrawOrAddRemoveRegion(bmp, graphics, boundingBox, overviewPositionValues, brushRemoveSideList);
-                GetDisplacementsToDrawOrAddRemoveRegion(bmp, graphics, boundingBox, overviewPositionValues, displacementRemoveSideList);
+                GetBrushesToDrawOrAddRemoveRegion(bmp, graphics, boundingBox, brushRemoveSideList);
+                GetDisplacementsToDrawOrAddRemoveRegion(bmp, graphics, boundingBox, displacementRemoveSideList);
 
                 // non-remove stuff (for stroke)
-                var brushesToDraw = GetBrushesToDrawOrAddRemoveRegion(bmp, graphics, boundingBox, overviewPositionValues, brushExceptRemoveSideList);
+                var brushesToDraw = GetBrushesToDrawOrAddRemoveRegion(bmp, graphics, boundingBox, brushExceptRemoveSideList);
                 foreach (var brushToRender in brushesToDraw)
                 {
                     var strokeSolidBrush = new SolidBrush(Color.Transparent);
@@ -374,7 +395,7 @@ namespace JERC
                     DrawFilledPolygonObjectBrushes(graphics, strokeSolidBrush, strokePen, brushToRender.vertices);
                 }
 
-                var displacementsToDraw = GetDisplacementsToDrawOrAddRemoveRegion(bmp, graphics, boundingBox, overviewPositionValues, displacementExceptRemoveSideList);
+                var displacementsToDraw = GetDisplacementsToDrawOrAddRemoveRegion(bmp, graphics, boundingBox, displacementExceptRemoveSideList);
                 foreach (var displacementToRender in displacementsToDraw)
                 {
                     var strokeSolidBrush = new SolidBrush(Color.Transparent);
@@ -810,7 +831,7 @@ namespace JERC
         }
 
 
-        private static List<ObjectToDraw> GetBrushesToDrawOrAddRemoveRegion(Bitmap bmp, Graphics graphics, BoundingBox boundingBox, OverviewPositionValues overviewPositionValues, List<BrushSide> brushSideList)
+        private static List<ObjectToDraw> GetBrushesToDrawOrAddRemoveRegion(Bitmap bmp, Graphics graphics, BoundingBox boundingBox, List<BrushSide> brushSideList)
         {
             var brushesToDraw = new List<ObjectToDraw>();
 
@@ -883,7 +904,7 @@ namespace JERC
         }
 
 
-        private static List<ObjectToDraw> GetDisplacementsToDrawOrAddRemoveRegion(Bitmap bmp, Graphics graphics, BoundingBox boundingBox, OverviewPositionValues overviewPositionValues, List<BrushSide> displacementSideList)
+        private static List<ObjectToDraw> GetDisplacementsToDrawOrAddRemoveRegion(Bitmap bmp, Graphics graphics, BoundingBox boundingBox, List<BrushSide> displacementSideList)
         {
             var displacementsToDraw = new List<ObjectToDraw>();
 
@@ -1151,7 +1172,7 @@ namespace JERC
         }
 
 
-        private static void GenerateTxt(OverviewPositionValues overviewPositionValues)
+        private static void GenerateTxt()
         {
             var overviewTxt = GetOverviewTxt(overviewPositionValues);
 
@@ -1163,23 +1184,140 @@ namespace JERC
 
         private static OverviewTxt GetOverviewTxt(OverviewPositionValues overviewPositionValues)
         {
-            // TODO: uncomment
-            /*
-            var overviewTxt = new OverviewTxt(
+            string scale = overviewPositionValues.scale.ToString();
+            string pos_x = overviewPositionValues.posX.ToString();
+            string pos_y = overviewPositionValues.posY.ToString();
+            string rotate = null;
+            string zoom = null;
+
+            string inset_left = null, inset_top = null, inset_right = null, inset_bottom = null;
+
+            string CTSpawn_x = null, CTSpawn_y = null, TSpawn_x = null, TSpawn_y = null;
+
+            string bombA_x = null, bombA_y = null, bombB_x = null, bombB_y = null;
+
+            string Hostage1_x = null, Hostage1_y = null, Hostage2_x = null, Hostage2_y = null, Hostage3_x = null, Hostage3_y = null, Hostage4_x = null, Hostage4_y = null;
+
+
+            var paddingPercentageEachSideX = overviewPositionValues.paddingPercentageX == 0 ? 0 : (overviewPositionValues.paddingPercentageX / 2);
+            var paddingPercentageEachSideY = overviewPositionValues.paddingPercentageY == 0 ? 0 : (overviewPositionValues.paddingPercentageY / 2);
+
+            if (vmfRequiredData.ctSpawnEntities.Any())
+            {
+                var origins = vmfRequiredData.ctSpawnEntities.Select(x => new Vertices(x.origin));
+                var xPercent = Math.Abs((Math.Abs(Math.Abs(origins.Average(x => x.x)) - Math.Abs(overviewPositionValues.brushVerticesPosMinX))) / overviewPositionValues.outputResolution) + paddingPercentageEachSideX;
+                var yPercent = Math.Abs((Math.Abs(Math.Abs(origins.Average(x => x.y)) - Math.Abs(overviewPositionValues.brushVerticesPosMinY))) / overviewPositionValues.outputResolution) + paddingPercentageEachSideY;
+
+                CTSpawn_x = FlipOverviewTxtValues(xPercent, true);
+                CTSpawn_y = FlipOverviewTxtValues(yPercent, false);
+            }
+            
+            if (vmfRequiredData.tSpawnEntities.Any())
+            {
+                var origins = vmfRequiredData.tSpawnEntities.Select(x => new Vertices(x.origin));
+                var xPercent = Math.Abs((Math.Abs(Math.Abs(origins.Average(x => x.x)) - Math.Abs(overviewPositionValues.brushVerticesPosMinX))) / overviewPositionValues.outputResolution) + paddingPercentageEachSideX;
+                var yPercent = Math.Abs((Math.Abs(Math.Abs(origins.Average(x => x.y)) - Math.Abs(overviewPositionValues.brushVerticesPosMinY))) / overviewPositionValues.outputResolution) + paddingPercentageEachSideY;
+
+                TSpawn_x = FlipOverviewTxtValues(xPercent, true);
+                TSpawn_y = FlipOverviewTxtValues(yPercent, false);
+            }
+
+            if (vmfRequiredData.bombsiteBrushEntities.Any())
+            {
+                var bombsites = vmfRequiredData.bombsiteBrushEntities;
+
+                if (vmfRequiredData.bombsiteBrushEntities.LastOrDefault().targetname.ToLower().Contains("bombsite_a"))
+                {
+                    bombsites.Reverse();
+                }
+
+                var xAllValues1 = bombsites.FirstOrDefault().brushes.SelectMany(x => x.side.SelectMany(y => y.vertices_plus.Select(x => x.x)));
+                var yAllValues1 = bombsites.FirstOrDefault().brushes.SelectMany(x => x.side.SelectMany(y => y.vertices_plus.Select(x => x.y)));
+                var xAverage1 = xAllValues1.Average();
+                var yAverage1 = yAllValues1.Average();
+                //var xPercent1 = Math.Abs((xAverage1 - (overviewPositionValues.brushVerticesPosMinX + overviewPositionValues.paddingSizeX)) / overviewPositionValues.outputResolution);
+                var xPercent1 = Math.Abs((Math.Abs(Math.Abs(xAverage1) - Math.Abs(overviewPositionValues.brushVerticesPosMinX))) / overviewPositionValues.outputResolution) + paddingPercentageEachSideX;
+                var yPercent1 = Math.Abs((Math.Abs(Math.Abs(yAverage1) - Math.Abs(overviewPositionValues.brushVerticesPosMinY))) / overviewPositionValues.outputResolution) + paddingPercentageEachSideY;
+
+                bombA_x = FlipOverviewTxtValues(xPercent1, true);
+                bombA_y = FlipOverviewTxtValues(yPercent1, false);
+
+                if (vmfRequiredData.bombsiteBrushEntities.Count() > 1)
+                {
+                    var xAllValues2 = bombsites.Skip(1).FirstOrDefault().brushes.SelectMany(x => x.side.SelectMany(y => y.vertices_plus.Select(x => x.x)));
+                    var yAllValues2 = bombsites.Skip(1).FirstOrDefault().brushes.SelectMany(x => x.side.SelectMany(y => y.vertices_plus.Select(x => x.y)));
+                    var xAverage2 = xAllValues2.Average();
+                    var yAverage2 = yAllValues2.Average();
+                    var xPercent2 = Math.Abs((Math.Abs(Math.Abs(xAverage2) - Math.Abs(overviewPositionValues.brushVerticesPosMinX))) / overviewPositionValues.outputResolution) + paddingPercentageEachSideX;
+                    var yPercent2 = Math.Abs((Math.Abs(Math.Abs(yAverage2) - Math.Abs(overviewPositionValues.brushVerticesPosMinY))) / overviewPositionValues.outputResolution) + paddingPercentageEachSideY;
+
+                    bombB_x = FlipOverviewTxtValues(xPercent2, true);
+                    bombB_y = FlipOverviewTxtValues(yPercent2, false);
+                }
+            }
+
+            if (vmfRequiredData.hostageEntities.Any())
+            {
+                var origin1 = new Vertices(vmfRequiredData.hostageEntities.FirstOrDefault().origin);
+                var xPercent1 = Math.Abs((Math.Abs(Math.Abs(origin1.x) - Math.Abs(overviewPositionValues.brushVerticesPosMinX))) / overviewPositionValues.outputResolution) + paddingPercentageEachSideX;
+                var yPercent1 = Math.Abs((Math.Abs(Math.Abs(origin1.y) - Math.Abs(overviewPositionValues.brushVerticesPosMinY))) / overviewPositionValues.outputResolution) + paddingPercentageEachSideY;
+
+                Hostage1_x = FlipOverviewTxtValues(xPercent1, true);
+                Hostage1_y = FlipOverviewTxtValues(yPercent1, false);
+
+                if (vmfRequiredData.hostageEntities.Count() > 1)
+                {
+                    var origin2 = new Vertices(vmfRequiredData.hostageEntities.Skip(1).FirstOrDefault().origin);
+                    var xPercent2 = Math.Abs((Math.Abs(Math.Abs(origin2.x) - Math.Abs(overviewPositionValues.brushVerticesPosMinX))) / overviewPositionValues.outputResolution) + paddingPercentageEachSideX;
+                    var yPercent2 = Math.Abs((Math.Abs(Math.Abs(origin2.y) - Math.Abs(overviewPositionValues.brushVerticesPosMinY))) / overviewPositionValues.outputResolution) + paddingPercentageEachSideY;
+
+                    Hostage2_x = FlipOverviewTxtValues(xPercent2, true);
+                    Hostage2_y = FlipOverviewTxtValues(yPercent2, false);
+
+                    if (vmfRequiredData.hostageEntities.Count() > 2)
+                    {
+                        var origin3 = new Vertices(vmfRequiredData.hostageEntities.Skip(2).FirstOrDefault().origin);
+                        var xPercent3 = Math.Abs((Math.Abs(Math.Abs(origin3.x) - Math.Abs(overviewPositionValues.brushVerticesPosMinX))) / overviewPositionValues.outputResolution) + paddingPercentageEachSideX;
+                        var yPercent3 = Math.Abs((Math.Abs(Math.Abs(origin3.y) - Math.Abs(overviewPositionValues.brushVerticesPosMinY))) / overviewPositionValues.outputResolution) + paddingPercentageEachSideY;
+
+                        Hostage3_x = FlipOverviewTxtValues(xPercent3, true);
+                        Hostage3_y = FlipOverviewTxtValues(yPercent3, false);
+
+                        if (vmfRequiredData.hostageEntities.Count() > 3)
+                        {
+                            var origin4 = new Vertices(vmfRequiredData.hostageEntities.Skip(3).FirstOrDefault().origin);
+                            var xPercent4 = Math.Abs((Math.Abs(Math.Abs(origin4.x) - Math.Abs(overviewPositionValues.brushVerticesPosMinX))) / overviewPositionValues.outputResolution) + paddingPercentageEachSideX;
+                            var yPercent4 = Math.Abs((Math.Abs(Math.Abs(origin4.y) - Math.Abs(overviewPositionValues.brushVerticesPosMinY))) / overviewPositionValues.outputResolution) + paddingPercentageEachSideY;
+
+                            Hostage4_x = FlipOverviewTxtValues(xPercent4, true);
+                            Hostage4_y = FlipOverviewTxtValues(yPercent4, false);
+                        }
+                    }
+                }
+            }
+
+
+            return new OverviewTxt(
                 mapName, pos_x, pos_y, scale, rotate, zoom,
                 inset_left, inset_top, inset_right, inset_bottom,
                 CTSpawn_x, CTSpawn_y, TSpawn_x, TSpawn_y,
                 bombA_x, bombA_y, bombB_x, bombB_y,
-                Hostage1_x, Hostage1_y, Hostage2_x, Hostage2_y
+                Hostage1_x, Hostage1_y, Hostage2_x, Hostage2_y, Hostage3_x, Hostage3_y, Hostage4_x, Hostage4_y
             );
-            */
-            return new OverviewTxt(
-                mapName, overviewPositionValues.posX.ToString(), overviewPositionValues.posY.ToString(), overviewPositionValues.scale.ToString(), null, null,
-                null, null, null, null,
-                null, null, null, null,
-                null, null, null, null,
-                null, null, null, null
-            );
+        }
+
+
+        private static string FlipOverviewTxtValues(float value, bool isAxisX)
+        {
+            var newValue = value;
+
+            if (!isAxisX)
+            {
+                newValue -= 1;
+                newValue = -newValue;
+            }
+
+            return newValue.ToString();
         }
 
 

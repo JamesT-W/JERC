@@ -9,6 +9,7 @@ namespace JERC.Models
     public class Entity
     {
         public int id;
+        public string targetname;
         public string classname;
         public string angles;
         public string model;
@@ -23,6 +24,7 @@ namespace JERC.Models
             // ignoring a lot of other values
 
             id = int.Parse(entity.Body.FirstOrDefault(x => x.Name == "id")?.Value);
+            targetname = entity.Body.FirstOrDefault(x => x.Name == "targetname")?.Value;
             classname = entity.Body.FirstOrDefault(x => x.Name == "classname")?.Value;
             angles = entity.Body.FirstOrDefault(x => x.Name == "angles")?.Value;
             model = entity.Body.FirstOrDefault(x => x.Name == "model")?.Value;

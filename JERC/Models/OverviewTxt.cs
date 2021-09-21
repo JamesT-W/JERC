@@ -32,6 +32,10 @@ namespace JERC.Models
         public string Hostage1_y;
         public string Hostage2_x;
         public string Hostage2_y;
+        public string Hostage3_x;
+        public string Hostage3_y;
+        public string Hostage4_x;
+        public string Hostage4_y;
 
 
         public OverviewTxt(
@@ -39,7 +43,7 @@ namespace JERC.Models
             string inset_left, string inset_top, string inset_right, string inset_bottom,
             string CTSpawn_x, string CTSpawn_y, string TSpawn_x, string TSpawn_y,
             string bombA_x, string bombA_y, string bombB_x, string bombB_y,
-            string Hostage1_x, string Hostage1_y, string Hostage2_x, string Hostage2_y
+            string Hostage1_x, string Hostage1_y, string Hostage2_x, string Hostage2_y, string Hostage3_x, string Hostage3_y, string Hostage4_x, string Hostage4_y
         )
         {
             this.material = material;
@@ -68,6 +72,10 @@ namespace JERC.Models
             this.Hostage1_y = Hostage1_y;
             this.Hostage2_x = Hostage2_x;
             this.Hostage2_y = Hostage2_y;
+            this.Hostage3_x = Hostage3_x;
+            this.Hostage3_y = Hostage3_y;
+            this.Hostage4_x = Hostage4_x;
+            this.Hostage4_y = Hostage4_y;
         }
 
 
@@ -84,11 +92,11 @@ namespace JERC.Models
                     //string.Concat("\t\t\t\"rotate\"\t\"", rotate, "\""),
                     //string.Concat("\t\t\t\"zoom\"\t\"", zoom, "\""),
                     string.Empty,
-                    string.Concat("\t\"inset_left\"\t\"", inset_left, "\""),
-                    string.Concat("\t\"inset_top\"\t\t\"", inset_top, "\""),
-                    string.Concat("\t\"inset_right\"\t\"", inset_right, "\""),
-                    string.Concat("\t\"inset_bottom\"\t\"", inset_bottom, "\""),
-                    string.Empty,
+                    //string.Concat("\t\"inset_left\"\t\"", inset_left, "\""),
+                    //string.Concat("\t\"inset_top\"\t\t\"", inset_top, "\""),
+                    //string.Concat("\t\"inset_right\"\t\"", inset_right, "\""),
+                    //string.Concat("\t\"inset_bottom\"\t\"", inset_bottom, "\""),
+                    //string.Empty,
                     string.Concat("\t\"CTSpawn_x\"\t\t\"", CTSpawn_x, "\""),
                     string.Concat("\t\"CTSpawn_y\"\t\t\"", CTSpawn_y, "\""),
                     string.Concat("\t\"TSpawn_x\"\t\t\"", TSpawn_x, "\""),
@@ -116,6 +124,10 @@ namespace JERC.Models
                     string.Concat("\t\"Hostage1_y\"\t\"", Hostage1_y, "\""),
                     string.Concat("\t\"Hostage2_x\"\t\"", Hostage2_x, "\""),
                     string.Concat("\t\"Hostage2_y\"\t\"", Hostage2_y, "\""),
+                    string.Concat("\t\"Hostage3_x\"\t\"", Hostage3_x, "\""),
+                    string.Concat("\t\"Hostage3_y\"\t\"", Hostage3_y, "\""),
+                    string.Concat("\t\"Hostage4_x\"\t\"", Hostage4_x, "\""),
+                    string.Concat("\t\"Hostage4_y\"\t\"", Hostage4_y, "\""),
                 });
             }
 

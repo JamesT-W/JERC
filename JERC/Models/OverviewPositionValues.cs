@@ -17,11 +17,20 @@ namespace JERC.Models
         public int width;
         public int height;
 
+        public int paddingSizeX;
+        public int paddingSizeY;
+
+        public float paddingPercentageX;
+        public float paddingPercentageY;
+
+        public int outputResolution;
+
         //  used to align the image to center if the width != height
         public float brushVerticesOffsetX;
         public float brushVerticesOffsetY;
 
-        public int outputResolution;
+        public float offsetPercentageX;
+        public float offsetPercentageY;
 
         public float posX;
         public float posY;
@@ -34,13 +43,22 @@ namespace JERC.Models
             this.brushVerticesPosMinY = brushVerticesPosMinY;
             this.brushVerticesPosMaxY = brushVerticesPosMaxY;
 
-            width = (int)Math.Ceiling(brushVerticesPosMaxX - brushVerticesPosMinX) + (Sizes.StrokeWidthMultiplier * 2); // adds the stroke width mutliplier value as a margin at left and right
-            height = (int)Math.Ceiling(brushVerticesPosMaxY - brushVerticesPosMinY) + (Sizes.StrokeWidthMultiplier * 2); // adds the stroke width mutliplier value as a margin at top and bottom
+            width = (int)Math.Ceiling(brushVerticesPosMaxX - brushVerticesPosMinX) + (Sizes.StrokeWidthMultiplier * 2); // adds the stroke width mutliplier value as a padding at left and right
+            height = (int)Math.Ceiling(brushVerticesPosMaxY - brushVerticesPosMinY) + (Sizes.StrokeWidthMultiplier * 2); // adds the stroke width mutliplier value as a padding at top and bottom
+
+            outputResolution = width >= height ? width : height;
+
+            paddingSizeX = width < height ? height - width : 0;
+            paddingSizeY = height < width ? width - height : 0;
+
+            paddingPercentageX = (float)paddingSizeX / (float)outputResolution;
+            paddingPercentageY = (float)paddingSizeY / (float)outputResolution;
 
             brushVerticesOffsetX = width < height ? ((height - width) / 2) + Sizes.StrokeWidthMultiplier : 0 + Sizes.StrokeWidthMultiplier;
             brushVerticesOffsetY = height < width ? ((width - height) / 2) + Sizes.StrokeWidthMultiplier : 0 + Sizes.StrokeWidthMultiplier;
 
-            outputResolution = width >= height ? width : height;
+            offsetPercentageX = brushVerticesOffsetX / width;
+            offsetPercentageY = brushVerticesOffsetY / height;
 
             /*posX = ((brushVerticesPosMaxX - brushVerticesPosMinX) + OverviewOffsets.GetCenteredValueByScalePosX(scale)) - 1024 + 256; // - 1024 for resolution, + 256 for offset (because cl_leveloverview is used at 1280x1024)
             posY = ((brushVerticesPosMaxY - brushVerticesPosMinY) + OverviewOffsets.GetCenteredValueByScalePosY(scale)) - 1024;*/ // - 1024 for resolution

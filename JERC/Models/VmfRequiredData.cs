@@ -1,4 +1,4 @@
-using JERC.Constants;
+﻿using JERC.Constants;
 using JERC.Enums;
 using System;
 using System.Collections.Generic;
@@ -24,13 +24,15 @@ namespace JERC.Models
         public Dictionary<int, List<Side>> entitiesSidesByEntityBombsiteId = new Dictionary<int, List<Side>>();
         public Dictionary<int, List<Side>> entitiesSidesByEntityRescueZoneId = new Dictionary<int, List<Side>>();
 
-        public List<Entity> rescueZoneBrushes;
+        public List<Entity> bombsiteBrushEntities;
         public List<Entity> hostageEntities;
+        public List<Entity> ctSpawnEntities;
+        public List<Entity> tSpawnEntities;
 
         public VmfRequiredData(
             IEnumerable<IVNode> brushesRemove, IEnumerable<IVNode> brushesPath, IEnumerable<IVNode> brushesCover, IEnumerable<IVNode> brushesOverlap,
             IEnumerable<IVNode> displacementsRemove, IEnumerable<IVNode> displacementsPath, IEnumerable<IVNode> displacementsCover, IEnumerable<IVNode> displacementsOverlap,
-            IEnumerable<IVNode> buyzoneBrushEntities, IEnumerable<IVNode> bombsiteBrushEntities, IEnumerable<IVNode> rescueZoneBrushEntities, IEnumerable<IVNode> hostageEntities
+            IEnumerable<IVNode> buyzoneBrushEntities, IEnumerable<IVNode> bombsiteBrushEntities, IEnumerable<IVNode> rescueZoneBrushEntities, IEnumerable<IVNode> hostageEntities, IEnumerable<IVNode> ctSpawnEntities, IEnumerable<IVNode> tSpawnEntities
         )
         {
             // world brushes
@@ -73,7 +75,10 @@ namespace JERC.Models
                 entitiesSidesByEntityRescueZoneId.Add(entity.id, entity.brushes.SelectMany(x => x.side).ToList());
             }
 
+            this.bombsiteBrushEntities = bombsiteBrushEntities.Any() ? bombsiteBrushEntities.Select(x => new Entity(x)).ToList() : new List<Entity>();
             this.hostageEntities = hostageEntities.Any() ? hostageEntities.Select(x => new Entity(x)).ToList() : new List<Entity>();
+            this.ctSpawnEntities = ctSpawnEntities.Any() ? ctSpawnEntities.Select(x => new Entity(x)).ToList() : new List<Entity>();
+            this.tSpawnEntities = tSpawnEntities.Any() ? tSpawnEntities.Select(x => new Entity(x)).ToList() : new List<Entity>();
         }
     }
 }
