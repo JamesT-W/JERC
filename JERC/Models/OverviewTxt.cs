@@ -1,5 +1,7 @@
-﻿using System;
+﻿using JERC.Constants;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace JERC.Models
@@ -96,8 +98,10 @@ namespace JERC.Models
         }
 
 
-        public List<string> GetInExportableFormat(string mapName)
+        public List<string> GetInExportableFormat(JercConfigValues jercConfigValues, List<Entity> jercDividerEntities, string mapName)
         {
+            var numOfOverviewLevels = jercDividerEntities.Count() + 1;
+
             var lines = new List<string>()
             {
                 string.Concat("\"", mapName, "\""),
@@ -168,6 +172,46 @@ namespace JERC.Models
                     string.Concat("\t\"Hostage8_x\"\t\"", Hostage8_x, "\""),
                     string.Concat("\t\"Hostage8_y\"\t\"", Hostage8_y, "\""),
                 });
+            }
+
+            if (jercConfigValues.exportRadarAsSeparateLevels && numOfOverviewLevels > 1)
+            {
+                lines.AddRange(new List<string>()
+                {
+                    string.Empty,
+                    "\t\"verticalsections\"",
+                    "\t{",
+                });
+
+                var heightToUseMins = new float[numOfOverviewLevels];
+                var heightToUseMaxs = new float[numOfOverviewLevels];
+
+                for (int i = 0; i < numOfOverviewLevels; i++)
+                {
+                    var overviewLevelName = string.Empty;
+
+                    var valueDiff = i - jercConfigValues.defaultLevelNum;
+                    if (valueDiff == 0)
+                        overviewLevelName = "default";
+                    else if (valueDiff < 0)
+                        overviewLevelName = string.Concat(jercConfigValues.lowerLevelOutputName, Math.Abs(valueDiff));
+                    else if (valueDiff > 0)
+                        overviewLevelName = string.Concat(jercConfigValues.higherLevelOutputName, Math.Abs(valueDiff));
+
+                    heightToUseMins[i] = i == 0 ? -(Sizes.MaxHammerGridSize / 2) : heightToUseMaxs[i-1];
+                    heightToUseMaxs[i] = i == (numOfOverviewLevels - 1) ? (Sizes.MaxHammerGridSize / 2) : new Vertices(jercDividerEntities.ElementAt(i).origin).z;
+
+                    lines.AddRange(new List<string>()
+                    {
+                        string.Concat("\t\t\"", overviewLevelName, "\""),
+                        "\t\t{",
+                        string.Concat("\t\t\t\"AltitudeMin\"\t\"", heightToUseMins[i], "\""),
+                        string.Concat("\t\t\t\"AltitudeMax\"\t\"", heightToUseMaxs[i], "\""),
+                        "\t\t}",
+                    });
+                }
+
+                lines.Add("\t}");
             }
 
             lines.AddRange(new List<string>()

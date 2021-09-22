@@ -1120,7 +1120,9 @@ namespace JERC
         {
             var overviewTxt = GetOverviewTxt(overviewPositionValues);
 
-            var lines = overviewTxt.GetInExportableFormat(mapName);
+            var jercDividerEntities = vmfRequiredData.jercDividerEntities.ToList();
+
+            var lines = overviewTxt.GetInExportableFormat(jercConfigValues, jercDividerEntities, mapName);
 
             SaveOutputTxtFile(outputTxtFilepath, lines);
         }

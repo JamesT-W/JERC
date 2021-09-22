@@ -24,8 +24,8 @@ namespace JERC.Models
         public bool strokeAroundMainMaterials;
         public bool strokeAroundRemoveMaterials;
         public int defaultLevelNum;
-        public bool higherLevelOutputName;
-        public bool lowerLevelOutputName;
+        public string higherLevelOutputName;
+        public string lowerLevelOutputName;
         public bool exportRadarAsSeparateLevels;
         public bool exportTxt;
         public bool exportDds;
@@ -52,9 +52,15 @@ namespace JERC.Models
             strokeAroundMainMaterials = jercEntitySettingsValues["strokeAroundMainMaterials"] == "0";
             strokeAroundRemoveMaterials = jercEntitySettingsValues["strokeAroundRemoveMaterials"] == "0";
             exportRadarAsSeparateLevels = jercEntitySettingsValues["exportRadarAsSeparateLevels"] == "0";
-            defaultLevelNum = int.Parse(jercEntitySettingsValues["defaultLevelNum"]) <= jercDividerCount ? int.Parse(jercEntitySettingsValues["defaultLevelNum"]) : jercDividerCount;
-            higherLevelOutputName = jercEntitySettingsValues["higherLevelOutputName"] == "0";
-            lowerLevelOutputName = jercEntitySettingsValues["lowerLevelOutputName"] == "0";
+
+            defaultLevelNum = int.Parse(jercEntitySettingsValues["defaultLevelNum"]);
+            if (defaultLevelNum < jercDividerCount)
+                defaultLevelNum = 0;
+            else if (defaultLevelNum > jercDividerCount)
+                defaultLevelNum = jercDividerCount;
+
+            higherLevelOutputName = string.IsNullOrWhiteSpace(jercEntitySettingsValues["higherLevelOutputName"]) ? null : jercEntitySettingsValues["higherLevelOutputName"];
+            lowerLevelOutputName = string.IsNullOrWhiteSpace(jercEntitySettingsValues["lowerLevelOutputName"]) ? null : jercEntitySettingsValues["lowerLevelOutputName"];
             exportTxt = jercEntitySettingsValues["exportTxt"] == "0";
             exportDds = jercEntitySettingsValues["exportDds"] == "0";
             exportPng = jercEntitySettingsValues["exportPng"] == "0";
