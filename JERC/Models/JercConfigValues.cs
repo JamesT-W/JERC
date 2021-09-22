@@ -10,9 +10,9 @@ namespace JERC.Models
 {
     public class JercConfigValues
     {
-        public string backgroundFilename;
         public string alternateOutputPath;
         public bool onlyOutputToAlternatePath;
+        public string backgroundFilename;
         public Color pathColourHigh;
         public Color pathColourLow;
         public Color coverColourHigh;
@@ -23,19 +23,22 @@ namespace JERC.Models
         public Color strokeColour;
         public bool strokeAroundMainMaterials;
         public bool strokeAroundRemoveMaterials;
-        public bool exportSeparateLevelRadars;
+        public int defaultLevelNum;
+        public bool higherLevelOutputName;
+        public bool lowerLevelOutputName;
+        public bool exportRadarAsSeparateLevels;
         public bool exportTxt;
         public bool exportDds;
         public bool exportPng;
 
 
-        public JercConfigValues(Dictionary<string, string> jercEntitySettingsValues)
+        public JercConfigValues(Dictionary<string, string> jercEntitySettingsValues, int jercDividerCount)
         {
             // jerc_configure
 
-            backgroundFilename = string.IsNullOrWhiteSpace(jercEntitySettingsValues["backgroundFilename"]) ? null : jercEntitySettingsValues["backgroundFilename"];
             alternateOutputPath = string.IsNullOrWhiteSpace(jercEntitySettingsValues["alternateOutputPath"]) ? null : jercEntitySettingsValues["alternateOutputPath"];
             onlyOutputToAlternatePath = jercEntitySettingsValues["onlyOutputToAlternatePath"] == "0";
+            backgroundFilename = string.IsNullOrWhiteSpace(jercEntitySettingsValues["backgroundFilename"]) ? null : jercEntitySettingsValues["backgroundFilename"];
             pathColourHigh = GetColourStringAsColour(jercEntitySettingsValues["pathColourHigh"]);
             pathColourLow = GetColourStringAsColour(jercEntitySettingsValues["pathColourLow"]);
             coverColourHigh = GetColourStringAsColour(jercEntitySettingsValues["coverColourHigh"]);
@@ -48,7 +51,10 @@ namespace JERC.Models
             strokeColour = GetColourStringAsColour(jercEntitySettingsValues["strokeColour"]);
             strokeAroundMainMaterials = jercEntitySettingsValues["strokeAroundMainMaterials"] == "0";
             strokeAroundRemoveMaterials = jercEntitySettingsValues["strokeAroundRemoveMaterials"] == "0";
-            exportSeparateLevelRadars = jercEntitySettingsValues["exportSeparateLevelRadars"] == "0";
+            exportRadarAsSeparateLevels = jercEntitySettingsValues["exportRadarAsSeparateLevels"] == "0";
+            defaultLevelNum = int.Parse(jercEntitySettingsValues["defaultLevelNum"]) <= jercDividerCount ? int.Parse(jercEntitySettingsValues["defaultLevelNum"]) : jercDividerCount;
+            higherLevelOutputName = jercEntitySettingsValues["higherLevelOutputName"] == "0";
+            lowerLevelOutputName = jercEntitySettingsValues["lowerLevelOutputName"] == "0";
             exportTxt = jercEntitySettingsValues["exportTxt"] == "0";
             exportDds = jercEntitySettingsValues["exportDds"] == "0";
             exportPng = jercEntitySettingsValues["exportPng"] == "0";

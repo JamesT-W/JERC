@@ -140,34 +140,38 @@ namespace JERC
                                             select x;
 
             // brushes
-            var brushesRemove = GetBrushesRemove(allWorldBrushesInVisgroup);
-            var brushesPath = GetBrushesPath(allWorldBrushesInVisgroup);
-            var brushesCover = GetBrushesCover(allWorldBrushesInVisgroup);
-            var brushesOverlap = GetBrushesOverlap(allWorldBrushesInVisgroup);
+            var brushesRemove = GetBrushesByTextureName(allWorldBrushesInVisgroup, TextureNames.RemoveTextureName);
+            var brushesPath = GetBrushesByTextureName(allWorldBrushesInVisgroup, TextureNames.PathTextureName);
+            var brushesCover = GetBrushesByTextureName(allWorldBrushesInVisgroup, TextureNames.CoverTextureName);
+            var brushesOverlap = GetBrushesByTextureName(allWorldBrushesInVisgroup, TextureNames.OverlapTextureName);
 
             // displacements
-            var displacementsRemove = GetDisplacementsRemove(allWorldBrushesInVisgroup);
-            var displacementsPath = GetDisplacementsPath(allWorldBrushesInVisgroup);
-            var displacementsCover = GetDisplacementsCover(allWorldBrushesInVisgroup);
-            var displacementsOverlap = GetDisplacementsOverlap(allWorldBrushesInVisgroup);
+            var displacementsRemove = GetDisplacementsByTextureName(allWorldBrushesInVisgroup, TextureNames.RemoveTextureName);
+            var displacementsPath = GetDisplacementsByTextureName(allWorldBrushesInVisgroup, TextureNames.PathTextureName);
+            var displacementsCover = GetDisplacementsByTextureName(allWorldBrushesInVisgroup, TextureNames.CoverTextureName);
+            var displacementsOverlap = GetDisplacementsByTextureName(allWorldBrushesInVisgroup, TextureNames.OverlapTextureName);
 
             // entities (in game)
-            var buyzoneBrushEntities = GetBuyzoneBrushEntities(allEntities);
-            var bombsiteBrushEntities = GetBombsiteBrushEntities(allEntities);
-            var rescueZoneBrushEntities = GetRescueZoneBrushEntities(allEntities);
-            var hostageEntities = GetHostageEntities(allEntities);
-            var ctSpawnEntities = GetCTSpawnEntities(allEntities);
-            var tSpawnEntities = GetTSpawnEntities(allEntities);
+            var buyzoneBrushEntities = GetEntitiesByClassname(allEntities, Classnames.ClassnameBuyzone);
+            var bombsiteBrushEntities = GetEntitiesByClassname(allEntities, Classnames.ClassnameBombsite);
+            var rescueZoneBrushEntities = GetEntitiesByClassname(allEntities, Classnames.ClassnameRescueZone);
+            var hostageEntities = GetEntitiesByClassname(allEntities, Classnames.ClassnameHostage);
+            var ctSpawnEntities = GetEntitiesByClassname(allEntities, Classnames.ClassnameCTSpawn);
+            var tSpawnEntities = GetEntitiesByClassname(allEntities, Classnames.ClassnameTSpawn);
 
             // entities (JERC)
-            var jercEntities = GetJercEntities(allEntities);
+            var jercConfigureEntities = GetEntitiesByClassname(allEntities, Classnames.JercConfigure);
+            var jercDividerEntities = GetEntitiesByClassname(allEntities, Classnames.JercDivider);
 
-            jercConfigValues = new JercConfigValues(GetSettingsValuesFromJercEntities(jercEntities));
+            var allJercEntities = jercConfigureEntities.Concat(jercDividerEntities);
+
+            jercConfigValues = new JercConfigValues(GetSettingsValuesFromJercEntities(allJercEntities), jercDividerEntities.Count());
 
             return new VmfRequiredData(
                 brushesRemove, brushesPath, brushesCover, brushesOverlap,
                 displacementsRemove, displacementsPath, displacementsCover, displacementsOverlap,
-                buyzoneBrushEntities, bombsiteBrushEntities, rescueZoneBrushEntities, hostageEntities, ctSpawnEntities, tSpawnEntities
+                buyzoneBrushEntities, bombsiteBrushEntities, rescueZoneBrushEntities, hostageEntities, ctSpawnEntities, tSpawnEntities,
+                jercConfigureEntities, jercDividerEntities
             );
         }
 
@@ -179,9 +183,9 @@ namespace JERC
             // jerc_configure
             var jercConfigure = jercEntities.FirstOrDefault(x => x.Body.Any(y => y.Name == "classname" && y.Value == Classnames.JercConfigure)).Body;
 
-            jercEntitySettingsValues.Add("backgroundFilename", jercConfigure.FirstOrDefault(x => x.Name == "backgroundFilename")?.Value ?? string.Empty);
             jercEntitySettingsValues.Add("alternateOutputPath", jercConfigure.FirstOrDefault(x => x.Name == "alternateOutputPath")?.Value ?? string.Empty);
             jercEntitySettingsValues.Add("onlyOutputToAlternatePath", jercConfigure.FirstOrDefault(x => x.Name == "onlyOutputToAlternatePath")?.Value);
+            jercEntitySettingsValues.Add("backgroundFilename", jercConfigure.FirstOrDefault(x => x.Name == "backgroundFilename")?.Value ?? string.Empty);
             jercEntitySettingsValues.Add("pathColourHigh", jercConfigure.FirstOrDefault(x => x.Name == "pathColourHigh")?.Value);
             jercEntitySettingsValues.Add("pathColourLow", jercConfigure.FirstOrDefault(x => x.Name == "pathColourLow")?.Value);
             jercEntitySettingsValues.Add("coverColourHigh", jercConfigure.FirstOrDefault(x => x.Name == "coverColourHigh")?.Value);
@@ -192,7 +196,10 @@ namespace JERC
             jercEntitySettingsValues.Add("strokeColour", jercConfigure.FirstOrDefault(x => x.Name == "strokeColour")?.Value);
             jercEntitySettingsValues.Add("strokeAroundMainMaterials", jercConfigure.FirstOrDefault(x => x.Name == "strokeAroundMainMaterials")?.Value);
             jercEntitySettingsValues.Add("strokeAroundRemoveMaterials", jercConfigure.FirstOrDefault(x => x.Name == "strokeAroundRemoveMaterials")?.Value);
-            jercEntitySettingsValues.Add("exportSeparateLevelRadars", jercConfigure.FirstOrDefault(x => x.Name == "exportSeparateLevelRadars")?.Value);
+            jercEntitySettingsValues.Add("defaultLevelNum", jercConfigure.FirstOrDefault(x => x.Name == "defaultLevelNum")?.Value);
+            jercEntitySettingsValues.Add("higherLevelOutputName", jercConfigure.FirstOrDefault(x => x.Name == "higherLevelOutputName")?.Value);
+            jercEntitySettingsValues.Add("lowerLevelOutputName", jercConfigure.FirstOrDefault(x => x.Name == "lowerLevelOutputName")?.Value);
+            jercEntitySettingsValues.Add("exportRadarAsSeparateLevels", jercConfigure.FirstOrDefault(x => x.Name == "exportRadarAsSeparateLevels")?.Value);
             jercEntitySettingsValues.Add("exportTxt", jercConfigure.FirstOrDefault(x => x.Name == "exportTxt")?.Value);
             jercEntitySettingsValues.Add("exportDds", jercConfigure.FirstOrDefault(x => x.Name == "exportDds")?.Value);
             jercEntitySettingsValues.Add("exportPng", jercConfigure.FirstOrDefault(x => x.Name == "exportPng")?.Value);
@@ -206,7 +213,7 @@ namespace JERC
         }
 
 
-        private static IEnumerable<IVNode> GetBrushesRemove(IEnumerable<IVNode> allWorldBrushesInVisgroup)
+        private static IEnumerable<IVNode> GetBrushesByTextureName(IEnumerable<IVNode> allWorldBrushesInVisgroup, string textureName)
         {
             return from x in allWorldBrushesInVisgroup
                    from y in x.Body
@@ -214,51 +221,12 @@ namespace JERC
                    where !y.Body.Any(z => z.Name == "dispinfo")
                    from z in y.Body
                    where z.Name == "material"
-                   where z.Value.ToLower() == TextureNames.RemoveTextureName.ToLower()
+                   where z.Value.ToLower() == textureName.ToLower()
                    select x;
         }
 
 
-        private static IEnumerable<IVNode> GetBrushesPath(IEnumerable<IVNode> allWorldBrushesInVisgroup)
-        {
-            return from x in allWorldBrushesInVisgroup
-                   from y in x.Body
-                   where y.Name == "side"
-                   where !y.Body.Any(z => z.Name == "dispinfo")
-                   from z in y.Body
-                   where z.Name == "material"
-                   where z.Value.ToLower() == TextureNames.PathTextureName.ToLower()
-                   select x;
-        }
-
-
-        private static IEnumerable<IVNode> GetBrushesCover(IEnumerable<IVNode> allWorldBrushesInVisgroup)
-        {
-            return from x in allWorldBrushesInVisgroup
-                   from y in x.Body
-                   where y.Name == "side"
-                   where !y.Body.Any(z => z.Name == "dispinfo")
-                   from z in y.Body
-                   where z.Name == "material"
-                   where z.Value.ToLower() == TextureNames.CoverTextureName.ToLower()
-                   select x;
-        }
-
-
-        private static IEnumerable<IVNode> GetBrushesOverlap(IEnumerable<IVNode> allWorldBrushesInVisgroup)
-        {
-            return from x in allWorldBrushesInVisgroup
-                   from y in x.Body
-                   where y.Name == "side"
-                   where !y.Body.Any(z => z.Name == "dispinfo")
-                   from z in y.Body
-                   where z.Name == "material"
-                   where z.Value.ToLower() == TextureNames.OverlapTextureName.ToLower()
-                   select x;
-        }
-
-
-        private static IEnumerable<IVNode> GetDisplacementsRemove(IEnumerable<IVNode> allWorldBrushesInVisgroup)
+        private static IEnumerable<IVNode> GetDisplacementsByTextureName(IEnumerable<IVNode> allWorldBrushesInVisgroup, string textureName)
         {
             return from x in allWorldBrushesInVisgroup
                    from y in x.Body
@@ -266,120 +234,17 @@ namespace JERC
                    where y.Body.Any(z => z.Name == "dispinfo")
                    from z in y.Body
                    where z.Name == "material"
-                   where z.Value.ToLower() == TextureNames.RemoveTextureName.ToLower()
+                   where z.Value.ToLower() == textureName.ToLower()
                    select x;
         }
 
 
-        private static IEnumerable<IVNode> GetDisplacementsPath(IEnumerable<IVNode> allWorldBrushesInVisgroup)
-        {
-            return from x in allWorldBrushesInVisgroup
-                   from y in x.Body
-                   where y.Name == "side"
-                   where y.Body.Any(z => z.Name == "dispinfo")
-                   from z in y.Body
-                   where z.Name == "material"
-                   where z.Value.ToLower() == TextureNames.PathTextureName.ToLower()
-                   select x;
-        }
-
-
-        private static IEnumerable<IVNode> GetDisplacementsCover(IEnumerable<IVNode> allWorldBrushesInVisgroup)
-        {
-            return from x in allWorldBrushesInVisgroup
-                   from y in x.Body
-                   where y.Name == "side"
-                   where y.Body.Any(z => z.Name == "dispinfo")
-                   from z in y.Body
-                   where z.Name == "material"
-                   where z.Value.ToLower() == TextureNames.CoverTextureName.ToLower()
-                   select x;
-        }
-
-
-        private static IEnumerable<IVNode> GetDisplacementsOverlap(IEnumerable<IVNode> allWorldBrushesInVisgroup)
-        {
-            return from x in allWorldBrushesInVisgroup
-                   from y in x.Body
-                   where y.Name == "side"
-                   where y.Body.Any(z => z.Name == "dispinfo")
-                   from z in y.Body
-                   where z.Name == "material"
-                   where z.Value.ToLower() == TextureNames.OverlapTextureName.ToLower()
-                   select x;
-        }
-
-
-        private static IEnumerable<IVNode> GetBuyzoneBrushEntities(IEnumerable<IVNode> allEntities)
+        private static IEnumerable<IVNode> GetEntitiesByClassname(IEnumerable<IVNode> allEntities, string classname)
         {
             return from x in allEntities
                    from y in x.Body
                    where y.Name == "classname"
-                   where y.Value == Classnames.ClassnameBuyzone
-                   select x;
-        }
-
-
-        private static IEnumerable<IVNode> GetBombsiteBrushEntities(IEnumerable<IVNode> allEntities)
-        {
-            return from x in allEntities
-                   from y in x.Body
-                   where y.Name == "classname"
-                   where y.Value == Classnames.ClassnameBombsite
-                   select x;
-        }
-
-
-        private static IEnumerable<IVNode> GetRescueZoneBrushEntities(IEnumerable<IVNode> allEntities)
-        {
-            return from x in allEntities
-                   from y in x.Body
-                   where y.Name == "classname"
-                   where y.Value == Classnames.ClassnameRescueZone
-                   select x;
-        }
-
-
-        private static IEnumerable<IVNode> GetHostageEntities(IEnumerable<IVNode> allEntities)
-        {
-            return from x in allEntities
-                   from y in x.Body
-                   where y.Name == "classname"
-                   where y.Value == Classnames.ClassnameHostage
-                   select x;
-        }
-
-
-        private static IEnumerable<IVNode> GetCTSpawnEntities(IEnumerable<IVNode> allEntities)
-        {
-            return from x in allEntities
-                   from y in x.Body
-                   where y.Name == "classname"
-                   where y.Value == Classnames.ClassnameCTSpawn
-                   select x;
-        }
-
-
-        private static IEnumerable<IVNode> GetTSpawnEntities(IEnumerable<IVNode> allEntities)
-        {
-            return from x in allEntities
-                   from y in x.Body
-                   where y.Name == "classname"
-                   where y.Value == Classnames.ClassnameTSpawn
-                   select x;
-        }
-
-
-        private static IEnumerable<IVNode> GetJercEntities(IEnumerable<IVNode> allEntities)
-        {
-            return from x in allEntities
-                   from y in x.Body
-                   where y.Name == "classname"
-                   where y.Value == Classnames.JercConfigure /*||
-                         y.Value == Classnames.JercConfigure ||
-                         y.Value == Classnames.JercConfigure ||
-                         y.Value == Classnames.JercConfigure ||
-                         y.Value == Classnames.JercConfigure*/
+                   where y.Value.ToLower() == classname.ToLower()
                    select x;
         }
 

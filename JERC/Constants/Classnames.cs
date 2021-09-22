@@ -14,5 +14,6 @@ namespace JERC.Constants
         public static readonly string ClassnameTSpawn = "info_player_terrorist";
 
         public static readonly string JercConfigure = "jerc_configure";
+        public static readonly string JercDivider = "jerc_divider";
     }
 }

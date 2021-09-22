@@ -29,10 +29,15 @@ namespace JERC.Models
         public List<Entity> ctSpawnEntities;
         public List<Entity> tSpawnEntities;
 
+        public List<Entity> jercConfigureEntities;
+        public List<Entity> jercDividerEntities;
+
+
         public VmfRequiredData(
             IEnumerable<IVNode> brushesRemove, IEnumerable<IVNode> brushesPath, IEnumerable<IVNode> brushesCover, IEnumerable<IVNode> brushesOverlap,
             IEnumerable<IVNode> displacementsRemove, IEnumerable<IVNode> displacementsPath, IEnumerable<IVNode> displacementsCover, IEnumerable<IVNode> displacementsOverlap,
-            IEnumerable<IVNode> buyzoneBrushEntities, IEnumerable<IVNode> bombsiteBrushEntities, IEnumerable<IVNode> rescueZoneBrushEntities, IEnumerable<IVNode> hostageEntities, IEnumerable<IVNode> ctSpawnEntities, IEnumerable<IVNode> tSpawnEntities
+            IEnumerable<IVNode> buyzoneBrushEntities, IEnumerable<IVNode> bombsiteBrushEntities, IEnumerable<IVNode> rescueZoneBrushEntities, IEnumerable<IVNode> hostageEntities, IEnumerable<IVNode> ctSpawnEntities, IEnumerable<IVNode> tSpawnEntities,
+            IEnumerable<IVNode> jercConfigureEntities, IEnumerable<IVNode> jercDividerEntities
         )
         {
             // world brushes
@@ -79,6 +84,9 @@ namespace JERC.Models
             this.hostageEntities = hostageEntities.Any() ? hostageEntities.Select(x => new Entity(x)).ToList() : new List<Entity>();
             this.ctSpawnEntities = ctSpawnEntities.Any() ? ctSpawnEntities.Select(x => new Entity(x)).ToList() : new List<Entity>();
             this.tSpawnEntities = tSpawnEntities.Any() ? tSpawnEntities.Select(x => new Entity(x)).ToList() : new List<Entity>();
+
+            this.jercConfigureEntities = jercConfigureEntities.Any() ? jercConfigureEntities.Select(x => new Entity(x)).ToList() : new List<Entity>();
+            this.jercDividerEntities = jercDividerEntities.Any() ? jercDividerEntities.Select(x => new Entity(x)).ToList() : new List<Entity>();
         }
     }
 }
