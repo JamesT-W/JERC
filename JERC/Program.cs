@@ -108,9 +108,11 @@ namespace JERC
                 return;
             }
 
+            var levelHeights = GetLevelHeights();
+
             GenerateRadar();
 
-            GenerateTxt();
+            GenerateTxt(levelHeights);
         }
 
 
@@ -284,6 +286,37 @@ namespace JERC
 
             var unitsPerPixelX = sizeX / overviewPositionValues.outputResolution;
             var unitsPerPixelY = sizeY / overviewPositionValues.outputResolution;
+        }
+
+
+        private static List<LevelHeight> GetLevelHeights()
+        {
+            var levelHeights = new List<LevelHeight>();
+
+            var jercDividerEntities = vmfRequiredData.jercDividerEntities.ToList();
+            if (jercDividerEntities.Count() == 0)
+                return null;
+
+            var numOfOverviewLevels = jercDividerEntities.Count() + 1;
+            for (int i = 0; i < numOfOverviewLevels; i++)
+            {
+                var overviewLevelName = string.Empty;
+
+                var valueDiff = i - jercConfigValues.defaultLevelNum;
+                if (valueDiff == 0)
+                    overviewLevelName = "default";
+                else if (valueDiff < 0)
+                    overviewLevelName = string.Concat(jercConfigValues.lowerLevelOutputName, Math.Abs(valueDiff));
+                else if (valueDiff > 0)
+                    overviewLevelName = string.Concat(jercConfigValues.higherLevelOutputName, Math.Abs(valueDiff));
+
+                var zMin = i == 0 ? -(Sizes.MaxHammerGridSize / 2) : levelHeights.ElementAt(i - 1).zMax;
+                var zMax = i == (numOfOverviewLevels - 1) ? (Sizes.MaxHammerGridSize / 2) : new Vertices(jercDividerEntities.ElementAt(i).origin).z;
+
+                levelHeights.Add(new LevelHeight(levelHeights.Count(), overviewLevelName, zMin, zMax));
+            }
+
+            return levelHeights;
         }
 
 
@@ -1116,13 +1149,11 @@ namespace JERC
         }
 
 
-        private static void GenerateTxt()
+        private static void GenerateTxt(List<LevelHeight> levelHeights)
         {
             var overviewTxt = GetOverviewTxt(overviewPositionValues);
 
-            var jercDividerEntities = vmfRequiredData.jercDividerEntities.ToList();
-
-            var lines = overviewTxt.GetInExportableFormat(jercConfigValues, jercDividerEntities, mapName);
+            var lines = overviewTxt.GetInExportableFormat(jercConfigValues, levelHeights, mapName);
 
             SaveOutputTxtFile(outputTxtFilepath, lines);
         }

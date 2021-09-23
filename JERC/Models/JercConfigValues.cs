@@ -54,7 +54,7 @@ namespace JERC.Models
             exportRadarAsSeparateLevels = jercEntitySettingsValues["exportRadarAsSeparateLevels"] == "0";
 
             defaultLevelNum = int.Parse(jercEntitySettingsValues["defaultLevelNum"]);
-            if (defaultLevelNum < jercDividerCount)
+            if (defaultLevelNum < 0)
                 defaultLevelNum = 0;
             else if (defaultLevelNum > jercDividerCount)
                 defaultLevelNum = jercDividerCount;
