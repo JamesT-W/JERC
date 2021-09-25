@@ -1,4 +1,4 @@
-using JERC.Constants;
+﻿using JERC.Constants;
 using JERC.Enums;
 using JERC.Models;
 using System;
@@ -31,7 +31,8 @@ namespace JERC
         private static readonly string gameCsgoDirectoryPath = Path.GetFullPath(Path.Combine(Path.Combine(gameBinDirectoryPath, @"..\"), @"csgo\"));
         private static readonly string gameOverviewsDirectoryPath = Path.GetFullPath(Path.Combine(gameCsgoDirectoryPath, @"resource\overviews\"));
 
-        private static string outputImageFilepath;
+        private static string outputImageFilepathPart1;
+        private static string outputImageFilepathPart2;
         private static string outputTxtFilepath;
 
         private static readonly string visgroupName = "JERC";
@@ -87,10 +88,12 @@ namespace JERC
 
             // TODO: uncomment for release
             /*
-            outputImageFilepath = string.Concat(gameOverviewsDirectoryPath, mapName, "_radar");
+            outputImageFilepathPart1 = string.Concat(gameOverviewsDirectoryPath, mapName);
+            outputImageFilepathPart2 = "_radar";
             outputTxtFilepath = string.Concat(gameOverviewsDirectoryPath, mapName, ".txt");
             */
-            outputImageFilepath = @"F:\Coding Stuff\GitHub Files\JERC\jerc_test_map_radar";
+            outputImageFilepathPart1 = @"F:\Coding Stuff\GitHub Files\JERC\jerc_test_map";
+            outputImageFilepathPart2 = "_radar";
             outputTxtFilepath = @"F:\Coding Stuff\GitHub Files\JERC\jerc_test_map.txt";
 
 
@@ -110,7 +113,10 @@ namespace JERC
 
             var levelHeights = GetLevelHeights();
 
-            GenerateRadar();
+            foreach (var levelHeight in levelHeights)
+            {
+                GenerateRadar(levelHeight);
+            }
 
             GenerateTxt(levelHeights);
         }
@@ -320,7 +326,7 @@ namespace JERC
         }
 
 
-        private static void GenerateRadar()
+        private static void GenerateRadar(LevelHeight levelHeight)
         {
             Bitmap bmp = new Bitmap(overviewPositionValues.outputResolution, overviewPositionValues.outputResolution);
 
@@ -332,12 +338,23 @@ namespace JERC
 
                 graphics.SetClip(Rectangle.FromLTRB(0, 0, overviewPositionValues.outputResolution, overviewPositionValues.outputResolution));
 
-                // get all brushes, displacements and entities to draw
-                var brushRemoveSideList = GetBrushRemoveOnlyVerticesList(boundingBox);
-                var displacementRemoveSideList = GetDisplacementRemoveOnlyVerticesList(boundingBox);
-                var brushExceptRemoveSideList = GetBrushExceptRemoveOnlyVerticesList(boundingBox);
-                var displacementExceptRemoveSideList = GetDisplacementExceptRemoveOnlyVerticesList(boundingBox);
-                var entityBrushSideListById = GetEntityVerticesListById();
+                // get all brush sides and displacement sides to draw
+                var brushRemoveSideList = GetBrushRemoveOnlyVerticesList(boundingBox).Where(x => x.worldHeight >= levelHeight.zMin && x.worldHeight < levelHeight.zMax).ToList();
+                var displacementRemoveSideList = GetDisplacementRemoveOnlyVerticesList(boundingBox).Where(x => x.worldHeight >= levelHeight.zMin && x.worldHeight < levelHeight.zMax).ToList();
+                var brushExceptRemoveSideList = GetBrushExceptRemoveOnlyVerticesList(boundingBox).Where(x => x.worldHeight >= levelHeight.zMin && x.worldHeight < levelHeight.zMax).ToList();
+                var displacementExceptRemoveSideList = GetDisplacementExceptRemoveOnlyVerticesList(boundingBox).Where(x => x.worldHeight >= levelHeight.zMin && x.worldHeight < levelHeight.zMax).ToList();
+
+                // get all entity sides to draw
+                var entityBrushSideListByIdUnfiltered = GetEntityVerticesListById();
+                var entityBrushSideListById = new Dictionary<int, List<EntityBrushSide>>();
+                foreach (var entityBrushSideById in entityBrushSideListByIdUnfiltered)
+                {
+                    if (entityBrushSideById.Value.Any(x => x.worldHeight >= levelHeight.zMin && x.worldHeight < levelHeight.zMax)) // would this allow entities to be on more than 1 level if their brushes span across level dividers ??
+                    {
+                        entityBrushSideListById.Add(entityBrushSideById.Key, entityBrushSideById.Value);
+                    }
+                }
+
 
                 // add remove stuff first to set to graphics' clip
                 GetBrushesToDrawOrAddRemoveRegion(bmp, graphics, boundingBox, brushRemoveSideList);
@@ -401,6 +418,9 @@ namespace JERC
                 FlipImage(bmp);
 
                 Bitmap bmpNew = new Bitmap(bmp, 1024, 1024);
+
+                var radarLevelString = levelHeight.levelName.ToLower() == "default" ? string.Empty : string.Concat("_", levelHeight.levelName.ToLower());
+                var outputImageFilepath = string.Concat(outputImageFilepathPart1, radarLevelString, outputImageFilepathPart2);
 
                 SaveImage(outputImageFilepath, bmpNew);
 
