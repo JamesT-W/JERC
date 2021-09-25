@@ -217,37 +217,37 @@ namespace JERC
 
         private static IEnumerable<IVNode> GetBrushesByTextureName(IEnumerable<IVNode> allWorldBrushesInVisgroup, string textureName)
         {
-            return from x in allWorldBrushesInVisgroup
+            return (from x in allWorldBrushesInVisgroup
                    from y in x.Body
                    where y.Name == "side"
                    where !y.Body.Any(z => z.Name == "dispinfo")
                    from z in y.Body
                    where z.Name == "material"
                    where z.Value.ToLower() == textureName.ToLower()
-                   select x;
+                   select x).Distinct();
         }
 
 
         private static IEnumerable<IVNode> GetDisplacementsByTextureName(IEnumerable<IVNode> allWorldBrushesInVisgroup, string textureName)
         {
-            return from x in allWorldBrushesInVisgroup
+            return (from x in allWorldBrushesInVisgroup
                    from y in x.Body
                    where y.Name == "side"
                    where y.Body.Any(z => z.Name == "dispinfo")
                    from z in y.Body
                    where z.Name == "material"
                    where z.Value.ToLower() == textureName.ToLower()
-                   select x;
+                   select x).Distinct();
         }
 
 
         private static IEnumerable<IVNode> GetEntitiesByClassname(IEnumerable<IVNode> allEntities, string classname)
         {
-            return from x in allEntities
+            return (from x in allEntities
                    from y in x.Body
                    where y.Name == "classname"
                    where y.Value.ToLower() == classname.ToLower()
-                   select x;
+                   select x).Distinct();
         }
 
 
