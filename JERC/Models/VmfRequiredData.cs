@@ -1,9 +1,6 @@
 ﻿using JERC.Constants;
-using JERC.Enums;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using VMFParser;
 
 namespace JERC.Models
@@ -46,10 +43,15 @@ namespace JERC.Models
             var brushesCoverModelled = brushesCover.Any() ? brushesCover.Select(x => new Brush(x)).ToList() : new List<Brush>();
             var brushesOverlapModelled = brushesOverlap.Any() ? brushesOverlap.Select(x => new Brush(x)).ToList() : new List<Brush>();
 
-            brushesSidesRemove = brushesRemoveModelled.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.RemoveTextureName)).ToList();
-            brushesSidesPath = brushesPathModelled.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.PathTextureName)).ToList();
-            brushesSidesCover = brushesCoverModelled.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.CoverTextureName)).ToList();
-            brushesSidesOverlap = brushesOverlapModelled.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.OverlapTextureName)).ToList();
+            var brushesSidesRemoveUnordered = brushesRemoveModelled.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.RemoveTextureName)).ToList();
+            var brushesSidesPathUnordered = brushesPathModelled.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.PathTextureName)).ToList();
+            var brushesSidesCoverUnordered = brushesCoverModelled.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.CoverTextureName)).ToList();
+            var brushesSidesOverlapUnordered = brushesOverlapModelled.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.OverlapTextureName)).ToList();
+
+            brushesSidesRemove = OrderListOfSidesByVerticesMin(brushesSidesRemoveUnordered);
+            brushesSidesPath = OrderListOfSidesByVerticesMin(brushesSidesPathUnordered);
+            brushesSidesCover = OrderListOfSidesByVerticesMin(brushesSidesCoverUnordered);
+            brushesSidesOverlap = OrderListOfSidesByVerticesMin(brushesSidesOverlapUnordered);
 
             // displacements
             var displacementsRemoveModelled = displacementsRemove.Any() ? displacementsRemove.Select(x => new Brush(x)).ToList() : new List<Brush>();
@@ -57,10 +59,15 @@ namespace JERC.Models
             var displacementsCoverModelled = displacementsCover.Any() ? displacementsCover.Select(x => new Brush(x)).ToList() : new List<Brush>();
             var displacementsOverlapModelled = displacementsOverlap.Any() ? displacementsOverlap.Select(x => new Brush(x)).ToList() : new List<Brush>();
 
-            displacementsSidesRemove = displacementsRemoveModelled.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.RemoveTextureName)).ToList();
-            displacementsSidesPath = displacementsPathModelled.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.PathTextureName)).ToList();
-            displacementsSidesCover = displacementsCoverModelled.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.CoverTextureName)).ToList();
-            displacementsSidesOverlap = displacementsOverlapModelled.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.OverlapTextureName)).ToList();
+            var displacementsSidesRemoveUnordered = displacementsRemoveModelled.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.RemoveTextureName)).ToList();
+            var displacementsSidesPathUnordered = displacementsPathModelled.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.PathTextureName)).ToList();
+            var displacementsSidesCoverUnordered = displacementsCoverModelled.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.CoverTextureName)).ToList();
+            var displacementsSidesOverlapUnordered = displacementsOverlapModelled.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.OverlapTextureName)).ToList();
+
+            displacementsSidesRemove = OrderListOfSidesByVerticesMin(displacementsSidesRemoveUnordered);
+            displacementsSidesPath = OrderListOfSidesByVerticesMin(displacementsSidesPathUnordered);
+            displacementsSidesCover = OrderListOfSidesByVerticesMin(displacementsSidesCoverUnordered);
+            displacementsSidesOverlap = OrderListOfSidesByVerticesMin(displacementsSidesOverlapUnordered);
 
             // entities
             var entitiesBuyzoneModelled = buyzoneBrushEntities.Any() ? buyzoneBrushEntities.Select(x => new Entity(x)).ToList() : new List<Entity>();
@@ -87,6 +94,21 @@ namespace JERC.Models
 
             this.jercConfigureEntities = jercConfigureEntities.Any() ? jercConfigureEntities.Select(x => new Entity(x)).ToList() : new List<Entity>();
             this.jercDividerEntities = jercDividerEntities.Any() ? jercDividerEntities.Select(x => new Entity(x)).OrderBy(x => new Vertices(x.origin).z).ToList() : new List<Entity>(); // order by lowest height first
+        }
+
+
+        // Orders by descending, then uses distinct to ensure that it gets the MAX value first for each side and ignores the rest.
+        // Then, it reverses, so it is ascending (MIN value first)
+        private static List<Side> OrderListOfSidesByVerticesMin(List<Side> sides)
+        {
+            var sidesNew = (from x in sides
+                            from y in x.vertices_plus
+                            orderby y.z descending
+                            select x).Distinct().ToList();
+
+            sidesNew.Reverse();
+
+            return sidesNew;
         }
     }
 }
