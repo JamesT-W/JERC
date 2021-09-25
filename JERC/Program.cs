@@ -180,7 +180,7 @@ namespace JERC
 
         private static Dictionary<string, string> GetSettingsValuesFromJercEntities(IEnumerable<IVNode> jercEntities)
         {
-            Dictionary<string, string> jercEntitySettingsValues = new Dictionary<string, string>();
+            var jercEntitySettingsValues = new Dictionary<string, string>();
 
             // jerc_configure
             var jercConfigure = jercEntities.FirstOrDefault(x => x.Body.Any(y => y.Name == "classname" && y.Value == Classnames.JercConfigure)).Body;
