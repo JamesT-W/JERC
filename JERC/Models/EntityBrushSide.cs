@@ -10,13 +10,9 @@ namespace JERC.Models
 {
     public class EntityBrushSide
     {
-        public PointF[] vertices;
-        public float worldHeight;
+        public List<Vertices> vertices = new List<Vertices>();
         public EntityTypes entityType;
 
-        public EntityBrushSide(int numOfVertices)
-        {
-            vertices = new PointF[numOfVertices];
-        }
+        public EntityBrushSide() {}
     }
 }

@@ -11,11 +11,21 @@ namespace JERC.Models
         public List<Side> brushesSidesPath;
         public List<Side> brushesSidesCover;
         public List<Side> brushesSidesOverlap;
+        
+        public List<Brush> brushesRemove;
+        public List<Brush> brushesPath;
+        public List<Brush> brushesCover;
+        public List<Brush> brushesOverlap;
 
         public List<Side> displacementsSidesRemove;
         public List<Side> displacementsSidesPath;
         public List<Side> displacementsSidesCover;
         public List<Side> displacementsSidesOverlap;
+
+        public List<Brush> displacementsRemove;
+        public List<Brush> displacementsPath;
+        public List<Brush> displacementsCover;
+        public List<Brush> displacementsOverlap;
 
         public Dictionary<int, List<Side>> entitiesSidesByEntityBuyzoneId = new Dictionary<int, List<Side>>();
         public Dictionary<int, List<Side>> entitiesSidesByEntityBombsiteId = new Dictionary<int, List<Side>>();
@@ -31,22 +41,22 @@ namespace JERC.Models
 
 
         public VmfRequiredData(
-            IEnumerable<IVNode> brushesRemove, IEnumerable<IVNode> brushesPath, IEnumerable<IVNode> brushesCover, IEnumerable<IVNode> brushesOverlap,
-            IEnumerable<IVNode> displacementsRemove, IEnumerable<IVNode> displacementsPath, IEnumerable<IVNode> displacementsCover, IEnumerable<IVNode> displacementsOverlap,
-            IEnumerable<IVNode> buyzoneBrushEntities, IEnumerable<IVNode> bombsiteBrushEntities, IEnumerable<IVNode> rescueZoneBrushEntities, IEnumerable<IVNode> hostageEntities, IEnumerable<IVNode> ctSpawnEntities, IEnumerable<IVNode> tSpawnEntities,
-            IEnumerable<IVNode> jercConfigureEntities, IEnumerable<IVNode> jercDividerEntities
+            IEnumerable<IVNode> brushesRemoveIVNodes, IEnumerable<IVNode> brushesPathIVNodes, IEnumerable<IVNode> brushesCoverIVNodes, IEnumerable<IVNode> brushesOverlapIVNodes,
+            IEnumerable<IVNode> displacementsRemoveIVNodes, IEnumerable<IVNode> displacementsPathIVNodes, IEnumerable<IVNode> displacementsCoverIVNodes, IEnumerable<IVNode> displacementsOverlapIVNodes,
+            IEnumerable<IVNode> buyzoneBrushEntitiesIVNodes, IEnumerable<IVNode> bombsiteBrushEntitiesIVNodes, IEnumerable<IVNode> rescueZoneBrushEntitiesIVNodes, IEnumerable<IVNode> hostageEntitiesIVNodes, IEnumerable<IVNode> ctSpawnEntitiesIVNodes, IEnumerable<IVNode> tSpawnEntitiesIVNodes,
+            IEnumerable<IVNode> jercConfigureEntitiesIVNodes, IEnumerable<IVNode> jercDividerEntitiesIVNodes
         )
         {
             // world brushes
-            var brushesRemoveModelled = brushesRemove.Any() ? brushesRemove.Select(x => new Brush(x)).ToList() : new List<Brush>();
-            var brushesPathModelled = brushesPath.Any() ? brushesPath.Select(x => new Brush(x)).ToList() : new List<Brush>();
-            var brushesCoverModelled = brushesCover.Any() ? brushesCover.Select(x => new Brush(x)).ToList() : new List<Brush>();
-            var brushesOverlapModelled = brushesOverlap.Any() ? brushesOverlap.Select(x => new Brush(x)).ToList() : new List<Brush>();
+            brushesRemove = brushesRemoveIVNodes.Any() ? brushesRemoveIVNodes.Select(x => new Brush(x)).ToList() : new List<Brush>();
+            brushesPath = brushesPathIVNodes.Any() ? brushesPathIVNodes.Select(x => new Brush(x)).ToList() : new List<Brush>();
+            brushesCover = brushesCoverIVNodes.Any() ? brushesCoverIVNodes.Select(x => new Brush(x)).ToList() : new List<Brush>();
+            brushesOverlap = brushesOverlapIVNodes.Any() ? brushesOverlapIVNodes.Select(x => new Brush(x)).ToList() : new List<Brush>();
 
-            var brushesSidesRemoveUnordered = brushesRemoveModelled.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.RemoveTextureName)).ToList();
-            var brushesSidesPathUnordered = brushesPathModelled.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.PathTextureName)).ToList();
-            var brushesSidesCoverUnordered = brushesCoverModelled.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.CoverTextureName)).ToList();
-            var brushesSidesOverlapUnordered = brushesOverlapModelled.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.OverlapTextureName)).ToList();
+            var brushesSidesRemoveUnordered = brushesRemove.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.RemoveTextureName)).ToList();
+            var brushesSidesPathUnordered = brushesPath.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.PathTextureName)).ToList();
+            var brushesSidesCoverUnordered = brushesCover.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.CoverTextureName)).ToList();
+            var brushesSidesOverlapUnordered = brushesOverlap.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.OverlapTextureName)).ToList();
 
             brushesSidesRemove = OrderListOfSidesByVerticesMin(brushesSidesRemoveUnordered);
             brushesSidesPath = OrderListOfSidesByVerticesMin(brushesSidesPathUnordered);
@@ -54,15 +64,15 @@ namespace JERC.Models
             brushesSidesOverlap = OrderListOfSidesByVerticesMin(brushesSidesOverlapUnordered);
 
             // displacements
-            var displacementsRemoveModelled = displacementsRemove.Any() ? displacementsRemove.Select(x => new Brush(x)).ToList() : new List<Brush>();
-            var displacementsPathModelled = displacementsPath.Any() ? displacementsPath.Select(x => new Brush(x)).ToList() : new List<Brush>();
-            var displacementsCoverModelled = displacementsCover.Any() ? displacementsCover.Select(x => new Brush(x)).ToList() : new List<Brush>();
-            var displacementsOverlapModelled = displacementsOverlap.Any() ? displacementsOverlap.Select(x => new Brush(x)).ToList() : new List<Brush>();
+            displacementsRemove = displacementsRemoveIVNodes.Any() ? displacementsRemoveIVNodes.Select(x => new Brush(x)).ToList() : new List<Brush>();
+            displacementsPath = displacementsPathIVNodes.Any() ? displacementsPathIVNodes.Select(x => new Brush(x)).ToList() : new List<Brush>();
+            displacementsCover = displacementsCoverIVNodes.Any() ? displacementsCoverIVNodes.Select(x => new Brush(x)).ToList() : new List<Brush>();
+            displacementsOverlap = displacementsOverlapIVNodes.Any() ? displacementsOverlapIVNodes.Select(x => new Brush(x)).ToList() : new List<Brush>();
 
-            var displacementsSidesRemoveUnordered = displacementsRemoveModelled.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.RemoveTextureName)).ToList();
-            var displacementsSidesPathUnordered = displacementsPathModelled.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.PathTextureName)).ToList();
-            var displacementsSidesCoverUnordered = displacementsCoverModelled.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.CoverTextureName)).ToList();
-            var displacementsSidesOverlapUnordered = displacementsOverlapModelled.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.OverlapTextureName)).ToList();
+            var displacementsSidesRemoveUnordered = displacementsRemove.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.RemoveTextureName)).ToList();
+            var displacementsSidesPathUnordered = displacementsPath.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.PathTextureName)).ToList();
+            var displacementsSidesCoverUnordered = displacementsCover.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.CoverTextureName)).ToList();
+            var displacementsSidesOverlapUnordered = displacementsOverlap.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.OverlapTextureName)).ToList();
 
             displacementsSidesRemove = OrderListOfSidesByVerticesMin(displacementsSidesRemoveUnordered);
             displacementsSidesPath = OrderListOfSidesByVerticesMin(displacementsSidesPathUnordered);
@@ -70,9 +80,9 @@ namespace JERC.Models
             displacementsSidesOverlap = OrderListOfSidesByVerticesMin(displacementsSidesOverlapUnordered);
 
             // entities
-            var entitiesBuyzoneModelled = buyzoneBrushEntities.Any() ? buyzoneBrushEntities.Select(x => new Entity(x)).ToList() : new List<Entity>();
-            var entitiesBombsiteModelled = bombsiteBrushEntities.Any() ? bombsiteBrushEntities.Select(x => new Entity(x)).ToList() : new List<Entity>();
-            var entitiesRescueZoneModelled = rescueZoneBrushEntities.Any() ? rescueZoneBrushEntities.Select(x => new Entity(x)).ToList() : new List<Entity>();
+            var entitiesBuyzoneModelled = buyzoneBrushEntitiesIVNodes.Any() ? buyzoneBrushEntitiesIVNodes.Select(x => new Entity(x)).ToList() : new List<Entity>();
+            var entitiesBombsiteModelled = bombsiteBrushEntitiesIVNodes.Any() ? bombsiteBrushEntitiesIVNodes.Select(x => new Entity(x)).ToList() : new List<Entity>();
+            var entitiesRescueZoneModelled = rescueZoneBrushEntitiesIVNodes.Any() ? rescueZoneBrushEntitiesIVNodes.Select(x => new Entity(x)).ToList() : new List<Entity>();
 
             foreach (var entity in entitiesBuyzoneModelled)
             {
@@ -87,13 +97,13 @@ namespace JERC.Models
                 entitiesSidesByEntityRescueZoneId.Add(entity.id, entity.brushes.SelectMany(x => x.side).ToList());
             }
 
-            this.bombsiteBrushEntities = bombsiteBrushEntities.Any() ? bombsiteBrushEntities.Select(x => new Entity(x)).ToList() : new List<Entity>();
-            this.hostageEntities = hostageEntities.Any() ? hostageEntities.Select(x => new Entity(x)).ToList() : new List<Entity>();
-            this.ctSpawnEntities = ctSpawnEntities.Any() ? ctSpawnEntities.Select(x => new Entity(x)).ToList() : new List<Entity>();
-            this.tSpawnEntities = tSpawnEntities.Any() ? tSpawnEntities.Select(x => new Entity(x)).ToList() : new List<Entity>();
+            this.bombsiteBrushEntities = bombsiteBrushEntitiesIVNodes.Any() ? bombsiteBrushEntitiesIVNodes.Select(x => new Entity(x)).ToList() : new List<Entity>();
+            this.hostageEntities = hostageEntitiesIVNodes.Any() ? hostageEntitiesIVNodes.Select(x => new Entity(x)).ToList() : new List<Entity>();
+            this.ctSpawnEntities = ctSpawnEntitiesIVNodes.Any() ? ctSpawnEntitiesIVNodes.Select(x => new Entity(x)).ToList() : new List<Entity>();
+            this.tSpawnEntities = tSpawnEntitiesIVNodes.Any() ? tSpawnEntitiesIVNodes.Select(x => new Entity(x)).ToList() : new List<Entity>();
 
-            this.jercConfigureEntities = jercConfigureEntities.Any() ? jercConfigureEntities.Select(x => new Entity(x)).ToList() : new List<Entity>();
-            this.jercDividerEntities = jercDividerEntities.Any() ? jercDividerEntities.Select(x => new Entity(x)).OrderBy(x => new Vertices(x.origin).z).ToList() : new List<Entity>(); // order by lowest height first
+            this.jercConfigureEntities = jercConfigureEntitiesIVNodes.Any() ? jercConfigureEntitiesIVNodes.Select(x => new Entity(x)).ToList() : new List<Entity>();
+            this.jercDividerEntities = jercDividerEntitiesIVNodes.Any() ? jercDividerEntitiesIVNodes.Select(x => new Entity(x)).OrderBy(x => new Vertices(x.origin).z).ToList() : new List<Entity>(); // order by lowest height first
         }
 
 

@@ -8,13 +8,13 @@ namespace JERC.Models
 {
     public class BrushSide
     {
-        public PointF[] vertices;
-        public float worldHeight; // used to figure out the colour gradient values needed for the Pen and SolidBrush
+        public List<Vertices> vertices = new List<Vertices>();
         public JercTypes jercType;
 
-        public BrushSide(int numOfVertices)
+        public BrushSide() { }
+        public BrushSide(JercTypes jercType)
         {
-            vertices = new PointF[numOfVertices];
+            this.jercType = jercType;
         }
     }
 }
