@@ -1,0 +1,78 @@
+@PointClass iconsprite("jerc/editor/jerc_configure.vmt") color(150 224 100) = jerc_configure : 
+	"JERC - Configure the main functionality."
+[
+	alternateOutputPath(string) report : "Alternate Output Path" : "" : "An alternate output path. Leave blank if you want to output to /csgo/resources/overviews only"
+
+	onlyOutputToAlternatePath(choices) : "Only Output to Alternate Path" : 1 =
+	[
+		0: "Yes"
+		1: "No"
+	]
+
+	backgroundFilename(string) : "Background Image Filename" : "grid.png" : "For custom images, place them inside the following folder: /Counter-Strike Global Offensive/bin/jerc/textures/"
+	
+	pathColourHigh(color255) : "Path Colour High" : "180 180 180 255" : "Colour of path world brushes at the highest point"
+
+	pathColourLow(color255) : "Path Colour Low" : "100 100 100 255" : "Colour of path world brushes at the lowest point"
+	
+	coverColourHigh(color255) : "Cover Colour High" : "240 240 240 255" : "Colour of cover world brushes at the highest point"
+
+	coverColourLow(color255) : "Cover Colour Low" : "160 160 160 255" : "Colour of cover world brushes at the lowest point"
+
+	overlapColourHigh(color255) : "Overlap Colour High" : "125 125 210 255" : "Colour of overlap world brushes at the highest point"
+
+	overlapColourLow(color255) : "Overlap Colour Low" : "35 35 105 255" : "Colour of overlap world brushes at the lowest point"
+
+	strokeWidth(integer) : "Stroke Width (int)" : 0 : "Width of stroke to use"
+	
+	strokeColour(color255) : "Stroke Colour" : "255 255 255 255" : "Colour of the stroke"
+
+	strokeAroundMainMaterials(choices) : "Stroke Around Main Materials" : 0 =
+	[
+		0: "Yes"
+		1: "No"
+	]
+
+	strokeAroundRemoveMaterials(choices) : "Stroke Around Remove Materials" : 0 =
+	[
+		0: "Yes"
+		1: "No"
+	]
+
+	defaultLevelNum(integer) : "Default Level Num (int)" : 0 : "The index that the default level is. 0 = bottom, 1 = second from bottom, ..."
+
+	higherLevelOutputName(string) : "Higher Level Output Name" : "higher" : "The higher level radar name JERC uses for naming"
+
+	lowerLevelOutputName(string) : "Lower Level Output Name" : "lower" : "The lower level radar name JERC uses for naming"
+
+	exportRadarAsSeparateLevels(choices) : "Export Multilevel Radars Separately" : 0 : "Exports multiple separate radars (if there are any jerc_divider entities)" =
+	[
+		0: "Yes"
+		1: "No"
+	]
+
+	exportTxt(choices) : "Export .TXT" : 0 =
+	[
+		0: "Yes"
+		1: "No"
+	]
+
+	exportDds(choices) : "Export .DDS" : 0 =
+	[
+		0: "Yes"
+		1: "No"
+	]
+
+	exportPng(choices) : "Export .PNG" : 1 =
+	[
+		0: "Yes"
+		1: "No"
+	]
+]
+
+
+@PointClass iconsprite("jerc/editor/jerc_divider.vmt") color(150 224 100) = jerc_divider : 
+	"JERC - A divider between different levels of the radar."
+[
+	
+]
