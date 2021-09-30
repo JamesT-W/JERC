@@ -1,4 +1,4 @@
-using ImageAlterer;
+﻿using ImageAlterer;
 using JERC.Constants;
 using JERC.Enums;
 using JERC.Models;
@@ -612,9 +612,14 @@ namespace JERC
             radarLevel.bmp = new Bitmap(radarLevel.bmp, Sizes.FinalOutputImageResolution, Sizes.FinalOutputImageResolution);
 
             var radarLevelString = radarLevel.levelHeight.levelName.ToLower() == "default" ? string.Empty : string.Concat("_", radarLevel.levelHeight.levelName.ToLower());
-            var outputImageFilepath = string.Concat(outputImageFilepathPart1, radarLevelString, outputImageFilepathPart2);
 
+            var outputImageFilepath = string.Concat(outputImageFilepathPart1, radarLevelString, outputImageFilepathPart2);
             SaveImage(outputImageFilepath, radarLevel.bmp);
+
+            if (!jercConfigValues.onlyOutputToAlternatePath && !string.IsNullOrWhiteSpace(jercConfigValues.alternateOutputPath))
+            {
+                SaveImage(jercConfigValues.alternateOutputPath, radarLevel.bmp);
+            }
         }
 
 
