@@ -202,6 +202,8 @@ namespace JERC
             jercEntitySettingsValues.Add("strokeAroundMainMaterials", jercConfigure.FirstOrDefault(x => x.Name == "strokeAroundMainMaterials")?.Value);
             jercEntitySettingsValues.Add("strokeAroundRemoveMaterials", jercConfigure.FirstOrDefault(x => x.Name == "strokeAroundRemoveMaterials")?.Value);
             jercEntitySettingsValues.Add("defaultLevelNum", jercConfigure.FirstOrDefault(x => x.Name == "defaultLevelNum")?.Value);
+            jercEntitySettingsValues.Add("levelBackgroundEnabled", jercConfigure.FirstOrDefault(x => x.Name == "levelBackgroundEnabled")?.Value);
+            jercEntitySettingsValues.Add("levelBackgroundDarkenAlpha", jercConfigure.FirstOrDefault(x => x.Name == "levelBackgroundDarkenAlpha")?.Value);
             jercEntitySettingsValues.Add("higherLevelOutputName", jercConfigure.FirstOrDefault(x => x.Name == "higherLevelOutputName")?.Value);
             jercEntitySettingsValues.Add("lowerLevelOutputName", jercConfigure.FirstOrDefault(x => x.Name == "lowerLevelOutputName")?.Value);
             jercEntitySettingsValues.Add("exportRadarAsSeparateLevels", jercConfigure.FirstOrDefault(x => x.Name == "exportRadarAsSeparateLevels")?.Value);
@@ -327,24 +329,69 @@ namespace JERC
         {
             var radarLevels = new List<RadarLevel>();
 
-            // get overview for each separate level
-            foreach (var levelHeight in levelHeights)
+            // get overview for each separate level if levelBackgroundEnabled == true
+            if (jercConfigValues.levelBackgroundEnabled)
             {
+                foreach (var levelHeight in levelHeights)
+                {
+                    var radarLevel = GenerateRadarLevel(levelHeight);
+                    radarLevels.Add(radarLevel);
+                }
+            }
+            else
+            {
+                var levelHeight = new LevelHeight(0, "default", -Sizes.MaxHammerGridSize, Sizes.MaxHammerGridSize);
                 var radarLevel = GenerateRadarLevel(levelHeight);
                 radarLevels.Add(radarLevel);
             }
 
-            // save overview levels
-            foreach (var radarLevel in radarLevels)
+            var radarLevelsToSaveList = new List<RadarLevel>();
+
+            // add darkened background for all overview levels if levelBackgroundEnabled == true
+            if (jercConfigValues.levelBackgroundEnabled)
             {
+                var backgroundBmp = GetBackgroundToRadarLevels(radarLevels);
+
+                foreach (var radarLevel in radarLevels)
+                {
+                    Bitmap newBmp = new Bitmap(radarLevels.FirstOrDefault().bmp);
+                    Graphics newGraphics = Graphics.FromImage(newBmp);
+                    //newGraphics.ResetClip();
+                    //newGraphics.Clear(Color.Transparent);
+
+                    //FlipImage(radarLevel.bmp);
+                    newGraphics.CompositingMode = CompositingMode.SourceCopy;
+                    newGraphics.DrawImage(backgroundBmp, 0, 0);
+                    newGraphics.Save();
+                    newGraphics.CompositingMode = CompositingMode.SourceOver;
+                    newGraphics.DrawImage(radarLevel.bmp, 0, 0);
+                    newGraphics.Save();
+
+                    radarLevelsToSaveList.Add(new RadarLevel(newBmp, radarLevel.levelHeight));
+                }
+
+                // dispose
+                DisposeGraphics(Graphics.FromImage(backgroundBmp));
+                DisposeImage(backgroundBmp);
+            }
+            else
+            {
+                radarLevelsToSaveList = radarLevels;
+            }
+
+            // save overview levels
+            foreach (var radarLevel in radarLevelsToSaveList)
+            {
+                FlipImage(radarLevel.bmp);
+
                 SaveRadarLevel(radarLevel);
             }
 
             // dispose
-            foreach (var radarLevel in radarLevels)
+            foreach (var radarLevel in radarLevels.Concat(radarLevelsToSaveList))
             {
-                DisposeImage(radarLevel.bmp);
                 DisposeGraphics(radarLevel.graphics);
+                DisposeImage(radarLevel.bmp);
             }
         }
 
@@ -457,7 +504,7 @@ namespace JERC
             }
 
             // reset the clip so that entity brushes can render anywhere
-            graphics.ResetClip();
+            ///////graphics.ResetClip();
 
             // entities next
             var entitiesToDraw = GetEntitiesToDraw(bmp, graphics, boundingBox, overviewPositionValues, entityBrushSideListById);
@@ -469,9 +516,59 @@ namespace JERC
 
             graphics.Save();
 
-            FlipImage(bmp);
+            //FlipImage(bmp);
 
-            return new RadarLevel(bmp, graphics, levelHeight);
+            return new RadarLevel(bmp, levelHeight);
+        }
+
+
+        private static Bitmap GetBackgroundToRadarLevels(List<RadarLevel> radarLevels)
+        {
+            var allGraphics = radarLevels.Select(x => x.graphics);
+
+            Bitmap backgroundBmp = new Bitmap(radarLevels.FirstOrDefault().bmp);
+            Graphics backgroundGraphics = Graphics.FromImage(backgroundBmp);
+            backgroundGraphics.ResetClip();
+            backgroundGraphics.Clear(Color.Transparent);
+
+            // draw all levels on top of one another, bottom first
+            foreach (var radarLevel in radarLevels)
+            {
+                //radarLevel.graphics.ResetClip();
+                backgroundGraphics.CompositingMode = CompositingMode.SourceOver;
+                backgroundGraphics.DrawImage(radarLevel.bmp, 0, 0);
+            }
+
+            // get transparent pixels
+            var transparentPixelLocations = new List<Vertices>();
+            for (int x = 0; x < backgroundBmp.Width; x++)
+            {
+                for (int y = 0; y < backgroundBmp.Height; y++)
+                {
+                    if (backgroundBmp.GetPixel(x, y).A == 0)
+                    {
+                        transparentPixelLocations.Add(new Vertices(x, y));
+                    }
+                }
+            }
+
+            // darken backgroundGraphics
+            var rectangle = Rectangle.FromLTRB(0, 0, overviewPositionValues.outputResolution, overviewPositionValues.outputResolution);
+            GraphicsPath path = new GraphicsPath();
+            path.AddRectangle(rectangle);
+            Region r1 = new Region(path);
+            backgroundGraphics.FillRectangle(new SolidBrush(Color.FromArgb(jercConfigValues.levelBackgroundDarkenAlpha, 0, 0, 0)), rectangle);
+
+            // reapply the transparent pixels
+            foreach (var pixel in transparentPixelLocations)
+            {
+                backgroundBmp.SetPixel((int)pixel.x, (int)pixel.y, Color.Transparent);
+            }
+
+            // save graphics
+            backgroundGraphics.Save();
+
+            return backgroundBmp;
         }
 
 

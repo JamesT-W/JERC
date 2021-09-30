@@ -24,6 +24,8 @@ namespace JERC.Models
         public bool strokeAroundMainMaterials;
         public bool strokeAroundRemoveMaterials;
         public int defaultLevelNum;
+        public bool levelBackgroundEnabled;
+        public int levelBackgroundDarkenAlpha;
         public string higherLevelOutputName;
         public string lowerLevelOutputName;
         public bool exportRadarAsSeparateLevels;
@@ -59,6 +61,8 @@ namespace JERC.Models
             else if (defaultLevelNum > jercDividerCount)
                 defaultLevelNum = jercDividerCount;
 
+            levelBackgroundEnabled = jercEntitySettingsValues["levelBackgroundEnabled"] == "0";
+            levelBackgroundDarkenAlpha = Math.Clamp(int.Parse(jercEntitySettingsValues["levelBackgroundDarkenAlpha"]), 0, 255);
             higherLevelOutputName = string.IsNullOrWhiteSpace(jercEntitySettingsValues["higherLevelOutputName"]) ? null : jercEntitySettingsValues["higherLevelOutputName"];
             lowerLevelOutputName = string.IsNullOrWhiteSpace(jercEntitySettingsValues["lowerLevelOutputName"]) ? null : jercEntitySettingsValues["lowerLevelOutputName"];
             exportTxt = jercEntitySettingsValues["exportTxt"] == "0";

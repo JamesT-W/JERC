@@ -8,10 +8,10 @@ namespace JERC.Models
         public Graphics graphics;
         public LevelHeight levelHeight;
 
-        public RadarLevel(Bitmap bmp, Graphics graphics, LevelHeight levelHeight)
+        public RadarLevel(Bitmap bmp, LevelHeight levelHeight)
         {
             this.bmp = bmp;
-            this.graphics = graphics;
+            this.graphics = Graphics.FromImage(bmp);
             this.levelHeight = levelHeight;
         }
     }

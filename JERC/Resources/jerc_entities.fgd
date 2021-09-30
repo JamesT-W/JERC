@@ -23,7 +23,7 @@
 
 	overlapColourLow(color255) : "Overlap Colour Low" : "35 35 105 255" : "Colour of overlap world brushes at the lowest point"
 
-	strokeWidth(integer) : "Stroke Width (int)" : 0 : "Width of stroke to use"
+	strokeWidth(integer) : "Stroke Width (int)" : 10 : "Width of stroke to use"
 	
 	strokeColour(color255) : "Stroke Colour" : "255 255 255 255" : "Colour of the stroke"
 
@@ -40,6 +40,14 @@
 	]
 
 	defaultLevelNum(integer) : "Default Level Num (int)" : 0 : "The index that the default level is. 0 = bottom, 1 = second from bottom, ..."
+
+	levelBackgroundEnabled(choices) : "Enable Levels As Backgrounds" : 0 : "Adds all levels as a background for each level when using multiple radar levels" =
+	[
+		0: "Yes"
+		1: "No"
+	]
+
+	levelBackgroundDarkenAlpha(integer) : "Level Background Darken Alpha (int)" : 150 : "The alpha value of the background overlay for multiple radars (0-255)"
 
 	higherLevelOutputName(string) : "Higher Level Output Name" : "higher" : "The higher level radar name JERC uses for naming"
 

@@ -29,5 +29,11 @@ namespace JERC.Models
             this.y = y;
             this.z = z;
         }
+
+        public Vertices(float x, float y)
+        {
+            this.x = x;
+            this.y = y;
+        }
     }
 }
