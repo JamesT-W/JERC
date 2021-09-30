@@ -1,4 +1,4 @@
-﻿using ImageAlterer;
+using ImageAlterer;
 using JERC.Constants;
 using JERC.Enums;
 using JERC.Models;
@@ -384,8 +384,6 @@ namespace JERC
                 {
                     Bitmap newBmp = new Bitmap(radarLevels.FirstOrDefault().bmp);
                     Graphics newGraphics = Graphics.FromImage(newBmp);
-                    //newGraphics.ResetClip();
-                    //newGraphics.Clear(Color.Transparent);
 
                     // apply blurred background levels to new image
                     newGraphics.CompositingMode = CompositingMode.SourceCopy;
@@ -544,8 +542,6 @@ namespace JERC
             }
 
             graphics.Save();
-
-            //FlipImage(bmp);
 
             return new RadarLevel(bmp, levelHeight);
         }
