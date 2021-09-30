@@ -10,15 +10,23 @@ namespace JERC.Models
     {
         public int levelNum;
         public string levelName;
-        public float zMin;
-        public float zMax;
+        public float zMinForTxt;
+        public float zMaxForTxt;
+        public float zMinForRadar;
+        public float zMaxForRadar;
+        public float zMinForRadarGradient;
+        public float zMaxForRadarGradient;
 
-        public LevelHeight(int levelNum, string levelName, float zMin, float zMax)
+        public LevelHeight(int levelNum, string levelName, float zMinForTxt, float zMaxForTxt, float zMinForRadar, float zMaxForRadar, float zMinForRadarGradient, float zMaxForRadarGradient)
         {
             this.levelNum = levelNum;
             this.levelName = levelName;
-            this.zMin = zMin;
-            this.zMax = zMax;
+            this.zMinForTxt = zMinForTxt;
+            this.zMaxForTxt = zMaxForTxt;
+            this.zMinForRadar = zMinForRadar;
+            this.zMaxForRadar = zMaxForRadar;
+            this.zMinForRadarGradient = zMinForRadarGradient;
+            this.zMaxForRadarGradient = zMaxForRadarGradient;
         }
     }
 }

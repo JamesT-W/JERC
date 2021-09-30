@@ -187,8 +187,8 @@ namespace JERC.Models
                     {
                         string.Concat("\t\t\"", levelHeight.levelName, "\""),
                         "\t\t{",
-                        string.Concat("\t\t\t\"AltitudeMin\"\t\"", levelHeight.zMin, "\""),
-                        string.Concat("\t\t\t\"AltitudeMax\"\t\"", levelHeight.zMax, "\""),
+                        string.Concat("\t\t\t\"AltitudeMin\"\t\"", levelHeight.zMinForTxt, "\""),
+                        string.Concat("\t\t\t\"AltitudeMax\"\t\"", levelHeight.zMaxForTxt, "\""),
                         "\t\t}",
                     });
                 }

@@ -40,13 +40,15 @@ namespace JERC.Models
 
         public List<Entity> jercConfigureEntities;
         public List<Entity> jercDividerEntities;
+        public List<Entity> jercFloorEntities;
+        public List<Entity> jercCeilingEntities;
 
 
         public VmfRequiredData(
             IEnumerable<IVNode> brushesRemoveIVNodes, IEnumerable<IVNode> brushesPathIVNodes, IEnumerable<IVNode> brushesCoverIVNodes, IEnumerable<IVNode> brushesOverlapIVNodes,
             IEnumerable<IVNode> displacementsRemoveIVNodes, IEnumerable<IVNode> displacementsPathIVNodes, IEnumerable<IVNode> displacementsCoverIVNodes, IEnumerable<IVNode> displacementsOverlapIVNodes,
             IEnumerable<IVNode> buyzoneBrushEntitiesIVNodes, IEnumerable<IVNode> bombsiteBrushEntitiesIVNodes, IEnumerable<IVNode> rescueZoneBrushEntitiesIVNodes, IEnumerable<IVNode> hostageEntitiesIVNodes, IEnumerable<IVNode> ctSpawnEntitiesIVNodes, IEnumerable<IVNode> tSpawnEntitiesIVNodes,
-            IEnumerable<IVNode> jercConfigureEntitiesIVNodes, IEnumerable<IVNode> jercDividerEntitiesIVNodes
+            IEnumerable<IVNode> jercConfigureEntitiesIVNodes, IEnumerable<IVNode> jercDividerEntitiesIVNodes, IEnumerable<IVNode> jercFloorEntitiesIVNodes, IEnumerable<IVNode> jercCeilingEntitiesIVNodes
         )
         {
             // world brushes
@@ -104,6 +106,8 @@ namespace JERC.Models
 
             jercConfigureEntities = jercConfigureEntitiesIVNodes.Any() ? jercConfigureEntitiesIVNodes.Select(x => new Entity(x)).ToList() : new List<Entity>();
             jercDividerEntities = jercDividerEntitiesIVNodes.Any() ? jercDividerEntitiesIVNodes.Select(x => new Entity(x)).OrderBy(x => new Vertices(x.origin).z).ToList() : new List<Entity>(); // order by lowest height first
+            jercFloorEntities = jercFloorEntitiesIVNodes.Any() ? jercFloorEntitiesIVNodes.Select(x => new Entity(x)).OrderBy(x => new Vertices(x.origin).z).ToList() : new List<Entity>(); // order by lowest height first
+            jercCeilingEntities = jercCeilingEntitiesIVNodes.Any() ? jercCeilingEntitiesIVNodes.Select(x => new Entity(x)).OrderBy(x => new Vertices(x.origin).z).ToList() : new List<Entity>(); // order by lowest height first
         }
 
 

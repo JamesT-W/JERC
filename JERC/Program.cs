@@ -171,8 +171,10 @@ namespace JERC
             // entities (JERC)
             var jercConfigureEntities = GetEntitiesByClassname(allEntities, Classnames.JercConfigure);
             var jercDividerEntities = GetEntitiesByClassname(allEntities, Classnames.JercDivider);
+            var jercFloorEntities = GetEntitiesByClassname(allEntities, Classnames.JercFloor);
+            var jercCeilingEntities = GetEntitiesByClassname(allEntities, Classnames.JercCeiling);
 
-            var allJercEntities = jercConfigureEntities.Concat(jercDividerEntities);
+            var allJercEntities = jercConfigureEntities.Concat(jercDividerEntities).Concat(jercFloorEntities).Concat(jercCeilingEntities);
 
             jercConfigValues = new JercConfigValues(GetSettingsValuesFromJercEntities(allJercEntities), jercDividerEntities.Count());
 
@@ -180,7 +182,7 @@ namespace JERC
                 brushesRemove, brushesPath, brushesCover, brushesOverlap,
                 displacementsRemove, displacementsPath, displacementsCover, displacementsOverlap,
                 buyzoneBrushEntities, bombsiteBrushEntities, rescueZoneBrushEntities, hostageEntities, ctSpawnEntities, tSpawnEntities,
-                jercConfigureEntities, jercDividerEntities
+                jercConfigureEntities, jercDividerEntities, jercFloorEntities, jercCeilingEntities
             );
         }
 
@@ -321,10 +323,19 @@ namespace JERC
                 else if (valueDiff > 0)
                     overviewLevelName = string.Concat(jercConfigValues.higherLevelOutputName, Math.Abs(valueDiff));
 
-                var zMin = i == 0 ? -(Sizes.MaxHammerGridSize / 2) : levelHeights.ElementAt(i - 1).zMax;
-                var zMax = i == (numOfOverviewLevels - 1) ? (Sizes.MaxHammerGridSize / 2) : new Vertices(jercDividerEntities.ElementAt(i).origin).z;
+                var zMinForTxt = i == 0 ? -(Sizes.MaxHammerGridSize / 2) : levelHeights.ElementAt(i - 1).zMaxForTxt;
+                var zMaxForTxt = i == (numOfOverviewLevels - 1) ? (Sizes.MaxHammerGridSize / 2) : new Vertices(jercDividerEntities.ElementAt(i).origin).z;
 
-                levelHeights.Add(new LevelHeight(levelHeights.Count(), overviewLevelName, zMin, zMax));
+                var zMinForRadar = i == 0 ? vmfRequiredData.GetLowestVerticesZ() : levelHeights.ElementAt(i - 1).zMaxForRadar;
+                var zMaxForRadar = i == (numOfOverviewLevels - 1) ? vmfRequiredData.GetHighestVerticesZ() : new Vertices(jercDividerEntities.ElementAt(i).origin).z;
+
+                var jercFloorEntitiesInsideLevel = vmfRequiredData.jercFloorEntities.Where(x => new Vertices(x.origin).z >= zMinForRadar && new Vertices(x.origin).z < zMaxForRadar).ToList();
+                var zMinForGradient = jercFloorEntitiesInsideLevel.Any() ? jercFloorEntitiesInsideLevel.Select(x => new Vertices(x.origin).z).FirstOrDefault() : zMinForRadar;
+
+                var jercCeilingEntitiesInsideLevel = vmfRequiredData.jercCeilingEntities.Where(x => new Vertices(x.origin).z >= zMinForRadar && new Vertices(x.origin).z < zMaxForRadar).ToList();
+                var zMaxForGradient = jercCeilingEntitiesInsideLevel.Any() ? jercCeilingEntitiesInsideLevel.Select(x => new Vertices(x.origin).z).FirstOrDefault() : zMaxForRadar;
+
+                levelHeights.Add(new LevelHeight(levelHeights.Count(), overviewLevelName, zMinForTxt, zMaxForTxt, zMinForRadar, zMaxForRadar, zMinForGradient, zMaxForGradient));
             }
 
             return levelHeights;
@@ -336,24 +347,28 @@ namespace JERC
             var radarLevels = new List<RadarLevel>();
 
             // get overview for each separate level if levelBackgroundEnabled == true
-            if (jercConfigValues.exportRadarAsSeparateLevels && levelHeights != null && levelHeights.Count() > 1)
+            if (levelHeights.Count() > 1)
             {
-                foreach (var levelHeight in levelHeights)
+                if (jercConfigValues.exportRadarAsSeparateLevels)
                 {
-                    // use lowest/highest Z vertices if it is currently set to bottom/top of world
-                    var levelHeightToUse = levelHeight;
-                    if (levelHeightToUse.zMin == -Sizes.MaxHammerGridSize)
-                        levelHeightToUse.zMin = vmfRequiredData.GetLowestVerticesZ();
-                    if (levelHeightToUse.zMax == Sizes.MaxHammerGridSize)
-                        levelHeightToUse.zMax = vmfRequiredData.GetHighestVerticesZ();
-
-                    var radarLevel = GenerateRadarLevel(levelHeightToUse);
+                    foreach (var levelHeight in levelHeights)
+                    {
+                        var radarLevel = GenerateRadarLevel(levelHeight);
+                        radarLevels.Add(radarLevel);
+                    }
+                }
+                else // more than one level height, but user has specified exporting as a single radar anyway
+                {
+                    var levelHeight = new LevelHeight(0, "default", levelHeights.Min(x => x.zMinForTxt), levelHeights.Max(x => x.zMaxForTxt), levelHeights.Min(x => x.zMinForRadar), levelHeights.Max(x => x.zMaxForRadar), levelHeights.Min(x => x.zMinForRadarGradient), levelHeights.Max(x => x.zMaxForRadarGradient));
+                    var radarLevel = GenerateRadarLevel(levelHeight);
                     radarLevels.Add(radarLevel);
                 }
             }
             else
             {
-                var levelHeight = new LevelHeight(0, "default", vmfRequiredData.GetLowestVerticesZ(), vmfRequiredData.GetHighestVerticesZ());
+                var currentLevelHeight = levelHeights.FirstOrDefault();
+
+                var levelHeight = new LevelHeight(0, "default", currentLevelHeight.zMinForTxt, currentLevelHeight.zMaxForTxt, currentLevelHeight.zMinForRadar, currentLevelHeight.zMaxForRadar, currentLevelHeight.zMinForRadarGradient, currentLevelHeight.zMaxForRadarGradient);
                 var radarLevel = GenerateRadarLevel(levelHeight);
                 radarLevels.Add(radarLevel);
             }
@@ -418,7 +433,8 @@ namespace JERC
             var boundingBox = new BoundingBox(
                 overviewPositionValues.brushVerticesPosMinX, overviewPositionValues.brushVerticesPosMaxX,
                 overviewPositionValues.brushVerticesPosMinY, overviewPositionValues.brushVerticesPosMaxY,
-                levelHeight.zMin, levelHeight.zMax
+                levelHeight.zMinForRadar, levelHeight.zMaxForRadar,
+                levelHeight.zMinForRadarGradient, levelHeight.zMaxForRadarGradient
             );
 
             graphics.SmoothingMode = SmoothingMode.AntiAlias;
@@ -427,30 +443,30 @@ namespace JERC
 
             // get all brush sides and displacement sides to draw
             var brushRemoveList = GetBrushRemoveVerticesList().Where(x => !(
-                (x.brushSides.SelectMany(y => y.vertices).All(y => y.z < levelHeight.zMin) && x.brushSides.SelectMany(y => y.vertices).All(y => y.z < levelHeight.zMax)) ||
-                (x.brushSides.SelectMany(y => y.vertices).All(y => y.z >= levelHeight.zMin) && x.brushSides.SelectMany(y => y.vertices).All(y => y.z >= levelHeight.zMax))
+                (x.brushSides.SelectMany(y => y.vertices).All(y => y.z < levelHeight.zMinForRadar) && x.brushSides.SelectMany(y => y.vertices).All(y => y.z < levelHeight.zMaxForRadar)) ||
+                (x.brushSides.SelectMany(y => y.vertices).All(y => y.z >= levelHeight.zMinForRadar) && x.brushSides.SelectMany(y => y.vertices).All(y => y.z >= levelHeight.zMaxForRadar))
             )).ToList();
             var displacementRemoveList = GetDisplacementRemoveVerticesList().Where(x => !(
-                (x.brushSides.SelectMany(y => y.vertices).All(y => y.z < levelHeight.zMin) && x.brushSides.SelectMany(y => y.vertices).All(y => y.z < levelHeight.zMax)) ||
-                (x.brushSides.SelectMany(y => y.vertices).All(y => y.z >= levelHeight.zMin) && x.brushSides.SelectMany(y => y.vertices).All(y => y.z >= levelHeight.zMax))
+                (x.brushSides.SelectMany(y => y.vertices).All(y => y.z < levelHeight.zMinForRadar) && x.brushSides.SelectMany(y => y.vertices).All(y => y.z < levelHeight.zMaxForRadar)) ||
+                (x.brushSides.SelectMany(y => y.vertices).All(y => y.z >= levelHeight.zMinForRadar) && x.brushSides.SelectMany(y => y.vertices).All(y => y.z >= levelHeight.zMaxForRadar))
             )).ToList();
 
             var brushCoverList = GetBrushCoverVerticesList().Where(x => !(
-                (x.brushSides.SelectMany(y => y.vertices).All(y => y.z < levelHeight.zMin) && x.brushSides.SelectMany(y => y.vertices).All(y => y.z < levelHeight.zMax)) ||
-                (x.brushSides.SelectMany(y => y.vertices).All(y => y.z >= levelHeight.zMin) && x.brushSides.SelectMany(y => y.vertices).All(y => y.z >= levelHeight.zMax))
+                (x.brushSides.SelectMany(y => y.vertices).All(y => y.z < levelHeight.zMinForRadar) && x.brushSides.SelectMany(y => y.vertices).All(y => y.z < levelHeight.zMaxForRadar)) ||
+                (x.brushSides.SelectMany(y => y.vertices).All(y => y.z >= levelHeight.zMinForRadar) && x.brushSides.SelectMany(y => y.vertices).All(y => y.z >= levelHeight.zMaxForRadar))
             )).ToList();
             var displacementCoverList = GetDisplacementCoverVerticesList().Where(x => !(
-                (x.brushSides.SelectMany(y => y.vertices).All(y => y.z < levelHeight.zMin) && x.brushSides.SelectMany(y => y.vertices).All(y => y.z < levelHeight.zMax)) ||
-                (x.brushSides.SelectMany(y => y.vertices).All(y => y.z >= levelHeight.zMin) && x.brushSides.SelectMany(y => y.vertices).All(y => y.z >= levelHeight.zMax))
+                (x.brushSides.SelectMany(y => y.vertices).All(y => y.z < levelHeight.zMinForRadar) && x.brushSides.SelectMany(y => y.vertices).All(y => y.z < levelHeight.zMaxForRadar)) ||
+                (x.brushSides.SelectMany(y => y.vertices).All(y => y.z >= levelHeight.zMinForRadar) && x.brushSides.SelectMany(y => y.vertices).All(y => y.z >= levelHeight.zMaxForRadar))
             )).ToList();
 
             var brushPathAndOverlapSideList = GetBrushPathAndOverlapSideOnlyVerticesList().Where(x => !(
-                (x.vertices.All(y => y.z < levelHeight.zMin) && x.vertices.All(y => y.z < levelHeight.zMax)) ||
-                (x.vertices.All(y => y.z >= levelHeight.zMin) && x.vertices.All(y => y.z >= levelHeight.zMax))
+                (x.vertices.All(y => y.z < levelHeight.zMinForRadar) && x.vertices.All(y => y.z < levelHeight.zMaxForRadar)) ||
+                (x.vertices.All(y => y.z >= levelHeight.zMinForRadar) && x.vertices.All(y => y.z >= levelHeight.zMaxForRadar))
             )).ToList();
             var displacementPathAndOverlapSideList = GetDisplacementPathAndOverlapSideOnlyVerticesList().Where(x => !(
-                (x.vertices.All(y => y.z < levelHeight.zMin) && x.vertices.All(y => y.z < levelHeight.zMax)) ||
-                (x.vertices.All(y => y.z >= levelHeight.zMin) && x.vertices.All(y => y.z >= levelHeight.zMax))
+                (x.vertices.All(y => y.z < levelHeight.zMinForRadar) && x.vertices.All(y => y.z < levelHeight.zMaxForRadar)) ||
+                (x.vertices.All(y => y.z >= levelHeight.zMinForRadar) && x.vertices.All(y => y.z >= levelHeight.zMaxForRadar))
             )).ToList();
 
 
@@ -463,7 +479,7 @@ namespace JERC
             var entityBrushSideListById = new Dictionary<int, List<EntityBrushSide>>();
             foreach (var entityBrushSideById in entityBrushSideListByIdUnfiltered)
             {
-                if (entityBrushSideById.Value.Any(x => !((x.vertices.All(y => y.z < levelHeight.zMin) && x.vertices.All(y => y.z < levelHeight.zMax)) || (x.vertices.All(y => y.z >= levelHeight.zMin) && x.vertices.All(y => y.z >= levelHeight.zMax))))) // would this allow entities to be on more than 1 level if their brushes span across level dividers ??
+                if (entityBrushSideById.Value.Any(x => !((x.vertices.All(y => y.z < levelHeight.zMinForRadar) && x.vertices.All(y => y.z < levelHeight.zMaxForRadar)) || (x.vertices.All(y => y.z >= levelHeight.zMinForRadar) && x.vertices.All(y => y.z >= levelHeight.zMaxForRadar))))) // would this allow entities to be on more than 1 level if their brushes span across level dividers ??
                 {
                     entityBrushSideListById.Add(entityBrushSideById.Key, entityBrushSideById.Value);
                 }
@@ -1065,12 +1081,12 @@ namespace JERC
 
             foreach (var brushSide in brushSidesList)
             {
-                var heightAboveMin = brushSide.vertices.Max(x => x.z) - boundingBox.minZ; // TODO: is this a place where it should do some logic for blending colours for different heights? Should Max() be removed?
+                var heightAboveMin = brushSide.vertices.Max(x => x.z) - boundingBox.minZGradient; // TODO: is this a place where it should do some logic for blending colours for different heights? Should Max() be removed?
 
                 float? percentageAboveMin;
                 if (heightAboveMin == 0)
                 {
-                    if (boundingBox.minZ == boundingBox.maxZ)
+                    if (boundingBox.minZGradient == boundingBox.maxZGradient)
                     {
                         percentageAboveMin = 1.00f;
                     }
@@ -1081,15 +1097,10 @@ namespace JERC
                 }
                 else
                 {
-                    percentageAboveMin = (float?)((Math.Ceiling(Convert.ToDouble(heightAboveMin)) / (boundingBox.maxZ - boundingBox.minZ)));
+                    percentageAboveMin = (float?)((Math.Ceiling(Convert.ToDouble(heightAboveMin)) / (boundingBox.maxZGradient - boundingBox.minZGradient)));
                 }
 
-                var gradientValue = (int)Math.Round((float)percentageAboveMin * 255, 0);
-
-                if (gradientValue < 1)
-                    gradientValue = 1;
-                else if (gradientValue > 255)
-                    gradientValue = 255;
+                var gradientValue = Math.Clamp((int)Math.Round((float)percentageAboveMin * 255, 0), 1, 255);
 
                 // corrects the verts to tax into account the movement from space in world to the space in the image (which starts at (0,0))
                 var verticesOffset = brushSide.vertices;
