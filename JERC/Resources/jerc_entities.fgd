@@ -53,9 +53,9 @@
 		1: "No"
 	]
 
-	levelBackgroundDarkenAlpha(integer) : "Level Background Darken Alpha (int)" : 200 : "The alpha value of the background overlay for multiple radars (0-255)"
+	levelBackgroundDarkenAlpha(integer) : "Levels Background Darken Alpha (int)" : 200 : "The alpha value of the black overlay to apply onto the background levels (0-255)"
 
-	levelBackgroundBlurAmount(integer) : "Level Background Blur Amount (int)" : 10 : "The amount of gaussian blur to apply to the background levels"
+	levelBackgroundBlurAmount(integer) : "Levels Background Blur Amount (int)" : 10 : "The amount of gaussian blur to apply to the background levels"
 
 	higherLevelOutputName(string) : "Higher Level Output Name" : "higher" : "The higher level radar name JERC uses for naming"
 
