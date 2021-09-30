@@ -92,3 +92,17 @@
 [
 	
 ]
+
+
+@PointClass iconsprite("jerc/editor/jerc_floor.vmt") color(150 224 100) = jerc_floor : 
+	"JERC - Overrides the minimum height value of a radar level that is used for gradients."
+[
+	
+]
+
+
+@PointClass iconsprite("jerc/editor/jerc_ceiling.vmt") color(150 224 100) = jerc_ceiling : 
+	"JERC - Overrides the maximum height value of a radar level that is used for gradients."
+[
+	
+]
