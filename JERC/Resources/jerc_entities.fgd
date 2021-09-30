@@ -45,7 +45,7 @@
 		1: "No"
 	]
 
-	defaultLevelNum(integer) : "Default Level Num (int)" : 0 : "The index that the default level is. 0 = bottom, 1 = second from bottom, ..."
+	defaultLevelNum(integer) : "Default Level Num (int)" : 0 : "The index that the default level is in a multilevel radar. 0 = bottom, 1 = second from bottom, ..."
 
 	levelBackgroundEnabled(choices) : "Enable Levels As Backgrounds" : 0 : "Adds all levels as a background for each level when using multiple radar levels" =
 	[
