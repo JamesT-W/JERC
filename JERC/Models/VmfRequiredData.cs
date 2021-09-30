@@ -7,34 +7,36 @@ namespace JERC.Models
 {
     public class VmfRequiredData
     {
-        public List<Side> brushesSidesRemove;
-        public List<Side> brushesSidesPath;
-        public List<Side> brushesSidesCover;
-        public List<Side> brushesSidesOverlap;
-        
         public List<Brush> brushesRemove;
         public List<Brush> brushesPath;
         public List<Brush> brushesCover;
         public List<Brush> brushesOverlap;
 
-        public List<Side> displacementsSidesRemove;
-        public List<Side> displacementsSidesPath;
-        public List<Side> displacementsSidesCover;
-        public List<Side> displacementsSidesOverlap;
+        public List<Side> brushesSidesRemove;
+        public List<Side> brushesSidesPath;
+        public List<Side> brushesSidesCover;
+        public List<Side> brushesSidesOverlap;
 
         public List<Brush> displacementsRemove;
         public List<Brush> displacementsPath;
         public List<Brush> displacementsCover;
         public List<Brush> displacementsOverlap;
 
-        public Dictionary<int, List<Side>> entitiesSidesByEntityBuyzoneId = new Dictionary<int, List<Side>>();
-        public Dictionary<int, List<Side>> entitiesSidesByEntityBombsiteId = new Dictionary<int, List<Side>>();
-        public Dictionary<int, List<Side>> entitiesSidesByEntityRescueZoneId = new Dictionary<int, List<Side>>();
+        public List<Side> displacementsSidesRemove;
+        public List<Side> displacementsSidesPath;
+        public List<Side> displacementsSidesCover;
+        public List<Side> displacementsSidesOverlap;
 
+        public List<Entity> buyzoneBrushEntities;
         public List<Entity> bombsiteBrushEntities;
+        public List<Entity> rescueZoneBrushEntities;
         public List<Entity> hostageEntities;
         public List<Entity> ctSpawnEntities;
         public List<Entity> tSpawnEntities;
+
+        public Dictionary<int, List<Side>> entitiesSidesByEntityBuyzoneId = new Dictionary<int, List<Side>>();
+        public Dictionary<int, List<Side>> entitiesSidesByEntityBombsiteId = new Dictionary<int, List<Side>>();
+        public Dictionary<int, List<Side>> entitiesSidesByEntityRescueZoneId = new Dictionary<int, List<Side>>();
 
         public List<Entity> jercConfigureEntities;
         public List<Entity> jercDividerEntities;
@@ -80,30 +82,28 @@ namespace JERC.Models
             displacementsSidesOverlap = OrderListOfSidesByVerticesMin(displacementsSidesOverlapUnordered);
 
             // entities
-            var entitiesBuyzoneModelled = buyzoneBrushEntitiesIVNodes.Any() ? buyzoneBrushEntitiesIVNodes.Select(x => new Entity(x)).ToList() : new List<Entity>();
-            var entitiesBombsiteModelled = bombsiteBrushEntitiesIVNodes.Any() ? bombsiteBrushEntitiesIVNodes.Select(x => new Entity(x)).ToList() : new List<Entity>();
-            var entitiesRescueZoneModelled = rescueZoneBrushEntitiesIVNodes.Any() ? rescueZoneBrushEntitiesIVNodes.Select(x => new Entity(x)).ToList() : new List<Entity>();
+            buyzoneBrushEntities = buyzoneBrushEntitiesIVNodes.Any() ? buyzoneBrushEntitiesIVNodes.Select(x => new Entity(x)).ToList() : new List<Entity>();
+            bombsiteBrushEntities = bombsiteBrushEntitiesIVNodes.Any() ? bombsiteBrushEntitiesIVNodes.Select(x => new Entity(x)).ToList() : new List<Entity>();
+            rescueZoneBrushEntities = rescueZoneBrushEntitiesIVNodes.Any() ? rescueZoneBrushEntitiesIVNodes.Select(x => new Entity(x)).ToList() : new List<Entity>();
+            hostageEntities = hostageEntitiesIVNodes.Any() ? hostageEntitiesIVNodes.Select(x => new Entity(x)).ToList() : new List<Entity>();
+            ctSpawnEntities = ctSpawnEntitiesIVNodes.Any() ? ctSpawnEntitiesIVNodes.Select(x => new Entity(x)).ToList() : new List<Entity>();
+            tSpawnEntities = tSpawnEntitiesIVNodes.Any() ? tSpawnEntitiesIVNodes.Select(x => new Entity(x)).ToList() : new List<Entity>();
 
-            foreach (var entity in entitiesBuyzoneModelled)
+            foreach (var entity in buyzoneBrushEntities)
             {
                 entitiesSidesByEntityBuyzoneId.Add(entity.id, entity.brushes.SelectMany(x => x.side).ToList());
             }
-            foreach (var entity in entitiesBombsiteModelled)
+            foreach (var entity in bombsiteBrushEntities)
             {
                 entitiesSidesByEntityBombsiteId.Add(entity.id, entity.brushes.SelectMany(x => x.side).ToList());
             }
-            foreach (var entity in entitiesRescueZoneModelled)
+            foreach (var entity in rescueZoneBrushEntities)
             {
                 entitiesSidesByEntityRescueZoneId.Add(entity.id, entity.brushes.SelectMany(x => x.side).ToList());
             }
 
-            this.bombsiteBrushEntities = bombsiteBrushEntitiesIVNodes.Any() ? bombsiteBrushEntitiesIVNodes.Select(x => new Entity(x)).ToList() : new List<Entity>();
-            this.hostageEntities = hostageEntitiesIVNodes.Any() ? hostageEntitiesIVNodes.Select(x => new Entity(x)).ToList() : new List<Entity>();
-            this.ctSpawnEntities = ctSpawnEntitiesIVNodes.Any() ? ctSpawnEntitiesIVNodes.Select(x => new Entity(x)).ToList() : new List<Entity>();
-            this.tSpawnEntities = tSpawnEntitiesIVNodes.Any() ? tSpawnEntitiesIVNodes.Select(x => new Entity(x)).ToList() : new List<Entity>();
-
-            this.jercConfigureEntities = jercConfigureEntitiesIVNodes.Any() ? jercConfigureEntitiesIVNodes.Select(x => new Entity(x)).ToList() : new List<Entity>();
-            this.jercDividerEntities = jercDividerEntitiesIVNodes.Any() ? jercDividerEntitiesIVNodes.Select(x => new Entity(x)).OrderBy(x => new Vertices(x.origin).z).ToList() : new List<Entity>(); // order by lowest height first
+            jercConfigureEntities = jercConfigureEntitiesIVNodes.Any() ? jercConfigureEntitiesIVNodes.Select(x => new Entity(x)).ToList() : new List<Entity>();
+            jercDividerEntities = jercDividerEntitiesIVNodes.Any() ? jercDividerEntitiesIVNodes.Select(x => new Entity(x)).OrderBy(x => new Vertices(x.origin).z).ToList() : new List<Entity>(); // order by lowest height first
         }
 
 
@@ -119,6 +119,52 @@ namespace JERC.Models
             sidesNew.Reverse();
 
             return sidesNew;
+        }
+
+
+        public float GetLowestVerticesZ()
+        {
+            var allDisplayedBrushSides = GetAllDisplayedBrushSides();
+
+            return allDisplayedBrushSides.SelectMany(x => x.vertices_plus.Select(x => x.z)).Min();
+        }
+
+
+        public float GetHighestVerticesZ()
+        {
+            var allDisplayedBrushSides = GetAllDisplayedBrushSides();
+
+            return allDisplayedBrushSides.SelectMany(x => x.vertices_plus.Select(x => x.z)).Max();
+        }
+
+
+        private List<Brush> GetAllDisplayedBrushes()
+        {
+            return brushesPath
+                .Concat(brushesCover)
+                .Concat(brushesOverlap)
+                .Concat(displacementsPath)
+                .Concat(displacementsCover)
+                .Concat(displacementsOverlap)
+                .Concat(bombsiteBrushEntities.SelectMany(x => x.brushes))
+                .Concat(buyzoneBrushEntities.SelectMany(x => x.brushes))
+                .Concat(rescueZoneBrushEntities.SelectMany(x => x.brushes))
+                .ToList();
+        }
+
+
+        private List<Side> GetAllDisplayedBrushSides()
+        {
+            return brushesSidesPath
+                .Concat(brushesSidesCover)
+                .Concat(brushesSidesOverlap)
+                .Concat(displacementsSidesPath)
+                .Concat(displacementsSidesCover)
+                .Concat(displacementsSidesOverlap)
+                .Concat(entitiesSidesByEntityBuyzoneId.SelectMany(x => x.Value))
+                .Concat(entitiesSidesByEntityBombsiteId.SelectMany(x => x.Value))
+                .Concat(entitiesSidesByEntityRescueZoneId.SelectMany(x => x.Value))
+                .ToList();
         }
     }
 }

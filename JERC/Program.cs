@@ -340,13 +340,20 @@ namespace JERC
             {
                 foreach (var levelHeight in levelHeights)
                 {
-                    var radarLevel = GenerateRadarLevel(levelHeight);
+                    // use lowest/highest Z vertices if it is currently set to bottom/top of world
+                    var levelHeightToUse = levelHeight;
+                    if (levelHeightToUse.zMin == -Sizes.MaxHammerGridSize)
+                        levelHeightToUse.zMin = vmfRequiredData.GetLowestVerticesZ();
+                    if (levelHeightToUse.zMax == Sizes.MaxHammerGridSize)
+                        levelHeightToUse.zMax = vmfRequiredData.GetHighestVerticesZ();
+
+                    var radarLevel = GenerateRadarLevel(levelHeightToUse);
                     radarLevels.Add(radarLevel);
                 }
             }
             else
             {
-                var levelHeight = new LevelHeight(0, "default", -Sizes.MaxHammerGridSize, Sizes.MaxHammerGridSize);
+                var levelHeight = new LevelHeight(0, "default", vmfRequiredData.GetLowestVerticesZ(), vmfRequiredData.GetHighestVerticesZ());
                 var radarLevel = GenerateRadarLevel(levelHeight);
                 radarLevels.Add(radarLevel);
             }
@@ -1074,7 +1081,7 @@ namespace JERC
                 }
                 else
                 {
-                    percentageAboveMin = heightAboveMin / (boundingBox.maxZ - boundingBox.minZ);
+                    percentageAboveMin = (float?)((Math.Ceiling(Convert.ToDouble(heightAboveMin)) / (boundingBox.maxZ - boundingBox.minZ)));
                 }
 
                 var gradientValue = (int)Math.Round((float)percentageAboveMin * 255, 0);

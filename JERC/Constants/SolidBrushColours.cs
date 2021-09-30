@@ -19,7 +19,7 @@ namespace JERC.Constants
 
         private static int ClampGradientValue(float value)
         {
-            return (int)Math.Ceiling(Math.Clamp(value, 50, 200));
+            return (int)Math.Ceiling(Math.Clamp(value, 25, 230));
         }
     }
 }
