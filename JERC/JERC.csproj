@@ -10,6 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ImageAlterer\ImageAlterer.csproj" />
     <ProjectReference Include="..\VMFParser\VMFParser.csproj" />
   </ItemGroup>
 

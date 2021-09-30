@@ -1,4 +1,5 @@
-﻿using JERC.Constants;
+﻿using ImageAlterer;
+using JERC.Constants;
 using JERC.Enums;
 using JERC.Models;
 using System;
@@ -25,7 +26,7 @@ namespace JERC
 
 
 
-
+        private static readonly ImageProcessorExtender imageProcessorExtender = new ImageProcessorExtender();
 
         private static readonly string gameBinDirectoryPath = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), @"..\"));
         private static readonly string gameCsgoDirectoryPath = Path.GetFullPath(Path.Combine(Path.Combine(gameBinDirectoryPath, @"..\"), @"csgo\"));
@@ -33,6 +34,7 @@ namespace JERC
 
         private static string outputImageFilepathPart1;
         private static string outputImageFilepathPart2;
+        private static string outputImageBackgroundLevelsFilepath;
         private static string outputTxtFilepath;
 
         private static readonly string visgroupName = "JERC";
@@ -90,10 +92,12 @@ namespace JERC
             /*
             outputImageFilepathPart1 = string.Concat(gameOverviewsDirectoryPath, mapName);
             outputImageFilepathPart2 = "_radar";
+            outputImageBackgroundLevelsFilepath = string.Concat(outputImageFilepathPart1, "_background_levels.png");
             outputTxtFilepath = string.Concat(gameOverviewsDirectoryPath, mapName, ".txt");
             */
             outputImageFilepathPart1 = @"F:\Coding Stuff\GitHub Files\JERC\jerc_test_map";
             outputImageFilepathPart2 = "_radar";
+            outputImageBackgroundLevelsFilepath = @"F:\Coding Stuff\GitHub Files\JERC\jerc_test_map_background_levels.png";
             outputTxtFilepath = @"F:\Coding Stuff\GitHub Files\JERC\jerc_test_map.txt";
 
 
@@ -204,12 +208,14 @@ namespace JERC
             jercEntitySettingsValues.Add("defaultLevelNum", jercConfigure.FirstOrDefault(x => x.Name == "defaultLevelNum")?.Value);
             jercEntitySettingsValues.Add("levelBackgroundEnabled", jercConfigure.FirstOrDefault(x => x.Name == "levelBackgroundEnabled")?.Value);
             jercEntitySettingsValues.Add("levelBackgroundDarkenAlpha", jercConfigure.FirstOrDefault(x => x.Name == "levelBackgroundDarkenAlpha")?.Value);
+            jercEntitySettingsValues.Add("levelBackgroundBlurAmount", jercConfigure.FirstOrDefault(x => x.Name == "levelBackgroundBlurAmount")?.Value);
             jercEntitySettingsValues.Add("higherLevelOutputName", jercConfigure.FirstOrDefault(x => x.Name == "higherLevelOutputName")?.Value);
             jercEntitySettingsValues.Add("lowerLevelOutputName", jercConfigure.FirstOrDefault(x => x.Name == "lowerLevelOutputName")?.Value);
-            jercEntitySettingsValues.Add("exportRadarAsSeparateLevels", jercConfigure.FirstOrDefault(x => x.Name == "exportRadarAsSeparateLevels")?.Value);
             jercEntitySettingsValues.Add("exportTxt", jercConfigure.FirstOrDefault(x => x.Name == "exportTxt")?.Value);
             jercEntitySettingsValues.Add("exportDds", jercConfigure.FirstOrDefault(x => x.Name == "exportDds")?.Value);
             jercEntitySettingsValues.Add("exportPng", jercConfigure.FirstOrDefault(x => x.Name == "exportPng")?.Value);
+            jercEntitySettingsValues.Add("exportRadarAsSeparateLevels", jercConfigure.FirstOrDefault(x => x.Name == "exportRadarAsSeparateLevels")?.Value);
+            jercEntitySettingsValues.Add("exportBackgroundLevelsImage", jercConfigure.FirstOrDefault(x => x.Name == "exportBackgroundLevelsImage")?.Value);
 
 
             // 
@@ -359,7 +365,7 @@ namespace JERC
                     //newGraphics.ResetClip();
                     //newGraphics.Clear(Color.Transparent);
 
-                    //FlipImage(radarLevel.bmp);
+                    // apply blurred background levels to new image
                     newGraphics.CompositingMode = CompositingMode.SourceCopy;
                     newGraphics.DrawImage(backgroundBmp, 0, 0);
                     newGraphics.Save();
@@ -568,13 +574,23 @@ namespace JERC
             // save graphics
             backgroundGraphics.Save();
 
+            // blur and save background image
+            backgroundBmp = new Bitmap(backgroundBmp, Sizes.FinalOutputImageResolution, Sizes.FinalOutputImageResolution);
+            var imageFactoryBlurred = imageProcessorExtender.GetBlurredImage(backgroundBmp, jercConfigValues.levelBackgroundBlurAmount); //blur the image
+            backgroundBmp = new Bitmap(backgroundBmp, overviewPositionValues.outputResolution, overviewPositionValues.outputResolution);
+
+            if (jercConfigValues.exportBackgroundLevelsImage)
+                imageFactoryBlurred.Save(outputImageBackgroundLevelsFilepath);
+
+            imageFactoryBlurred.Dispose();
+
             return backgroundBmp;
         }
 
 
         private static void SaveRadarLevel(RadarLevel radarLevel)
         {
-            radarLevel.bmp = new Bitmap(radarLevel.bmp, 1024, 1024);
+            radarLevel.bmp = new Bitmap(radarLevel.bmp, Sizes.FinalOutputImageResolution, Sizes.FinalOutputImageResolution);
 
             var radarLevelString = radarLevel.levelHeight.levelName.ToLower() == "default" ? string.Empty : string.Concat("_", radarLevel.levelHeight.levelName.ToLower());
             var outputImageFilepath = string.Concat(outputImageFilepathPart1, radarLevelString, outputImageFilepathPart2);

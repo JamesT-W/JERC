@@ -47,17 +47,13 @@
 		1: "No"
 	]
 
-	levelBackgroundDarkenAlpha(integer) : "Level Background Darken Alpha (int)" : 150 : "The alpha value of the background overlay for multiple radars (0-255)"
+	levelBackgroundDarkenAlpha(integer) : "Level Background Darken Alpha (int)" : 200 : "The alpha value of the background overlay for multiple radars (0-255)"
+
+	levelBackgroundBlurAmount(integer) : "Level Background Blur Amount (int)" : 10 : "The amount of gaussian blur to apply to the background levels"
 
 	higherLevelOutputName(string) : "Higher Level Output Name" : "higher" : "The higher level radar name JERC uses for naming"
 
 	lowerLevelOutputName(string) : "Lower Level Output Name" : "lower" : "The lower level radar name JERC uses for naming"
-
-	exportRadarAsSeparateLevels(choices) : "Export Multilevel Radars Separately" : 0 : "Exports multiple separate radars (if there are any jerc_divider entities)" =
-	[
-		0: "Yes"
-		1: "No"
-	]
 
 	exportTxt(choices) : "Export .TXT" : 0 =
 	[
@@ -72,6 +68,18 @@
 	]
 
 	exportPng(choices) : "Export .PNG" : 1 =
+	[
+		0: "Yes"
+		1: "No"
+	]
+
+	exportRadarAsSeparateLevels(choices) : "Export Multilevel Radars Separately" : 0 : "Exports multiple separate radars (if there are any jerc_divider entities)" =
+	[
+		0: "Yes"
+		1: "No"
+	]
+
+	exportBackgroundLevelsImage(choices) : "Export Background Levels Image" : 1 : "Exports background levels image (if there are any jerc_divider entities)" =
 	[
 		0: "Yes"
 		1: "No"
