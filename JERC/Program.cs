@@ -336,7 +336,7 @@ namespace JERC
             var radarLevels = new List<RadarLevel>();
 
             // get overview for each separate level if levelBackgroundEnabled == true
-            if (jercConfigValues.levelBackgroundEnabled)
+            if (jercConfigValues.exportRadarAsSeparateLevels && levelHeights != null && levelHeights.Count() > 1)
             {
                 foreach (var levelHeight in levelHeights)
                 {
@@ -354,7 +354,7 @@ namespace JERC
             var radarLevelsToSaveList = new List<RadarLevel>();
 
             // add darkened background for all overview levels if levelBackgroundEnabled == true
-            if (jercConfigValues.levelBackgroundEnabled)
+            if (jercConfigValues.exportRadarAsSeparateLevels && levelHeights != null && levelHeights.Count() > 1 && jercConfigValues.levelBackgroundEnabled)
             {
                 var backgroundBmp = GetBackgroundToRadarLevels(radarLevels);
 
