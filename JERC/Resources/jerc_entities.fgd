@@ -9,6 +9,12 @@
 		1: "No"
 	]
 
+	exportRadarAsSeparateLevels(choices) : "Export Multilevel Radars Separately" : 0 : "Exports multiple separate radars (if there are any jerc_divider entities)" =
+	[
+		0: "Yes"
+		1: "No"
+	]
+
 	backgroundFilename(string) : "Background Image Filename" : "grid.png" : "For custom images, place them inside the following folder: /Counter-Strike Global Offensive/bin/jerc/textures/"
 	
 	pathColourHigh(color255) : "Path Colour High" : "180 180 180 255" : "Colour of path world brushes at the highest point"
@@ -68,12 +74,6 @@
 	]
 
 	exportPng(choices) : "Export .PNG" : 1 =
-	[
-		0: "Yes"
-		1: "No"
-	]
-
-	exportRadarAsSeparateLevels(choices) : "Export Multilevel Radars Separately" : 0 : "Exports multiple separate radars (if there are any jerc_divider entities)" =
 	[
 		0: "Yes"
 		1: "No"
