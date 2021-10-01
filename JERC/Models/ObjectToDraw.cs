@@ -1,4 +1,5 @@
-﻿using System;
+﻿using JERC.Enums;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -10,11 +11,21 @@ namespace JERC.Models
     public class ObjectToDraw
     {
         public List<VerticesToDraw> verticesToDraw;
+        public JercTypes? jercType;
+        public EntityTypes? entityType;
 
 
-        public ObjectToDraw(List<VerticesToDraw> verticesToDraw)
+        public ObjectToDraw(List<VerticesToDraw> verticesToDraw, JercTypes jercType)
         {
             this.verticesToDraw = verticesToDraw;
+            this.jercType = jercType;
+        }
+
+
+        public ObjectToDraw(List<VerticesToDraw> verticesToDraw, EntityTypes entityType)
+        {
+            this.verticesToDraw = verticesToDraw;
+            this.entityType = entityType;
         }
 
 
@@ -27,7 +38,15 @@ namespace JERC.Models
                 verticesToDrawNew.Add(new VerticesToDraw(verticesToDraw.vertices, verticesToDraw.colour));
             }
 
-            return new ObjectToDraw(verticesToDrawNew);
+            var jercTypeNew = objectToDraw.jercType;
+            var entityTypeNew = objectToDraw.entityType;
+
+            if (jercTypeNew != null)
+                return new ObjectToDraw(verticesToDrawNew, (JercTypes)jercTypeNew);
+            else if (entityTypeNew != null)
+                return new ObjectToDraw(verticesToDrawNew, (EntityTypes)entityTypeNew);
+            else
+                return null;
         }
     }
 }

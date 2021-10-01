@@ -29,9 +29,15 @@ namespace JERC.Constants
                 ClampGradientValue(((float)rgb[2] / 255) * gradientValue)
             );
 
-        public static Color ColourBuyzones() => Color.FromArgb(255, 0, 255, 0);
-        public static Color ColourBombsites() => Color.FromArgb(255, 255, 0, 0);
-        public static Color ColourRescueZones() => Color.FromArgb(255, 0, 0, 255);
+        public static Color ColourBrushesStroke() => Color.FromArgb(255, 255, 255, 255);
+
+        public static Color ColourBuyzones() => Color.FromArgb(75, 0, 255, 0);
+        public static Color ColourBombsites() => Color.FromArgb(75, 255, 0, 0);
+        public static Color ColourRescueZones() => Color.FromArgb(75, 0, 0, 255);
+
+        public static Color ColourBuyzonesStroke() => Color.FromArgb(255, 0, 255, 0);
+        public static Color ColourBombsitesStroke() => Color.FromArgb(255, 255, 0, 0);
+        public static Color ColourRescueZonesStroke() => Color.FromArgb(255, 0, 0, 255);
 
 
         private static int ClampGradientValue(float value)

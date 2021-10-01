@@ -471,6 +471,8 @@ namespace JERC
             var allBrushSidesExceptRemove = brushPathAndOverlapSideList.Concat(brushCoverList.SelectMany(x => x.brushSides)).ToList();
             var allDisplacementSidesExceptRemove = displacementPathAndOverlapSideList.Concat(brushCoverList.SelectMany(x => x.brushSides)).ToList();
 
+            var brushesToDraw = GetBrushesToDraw(bmp, graphics, boundingBox, allBrushSidesExceptRemove);
+            var displacementsToDraw = GetBrushesToDraw(bmp, graphics, boundingBox, allDisplacementSidesExceptRemove);
 
             // get all entity sides to draw
             var entityBrushSideListByIdUnfiltered = GetEntityVerticesListById();
@@ -489,39 +491,19 @@ namespace JERC
             AddRemoveRegion(bmp, graphics, displacementRemoveList);
 
             // non-remove stuff (for stroke)
-            var brushesToDraw = GetBrushesToDraw(bmp, graphics, boundingBox, allBrushSidesExceptRemove);
-
             if (jercConfigValues.strokeAroundMainMaterials)
             {
-                foreach (var brushToRender in brushesToDraw)
+                foreach (var brushToRender in brushesToDraw.Where(x => x.jercType == JercTypes.Path || x.jercType == JercTypes.Overlap))
                 {
-                    var strokeSolidBrush = new SolidBrush(Color.Transparent);
-                    var strokePen = new Pen(Color.White);
-                    strokePen.Width *= jercConfigValues.strokeWidth;
-
-                    DrawFilledPolygonObjectBrushes(graphics, strokeSolidBrush, strokePen, brushToRender.verticesToDraw.Select(x => x.vertices).ToArray());
-
-                    // dispose
-                    strokeSolidBrush?.Dispose();
-                    strokePen?.Dispose();
+                    DrawStroke(graphics, brushToRender, Colours.ColourBrushesStroke());
                 }
             }
 
-            var displacementsToDraw = GetBrushesToDraw(bmp, graphics, boundingBox, allDisplacementSidesExceptRemove);
-
             if (jercConfigValues.strokeAroundMainMaterials)
             {
-                foreach (var displacementToRender in displacementsToDraw)
+                foreach (var displacementToRender in displacementsToDraw.Where(x => x.jercType == JercTypes.Path || x.jercType == JercTypes.Overlap))
                 {
-                    var strokeSolidBrush = new SolidBrush(Color.Transparent);
-                    var strokePen = new Pen(Color.White);
-                    strokePen.Width *= jercConfigValues.strokeWidth;
-
-                    DrawFilledPolygonObjectBrushes(graphics, strokeSolidBrush, strokePen, displacementToRender.verticesToDraw.Select(x => x.vertices).ToArray());
-
-                    // dispose
-                    strokeSolidBrush?.Dispose();
-                    strokePen?.Dispose();
+                    DrawStroke(graphics, displacementToRender, Colours.ColourBrushesStroke());
                 }
             }
 
@@ -542,14 +524,53 @@ namespace JERC
             // entities next
             var entitiesToDraw = GetEntitiesToDraw(bmp, graphics, boundingBox, overviewPositionValues, entityBrushSideListById);
 
-            foreach (var entityToDraw in entitiesToDraw)
+            // stroke
+            if (jercConfigValues.strokeAroundMainMaterials)
             {
-                DrawFilledPolygonGradient(graphics, entityToDraw);
+                foreach (var entityToRender in entitiesToDraw)
+                {
+                    Color colour = Color.White;
+
+                    switch (entityToRender.entityType)
+                    {
+                        case EntityTypes.Buyzone:
+                            colour = Colours.ColourBuyzonesStroke();
+                            break;
+                        case EntityTypes.Bombsite:
+                            colour = Colours.ColourBombsitesStroke();
+                            break;
+                        case EntityTypes.RescueZone:
+                            colour = Colours.ColourRescueZonesStroke();
+                            break;
+                    }
+
+                    DrawStroke(graphics, entityToRender, colour);
+                }
+            }
+
+            // normal
+            foreach (var entityToRender in entitiesToDraw)
+            {
+                DrawFilledPolygonGradient(graphics, entityToRender);
             }
 
             graphics.Save();
 
             return new RadarLevel(bmp, levelHeight);
+        }
+
+
+        private static void DrawStroke(Graphics graphics, ObjectToDraw objectToDraw, Color colourStroke)
+        {
+            var strokeSolidBrush = new SolidBrush(Color.Transparent);
+            var strokePen = new Pen(colourStroke);
+            strokePen.Width *= jercConfigValues.strokeWidth;
+
+            DrawFilledPolygonObjectBrushes(graphics, strokeSolidBrush, strokePen, objectToDraw.verticesToDraw.Select(x => x.vertices).ToArray());
+
+            // dispose
+            strokeSolidBrush?.Dispose();
+            strokePen?.Dispose();
         }
 
 
@@ -1155,7 +1176,7 @@ namespace JERC
                     verticesOffsetsToUse.Add(new VerticesToDraw(new Point((int)verticesOffset.x, (int)verticesOffset.y), colour));
                 }
 
-                brushesToDraw.Add(new ObjectToDraw(verticesOffsetsToUse));
+                brushesToDraw.Add(new ObjectToDraw(verticesOffsetsToUse, brushSide.jercType));
             }
 
             return brushesToDraw;
@@ -1189,7 +1210,7 @@ namespace JERC
                         verticesOffsetsToUse.Add(new VerticesToDraw(new Point((int)verticesOffset.x, (int)verticesOffset.y), colour));
                     }
 
-                    entitiesToDraw.Add(new ObjectToDraw(verticesOffsetsToUse));
+                    entitiesToDraw.Add(new ObjectToDraw(verticesOffsetsToUse, entityBrushSide.entityType));
                 }
             }
 
