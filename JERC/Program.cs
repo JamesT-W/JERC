@@ -1082,6 +1082,32 @@ namespace JERC
         }
 
 
+        private static void AddRemoveRegion(Bitmap bmp, Graphics graphics, BrushSide brushSide)
+        {
+            var verticesToUse = brushSide.vertices.Select(x => new PointF(x.x, x.y)).ToArray();
+            if (verticesToUse.Length < 3)
+            {
+                return;
+            }
+
+            var graphicsPath = new GraphicsPath();
+            graphicsPath.AddPolygon(verticesToUse);
+
+            // add stroke
+            if (jercConfigValues.strokeAroundRemoveMaterials)
+            {
+                var strokeSolidBrush = new SolidBrush(Color.Transparent);
+                var strokePen = new Pen(Color.White, jercConfigValues.strokeWidth);
+                DrawFilledPolygonObjectBrushes(graphics, strokeSolidBrush, strokePen, graphicsPath.PathPoints.Select(x => new Point((int)x.X, (int)x.Y)).ToArray());
+            }
+
+            var region = new Region(graphicsPath);
+            graphics.ExcludeClip(region);
+
+            graphicsPath.CloseFigure();
+        }
+
+
         private static List<ObjectToDraw> GetBrushesToDraw(Bitmap bmp, Graphics graphics, BoundingBox boundingBox, List<BrushSide> brushSidesList)
         {
             var brushesToDraw = new List<ObjectToDraw>();
@@ -1181,33 +1207,6 @@ namespace JERC
         {
             bmp.Dispose();
         }
-
-
-        private static void AddRemoveRegion(Bitmap bmp, Graphics graphics, BrushSide brushSide)
-        {
-            var verticesToUse = brushSide.vertices.Select(x => new PointF(x.x, x.y)).ToArray();
-            if (verticesToUse.Length < 3)
-            {
-                return;
-            }
-
-            var graphicsPath = new GraphicsPath();
-            graphicsPath.AddPolygon(verticesToUse);
-
-            // add stroke
-            if (jercConfigValues.strokeAroundRemoveMaterials)
-            {
-                var strokeSolidBrush = new SolidBrush(Color.Transparent);
-                var strokePen = new Pen(Color.White, jercConfigValues.strokeWidth);
-                DrawFilledPolygonObjectBrushes(graphics, strokeSolidBrush, strokePen, graphicsPath.PathPoints.Select(x => new Point((int)x.X, (int)x.Y)).ToArray());
-            }
-
-            var region = new Region(graphicsPath);
-            graphics.ExcludeClip(region);
-
-            graphicsPath.CloseFigure();
-        }
-
 
 
         private static void DrawFilledPolygonGradient(Graphics graphics, ObjectToDraw objectToDraw)
