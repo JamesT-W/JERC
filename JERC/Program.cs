@@ -496,11 +496,14 @@ namespace JERC
                 foreach (var brushToRender in brushesToDraw)
                 {
                     var strokeSolidBrush = new SolidBrush(Color.Transparent);
-                    var strokePen = (Pen)brushToRender.pen.Clone();
-                    strokePen.Color = Color.White;
+                    var strokePen = new Pen(Color.White);
                     strokePen.Width *= jercConfigValues.strokeWidth;
 
-                    DrawFilledPolygonObjectBrushes(graphics, strokeSolidBrush, strokePen, brushToRender.vertices);
+                    DrawFilledPolygonObjectBrushes(graphics, strokeSolidBrush, strokePen, brushToRender.verticesToDraw.Select(x => x.vertices).ToArray());
+
+                    // dispose
+                    strokeSolidBrush?.Dispose();
+                    strokePen?.Dispose();
                 }
             }
 
@@ -511,23 +514,26 @@ namespace JERC
                 foreach (var displacementToRender in displacementsToDraw)
                 {
                     var strokeSolidBrush = new SolidBrush(Color.Transparent);
-                    var strokePen = (Pen)displacementToRender.pen.Clone();
-                    strokePen.Color = Color.White;
+                    var strokePen = new Pen(Color.White);
                     strokePen.Width *= jercConfigValues.strokeWidth;
 
-                    DrawFilledPolygonObjectDisplacements(graphics, strokeSolidBrush, strokePen, displacementToRender.vertices);
+                    DrawFilledPolygonObjectBrushes(graphics, strokeSolidBrush, strokePen, displacementToRender.verticesToDraw.Select(x => x.vertices).ToArray());
+
+                    // dispose
+                    strokeSolidBrush?.Dispose();
+                    strokePen?.Dispose();
                 }
             }
 
             // non-remove stuff next
             foreach (var brushToRender in brushesToDraw)
             {
-                DrawFilledPolygonObjectBrushes(graphics, brushToRender.solidBrush, brushToRender.pen, brushToRender.vertices);
+                DrawFilledPolygonGradient(graphics, brushToRender);
             }
 
             foreach (var displacementToRender in displacementsToDraw)
             {
-                DrawFilledPolygonObjectDisplacements(graphics, displacementToRender.solidBrush, displacementToRender.pen, displacementToRender.vertices);
+                DrawFilledPolygonGradient(graphics, displacementToRender);
             }
 
             // reset the clip so that entity brushes can render anywhere
@@ -538,7 +544,7 @@ namespace JERC
 
             foreach (var entityToDraw in entitiesToDraw)
             {
-                DrawFilledPolygonObjectEntities(graphics, entityToDraw.solidBrush, entityToDraw.pen, entityToDraw.vertices);
+                DrawFilledPolygonGradient(graphics, entityToDraw);
             }
 
             graphics.Save();
@@ -1082,57 +1088,48 @@ namespace JERC
 
             foreach (var brushSide in brushSidesList)
             {
-                var heightAboveMin = brushSide.vertices.Max(x => x.z) - boundingBox.minZGradient; // TODO: is this a place where it should do some logic for blending colours for different heights? Should Max() be removed?
+                var verticesOffsetsToUse = new List<VerticesToDraw>();
 
-                float? percentageAboveMin;
-                if (heightAboveMin == 0)
+                foreach (var vertices in brushSide.vertices)
                 {
-                    if (boundingBox.minZGradient == boundingBox.maxZGradient)
+                    var heightAboveMin = vertices.z - boundingBox.minZGradient;
+
+                    float? percentageAboveMin;
+                    if (heightAboveMin == 0)
                     {
-                        percentageAboveMin = 1.00f;
+                        if (boundingBox.minZGradient == boundingBox.maxZGradient)
+                        {
+                            percentageAboveMin = 1.00f;
+                        }
+                        else
+                        {
+                            percentageAboveMin = 0.01f;
+                        }
                     }
                     else
                     {
-                        percentageAboveMin = 0.01f;
+                        percentageAboveMin = (float?)((Math.Ceiling(Convert.ToDouble(heightAboveMin)) / (boundingBox.maxZGradient - boundingBox.minZGradient)));
                     }
+
+                    var gradientValue = Math.Clamp((int)Math.Round((float)percentageAboveMin * 255, 0), 1, 255);
+
+                    // corrects the verts by taking into account the movement from space in world to the space in the image (which starts at (0,0))
+                    var verticesOffset = vertices;
+                    verticesOffset.x = verticesOffset.x - overviewPositionValues.brushVerticesPosMinX + overviewPositionValues.brushVerticesOffsetX;
+                    verticesOffset.y = verticesOffset.y - overviewPositionValues.brushVerticesPosMinY + overviewPositionValues.brushVerticesOffsetY;
+
+                    Color colour = brushSide.jercType switch
+                    {
+                        //JercTypes.Remove => Colours.ColourRemove(gradientValue),
+                        JercTypes.Path => Colours.ColourPath(TEMPORARYrgbColourPath, gradientValue),
+                        JercTypes.Cover => Colours.ColourCover(TEMPORARYrgbColourCover, gradientValue),
+                        JercTypes.Overlap => Colours.ColourOverlap(TEMPORARYrgbColourOverlap, gradientValue),
+                    };
+
+                    verticesOffsetsToUse.Add(new VerticesToDraw(new Point((int)verticesOffset.x, (int)verticesOffset.y), colour));
                 }
-                else
-                {
-                    percentageAboveMin = (float?)((Math.Ceiling(Convert.ToDouble(heightAboveMin)) / (boundingBox.maxZGradient - boundingBox.minZGradient)));
-                }
 
-                var gradientValue = Math.Clamp((int)Math.Round((float)percentageAboveMin * 255, 0), 1, 255);
-
-                // corrects the verts to tax into account the movement from space in world to the space in the image (which starts at (0,0))
-                var verticesOffset = brushSide.vertices;
-                for (var i = 0; i < verticesOffset.Count(); i++)
-                {
-                    verticesOffset[i].x = verticesOffset[i].x - overviewPositionValues.brushVerticesPosMinX + overviewPositionValues.brushVerticesOffsetX;
-                    verticesOffset[i].y = verticesOffset[i].y - overviewPositionValues.brushVerticesPosMinY + overviewPositionValues.brushVerticesOffsetY;
-                }
-
-                Pen pen = brushSide.jercType switch
-                {
-                    //JercTypes.Remove => PenColours.PenRemove(gradientValue),
-                    JercTypes.Path => PenColours.PenPath(TEMPORARYrgbColourPath, gradientValue),
-                    JercTypes.Cover => PenColours.PenCover(TEMPORARYrgbColourCover, gradientValue),
-                    JercTypes.Overlap => PenColours.PenOverlap(TEMPORARYrgbColourOverlap, gradientValue),
-                    _ => null,
-                };
-
-                SolidBrush solidBrush = brushSide.jercType switch
-                {
-                    //JercTypes.Remove => BrushColours.SolidBrushRemove(gradientValue),
-                    JercTypes.Path => SolidBrushColours.SolidBrushPath(TEMPORARYrgbColourPath, gradientValue),
-                    JercTypes.Cover => SolidBrushColours.SolidBrushCover(TEMPORARYrgbColourCover, gradientValue),
-                    JercTypes.Overlap => SolidBrushColours.SolidBrushOverlap(TEMPORARYrgbColourOverlap, gradientValue),
-                    _ => null,
-                };
-
-
-                var verticesOffsetToUse = verticesOffset.Select(x => new PointF(x.x, x.y)).ToArray();
-
-                brushesToDraw.Add(new ObjectToDraw(verticesOffsetToUse, pen, solidBrush));
+                brushesToDraw.Add(new ObjectToDraw(verticesOffsetsToUse));
             }
 
             return brushesToDraw;
@@ -1147,34 +1144,26 @@ namespace JERC
             {
                 foreach (var entityBrushSide in entityBrushSideByBrush)
                 {
-                    // corrects the verts to tax into account the movement from space in world to the space in the image (which starts at (0,0))
-                    var verticesOffset = entityBrushSide.vertices;
-                    for (var i = 0; i < verticesOffset.Count(); i++)
+                    var verticesOffsetsToUse = new List<VerticesToDraw>();
+
+                    foreach (var vertices in entityBrushSide.vertices)
                     {
-                        verticesOffset[i].x = verticesOffset[i].x - overviewPositionValues.brushVerticesPosMinX + overviewPositionValues.brushVerticesOffsetX;
-                        verticesOffset[i].y = verticesOffset[i].y - overviewPositionValues.brushVerticesPosMinY + overviewPositionValues.brushVerticesOffsetY;
+                        // corrects the verts to tax into account the movement from space in world to the space in the image (which starts at (0,0))
+                        var verticesOffset = vertices;
+                        verticesOffset.x = verticesOffset.x - overviewPositionValues.brushVerticesPosMinX + overviewPositionValues.brushVerticesOffsetX;
+                        verticesOffset.y = verticesOffset.y - overviewPositionValues.brushVerticesPosMinY + overviewPositionValues.brushVerticesOffsetY;
+
+                        Color colour = entityBrushSide.entityType switch
+                        {
+                            EntityTypes.Buyzone => Colours.ColourBuyzones(),
+                            EntityTypes.Bombsite => Colours.ColourBombsites(),
+                            EntityTypes.RescueZone => Colours.ColourRescueZones(),
+                        };
+
+                        verticesOffsetsToUse.Add(new VerticesToDraw(new Point((int)verticesOffset.x, (int)verticesOffset.y), colour));
                     }
 
-                    Pen pen = entityBrushSide.entityType switch
-                    {
-                        EntityTypes.Buyzone => PenColours.PenBuyzones(),
-                        EntityTypes.Bombsite => PenColours.PenBombsites(),
-                        EntityTypes.RescueZone => PenColours.PenRescueZones(),
-                        _ => null,
-                    };
-
-                    SolidBrush solidBrush = entityBrushSide.entityType switch
-                    {
-                        EntityTypes.Buyzone => SolidBrushColours.SolidBrushBuyzones(),
-                        EntityTypes.Bombsite => SolidBrushColours.SolidBrushBombsites(),
-                        EntityTypes.RescueZone => SolidBrushColours.SolidBrushRescueZones(),
-                        _ => null,
-                    };
-
-
-                    var verticesOffsetToUse = verticesOffset.Select(x => new PointF(x.x, x.y)).ToArray();
-
-                    entitiesToDraw.Add(new ObjectToDraw(verticesOffsetToUse, pen, solidBrush));
+                    entitiesToDraw.Add(new ObjectToDraw(verticesOffsetsToUse));
                 }
             }
 
@@ -1220,6 +1209,61 @@ namespace JERC
         }
 
 
+
+        private static void DrawFilledPolygonGradient(Graphics graphics, ObjectToDraw objectToDraw)
+        {
+            // Make the points for a polygon.
+            var vertices = objectToDraw.verticesToDraw.Select(x => x.vertices).ToList();
+
+            // remove duplicate point positions (this can be caused by vertical brush sides, where their X and Y values are the same (Z is not taken into account here))
+            vertices = vertices.Distinct().ToList();
+
+            // check there are still more than 2 points
+            if (vertices.Count() < 3)
+                return;
+
+            // check there are more than 1 value on each axis
+            if (vertices.Select(x => x.X).Distinct().Count() < 2 || vertices.Select(x => x.Y).Distinct().Count() < 2)
+                return;
+
+            // draw polygon
+            var verticesArray = vertices.ToArray();
+
+            using (PathGradientBrush pathBrush = new PathGradientBrush(verticesArray))
+            {
+                var colours = new List<Color>();
+                for (int i = 0; i < verticesArray.Length; i++)
+                {
+                    colours.Add(objectToDraw.verticesToDraw[i].colour);
+                }
+
+                // get average colour for center
+                int averageColourA = 0, averageColourR = 0, averageColourG = 0, averageColourB = 0;
+                foreach (var colour in colours)
+                {
+                    averageColourA += colour.A;
+                    averageColourR += colour.R;
+                    averageColourG += colour.G;
+                    averageColourB += colour.B;
+                }
+
+                averageColourA /= colours.Count();
+                averageColourR /= colours.Count();
+                averageColourG /= colours.Count();
+                averageColourB /= colours.Count();
+
+                var averageColour = Color.FromArgb(averageColourA, averageColourR, averageColourG, averageColourB);
+
+                // Define the center and surround colors.
+                pathBrush.CenterColor = averageColour;
+                pathBrush.SurroundColors = colours.ToArray();
+
+                // Fill the hexagon.
+                graphics.FillPolygon(pathBrush, verticesArray);
+            }
+        }
+
+
         private static void DrawFilledPolygonObjectBrushes(Graphics graphics, SolidBrush solidBrush, Pen pen, Point[] vertices)
         {
             graphics.DrawPolygon(pen, vertices);
@@ -1230,7 +1274,7 @@ namespace JERC
         }
 
 
-        private static void DrawFilledPolygonObjectDisplacements(Graphics graphics, SolidBrush solidBrush, Pen pen, Point[] vertices)
+        /*private static void DrawFilledPolygonObjectDisplacements(Graphics graphics, SolidBrush solidBrush, Pen pen, Point[] vertices)
         {
             graphics.DrawPolygon(pen, vertices);
             graphics.FillPolygon(solidBrush, vertices);
@@ -1247,7 +1291,7 @@ namespace JERC
 
             pen?.Dispose();
             solidBrush?.Dispose();
-        }
+        }*/
 
 
         private static void SaveImage(string filepath, Bitmap bmp)

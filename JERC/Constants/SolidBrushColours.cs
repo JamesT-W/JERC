@@ -8,37 +8,13 @@ namespace JERC.Constants
 {
     public static class SolidBrushColours
     {
-        //public static SolidBrush SolidBrushRemove() => new SolidBrush(Color.Transparent);
-        public static SolidBrush SolidBrushPath(int[] rgb, int gradientValue) =>
-            new SolidBrush(Color.FromArgb(255,
-                ClampGradientValue(((float)rgb[0] / 255) * gradientValue),
-                ClampGradientValue(((float)rgb[1] / 255) * gradientValue),
-                ClampGradientValue(((float)rgb[2] / 255) * gradientValue)
-            )
-        );
-        public static SolidBrush SolidBrushCover(int[] rgb, int gradientValue) =>
-            new SolidBrush(Color.FromArgb(255,
-                ClampGradientValue(((float)rgb[0] / 255) * gradientValue),
-                ClampGradientValue(((float)rgb[1] / 255) * gradientValue),
-                ClampGradientValue(((float)rgb[2] / 255) * gradientValue)
-            )
-        );
-        public static SolidBrush SolidBrushOverlap(int[] rgb, int gradientValue) =>
-            new SolidBrush(Color.FromArgb(255,
-                ClampGradientValue(((float)rgb[0] / 255) * gradientValue),
-                ClampGradientValue(((float)rgb[1] / 255) * gradientValue),
-                ClampGradientValue(((float)rgb[2] / 255) * gradientValue)
-            )
-        );
+        public static SolidBrush SolidBrushRemove() => new SolidBrush(Colours.ColourRemove());
+        public static SolidBrush SolidBrushPath(int[] rgb, int gradientValue) => new SolidBrush(Colours.ColourPath(rgb, gradientValue));
+        public static SolidBrush SolidBrushCover(int[] rgb, int gradientValue) => new SolidBrush(Colours.ColourCover(rgb, gradientValue));
+        public static SolidBrush SolidBrushOverlap(int[] rgb, int gradientValue) => new SolidBrush(Colours.ColourOverlap(rgb, gradientValue));
 
-        public static SolidBrush SolidBrushBuyzones() => new SolidBrush(Color.FromArgb(40, 0, 255, 0));
-        public static SolidBrush SolidBrushBombsites() => new SolidBrush(Color.FromArgb(40, 255, 0, 0));
-        public static SolidBrush SolidBrushRescueZones() => new SolidBrush(Color.FromArgb(40, 0, 0, 255));
-
-
-        private static int ClampGradientValue(float value)
-        {
-            return (int)Math.Ceiling(Math.Clamp(value, 10, 245));
-        }
+        public static SolidBrush SolidBrushBuyzones() => new SolidBrush(Colours.ColourBuyzones());
+        public static SolidBrush SolidBrushBombsites() => new SolidBrush(Colours.ColourBombsites());
+        public static SolidBrush SolidBrushRescueZones() => new SolidBrush(Colours.ColourRescueZones());
     }
 }

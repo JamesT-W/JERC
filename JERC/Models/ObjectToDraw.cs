@@ -9,15 +9,25 @@ namespace JERC.Models
 {
     public class ObjectToDraw
     {
-        public Point[] vertices;
-        public Pen pen;
-        public SolidBrush solidBrush;
+        public List<VerticesToDraw> verticesToDraw;
 
-        public ObjectToDraw(PointF[] vertices, Pen pen, SolidBrush solidBrush)
+
+        public ObjectToDraw(List<VerticesToDraw> verticesToDraw)
         {
-            this.vertices = vertices.Select(x => new Point((int)x.X, (int)x.Y)).ToArray();
-            this.pen = pen;
-            this.solidBrush = solidBrush;
+            this.verticesToDraw = verticesToDraw;
+        }
+
+
+        public static ObjectToDraw Clone(ObjectToDraw objectToDraw)
+        {
+            var verticesToDrawNew = new List<VerticesToDraw>();
+
+            foreach (var verticesToDraw in objectToDraw.verticesToDraw)
+            {
+                verticesToDrawNew.Add(new VerticesToDraw(verticesToDraw.vertices, verticesToDraw.colour));
+            }
+
+            return new ObjectToDraw(verticesToDrawNew);
         }
     }
 }
