@@ -469,7 +469,7 @@ namespace JERC
 
 
             var allBrushSidesExceptRemove = brushPathAndOverlapSideList.Concat(brushCoverList.SelectMany(x => x.brushSides)).ToList();
-            var allDisplacementSidesExceptRemove = displacementPathAndOverlapSideList.Concat(brushCoverList.SelectMany(x => x.brushSides)).ToList();
+            var allDisplacementSidesExceptRemove = displacementPathAndOverlapSideList.Concat(displacementCoverList.SelectMany(x => x.brushSides)).ToList();
 
             var brushesToDraw = GetBrushesToDraw(bmp, graphics, boundingBox, allBrushSidesExceptRemove);
             var displacementsToDraw = GetBrushesToDraw(bmp, graphics, boundingBox, allDisplacementSidesExceptRemove);
