@@ -1,4 +1,4 @@
-﻿using ImageAlterer;
+using ImageAlterer;
 using JERC.Constants;
 using JERC.Enums;
 using JERC.Models;
@@ -518,8 +518,10 @@ namespace JERC
                 DrawFilledPolygonGradient(graphics, displacementToRender);
             }
 
+
             // reset the clip so that entity brushes can render anywhere
-            ///////graphics.ResetClip();
+            ////graphics.ResetClip();
+
 
             // entities next
             var entitiesToDraw = GetEntitiesToDraw(bmp, graphics, boundingBox, overviewPositionValues, entityBrushSideListById);
