@@ -497,10 +497,7 @@ namespace JERC
                 {
                     DrawStroke(graphics, brushToRender, Colours.ColourBrushesStroke());
                 }
-            }
 
-            if (jercConfigValues.strokeAroundMainMaterials)
-            {
                 foreach (var displacementToRender in displacementsToDraw.Where(x => x.jercType == JercTypes.Path || x.jercType == JercTypes.Overlap))
                 {
                     DrawStroke(graphics, displacementToRender, Colours.ColourBrushesStroke());
