@@ -460,18 +460,30 @@ namespace JERC
                 (x.brushSides.SelectMany(y => y.vertices).All(y => y.z >= levelHeight.zMinForRadar) && x.brushSides.SelectMany(y => y.vertices).All(y => y.z >= levelHeight.zMaxForRadar))
             )).ToList();
 
-            var brushPathAndOverlapSideList = GetBrushPathAndOverlapSideOnlyVerticesList().Where(x => !(
+            var brushPathSideList = GetBrushPathSidesVerticesList().Where(x => !(
                 (x.vertices.All(y => y.z < levelHeight.zMinForRadar) && x.vertices.All(y => y.z < levelHeight.zMaxForRadar)) ||
                 (x.vertices.All(y => y.z >= levelHeight.zMinForRadar) && x.vertices.All(y => y.z >= levelHeight.zMaxForRadar))
             )).ToList();
-            var displacementPathAndOverlapSideList = GetDisplacementPathAndOverlapSideOnlyVerticesList().Where(x => !(
+            var displacementPathSideList = GetDisplacementPathSidesVerticesList().Where(x => !(
+                (x.vertices.All(y => y.z < levelHeight.zMinForRadar) && x.vertices.All(y => y.z < levelHeight.zMaxForRadar)) ||
+                (x.vertices.All(y => y.z >= levelHeight.zMinForRadar) && x.vertices.All(y => y.z >= levelHeight.zMaxForRadar))
+            )).ToList();
+
+            var brushOverlapSideList = GetBrushOverlapSidesVerticesList().Where(x => !(
+                (x.vertices.All(y => y.z < levelHeight.zMinForRadar) && x.vertices.All(y => y.z < levelHeight.zMaxForRadar)) ||
+                (x.vertices.All(y => y.z >= levelHeight.zMinForRadar) && x.vertices.All(y => y.z >= levelHeight.zMaxForRadar))
+            )).ToList();
+            var displacementOverlapSideList = GetDisplacementOverlapSidesVerticesList().Where(x => !(
                 (x.vertices.All(y => y.z < levelHeight.zMinForRadar) && x.vertices.All(y => y.z < levelHeight.zMaxForRadar)) ||
                 (x.vertices.All(y => y.z >= levelHeight.zMinForRadar) && x.vertices.All(y => y.z >= levelHeight.zMaxForRadar))
             )).ToList();
 
 
-            var brushesToDrawPathAndOverlap = GetBrushesToDraw(boundingBox, brushPathAndOverlapSideList);
-            var displacementsToDrawPathAndOverlap = GetBrushesToDraw(boundingBox, displacementPathAndOverlapSideList);
+            var brushesToDrawPath = GetBrushesToDraw(boundingBox, brushPathSideList);
+            var displacementsToDrawPath = GetBrushesToDraw(boundingBox, displacementPathSideList);
+
+            var brushesToDrawOverlap = GetBrushesToDraw(boundingBox, brushOverlapSideList);
+            var displacementsToDrawOverlap = GetBrushesToDraw(boundingBox, displacementOverlapSideList);
 
             var brushesToDrawCover = GetBrushesToDraw(boundingBox, brushCoverList.SelectMany(x => x.brushSides).ToList());
             var displacementsToDrawCover = GetBrushesToDraw(boundingBox, displacementCoverList.SelectMany(x => x.brushSides).ToList());
@@ -495,37 +507,32 @@ namespace JERC
             // path and overlap brush stuff (for stroke)
             if (jercConfigValues.strokeAroundLayoutMaterials)
             {
-                foreach (var brushToRender in brushesToDrawPathAndOverlap.Where(x => x.jercType == JercTypes.Path || x.jercType == JercTypes.Overlap))
+                foreach (var brushToRender in brushesToDrawPath.Concat(brushesToDrawOverlap).Where(x => x.jercType == JercTypes.Path || x.jercType == JercTypes.Overlap))
                 {
                     DrawStroke(graphics, brushToRender, Colours.ColourBrushesStroke());
                 }
 
-                foreach (var displacementToRender in displacementsToDrawPathAndOverlap.Where(x => x.jercType == JercTypes.Path || x.jercType == JercTypes.Overlap))
+                foreach (var displacementToRender in displacementsToDrawPath.Concat(displacementsToDrawOverlap).Where(x => x.jercType == JercTypes.Path || x.jercType == JercTypes.Overlap))
                 {
                     DrawStroke(graphics, displacementToRender, Colours.ColourBrushesStroke());
                 }
             }
 
-            // path and overlap brush stuff
-            foreach (var brushToRender in brushesToDrawPathAndOverlap)
+            // path brush stuff
+            foreach (var brushToRender in brushesToDrawPath)
             {
                 DrawFilledPolygonGradient(graphics, brushToRender, true);
             }
 
-            foreach (var displacementToRender in displacementsToDrawPathAndOverlap)
+            foreach (var displacementToRender in displacementsToDrawPath)
             {
                 DrawFilledPolygonGradient(graphics, displacementToRender, true);
             }
 
-            // cover brush stuff
-            foreach (var brushToRender in brushesToDrawCover)
+            // cover and overlap brush stuff
+            foreach (var brushToRender in brushesToDrawOverlap.Concat(displacementsToDrawOverlap).Concat(brushesToDrawCover).Concat(displacementsToDrawCover).OrderBy(x => x.zAxisAverage))
             {
                 DrawFilledPolygonGradient(graphics, brushToRender, false);
-            }
-
-            foreach (var displacementToRender in displacementsToDrawCover)
-            {
-                DrawFilledPolygonGradient(graphics, displacementToRender, false);
             }
 
 
@@ -659,30 +666,6 @@ namespace JERC
             {
                 SaveImage(jercConfigValues.alternateOutputPath, radarLevel.bmp);
             }
-        }
-
-
-        // returns brush sides
-        private static List<BrushSide> GetBrushPathAndOverlapSideOnlyVerticesList()
-        {
-            var brushSideList = new List<BrushSide>();
-
-            brushSideList.AddRange(GetBrushPathSidesVerticesList());
-            brushSideList.AddRange(GetBrushOverlapSidesVerticesList());
-
-            return brushSideList;
-        }
-
-
-        // returns brush sides
-        private static List<BrushSide> GetDisplacementPathAndOverlapSideOnlyVerticesList()
-        {
-            var displacementSideList = new List<BrushSide>();
-
-            displacementSideList.AddRange(GetDisplacementPathSidesVerticesList());
-            displacementSideList.AddRange(GetDisplacementOverlapSidesVerticesList());
-
-            return displacementSideList;
         }
 
 
@@ -1187,10 +1170,10 @@ namespace JERC
 
                     verticesOffsetsToUse = verticesOffsetsToUse.Distinct().ToList(); // TODO: doesn't seem to work
 
-                    verticesOffsetsToUse.Add(new VerticesToDraw(new Point((int)verticesOffset.x, (int)verticesOffset.y), colour));
+                    verticesOffsetsToUse.Add(new VerticesToDraw(new Point((int)verticesOffset.x, (int)verticesOffset.y), (int)verticesOffset.z, colour));
                 }
 
-                brushesToDraw.Add(new ObjectToDraw(verticesOffsetsToUse, brushSide.jercType));
+                brushesToDraw.Add(new ObjectToDraw(verticesOffsetsToUse, (int)verticesOffsetsToUse.Select(x => x.zAxis).Average(x => x), brushSide.jercType));
             }
 
             return brushesToDraw;
@@ -1221,12 +1204,12 @@ namespace JERC
                             EntityTypes.RescueZone => Colours.ColourRescueZones(),
                         };
 
-                        verticesOffsetsToUse.Add(new VerticesToDraw(new Point((int)verticesOffset.x, (int)verticesOffset.y), colour));
+                        verticesOffsetsToUse.Add(new VerticesToDraw(new Point((int)verticesOffset.x, (int)verticesOffset.y), (int)verticesOffset.z, colour));
                     }
 
                     verticesOffsetsToUse = verticesOffsetsToUse.Distinct().ToList(); // TODO: doesn't seem to work
 
-                    entitiesToDraw.Add(new ObjectToDraw(verticesOffsetsToUse, entityBrushSide.entityType));
+                    entitiesToDraw.Add(new ObjectToDraw(verticesOffsetsToUse, (int)verticesOffsetsToUse.Select(x => x.zAxis).Average(x => x), entityBrushSide.entityType));
                 }
             }
 

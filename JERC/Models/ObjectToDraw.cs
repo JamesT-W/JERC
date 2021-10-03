@@ -11,20 +11,23 @@ namespace JERC.Models
     public class ObjectToDraw
     {
         public List<VerticesToDraw> verticesToDraw;
+        public int zAxisAverage;
         public JercTypes? jercType;
         public EntityTypes? entityType;
 
 
-        public ObjectToDraw(List<VerticesToDraw> verticesToDraw, JercTypes jercType)
+        public ObjectToDraw(List<VerticesToDraw> verticesToDraw, int zAxisAverage, JercTypes jercType)
         {
             this.verticesToDraw = verticesToDraw;
+            this.zAxisAverage = zAxisAverage;
             this.jercType = jercType;
         }
 
 
-        public ObjectToDraw(List<VerticesToDraw> verticesToDraw, EntityTypes entityType)
+        public ObjectToDraw(List<VerticesToDraw> verticesToDraw, int zAxisAverage, EntityTypes entityType)
         {
             this.verticesToDraw = verticesToDraw;
+            this.zAxisAverage = zAxisAverage;
             this.entityType = entityType;
         }
 
@@ -35,16 +38,17 @@ namespace JERC.Models
 
             foreach (var verticesToDraw in objectToDraw.verticesToDraw)
             {
-                verticesToDrawNew.Add(new VerticesToDraw(verticesToDraw.vertices, verticesToDraw.colour));
+                verticesToDrawNew.Add(new VerticesToDraw(verticesToDraw.vertices, verticesToDraw.zAxis, verticesToDraw.colour));
             }
 
+            var zAxisAverage = objectToDraw.zAxisAverage;
             var jercTypeNew = objectToDraw.jercType;
             var entityTypeNew = objectToDraw.entityType;
 
             if (jercTypeNew != null)
-                return new ObjectToDraw(verticesToDrawNew, (JercTypes)jercTypeNew);
+                return new ObjectToDraw(verticesToDrawNew, zAxisAverage, (JercTypes)jercTypeNew);
             else if (entityTypeNew != null)
-                return new ObjectToDraw(verticesToDrawNew, (EntityTypes)entityTypeNew);
+                return new ObjectToDraw(verticesToDrawNew, zAxisAverage, (EntityTypes)entityTypeNew);
             else
                 return null;
         }
