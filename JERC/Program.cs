@@ -308,15 +308,15 @@ namespace JERC
             var levelHeights = new List<LevelHeight>();
 
             var jercDividerEntities = vmfRequiredData.jercDividerEntities.ToList();
-            if (jercDividerEntities.Count() == 0)
-                return null;
+            /*if (jercDividerEntities.Count() == 0)
+                return null;*/
 
             var numOfOverviewLevels = jercDividerEntities.Count() + 1;
             for (int i = 0; i < numOfOverviewLevels; i++)
             {
                 var overviewLevelName = string.Empty;
 
-                var valueDiff = i - jercConfigValues.defaultLevelNum;
+                var valueDiff = numOfOverviewLevels == 1 ? 0 : (i - jercConfigValues.defaultLevelNum); // set to 0 if there are no dividers
                 if (valueDiff == 0)
                     overviewLevelName = "default";
                 else if (valueDiff < 0)
@@ -436,7 +436,8 @@ namespace JERC
                 levelHeight.zMinForRadarGradient, levelHeight.zMaxForRadarGradient
             );
 
-            graphics.SmoothingMode = SmoothingMode.AntiAlias;
+            //graphics.SmoothingMode = SmoothingMode.AntiAlias;
+            graphics.SmoothingMode = SmoothingMode.HighSpeed;
 
             graphics.SetClip(Rectangle.FromLTRB(0, 0, overviewPositionValues.outputResolution, overviewPositionValues.outputResolution));
 
@@ -469,11 +470,11 @@ namespace JERC
             )).ToList();
 
 
-            var allBrushSidesExceptRemove = brushPathAndOverlapSideList.Concat(brushCoverList.SelectMany(x => x.brushSides)).ToList();
-            var allDisplacementSidesExceptRemove = displacementPathAndOverlapSideList.Concat(displacementCoverList.SelectMany(x => x.brushSides)).ToList();
+            var brushesToDrawPathAndOverlap = GetBrushesToDraw(boundingBox, brushPathAndOverlapSideList);
+            var displacementsToDrawPathAndOverlap = GetBrushesToDraw(boundingBox, displacementPathAndOverlapSideList);
 
-            var brushesToDraw = GetBrushesToDraw(bmp, graphics, boundingBox, allBrushSidesExceptRemove);
-            var displacementsToDraw = GetBrushesToDraw(bmp, graphics, boundingBox, allDisplacementSidesExceptRemove);
+            var brushesToDrawCover = GetBrushesToDraw(boundingBox, brushCoverList.SelectMany(x => x.brushSides).ToList());
+            var displacementsToDrawCover = GetBrushesToDraw(boundingBox, displacementCoverList.SelectMany(x => x.brushSides).ToList());
 
             // get all entity sides to draw
             var entityBrushSideListByIdUnfiltered = GetEntityVerticesListById();
@@ -491,29 +492,40 @@ namespace JERC
             AddRemoveRegion(bmp, graphics, brushRemoveList);
             AddRemoveRegion(bmp, graphics, displacementRemoveList);
 
-            // non-remove stuff (for stroke)
+            // path and overlap brush stuff (for stroke)
             if (jercConfigValues.strokeAroundLayoutMaterials)
             {
-                foreach (var brushToRender in brushesToDraw.Where(x => x.jercType == JercTypes.Path || x.jercType == JercTypes.Overlap))
+                foreach (var brushToRender in brushesToDrawPathAndOverlap.Where(x => x.jercType == JercTypes.Path || x.jercType == JercTypes.Overlap))
                 {
                     DrawStroke(graphics, brushToRender, Colours.ColourBrushesStroke());
                 }
 
-                foreach (var displacementToRender in displacementsToDraw.Where(x => x.jercType == JercTypes.Path || x.jercType == JercTypes.Overlap))
+                foreach (var displacementToRender in displacementsToDrawPathAndOverlap.Where(x => x.jercType == JercTypes.Path || x.jercType == JercTypes.Overlap))
                 {
                     DrawStroke(graphics, displacementToRender, Colours.ColourBrushesStroke());
                 }
             }
 
-            // non-remove stuff next
-            foreach (var brushToRender in brushesToDraw)
+            // path and overlap brush stuff
+            foreach (var brushToRender in brushesToDrawPathAndOverlap)
             {
-                DrawFilledPolygonGradient(graphics, brushToRender);
+                DrawFilledPolygonGradient(graphics, brushToRender, true);
             }
 
-            foreach (var displacementToRender in displacementsToDraw)
+            foreach (var displacementToRender in displacementsToDrawPathAndOverlap)
             {
-                DrawFilledPolygonGradient(graphics, displacementToRender);
+                DrawFilledPolygonGradient(graphics, displacementToRender, true);
+            }
+
+            // cover brush stuff
+            foreach (var brushToRender in brushesToDrawCover)
+            {
+                DrawFilledPolygonGradient(graphics, brushToRender, false);
+            }
+
+            foreach (var displacementToRender in displacementsToDrawCover)
+            {
+                DrawFilledPolygonGradient(graphics, displacementToRender, false);
             }
 
 
@@ -522,7 +534,7 @@ namespace JERC
 
 
             // entities next
-            var entitiesToDraw = GetEntitiesToDraw(bmp, graphics, boundingBox, overviewPositionValues, entityBrushSideListById);
+            var entitiesToDraw = GetEntitiesToDraw(overviewPositionValues, entityBrushSideListById);
 
             // stroke
             if (jercConfigValues.strokeAroundEntities)
@@ -551,7 +563,7 @@ namespace JERC
             // normal
             foreach (var entityToRender in entitiesToDraw)
             {
-                DrawFilledPolygonGradient(graphics, entityToRender);
+                DrawFilledPolygonGradient(graphics, entityToRender, true);
             }
 
             graphics.Save();
@@ -1129,7 +1141,7 @@ namespace JERC
         }
 
 
-        private static List<ObjectToDraw> GetBrushesToDraw(Bitmap bmp, Graphics graphics, BoundingBox boundingBox, List<BrushSide> brushSidesList)
+        private static List<ObjectToDraw> GetBrushesToDraw(BoundingBox boundingBox, List<BrushSide> brushSidesList)
         {
             var brushesToDraw = new List<ObjectToDraw>();
 
@@ -1173,6 +1185,8 @@ namespace JERC
                         JercTypes.Overlap => Colours.ColourOverlap(TEMPORARYrgbColourOverlap, gradientValue),
                     };
 
+                    verticesOffsetsToUse = verticesOffsetsToUse.Distinct().ToList(); // TODO: doesn't seem to work
+
                     verticesOffsetsToUse.Add(new VerticesToDraw(new Point((int)verticesOffset.x, (int)verticesOffset.y), colour));
                 }
 
@@ -1183,7 +1197,7 @@ namespace JERC
         }
 
 
-        private static List<ObjectToDraw> GetEntitiesToDraw(Bitmap bmp, Graphics graphics, BoundingBox boundingBox, OverviewPositionValues overviewPositionValues, Dictionary<int, List<EntityBrushSide>> entityBrushSideListById)
+        private static List<ObjectToDraw> GetEntitiesToDraw(OverviewPositionValues overviewPositionValues, Dictionary<int, List<EntityBrushSide>> entityBrushSideListById)
         {
             var entitiesToDraw = new List<ObjectToDraw>();
 
@@ -1210,6 +1224,8 @@ namespace JERC
                         verticesOffsetsToUse.Add(new VerticesToDraw(new Point((int)verticesOffset.x, (int)verticesOffset.y), colour));
                     }
 
+                    verticesOffsetsToUse = verticesOffsetsToUse.Distinct().ToList(); // TODO: doesn't seem to work
+
                     entitiesToDraw.Add(new ObjectToDraw(verticesOffsetsToUse, entityBrushSide.entityType));
                 }
             }
@@ -1230,7 +1246,7 @@ namespace JERC
         }
 
 
-        private static void DrawFilledPolygonGradient(Graphics graphics, ObjectToDraw objectToDraw)
+        private static void DrawFilledPolygonGradient(Graphics graphics, ObjectToDraw objectToDraw, bool drawAroundEdge)
         {
             // Make the points for a polygon.
             var vertices = objectToDraw.verticesToDraw.Select(x => x.vertices).ToList();
@@ -1278,8 +1294,31 @@ namespace JERC
                 pathBrush.CenterColor = averageColour;
                 pathBrush.SurroundColors = colours.ToArray();
 
-                // Fill the hexagon.
+                // Fill the hexagon
                 graphics.FillPolygon(pathBrush, verticesArray);
+
+                // Draw border of the hexagon
+                if (drawAroundEdge)
+                {
+                    var verticesToDrawList = objectToDraw.verticesToDraw;
+                    for (int i = 0; i < verticesToDrawList.Count(); i++)
+                    {
+                        var verticesToDraw1 = verticesToDrawList[i];
+                        var verticesToDraw2 = (i == verticesToDrawList.Count() - 1) ? verticesToDrawList[0] : verticesToDrawList[i + 1];
+
+                        if (verticesToDraw1.vertices == verticesToDraw2.vertices)
+                            continue;
+
+                        using (LinearGradientBrush linearBrush = new LinearGradientBrush(verticesToDraw1.vertices, verticesToDraw2.vertices, verticesToDraw1.colour, verticesToDraw2.colour))
+                        {
+                            Pen pen = new Pen(linearBrush);
+
+                            graphics.DrawLine(pen, verticesToDraw1.vertices, verticesToDraw2.vertices);
+
+                            pen?.Dispose();
+                        }
+                    }
+                }
             }
         }
 
