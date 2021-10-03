@@ -1,4 +1,4 @@
-@PointClass iconsprite("jerc/editor/jerc_configure.vmt") color(150 224 100) = jerc_configure : 
+@PointClass iconsprite("jerc/editor/jerc_config.vmt") color(150 224 100) = jerc_config : 
 	"JERC - Configure the main functionality."
 [
 	alternateOutputPath(string) report : "Alternate Output Path" : "" : "An alternate output path. Leave blank if you want to output to /csgo/resources/overviews only"

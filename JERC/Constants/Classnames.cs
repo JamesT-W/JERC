@@ -13,7 +13,7 @@ namespace JERC.Constants
         public static readonly string ClassnameCTSpawn = "info_player_counterterrorist";
         public static readonly string ClassnameTSpawn = "info_player_terrorist";
 
-        public static readonly string JercConfigure = "jerc_configure";
+        public static readonly string JercConfig = "jerc_config";
         public static readonly string JercDivider = "jerc_divider";
         public static readonly string JercFloor = "jerc_floor";
         public static readonly string JercCeiling = "jerc_ceiling";

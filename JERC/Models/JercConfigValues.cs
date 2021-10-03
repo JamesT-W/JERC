@@ -39,7 +39,7 @@ namespace JERC.Models
 
         public JercConfigValues(Dictionary<string, string> jercEntitySettingsValues, int jercDividerCount)
         {
-            // jerc_configure
+            // jerc_config
 
             alternateOutputPath = string.IsNullOrWhiteSpace(jercEntitySettingsValues["alternateOutputPath"]) ? null : jercEntitySettingsValues["alternateOutputPath"];
             onlyOutputToAlternatePath = jercEntitySettingsValues["onlyOutputToAlternatePath"] == "0";

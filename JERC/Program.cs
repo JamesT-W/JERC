@@ -169,12 +169,12 @@ namespace JERC
             var tSpawnEntities = GetEntitiesByClassname(allEntities, Classnames.ClassnameTSpawn);
 
             // entities (JERC)
-            var jercConfigureEntities = GetEntitiesByClassname(allEntities, Classnames.JercConfigure);
+            var jercConfigEntities = GetEntitiesByClassname(allEntities, Classnames.JercConfig);
             var jercDividerEntities = GetEntitiesByClassname(allEntities, Classnames.JercDivider);
             var jercFloorEntities = GetEntitiesByClassname(allEntities, Classnames.JercFloor);
             var jercCeilingEntities = GetEntitiesByClassname(allEntities, Classnames.JercCeiling);
 
-            var allJercEntities = jercConfigureEntities.Concat(jercDividerEntities).Concat(jercFloorEntities).Concat(jercCeilingEntities);
+            var allJercEntities = jercConfigEntities.Concat(jercDividerEntities).Concat(jercFloorEntities).Concat(jercCeilingEntities);
 
             jercConfigValues = new JercConfigValues(GetSettingsValuesFromJercEntities(allJercEntities), jercDividerEntities.Count());
 
@@ -182,7 +182,7 @@ namespace JERC
                 brushesRemove, brushesPath, brushesCover, brushesOverlap,
                 displacementsRemove, displacementsPath, displacementsCover, displacementsOverlap,
                 buyzoneBrushEntities, bombsiteBrushEntities, rescueZoneBrushEntities, hostageEntities, ctSpawnEntities, tSpawnEntities,
-                jercConfigureEntities, jercDividerEntities, jercFloorEntities, jercCeilingEntities
+                jercConfigEntities, jercDividerEntities, jercFloorEntities, jercCeilingEntities
             );
         }
 
@@ -191,34 +191,34 @@ namespace JERC
         {
             var jercEntitySettingsValues = new Dictionary<string, string>();
 
-            // jerc_configure
-            var jercConfigure = jercEntities.FirstOrDefault(x => x.Body.Any(y => y.Name == "classname" && y.Value == Classnames.JercConfigure)).Body;
+            // jerc_config
+            var jercConfig = jercEntities.FirstOrDefault(x => x.Body.Any(y => y.Name == "classname" && y.Value == Classnames.JercConfig)).Body;
 
-            jercEntitySettingsValues.Add("alternateOutputPath", jercConfigure.FirstOrDefault(x => x.Name == "alternateOutputPath")?.Value ?? string.Empty);
-            jercEntitySettingsValues.Add("onlyOutputToAlternatePath", jercConfigure.FirstOrDefault(x => x.Name == "onlyOutputToAlternatePath")?.Value);
-            jercEntitySettingsValues.Add("backgroundFilename", jercConfigure.FirstOrDefault(x => x.Name == "backgroundFilename")?.Value ?? string.Empty);
-            jercEntitySettingsValues.Add("pathColourHigh", jercConfigure.FirstOrDefault(x => x.Name == "pathColourHigh")?.Value);
-            jercEntitySettingsValues.Add("pathColourLow", jercConfigure.FirstOrDefault(x => x.Name == "pathColourLow")?.Value);
-            jercEntitySettingsValues.Add("coverColourHigh", jercConfigure.FirstOrDefault(x => x.Name == "coverColourHigh")?.Value);
-            jercEntitySettingsValues.Add("coverColourLow", jercConfigure.FirstOrDefault(x => x.Name == "coverColourLow")?.Value);
-            jercEntitySettingsValues.Add("overlapColourHigh", jercConfigure.FirstOrDefault(x => x.Name == "overlapColourHigh")?.Value);
-            jercEntitySettingsValues.Add("overlapColourLow", jercConfigure.FirstOrDefault(x => x.Name == "overlapColourLow")?.Value);
-            jercEntitySettingsValues.Add("strokeWidth", jercConfigure.FirstOrDefault(x => x.Name == "strokeWidth")?.Value);
-            jercEntitySettingsValues.Add("strokeColour", jercConfigure.FirstOrDefault(x => x.Name == "strokeColour")?.Value);
-            jercEntitySettingsValues.Add("strokeAroundLayoutMaterials", jercConfigure.FirstOrDefault(x => x.Name == "strokeAroundLayoutMaterials")?.Value);
-            jercEntitySettingsValues.Add("strokeAroundRemoveMaterials", jercConfigure.FirstOrDefault(x => x.Name == "strokeAroundRemoveMaterials")?.Value);
-            jercEntitySettingsValues.Add("strokeAroundEntities", jercConfigure.FirstOrDefault(x => x.Name == "strokeAroundEntities")?.Value);
-            jercEntitySettingsValues.Add("defaultLevelNum", jercConfigure.FirstOrDefault(x => x.Name == "defaultLevelNum")?.Value);
-            jercEntitySettingsValues.Add("levelBackgroundEnabled", jercConfigure.FirstOrDefault(x => x.Name == "levelBackgroundEnabled")?.Value);
-            jercEntitySettingsValues.Add("levelBackgroundDarkenAlpha", jercConfigure.FirstOrDefault(x => x.Name == "levelBackgroundDarkenAlpha")?.Value);
-            jercEntitySettingsValues.Add("levelBackgroundBlurAmount", jercConfigure.FirstOrDefault(x => x.Name == "levelBackgroundBlurAmount")?.Value);
-            jercEntitySettingsValues.Add("higherLevelOutputName", jercConfigure.FirstOrDefault(x => x.Name == "higherLevelOutputName")?.Value);
-            jercEntitySettingsValues.Add("lowerLevelOutputName", jercConfigure.FirstOrDefault(x => x.Name == "lowerLevelOutputName")?.Value);
-            jercEntitySettingsValues.Add("exportTxt", jercConfigure.FirstOrDefault(x => x.Name == "exportTxt")?.Value);
-            jercEntitySettingsValues.Add("exportDds", jercConfigure.FirstOrDefault(x => x.Name == "exportDds")?.Value);
-            jercEntitySettingsValues.Add("exportPng", jercConfigure.FirstOrDefault(x => x.Name == "exportPng")?.Value);
-            jercEntitySettingsValues.Add("exportRadarAsSeparateLevels", jercConfigure.FirstOrDefault(x => x.Name == "exportRadarAsSeparateLevels")?.Value);
-            jercEntitySettingsValues.Add("exportBackgroundLevelsImage", jercConfigure.FirstOrDefault(x => x.Name == "exportBackgroundLevelsImage")?.Value);
+            jercEntitySettingsValues.Add("alternateOutputPath", jercConfig.FirstOrDefault(x => x.Name == "alternateOutputPath")?.Value ?? string.Empty);
+            jercEntitySettingsValues.Add("onlyOutputToAlternatePath", jercConfig.FirstOrDefault(x => x.Name == "onlyOutputToAlternatePath")?.Value);
+            jercEntitySettingsValues.Add("backgroundFilename", jercConfig.FirstOrDefault(x => x.Name == "backgroundFilename")?.Value ?? string.Empty);
+            jercEntitySettingsValues.Add("pathColourHigh", jercConfig.FirstOrDefault(x => x.Name == "pathColourHigh")?.Value);
+            jercEntitySettingsValues.Add("pathColourLow", jercConfig.FirstOrDefault(x => x.Name == "pathColourLow")?.Value);
+            jercEntitySettingsValues.Add("coverColourHigh", jercConfig.FirstOrDefault(x => x.Name == "coverColourHigh")?.Value);
+            jercEntitySettingsValues.Add("coverColourLow", jercConfig.FirstOrDefault(x => x.Name == "coverColourLow")?.Value);
+            jercEntitySettingsValues.Add("overlapColourHigh", jercConfig.FirstOrDefault(x => x.Name == "overlapColourHigh")?.Value);
+            jercEntitySettingsValues.Add("overlapColourLow", jercConfig.FirstOrDefault(x => x.Name == "overlapColourLow")?.Value);
+            jercEntitySettingsValues.Add("strokeWidth", jercConfig.FirstOrDefault(x => x.Name == "strokeWidth")?.Value);
+            jercEntitySettingsValues.Add("strokeColour", jercConfig.FirstOrDefault(x => x.Name == "strokeColour")?.Value);
+            jercEntitySettingsValues.Add("strokeAroundLayoutMaterials", jercConfig.FirstOrDefault(x => x.Name == "strokeAroundLayoutMaterials")?.Value);
+            jercEntitySettingsValues.Add("strokeAroundRemoveMaterials", jercConfig.FirstOrDefault(x => x.Name == "strokeAroundRemoveMaterials")?.Value);
+            jercEntitySettingsValues.Add("strokeAroundEntities", jercConfig.FirstOrDefault(x => x.Name == "strokeAroundEntities")?.Value);
+            jercEntitySettingsValues.Add("defaultLevelNum", jercConfig.FirstOrDefault(x => x.Name == "defaultLevelNum")?.Value);
+            jercEntitySettingsValues.Add("levelBackgroundEnabled", jercConfig.FirstOrDefault(x => x.Name == "levelBackgroundEnabled")?.Value);
+            jercEntitySettingsValues.Add("levelBackgroundDarkenAlpha", jercConfig.FirstOrDefault(x => x.Name == "levelBackgroundDarkenAlpha")?.Value);
+            jercEntitySettingsValues.Add("levelBackgroundBlurAmount", jercConfig.FirstOrDefault(x => x.Name == "levelBackgroundBlurAmount")?.Value);
+            jercEntitySettingsValues.Add("higherLevelOutputName", jercConfig.FirstOrDefault(x => x.Name == "higherLevelOutputName")?.Value);
+            jercEntitySettingsValues.Add("lowerLevelOutputName", jercConfig.FirstOrDefault(x => x.Name == "lowerLevelOutputName")?.Value);
+            jercEntitySettingsValues.Add("exportTxt", jercConfig.FirstOrDefault(x => x.Name == "exportTxt")?.Value);
+            jercEntitySettingsValues.Add("exportDds", jercConfig.FirstOrDefault(x => x.Name == "exportDds")?.Value);
+            jercEntitySettingsValues.Add("exportPng", jercConfig.FirstOrDefault(x => x.Name == "exportPng")?.Value);
+            jercEntitySettingsValues.Add("exportRadarAsSeparateLevels", jercConfig.FirstOrDefault(x => x.Name == "exportRadarAsSeparateLevels")?.Value);
+            jercEntitySettingsValues.Add("exportBackgroundLevelsImage", jercConfig.FirstOrDefault(x => x.Name == "exportBackgroundLevelsImage")?.Value);
 
 
             // 
