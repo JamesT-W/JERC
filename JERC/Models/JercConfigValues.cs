@@ -21,8 +21,9 @@ namespace JERC.Models
         public Color overlapColourLow;
         public int strokeWidth;
         public Color strokeColour;
-        public bool strokeAroundPathOverlapMaterials;
+        public bool strokeAroundLayoutMaterials;
         public bool strokeAroundRemoveMaterials;
+        public bool strokeAroundEntities;
         public int defaultLevelNum;
         public bool levelBackgroundEnabled;
         public int levelBackgroundDarkenAlpha;
@@ -53,8 +54,9 @@ namespace JERC.Models
                 strokeWidth = defaultStrokeWidthMultiplier;*/
             strokeWidth = int.Parse(jercEntitySettingsValues["strokeWidth"]);
             strokeColour = GetColourStringAsColour(jercEntitySettingsValues["strokeColour"]);
-            strokeAroundPathOverlapMaterials = jercEntitySettingsValues["strokeAroundPathOverlapMaterials"] == "0";
+            strokeAroundLayoutMaterials = jercEntitySettingsValues["strokeAroundLayoutMaterials"] == "0";
             strokeAroundRemoveMaterials = jercEntitySettingsValues["strokeAroundRemoveMaterials"] == "0";
+            strokeAroundEntities = jercEntitySettingsValues["strokeAroundEntities"] == "0";
 
             defaultLevelNum = int.Parse(jercEntitySettingsValues["defaultLevelNum"]);
             if (defaultLevelNum < 0)

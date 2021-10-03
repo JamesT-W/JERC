@@ -33,13 +33,19 @@
 	
 	strokeColour(color255) : "Stroke Colour" : "255 255 255 255" : "Colour of the stroke"
 
-	strokeAroundPathOverlapMaterials(choices) : "Stroke Around Path & Overlap Materials" : 0 =
+	strokeAroundLayoutMaterials(choices) : "Stroke Around Path and Overlap Materials" : 0 =
 	[
 		0: "Yes"
 		1: "No"
 	]
 
-	strokeAroundRemoveMaterials(choices) : "Stroke Around Remove Materials" : 0 =
+	strokeAroundRemoveMaterials(choices) : "Stroke Around Remove Materials" : 1 =
+	[
+		0: "Yes"
+		1: "No"
+	]
+
+	strokeAroundEntities(choices) : "Stroke Around Entities" : 0 =
 	[
 		0: "Yes"
 		1: "No"

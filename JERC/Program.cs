@@ -205,8 +205,9 @@ namespace JERC
             jercEntitySettingsValues.Add("overlapColourLow", jercConfigure.FirstOrDefault(x => x.Name == "overlapColourLow")?.Value);
             jercEntitySettingsValues.Add("strokeWidth", jercConfigure.FirstOrDefault(x => x.Name == "strokeWidth")?.Value);
             jercEntitySettingsValues.Add("strokeColour", jercConfigure.FirstOrDefault(x => x.Name == "strokeColour")?.Value);
-            jercEntitySettingsValues.Add("strokeAroundPathOverlapMaterials", jercConfigure.FirstOrDefault(x => x.Name == "strokeAroundPathOverlapMaterials")?.Value);
+            jercEntitySettingsValues.Add("strokeAroundLayoutMaterials", jercConfigure.FirstOrDefault(x => x.Name == "strokeAroundLayoutMaterials")?.Value);
             jercEntitySettingsValues.Add("strokeAroundRemoveMaterials", jercConfigure.FirstOrDefault(x => x.Name == "strokeAroundRemoveMaterials")?.Value);
+            jercEntitySettingsValues.Add("strokeAroundEntities", jercConfigure.FirstOrDefault(x => x.Name == "strokeAroundEntities")?.Value);
             jercEntitySettingsValues.Add("defaultLevelNum", jercConfigure.FirstOrDefault(x => x.Name == "defaultLevelNum")?.Value);
             jercEntitySettingsValues.Add("levelBackgroundEnabled", jercConfigure.FirstOrDefault(x => x.Name == "levelBackgroundEnabled")?.Value);
             jercEntitySettingsValues.Add("levelBackgroundDarkenAlpha", jercConfigure.FirstOrDefault(x => x.Name == "levelBackgroundDarkenAlpha")?.Value);
@@ -491,7 +492,7 @@ namespace JERC
             AddRemoveRegion(bmp, graphics, displacementRemoveList);
 
             // non-remove stuff (for stroke)
-            if (jercConfigValues.strokeAroundPathOverlapMaterials)
+            if (jercConfigValues.strokeAroundLayoutMaterials)
             {
                 foreach (var brushToRender in brushesToDraw.Where(x => x.jercType == JercTypes.Path || x.jercType == JercTypes.Overlap))
                 {
@@ -524,7 +525,7 @@ namespace JERC
             var entitiesToDraw = GetEntitiesToDraw(bmp, graphics, boundingBox, overviewPositionValues, entityBrushSideListById);
 
             // stroke
-            if (jercConfigValues.strokeAroundPathOverlapMaterials)
+            if (jercConfigValues.strokeAroundEntities)
             {
                 foreach (var entityToRender in entitiesToDraw)
                 {
