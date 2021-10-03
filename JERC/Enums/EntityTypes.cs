@@ -8,8 +8,9 @@ namespace JERC.Enums
 {
     public enum EntityTypes
     {
-        Buyzone = 1,
-        Bombsite = 2,
-        RescueZone = 4
+        None = 1,
+        Buyzone = 2,
+        Bombsite = 4,
+        RescueZone = 8
     }
 }

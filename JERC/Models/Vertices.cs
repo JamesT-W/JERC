@@ -5,7 +5,7 @@ using System.Text;
 
 namespace JERC.Models
 {
-    public class Vertices
+    public class Vertices : IEquatable<Vertices>
     {
         public float x;
         public float y;
@@ -34,6 +34,25 @@ namespace JERC.Models
         {
             this.x = x;
             this.y = y;
+        }
+
+
+        public bool Equals(Vertices other)
+        {
+            if (x == other.x && y == other.y && z == other.z)
+                return true;
+
+            return false;
+        }
+
+
+        public override int GetHashCode()
+        {
+            int hashX = x == 0 ? 0 : x.GetHashCode();
+            int hashY = y == 0 ? 0 : y.GetHashCode();
+            int hashZ = z == 0 ? 0 : z.GetHashCode();
+
+            return hashX ^ hashY ^ hashZ;
         }
     }
 }

@@ -1,4 +1,4 @@
-using ImageAlterer;
+﻿using ImageAlterer;
 using JERC.Constants;
 using JERC.Enums;
 using JERC.Models;
@@ -468,22 +468,61 @@ namespace JERC
             )).ToList();
 
 
-            var allBrushSidesExceptRemove = brushPathAndOverlapSideList.Concat(brushCoverList.SelectMany(x => x.brushSides)).ToList();
-            var allDisplacementSidesExceptRemove = displacementPathAndOverlapSideList.Concat(displacementCoverList.SelectMany(x => x.brushSides)).ToList();
+            var brushCoverSideList = brushCoverList.SelectMany(x => x.brushSides).ToList();
+            var displacementCoverSideList = displacementCoverList.SelectMany(x => x.brushSides).ToList();
 
-            var brushesToDraw = GetBrushesToDraw(bmp, graphics, boundingBox, allBrushSidesExceptRemove);
-            var displacementsToDraw = GetBrushesToDraw(bmp, graphics, boundingBox, allDisplacementSidesExceptRemove);
+            // correct vertices 1
+            CorrectVerticesBrush(brushPathAndOverlapSideList);
+            CorrectVerticesBrush(displacementPathAndOverlapSideList);
+            CorrectVerticesBrush(brushCoverSideList);
+            CorrectVerticesBrush(displacementCoverSideList);
+
+
+            var allBrushSidesPathAndOverlap = brushPathAndOverlapSideList.Concat(brushCoverList.SelectMany(x => x.brushSides)).ToList();
+            var allDisplacementSidesPathAndOverlap = displacementPathAndOverlapSideList.Concat(displacementCoverList.SelectMany(x => x.brushSides)).ToList();
+
+            var brushesToDraw = GetBrushesToDraw(bmp, graphics, boundingBox, allBrushSidesPathAndOverlap);
+            var displacementsToDraw = GetBrushesToDraw(bmp, graphics, boundingBox, allDisplacementSidesPathAndOverlap);
 
             // get all entity sides to draw
-            var entityBrushSideListByIdUnfiltered = GetEntityVerticesListById();
-            var entityBrushSideListById = new Dictionary<int, List<EntityBrushSide>>();
-            foreach (var entityBrushSideById in entityBrushSideListByIdUnfiltered)
+            var buyzoneEntityBrushList = GetEntityBrushList(vmfRequiredData.buyzoneBrushEntities, EntityTypes.Buyzone);
+            var bombsiteEntityBrushList = GetEntityBrushList(vmfRequiredData.bombsiteBrushEntities, EntityTypes.Bombsite);
+            var rescueZoneEntityBrushList = GetEntityBrushList(vmfRequiredData.rescueZoneBrushEntities, EntityTypes.RescueZone);
+
+            var buyzoneEntityBrushListThisLevel = new List<EntityBrush>();
+            var bombsiteEntityBrushListThisLevel = new List<EntityBrush>();
+            var rescueZoneEntityBrushListThisLevel = new List<EntityBrush>();
+
+            foreach (var buyzoneEntityBrush in buyzoneEntityBrushList)
             {
-                if (entityBrushSideById.Value.Any(x => !((x.vertices.All(y => y.z < levelHeight.zMinForRadar) && x.vertices.All(y => y.z < levelHeight.zMaxForRadar)) || (x.vertices.All(y => y.z >= levelHeight.zMinForRadar) && x.vertices.All(y => y.z >= levelHeight.zMaxForRadar))))) // would this allow entities to be on more than 1 level if their brushes span across level dividers ??
+                if (buyzoneEntityBrush.entityBrushSides.Any(x => !(x.vertices.All(y => y.z < levelHeight.zMinForRadar) || x.vertices.All(y => y.z >= levelHeight.zMaxForRadar)))) // would this allow entities to be on more than 1 level if their brushes span across level dividers ??
                 {
-                    entityBrushSideListById.Add(entityBrushSideById.Key, entityBrushSideById.Value);
+                    buyzoneEntityBrushListThisLevel.Add(buyzoneEntityBrush);
                 }
             }
+
+            foreach (var bombsiteEntityBrush in bombsiteEntityBrushList)
+            {
+                if (bombsiteEntityBrush.entityBrushSides.Any(x => !(x.vertices.All(y => y.z < levelHeight.zMinForRadar) || x.vertices.All(y => y.z >= levelHeight.zMaxForRadar)))) // would this allow entities to be on more than 1 level if their brushes span across level dividers ??
+                {
+                    bombsiteEntityBrushListThisLevel.Add(bombsiteEntityBrush);
+                }
+            }
+
+            foreach (var rescueZoneEntityBrush in rescueZoneEntityBrushList)
+            {
+                if (rescueZoneEntityBrush.entityBrushSides.Any(x => !(x.vertices.All(y => y.z < levelHeight.zMinForRadar) || x.vertices.All(y => y.z >= levelHeight.zMaxForRadar)))) // would this allow entities to be on more than 1 level if their brushes span across level dividers ??
+                {
+                    rescueZoneEntityBrushListThisLevel.Add(rescueZoneEntityBrush);
+                }
+            }
+
+
+            // correct vertices 2
+            CorrectVerticesBrushVolume(brushRemoveList);
+            CorrectVerticesBrushVolume(displacementRemoveList);
+            //CorrectRemoveVertices(brushCoverList);
+            //CorrectRemoveVertices(displacementCoverList);
 
 
             // add remove stuff first to set to graphics' clip
@@ -523,17 +562,26 @@ namespace JERC
             ////graphics.ResetClip();
 
 
+            // correct vertices 3
+            CorrectVerticesEntityBrush(buyzoneEntityBrushListThisLevel.SelectMany(x => x.entityBrushSides).ToList());
+            CorrectVerticesEntityBrush(bombsiteEntityBrushListThisLevel.SelectMany(x => x.entityBrushSides).ToList());
+            CorrectVerticesEntityBrush(rescueZoneEntityBrushListThisLevel.SelectMany(x => x.entityBrushSides).ToList());
+
+
             // entities next
-            var entitiesToDraw = GetEntitiesToDraw(bmp, graphics, boundingBox, overviewPositionValues, entityBrushSideListById);
+            /*var buyzoneEntityBrushSidesToDraw = GetEntityBrushSidesToDraw(buyzoneEntityBrushListThisLevel);
+            var bombsiteEntityBrushSidesToDraw = GetEntityBrushSidesToDraw(bombsiteEntityBrushListThisLevel);
+            var rescueZoneEntityBrushSidesToDraw = GetEntityBrushSidesToDraw(rescueZoneEntityBrushListThisLevel);*/
+            var entityBrushSidesToDraw = GetEntityBrushSidesToDraw(buyzoneEntityBrushListThisLevel.Concat(bombsiteEntityBrushListThisLevel).Concat(rescueZoneEntityBrushListThisLevel).ToList());
 
             // stroke
             if (jercConfigValues.strokeAroundMainMaterials)
             {
-                foreach (var entityToRender in entitiesToDraw)
+                foreach (var entityBrushSideToRender in entityBrushSidesToDraw)
                 {
                     Color colour = Color.White;
 
-                    switch (entityToRender.entityType)
+                    switch (entityBrushSideToRender.entityType)
                     {
                         case EntityTypes.Buyzone:
                             colour = Colours.ColourBuyzonesStroke();
@@ -546,15 +594,127 @@ namespace JERC
                             break;
                     }
 
-                    DrawStroke(graphics, entityToRender, colour);
+                    DrawStroke(graphics, entityBrushSideToRender, colour);
                 }
             }
 
             // normal
-            foreach (var entityToRender in entitiesToDraw)
+            foreach (var entityBrushSideToRender in entityBrushSidesToDraw)
             {
-                DrawFilledPolygonGradient(graphics, entityToRender);
+                switch (entityBrushSideToRender.entityType)
+                {
+                    case EntityTypes.Buyzone:
+                        DrawFilledPolygonObjectBrushes(graphics, SolidBrushColours.SolidBrushBuyzones(), PenColours.PenBuyzones(), entityBrushSideToRender.verticesToDraw.Select(x => new Point((int)x.vertices.X, (int)x.vertices.Y)).ToArray());
+                            //(x => new Point((int)x.vertices     //.Select(x => new Point((int)x.X, (int)x.Y)).ToArray());
+                        break;
+                    case EntityTypes.Bombsite:
+                        DrawFilledPolygonObjectBrushes(graphics, SolidBrushColours.SolidBrushBombsites(), PenColours.PenBombsites(), entityBrushSideToRender.verticesToDraw.Select(x => new Point((int)x.vertices.X, (int)x.vertices.Y)).ToArray());
+                        break;
+                    case EntityTypes.RescueZone:
+                        DrawFilledPolygonObjectBrushes(graphics, SolidBrushColours.SolidBrushRescueZones(), PenColours.PenRescueZones(), entityBrushSideToRender.verticesToDraw.Select(x => new Point((int)x.vertices.X, (int)x.vertices.Y)).ToArray());
+                        break;
+                }
             }
+
+
+            graphics.Save();
+
+
+            // remove overlap strokes for remove brushes
+            if (jercConfigValues.strokeAroundMainMaterials)
+            {
+                var allVerticesOnLinesRemove = brushRemoveList.Concat(displacementRemoveList).SelectMany(x => x.brushSides.Where(x => x.jercType == JercTypes.Remove)).SelectMany(x => x.brushLines.SelectMany(y => y.verticesOnLine)).ToList();
+                var duplicateVerticesRemove = allVerticesOnLinesRemove.GroupBy(a => new { a.x, a.y }).Where(a => a.Count() > 1).SelectMany(a => a).Distinct().ToList();
+
+                foreach (var vertices in duplicateVerticesRemove)
+                {
+                    bmp.SetPixel((int)vertices.x, (int)vertices.y, Colours.ColourRemove());
+                }
+            }
+
+            // remove overlap strokes for entity brushes
+            if (jercConfigValues.strokeAroundMainMaterials)
+            {
+                foreach (var entityBrushSideToRender in entityBrushSidesToDraw)
+                {
+                    var allVerticesOnLinesEntity = entityBrushSideToRender.brushLines.SelectMany(y => y.verticesOnLine).ToList();
+
+                    foreach (var entityBrushSideToRender2 in entityBrushSidesToDraw.Where(x => x.entityBrushId != entityBrushSideToRender.entityBrushId))
+                    {
+                        if (entityBrushSideToRender.entityId == entityBrushSideToRender2.entityId || entityBrushSideToRender.entityBrushId == entityBrushSideToRender2.entityBrushId)
+                            continue;
+
+
+
+
+                        var aaa = entityBrushSideToRender2.verticesToDraw.Where(x => x.vertices.X >= 1015 && x.vertices.X <= 1022).ToList();
+
+
+
+
+
+
+                        var allVerticesOnLinesEntity2 = entityBrushSideToRender2.brushLines.SelectMany(y => y.verticesOnLine).ToList();
+
+                        foreach (var vertices in allVerticesOnLinesEntity2)
+                        {
+                            if (allVerticesOnLinesEntity.Any(x => x == vertices || (x.x == vertices.x && x.y == vertices.y)))
+                            {
+                                // remove stroke
+                                for (float x = (vertices.x - (jercConfigValues.strokeWidth / 2)); x <= (vertices.x + (jercConfigValues.strokeWidth / 2)); x++)
+                                {
+                                    for (float y = (vertices.y - (jercConfigValues.strokeWidth / 2)); y <= (vertices.y + (jercConfigValues.strokeWidth / 2)); y++)
+                                    {
+                                        switch (entityBrushSideToRender.entityType)
+                                        {
+                                            case EntityTypes.Buyzone:
+                                                bmp.SetPixel((int)vertices.x, (int)vertices.y, Colours.ColourBuyzones());
+                                                break;
+                                            case EntityTypes.Bombsite:
+                                                bmp.SetPixel((int)vertices.x, (int)vertices.y, Colours.ColourBombsites());
+                                                break;
+                                            case EntityTypes.RescueZone:
+                                                bmp.SetPixel((int)vertices.x, (int)vertices.y, Colours.ColourRescueZones());
+                                                break;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // add stroke back to all vertices
+                foreach (var entityBrushSideToRender in entityBrushSidesToDraw)
+                {
+                    var allVerticesEntity = entityBrushSideToRender.verticesToDraw.Select(x => x.vertices);
+
+                    foreach (var point in allVerticesEntity)
+                    {
+                        Color colour = Color.White;
+
+                        switch (entityBrushSideToRender.entityType) // vertices.colour
+                        {
+                            case EntityTypes.Buyzone:
+                                colour = Colours.ColourBuyzonesStroke();
+                                break;
+                            case EntityTypes.Bombsite:
+                                colour = Colours.ColourBombsitesStroke();
+                                break;
+                            case EntityTypes.RescueZone:
+                                colour = Colours.ColourRescueZonesStroke();
+                                break;
+                        }
+
+                        var strokePen = new Pen(colour);
+
+                        graphics.DrawLine(strokePen, point, point); //////////////// does this work? maybe use a point directly next to this one as the second point
+
+                        strokePen?.Dispose();
+                    }
+                }
+            }
+
 
             graphics.Save();
 
@@ -564,11 +724,17 @@ namespace JERC
 
         private static void DrawStroke(Graphics graphics, ObjectToDraw objectToDraw, Color colourStroke)
         {
+            DrawStroke(graphics, objectToDraw.verticesToDraw.Select(x => x.vertices).ToArray(), colourStroke);
+        }
+
+
+        private static void DrawStroke(Graphics graphics, Point[] vertices, Color colourStroke)
+        {
             var strokeSolidBrush = new SolidBrush(Color.Transparent);
             var strokePen = new Pen(colourStroke);
             strokePen.Width *= jercConfigValues.strokeWidth;
 
-            DrawFilledPolygonObjectBrushes(graphics, strokeSolidBrush, strokePen, objectToDraw.verticesToDraw.Select(x => x.vertices).ToArray());
+            DrawFilledPolygonObjectBrushes(graphics, strokeSolidBrush, strokePen, vertices);
 
             // dispose
             strokeSolidBrush?.Dispose();
@@ -676,38 +842,38 @@ namespace JERC
         }
 
 
-        private static Dictionary<int, List<EntityBrushSide>> GetEntityVerticesListById()
+        /*private static Dictionary<int, List<EntityBrushSide>> GetEntityVerticesListById()
         {
             var entityBrushSideListById = new Dictionary<int, List<EntityBrushSide>>();
 
-            var entityBuyzoneVerticesListById = GetEntityBuyzoneSidesVerticesList();
-            var entityBombsiteVerticesListById = GetEntityBombsiteSidesVerticesList();
-            var entityRescueZoneVerticesListById = GetEntityRescueZoneSidesVerticesList();
+            var buyzoneEntityBrushList = GetBuyzoneEntityBrushList();
+            var bombsiteEntityBrushList = GetBombsiteEntityBrushList();
+            var rescueZoneEntityBrushList = GetRescueZoneEntityBrushList();
 
-            if (entityBuyzoneVerticesListById != null && entityBuyzoneVerticesListById.Any())
+            if (buyzoneEntityBrushList != null && buyzoneEntityBrushList.Any())
             {
-                foreach (var list in entityBuyzoneVerticesListById)
+                foreach (var list in buyzoneEntityBrushList)
                 {
                     entityBrushSideListById.Add(list.Key, list.Value);
                 }
             }
-            if (entityBombsiteVerticesListById != null && entityBombsiteVerticesListById.Any())
+            if (bombsiteEntityBrushList != null && bombsiteEntityBrushList.Any())
             {
-                foreach (var list in entityBombsiteVerticesListById)
+                foreach (var list in bombsiteEntityBrushList)
                 {
                     entityBrushSideListById.Add(list.Key, list.Value);
                 }
             }
-            if (entityRescueZoneVerticesListById != null && entityRescueZoneVerticesListById.Any())
+            if (rescueZoneEntityBrushList != null && rescueZoneEntityBrushList.Any())
             {
-                foreach (var list in entityRescueZoneVerticesListById)
+                foreach (var list in rescueZoneEntityBrushList)
                 {
                     entityBrushSideListById.Add(list.Key, list.Value);
                 }
             }
 
             return entityBrushSideListById;
-        }
+        }*/
 
 
         private static List<BrushVolume> GetBrushRemoveVerticesList()
@@ -722,7 +888,7 @@ namespace JERC
                     var brushSideNew = new BrushSide();
                     foreach (var vertices in brushSide.vertices_plus.ToList())
                     {
-                        brushSideNew.vertices.Add(new Vertices(vertices.x / Sizes.SizeReductionMultiplier, vertices.y / Sizes.SizeReductionMultiplier, vertices.z));
+                        brushSideNew.AddVertices(new Vertices(vertices.x / Sizes.SizeReductionMultiplier, vertices.y / Sizes.SizeReductionMultiplier, vertices.z));
                         brushSideNew.jercType = JercTypes.Remove;
                     }
 
@@ -749,7 +915,7 @@ namespace JERC
                 {
                     var vert = side.vertices_plus[i];
 
-                    brushSide.vertices.Add(new Vertices(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier, vert.z));
+                    brushSide.AddVertices(new Vertices(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier, vert.z));
                     brushSide.jercType = JercTypes.Remove;
                 }
 
@@ -771,7 +937,7 @@ namespace JERC
                 {
                     var vert = side.vertices_plus[i];
 
-                    brushSide.vertices.Add(new Vertices(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier, vert.z));
+                    brushSide.AddVertices(new Vertices(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier, vert.z));
                     brushSide.jercType = JercTypes.Path;
                 }
 
@@ -794,7 +960,7 @@ namespace JERC
                     var brushSideNew = new BrushSide();
                     foreach (var vertices in brushSide.vertices_plus.ToList())
                     {
-                        brushSideNew.vertices.Add(new Vertices(vertices.x / Sizes.SizeReductionMultiplier, vertices.y / Sizes.SizeReductionMultiplier, vertices.z));
+                        brushSideNew.AddVertices(new Vertices(vertices.x / Sizes.SizeReductionMultiplier, vertices.y / Sizes.SizeReductionMultiplier, vertices.z));
                         brushSideNew.jercType = JercTypes.Cover;
                     }
 
@@ -821,7 +987,7 @@ namespace JERC
                 {
                     var vert = side.vertices_plus[i];
 
-                    brushSide.vertices.Add(new Vertices(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier, vert.z));
+                    brushSide.AddVertices(new Vertices(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier, vert.z));
                     brushSide.jercType = JercTypes.Cover;
                 }
 
@@ -843,7 +1009,7 @@ namespace JERC
                 {
                     var vert = side.vertices_plus[i];
 
-                    brushSide.vertices.Add(new Vertices(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier, vert.z));
+                    brushSide.AddVertices(new Vertices(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier, vert.z));
                     brushSide.jercType = JercTypes.Overlap;
                 }
 
@@ -866,7 +1032,7 @@ namespace JERC
                     var displacementSideNew = new BrushSide();
                     foreach (var vertices in displacementSide.vertices_plus.ToList())
                     {
-                        displacementSideNew.vertices.Add(new Vertices(vertices.x / Sizes.SizeReductionMultiplier, vertices.y / Sizes.SizeReductionMultiplier, vertices.z));
+                        displacementSideNew.AddVertices(new Vertices(vertices.x / Sizes.SizeReductionMultiplier, vertices.y / Sizes.SizeReductionMultiplier, vertices.z));
                         displacementSideNew.jercType = JercTypes.Remove;
                     }
 
@@ -893,7 +1059,7 @@ namespace JERC
                 {
                     var vert = side.vertices_plus[i];
 
-                    displacementSide.vertices.Add(new Vertices(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier, vert.z));
+                    displacementSide.AddVertices(new Vertices(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier, vert.z));
                     displacementSide.jercType = JercTypes.Remove;
                 }
 
@@ -915,7 +1081,7 @@ namespace JERC
                 {
                     var vert = side.vertices_plus[i];
 
-                    displacementSide.vertices.Add(new Vertices(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier, vert.z));
+                    displacementSide.AddVertices(new Vertices(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier, vert.z));
                     displacementSide.jercType = JercTypes.Path;
                 }
 
@@ -938,7 +1104,7 @@ namespace JERC
                     var displacementSideNew = new BrushSide();
                     foreach (var vertices in displacementSide.vertices_plus.ToList())
                     {
-                        displacementSideNew.vertices.Add(new Vertices(vertices.x / Sizes.SizeReductionMultiplier, vertices.y / Sizes.SizeReductionMultiplier, vertices.z));
+                        displacementSideNew.AddVertices(new Vertices(vertices.x / Sizes.SizeReductionMultiplier, vertices.y / Sizes.SizeReductionMultiplier, vertices.z));
                         displacementSideNew.jercType = JercTypes.Cover;
                     }
 
@@ -965,7 +1131,7 @@ namespace JERC
                 {
                     var vert = side.vertices_plus[i];
 
-                    displacementSide.vertices.Add(new Vertices(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier, vert.z));
+                    displacementSide.AddVertices(new Vertices(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier, vert.z));
                     displacementSide.jercType = JercTypes.Cover;
                 }
 
@@ -987,7 +1153,7 @@ namespace JERC
                 {
                     var vert = side.vertices_plus[i];
 
-                    displacementSide.vertices.Add(new Vertices(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier, vert.z));
+                    displacementSide.AddVertices(new Vertices(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier, vert.z));
                     displacementSide.jercType = JercTypes.Overlap;
                 }
 
@@ -998,87 +1164,108 @@ namespace JERC
         }
 
 
-        private static Dictionary<int, List<EntityBrushSide>> GetEntityBuyzoneSidesVerticesList()
+        private static List<EntityBrush> GetEntityBrushList(List<Entity> entities, EntityTypes entityType)
         {
-            var entityBrushSideListById = new Dictionary<int, List<EntityBrushSide>>();
+            var entityBrushList = new List<EntityBrush>();
 
-            foreach (var entitySides in vmfRequiredData.entitiesSidesByEntityBuyzoneId)
+            foreach (var entity in entities)
             {
-                foreach (var side in entitySides.Value)
+                foreach (var entityBrush in entity.brushes)
                 {
-                    var entityBrushSide = new EntityBrushSide();
-                    for (int i = 0; i < side.vertices_plus.Count(); i++)
-                    {
-                        var vert = side.vertices_plus[i];
+                    var entityBrushNew = new EntityBrush(entity.id, entityBrush.id);
 
-                        entityBrushSide.vertices.Add(new Vertices(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier, vert.z));
-                        entityBrushSide.entityType = EntityTypes.Buyzone;
+                    foreach (var side in entityBrush.side)
+                    {
+                        var entityBrushSides = new EntityBrushSide();
+                        for (int i = 0; i < side.vertices_plus.Count(); i++)
+                        {
+                            var vert = side.vertices_plus[i];
+
+                            entityBrushSides.AddVertices(new Vertices(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier, vert.z));
+                            entityBrushSides.entityType = entityType;
+                        }
+
+                        entityBrushNew.entityBrushSides.Add(entityBrushSides);
                     }
 
-                    if (entityBrushSideListById.ContainsKey(entitySides.Key))
-                        entityBrushSideListById[entitySides.Key].Add(entityBrushSide);
-                    else
-                        entityBrushSideListById.Add(entitySides.Key, new List<EntityBrushSide>() { entityBrushSide });
+                    entityBrushList.Add(entityBrushNew);
                 }
             }
 
-            return entityBrushSideListById;
+            return entityBrushList;
         }
 
 
-        private static Dictionary<int, List<EntityBrushSide>> GetEntityBombsiteSidesVerticesList()
+        private static void CorrectVerticesBrushVolume(List<BrushVolume> brushList)
         {
-            var entityBrushSideListById = new Dictionary<int, List<EntityBrushSide>>();
-
-            foreach (var entitySides in vmfRequiredData.entitiesSidesByEntityBombsiteId)
+            foreach (var brush in brushList)
             {
-                foreach (var side in entitySides.Value)
-                {
-                    var entityBrushSide = new EntityBrushSide();
-                    for (int i = 0; i < side.vertices_plus.Count(); i++)
-                    {
-                        var vert = side.vertices_plus[i];
-
-                        entityBrushSide.vertices.Add(new Vertices(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier, vert.z));
-                        entityBrushSide.entityType = EntityTypes.Bombsite;
-                    }
-
-                    if (entityBrushSideListById.ContainsKey(entitySides.Key))
-                        entityBrushSideListById[entitySides.Key].Add(entityBrushSide);
-                    else
-                        entityBrushSideListById.Add(entitySides.Key, new List<EntityBrushSide>() { entityBrushSide });
-                }
+                CorrectVerticesBrush(brush.brushSides);
             }
-
-            return entityBrushSideListById;
         }
 
 
-        private static Dictionary<int, List<EntityBrushSide>> GetEntityRescueZoneSidesVerticesList()
+        private static void CorrectVerticesBrush(List<BrushSide> brushSideList)
         {
-            var entityBrushSideListById = new Dictionary<int, List<EntityBrushSide>>();
-
-            foreach (var entitySides in vmfRequiredData.entitiesSidesByEntityRescueZoneId)
+            // corrects the verts to tax into account the movement from space in world to the space in the image (which starts at (0,0))
+            foreach (var side in brushSideList)
             {
-                foreach (var side in entitySides.Value)
+                var verticesOffset = side.vertices;
+                for (var i = 0; i < verticesOffset.Count(); i++)
                 {
-                    var entityBrushSide = new EntityBrushSide();
-                    for (int i = 0; i < side.vertices_plus.Count(); i++)
+                    verticesOffset[i].x = verticesOffset[i].x - overviewPositionValues.brushVerticesPosMinX + overviewPositionValues.brushVerticesOffsetX;
+                    verticesOffset[i].y = verticesOffset[i].y - overviewPositionValues.brushVerticesPosMinY + overviewPositionValues.brushVerticesOffsetY;
+                }
+
+                var brushLinesOffset = side.brushLines;
+                for (var i = 0; i < brushLinesOffset.Count(); i++)
+                {
+                    /*
+                    brushLinesOffset[i].vertices1.x = brushLinesOffset[i].vertices1.x - overviewPositionValues.brushVerticesPosMinX + overviewPositionValues.brushVerticesOffsetX;
+                    brushLinesOffset[i].vertices1.y = brushLinesOffset[i].vertices1.y - overviewPositionValues.brushVerticesPosMinY + overviewPositionValues.brushVerticesOffsetY;
+
+                    brushLinesOffset[i].vertices2.x = brushLinesOffset[i].vertices2.x - overviewPositionValues.brushVerticesPosMinX + overviewPositionValues.brushVerticesOffsetX;
+                    brushLinesOffset[i].vertices2.y = brushLinesOffset[i].vertices2.y - overviewPositionValues.brushVerticesPosMinY + overviewPositionValues.brushVerticesOffsetY;
+                    */
+
+                    foreach (var verticesOnLine in brushLinesOffset[i].verticesOnLine)
                     {
-                        var vert = side.vertices_plus[i];
-
-                        entityBrushSide.vertices.Add(new Vertices(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier, vert.z));
-                        entityBrushSide.entityType = EntityTypes.RescueZone;
+                        verticesOnLine.x = verticesOnLine.x - overviewPositionValues.brushVerticesPosMinX + overviewPositionValues.brushVerticesOffsetX;
+                        verticesOnLine.y = verticesOnLine.y - overviewPositionValues.brushVerticesPosMinY + overviewPositionValues.brushVerticesOffsetY;
                     }
-
-                    if (entityBrushSideListById.ContainsKey(entitySides.Key))
-                        entityBrushSideListById[entitySides.Key].Add(entityBrushSide);
-                    else
-                        entityBrushSideListById.Add(entitySides.Key, new List<EntityBrushSide>() { entityBrushSide });
                 }
             }
+        }
 
-            return entityBrushSideListById;
+
+        private static void CorrectVerticesEntityBrush(List<EntityBrushSide> entityBrushSideList)
+        {
+            // corrects the verts to tax into account the movement from space in world to the space in the image (which starts at (0,0))
+            foreach (var side in entityBrushSideList)
+            {
+                var verticesOffset = side.vertices;
+                for (var i = 0; i < verticesOffset.Count(); i++)
+                {
+                    verticesOffset[i].x = verticesOffset[i].x - overviewPositionValues.brushVerticesPosMinX + overviewPositionValues.brushVerticesOffsetX;
+                    verticesOffset[i].y = verticesOffset[i].y - overviewPositionValues.brushVerticesPosMinY + overviewPositionValues.brushVerticesOffsetY;
+                }
+
+                var brushLinesOffset = side.brushLines;
+                for (var i = 0; i < brushLinesOffset.Count(); i++)
+                {
+                    brushLinesOffset[i].vertices1.x = brushLinesOffset[i].vertices1.x - overviewPositionValues.brushVerticesPosMinX + overviewPositionValues.brushVerticesOffsetX;
+                    brushLinesOffset[i].vertices1.y = brushLinesOffset[i].vertices1.y - overviewPositionValues.brushVerticesPosMinY + overviewPositionValues.brushVerticesOffsetY;
+
+                    brushLinesOffset[i].vertices2.x = brushLinesOffset[i].vertices2.x - overviewPositionValues.brushVerticesPosMinX + overviewPositionValues.brushVerticesOffsetX;
+                    brushLinesOffset[i].vertices2.y = brushLinesOffset[i].vertices2.y - overviewPositionValues.brushVerticesPosMinY + overviewPositionValues.brushVerticesOffsetY;
+
+                    foreach (var verticesOnLine in brushLinesOffset[i].verticesOnLine)
+                    {
+                        verticesOnLine.x = verticesOnLine.x - overviewPositionValues.brushVerticesPosMinX + overviewPositionValues.brushVerticesOffsetX;
+                        verticesOnLine.y = verticesOnLine.y - overviewPositionValues.brushVerticesPosMinY + overviewPositionValues.brushVerticesOffsetY;
+                    }
+                }
+            }
         }
 
 
@@ -1089,16 +1276,8 @@ namespace JERC
                 if (brush.jercType != JercTypes.Remove)
                     continue;
 
-                // corrects the verts to tax into account the movement from space in world to the space in the image (which starts at (0,0))
                 foreach (var side in brush.brushSides)
                 {
-                    var verticesOffset = side.vertices;
-                    for (var i = 0; i < verticesOffset.Count(); i++)
-                    {
-                        verticesOffset[i].x = verticesOffset[i].x - overviewPositionValues.brushVerticesPosMinX + overviewPositionValues.brushVerticesOffsetX;
-                        verticesOffset[i].y = verticesOffset[i].y - overviewPositionValues.brushVerticesPosMinY + overviewPositionValues.brushVerticesOffsetY;
-                    }
-
                     AddRemoveRegion(bmp, graphics, side);
                 }
             }
@@ -1162,11 +1341,6 @@ namespace JERC
 
                     var gradientValue = Math.Clamp((int)Math.Round((float)percentageAboveMin * 255, 0), 1, 255);
 
-                    // corrects the verts by taking into account the movement from space in world to the space in the image (which starts at (0,0))
-                    var verticesOffset = vertices;
-                    verticesOffset.x = verticesOffset.x - overviewPositionValues.brushVerticesPosMinX + overviewPositionValues.brushVerticesOffsetX;
-                    verticesOffset.y = verticesOffset.y - overviewPositionValues.brushVerticesPosMinY + overviewPositionValues.brushVerticesOffsetY;
-
                     Color colour = brushSide.jercType switch
                     {
                         //JercTypes.Remove => Colours.ColourRemove(gradientValue),
@@ -1175,33 +1349,28 @@ namespace JERC
                         JercTypes.Overlap => Colours.ColourOverlap(TEMPORARYrgbColourOverlap, gradientValue),
                     };
 
-                    verticesOffsetsToUse.Add(new VerticesToDraw(new Point((int)verticesOffset.x, (int)verticesOffset.y), colour));
+                    verticesOffsetsToUse.Add(new VerticesToDraw(new Point((int)vertices.x, (int)vertices.y), colour));
                 }
 
-                brushesToDraw.Add(new ObjectToDraw(verticesOffsetsToUse, brushSide.jercType));
+                brushesToDraw.Add(new ObjectToDraw(verticesOffsetsToUse, brushSide.brushLines, brushSide.jercType));
             }
 
             return brushesToDraw;
         }
 
 
-        private static List<ObjectToDraw> GetEntitiesToDraw(Bitmap bmp, Graphics graphics, BoundingBox boundingBox, OverviewPositionValues overviewPositionValues, Dictionary<int, List<EntityBrushSide>> entityBrushSideListById)
+        private static List<ObjectToDraw> GetEntityBrushSidesToDraw(List<EntityBrush> entityBrushes)
         {
-            var entitiesToDraw = new List<ObjectToDraw>();
+            var entityBrushSidesToDraw = new List<ObjectToDraw>();
 
-            foreach (var entityBrushSideByBrush in entityBrushSideListById.Values)
+            foreach (var entityBrush in entityBrushes)
             {
-                foreach (var entityBrushSide in entityBrushSideByBrush)
+                foreach (var entityBrushSide in entityBrush.entityBrushSides)
                 {
-                    var verticesOffsetsToUse = new List<VerticesToDraw>();
+                    var verticesToUse = new List<VerticesToDraw>();
 
                     foreach (var vertices in entityBrushSide.vertices)
                     {
-                        // corrects the verts to tax into account the movement from space in world to the space in the image (which starts at (0,0))
-                        var verticesOffset = vertices;
-                        verticesOffset.x = verticesOffset.x - overviewPositionValues.brushVerticesPosMinX + overviewPositionValues.brushVerticesOffsetX;
-                        verticesOffset.y = verticesOffset.y - overviewPositionValues.brushVerticesPosMinY + overviewPositionValues.brushVerticesOffsetY;
-
                         Color colour = entityBrushSide.entityType switch
                         {
                             EntityTypes.Buyzone => Colours.ColourBuyzones(),
@@ -1209,14 +1378,14 @@ namespace JERC
                             EntityTypes.RescueZone => Colours.ColourRescueZones(),
                         };
 
-                        verticesOffsetsToUse.Add(new VerticesToDraw(new Point((int)verticesOffset.x, (int)verticesOffset.y), colour));
+                        verticesToUse.Add(new VerticesToDraw(new Point((int)vertices.x, (int)vertices.y), colour));
                     }
 
-                    entitiesToDraw.Add(new ObjectToDraw(verticesOffsetsToUse, entityBrushSide.entityType));
+                    entityBrushSidesToDraw.Add(new ObjectToDraw(verticesToUse, entityBrushSide.brushLines, entityBrushSide.entityType, entityBrush.entityId, entityBrush.brushId));
                 }
             }
 
-            return entitiesToDraw;
+            return entityBrushSidesToDraw;
         }
 
 

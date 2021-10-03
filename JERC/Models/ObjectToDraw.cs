@@ -11,42 +11,28 @@ namespace JERC.Models
     public class ObjectToDraw
     {
         public List<VerticesToDraw> verticesToDraw;
+        public List<BrushLine> brushLines;
         public JercTypes? jercType;
         public EntityTypes? entityType;
+        public int? entityId;
+        public int? entityBrushId;
 
 
-        public ObjectToDraw(List<VerticesToDraw> verticesToDraw, JercTypes jercType)
+        public ObjectToDraw(List<VerticesToDraw> verticesToDraw, List<BrushLine> brushLines, JercTypes jercType)
         {
             this.verticesToDraw = verticesToDraw;
+            this.brushLines = brushLines;
             this.jercType = jercType;
         }
 
 
-        public ObjectToDraw(List<VerticesToDraw> verticesToDraw, EntityTypes entityType)
+        public ObjectToDraw(List<VerticesToDraw> verticesToDraw, List<BrushLine> brushLines, EntityTypes entityType, int entityId, int entityBrushId)
         {
             this.verticesToDraw = verticesToDraw;
+            this.brushLines = brushLines;
             this.entityType = entityType;
-        }
-
-
-        public static ObjectToDraw Clone(ObjectToDraw objectToDraw)
-        {
-            var verticesToDrawNew = new List<VerticesToDraw>();
-
-            foreach (var verticesToDraw in objectToDraw.verticesToDraw)
-            {
-                verticesToDrawNew.Add(new VerticesToDraw(verticesToDraw.vertices, verticesToDraw.colour));
-            }
-
-            var jercTypeNew = objectToDraw.jercType;
-            var entityTypeNew = objectToDraw.entityType;
-
-            if (jercTypeNew != null)
-                return new ObjectToDraw(verticesToDrawNew, (JercTypes)jercTypeNew);
-            else if (entityTypeNew != null)
-                return new ObjectToDraw(verticesToDrawNew, (EntityTypes)entityTypeNew);
-            else
-                return null;
+            this.entityId = entityId;
+            this.entityBrushId = entityBrushId;
         }
     }
 }
