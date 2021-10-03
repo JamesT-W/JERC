@@ -507,26 +507,16 @@ namespace JERC
             // path and overlap brush stuff (for stroke)
             if (jercConfigValues.strokeAroundLayoutMaterials)
             {
-                foreach (var brushToRender in brushesToDrawPath.Concat(brushesToDrawOverlap).Where(x => x.jercType == JercTypes.Path || x.jercType == JercTypes.Overlap))
+                foreach (var brushToRender in brushesToDrawPath.Concat(displacementsToDrawPath).Concat(brushesToDrawOverlap).Concat(displacementsToDrawOverlap).OrderBy(x => x.zAxisAverage))
                 {
                     DrawStroke(graphics, brushToRender, Colours.ColourBrushesStroke());
-                }
-
-                foreach (var displacementToRender in displacementsToDrawPath.Concat(displacementsToDrawOverlap).Where(x => x.jercType == JercTypes.Path || x.jercType == JercTypes.Overlap))
-                {
-                    DrawStroke(graphics, displacementToRender, Colours.ColourBrushesStroke());
                 }
             }
 
             // path brush stuff
-            foreach (var brushToRender in brushesToDrawPath)
+            foreach (var brushToRender in brushesToDrawPath.Concat(displacementsToDrawPath).OrderBy(x => x.zAxisAverage))
             {
                 DrawFilledPolygonGradient(graphics, brushToRender, true);
-            }
-
-            foreach (var displacementToRender in displacementsToDrawPath)
-            {
-                DrawFilledPolygonGradient(graphics, displacementToRender, true);
             }
 
             // cover and overlap brush stuff
