@@ -8,9 +8,10 @@ namespace JERC.Enums
 {
     public enum JercTypes
     {
-        Remove = 1,
-        Path = 2,
-        Cover = 4,
-        Overlap = 8,
+        None = 1,
+        Remove = 2,
+        Path = 4,
+        Cover = 8,
+        Overlap = 16,
     }
 }
