@@ -205,7 +205,7 @@ namespace JERC
             jercEntitySettingsValues.Add("overlapColourLow", jercConfigure.FirstOrDefault(x => x.Name == "overlapColourLow")?.Value);
             jercEntitySettingsValues.Add("strokeWidth", jercConfigure.FirstOrDefault(x => x.Name == "strokeWidth")?.Value);
             jercEntitySettingsValues.Add("strokeColour", jercConfigure.FirstOrDefault(x => x.Name == "strokeColour")?.Value);
-            jercEntitySettingsValues.Add("strokeAroundMainMaterials", jercConfigure.FirstOrDefault(x => x.Name == "strokeAroundMainMaterials")?.Value);
+            jercEntitySettingsValues.Add("strokeAroundPathOverlapMaterials", jercConfigure.FirstOrDefault(x => x.Name == "strokeAroundPathOverlapMaterials")?.Value);
             jercEntitySettingsValues.Add("strokeAroundRemoveMaterials", jercConfigure.FirstOrDefault(x => x.Name == "strokeAroundRemoveMaterials")?.Value);
             jercEntitySettingsValues.Add("defaultLevelNum", jercConfigure.FirstOrDefault(x => x.Name == "defaultLevelNum")?.Value);
             jercEntitySettingsValues.Add("levelBackgroundEnabled", jercConfigure.FirstOrDefault(x => x.Name == "levelBackgroundEnabled")?.Value);
@@ -491,7 +491,7 @@ namespace JERC
             AddRemoveRegion(bmp, graphics, displacementRemoveList);
 
             // non-remove stuff (for stroke)
-            if (jercConfigValues.strokeAroundMainMaterials)
+            if (jercConfigValues.strokeAroundPathOverlapMaterials)
             {
                 foreach (var brushToRender in brushesToDraw.Where(x => x.jercType == JercTypes.Path || x.jercType == JercTypes.Overlap))
                 {
@@ -524,7 +524,7 @@ namespace JERC
             var entitiesToDraw = GetEntitiesToDraw(bmp, graphics, boundingBox, overviewPositionValues, entityBrushSideListById);
 
             // stroke
-            if (jercConfigValues.strokeAroundMainMaterials)
+            if (jercConfigValues.strokeAroundPathOverlapMaterials)
             {
                 foreach (var entityToRender in entitiesToDraw)
                 {

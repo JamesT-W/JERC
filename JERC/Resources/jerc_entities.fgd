@@ -33,7 +33,7 @@
 	
 	strokeColour(color255) : "Stroke Colour" : "255 255 255 255" : "Colour of the stroke"
 
-	strokeAroundMainMaterials(choices) : "Stroke Around Main Materials" : 0 =
+	strokeAroundPathOverlapMaterials(choices) : "Stroke Around Path & Overlap Materials" : 0 =
 	[
 		0: "Yes"
 		1: "No"
