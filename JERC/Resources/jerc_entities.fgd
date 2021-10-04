@@ -16,21 +16,21 @@
 	]
 
 	backgroundFilename(string) : "Background Image Filename" : "default" : "For custom images, place them inside the following folder: /Counter-Strike Global Offensive/bin/jerc/textures/"
-	
-	pathColourHigh(color255) : "Path Colour High" : "180 180 180 255" : "Colour of path world brushes at the highest point"
 
-	pathColourLow(color255) : "Path Colour Low" : "100 100 100 255" : "Colour of path world brushes at the lowest point"
-	
+	pathColourHigh(color255) : "Path Colour High" : "255 153 62 255" : "Colour of path world brushes at the highest point"
+
+	pathColourLow(color255) : "Path Colour Low" : "35 35 35 255" : "Colour of path world brushes at the lowest point"
+
 	coverColourHigh(color255) : "Cover Colour High" : "240 240 240 255" : "Colour of cover world brushes at the highest point"
 
 	coverColourLow(color255) : "Cover Colour Low" : "160 160 160 255" : "Colour of cover world brushes at the lowest point"
 
-	overlapColourHigh(color255) : "Overlap Colour High" : "125 125 210 255" : "Colour of overlap world brushes at the highest point"
+	overlapColourHigh(color255) : "Overlap Colour High" : "159 28 147 255" : "Colour of overlap world brushes at the highest point"
 
-	overlapColourLow(color255) : "Overlap Colour Low" : "35 35 105 255" : "Colour of overlap world brushes at the lowest point"
+	overlapColourLow(color255) : "Overlap Colour Low" : "91 21 91 255" : "Colour of overlap world brushes at the lowest point"
 
 	strokeWidth(integer) : "Stroke Width (int)" : 10 : "Width of stroke to use"
-	
+
 	strokeColour(color255) : "Stroke Colour" : "255 255 255 255" : "Colour of the stroke"
 
 	strokeAroundLayoutMaterials(choices) : "Stroke Around Path and Overlap Materials" : 0 =
