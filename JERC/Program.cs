@@ -392,7 +392,6 @@ namespace JERC
 
                     // dispose
                     DisposeGraphics(newGraphics);
-                    DisposeImage(newBmp);
                 }
 
                 // dispose
