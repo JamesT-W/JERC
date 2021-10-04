@@ -15,6 +15,12 @@
 		1: "No"
 	]
 
+	useSeparateGradientEachLevel(choices) : "Separate Multilevel Radar Gradients" : 1 : "Uses a new gradient for each level instead of one gradient for all levels combined" =
+	[
+		0: "Yes"
+		1: "No"
+	]
+
 	backgroundFilename(string) : "Background Image Filename" : "default" : "For custom images, place them inside the following folder: /Counter-Strike Global Offensive/bin/jerc/textures/"
 
 	pathColourHigh(color255) : "Path Colour High" : "178 113 65" : "Colour of path world brushes at the highest point"
