@@ -10,23 +10,11 @@ namespace JERC.Constants
     public static class Colours
     {
         public static Color ColourRemove() => Color.Transparent;
-        public static Color ColourPath(int[] rgb, int gradientValue) =>
+        public static Color ColourBrush(Color rgbLow, Color rgbHigh, float percentageAboveMin) =>
             Color.FromArgb(255,
-                ClampGradientValue(((float)rgb[0] / 255) * gradientValue),
-                ClampGradientValue(((float)rgb[1] / 255) * gradientValue),
-                ClampGradientValue(((float)rgb[2] / 255) * gradientValue)
-            );
-        public static Color ColourCover(int[] rgb, int gradientValue) =>
-            Color.FromArgb(255,
-                ClampGradientValue(((float)rgb[0] / 255) * gradientValue),
-                ClampGradientValue(((float)rgb[1] / 255) * gradientValue),
-                ClampGradientValue(((float)rgb[2] / 255) * gradientValue)
-            );
-        public static Color ColourOverlap(int[] rgb, int gradientValue) =>
-            Color.FromArgb(255,
-                ClampGradientValue(((float)rgb[0] / 255) * gradientValue),
-                ClampGradientValue(((float)rgb[1] / 255) * gradientValue),
-                ClampGradientValue(((float)rgb[2] / 255) * gradientValue)
+                GetColour(rgbLow.R, rgbHigh.R, percentageAboveMin),
+                GetColour(rgbLow.G, rgbHigh.G, percentageAboveMin),
+                GetColour(rgbLow.B, rgbHigh.B, percentageAboveMin)
             );
 
         public static Color ColourBrushesStroke() => Color.FromArgb(255, 255, 255, 255);
@@ -40,9 +28,24 @@ namespace JERC.Constants
         public static Color ColourRescueZonesStroke() => Color.FromArgb(255, 0, 0, 255);
 
 
+        private static int GetColour(int rgbLow, int rgbHigh, float percentageAboveMin)
+        {
+            var highestNum = rgbLow > rgbHigh ? rgbLow : rgbHigh;
+            var lowestNum = rgbLow > rgbHigh ? rgbHigh : rgbLow;
+
+            var diff = highestNum - lowestNum;
+
+            var diffMultiplied = diff * percentageAboveMin;
+
+            var value = lowestNum + diffMultiplied;
+
+            return ClampGradientValue(value);
+        }
+
+
         private static int ClampGradientValue(float value)
         {
-            return (int)Math.Ceiling(Math.Clamp(value, 10, 245));
+            return Math.Clamp((int)Math.Ceiling(value), 0, 255);
         }
     }
 }

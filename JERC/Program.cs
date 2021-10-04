@@ -16,16 +16,6 @@ namespace JERC
 {
     class Program
     {
-
-
-        // TODO: this should be configured by hammer entities
-        private static readonly int[] TEMPORARYrgbColourPath = new int[3] { 127, 127, 127 };
-        private static readonly int[] TEMPORARYrgbColourCover = new int[3] { 225, 225, 225 };
-        private static readonly int[] TEMPORARYrgbColourOverlap = new int[3] { 0, 127, 127 };
-
-
-
-
         private static readonly ImageProcessorExtender imageProcessorExtender = new ImageProcessorExtender();
 
         private static readonly string gameBinDirectoryPath = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), @"..\"));
@@ -1178,7 +1168,7 @@ namespace JERC
                 {
                     var heightAboveMin = vertices.z - boundingBox.minZGradient;
 
-                    float? percentageAboveMin;
+                    float percentageAboveMin = 0;
                     if (heightAboveMin == 0)
                     {
                         if (boundingBox.minZGradient == boundingBox.maxZGradient)
@@ -1192,20 +1182,18 @@ namespace JERC
                     }
                     else
                     {
-                        percentageAboveMin = (float?)((Math.Ceiling(Convert.ToDouble(heightAboveMin)) / (boundingBox.maxZGradient - boundingBox.minZGradient)));
+                        percentageAboveMin = (float)((Math.Ceiling(Convert.ToDouble(heightAboveMin)) / (boundingBox.maxZGradient - boundingBox.minZGradient)));
                     }
-
-                    var gradientValue = Math.Clamp((int)Math.Round((float)percentageAboveMin * 255, 0), 1, 255);
 
                     // corrects the verts by taking into account the movement from space in world to the space in the image (which starts at (0,0))
                     var verticesOffset = GetCorrectedVerticesPositionInWorld(vertices);
 
                     Color colour = brushSide.jercType switch
                     {
-                        //JercTypes.Remove => Colours.ColourRemove(gradientValue),
-                        JercTypes.Path => Colours.ColourPath(TEMPORARYrgbColourPath, gradientValue),
-                        JercTypes.Cover => Colours.ColourCover(TEMPORARYrgbColourCover, gradientValue),
-                        JercTypes.Overlap => Colours.ColourOverlap(TEMPORARYrgbColourOverlap, gradientValue),
+                        //JercTypes.Remove => Colours.ColourRemove(percentageAboveMin),
+                        JercTypes.Path => Colours.ColourBrush(jercConfigValues.pathColourLow, jercConfigValues.pathColourHigh, percentageAboveMin),
+                        JercTypes.Cover => Colours.ColourBrush(jercConfigValues.coverColourLow, jercConfigValues.coverColourHigh, percentageAboveMin),
+                        JercTypes.Overlap => Colours.ColourBrush(jercConfigValues.overlapColourLow, jercConfigValues.overlapColourHigh, percentageAboveMin),
                     };
 
                     verticesOffsetsToUse = verticesOffsetsToUse.Distinct().ToList(); // TODO: doesn't seem to work
