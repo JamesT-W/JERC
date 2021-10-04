@@ -125,8 +125,8 @@ namespace JERC.Models
             {
                 lines.AddRange(new List<string>()
                 {
-                    string.Concat("\t\"CTSpawn_x\"\t\t\"", float.Parse(CTSpawn_x).ToString("N", nfi), "\""),
-                    string.Concat("\t\"CTSpawn_y\"\t\t\"", float.Parse(CTSpawn_y).ToString("N", nfi), "\""),
+                    string.Concat("\t\"CTSpawn_x\"\t\t\"", (CTSpawn_x != null ? float.Parse(CTSpawn_x).ToString("N", nfi) : string.Empty), "\""),
+                    string.Concat("\t\"CTSpawn_y\"\t\t\"", (CTSpawn_y != null ? float.Parse(CTSpawn_y).ToString("N", nfi) : string.Empty), "\""),
                 });
             }
 
@@ -134,8 +134,8 @@ namespace JERC.Models
             {
                 lines.AddRange(new List<string>()
                 {
-                    string.Concat("\t\"TSpawn_x\"\t\t\"", float.Parse(TSpawn_x).ToString("N", nfi), "\""),
-                    string.Concat("\t\"TSpawn_y\"\t\t\"", float.Parse(TSpawn_y).ToString("N", nfi), "\""),
+                    string.Concat("\t\"TSpawn_x\"\t\t\"", (TSpawn_x != null ? float.Parse(TSpawn_x).ToString("N", nfi) : string.Empty), "\""),
+                    string.Concat("\t\"TSpawn_y\"\t\t\"", (TSpawn_y != null ? float.Parse(TSpawn_y).ToString("N", nfi) : string.Empty), "\""),
                 });
             }
 
@@ -144,10 +144,10 @@ namespace JERC.Models
                 lines.AddRange(new List<string>()
                 {
                     string.Empty,
-                    string.Concat("\t\"bombA_x\"\t\t\"", float.Parse(bombA_x).ToString("N", nfi), "\""),
-                    string.Concat("\t\"bombA_y\"\t\t\"", float.Parse(bombA_y).ToString("N", nfi), "\""),
-                    string.Concat("\t\"bombB_x\"\t\t\"", float.Parse(bombB_x).ToString("N", nfi), "\""),
-                    string.Concat("\t\"bombB_y\"\t\t\"", float.Parse(bombB_y).ToString("N", nfi), "\""),
+                    string.Concat("\t\"bombA_x\"\t\t\"", (bombA_x != null ? float.Parse(bombA_x).ToString("N", nfi) : string.Empty), "\""),
+                    string.Concat("\t\"bombA_y\"\t\t\"", (bombA_y != null ? float.Parse(bombA_y).ToString("N", nfi) : string.Empty), "\""),
+                    string.Concat("\t\"bombB_x\"\t\t\"", (bombB_x != null ? float.Parse(bombB_x).ToString("N", nfi) : string.Empty), "\""),
+                    string.Concat("\t\"bombB_y\"\t\t\"", (bombB_y != null ? float.Parse(bombB_y).ToString("N", nfi) : string.Empty), "\""),
                 });
             }
 
@@ -156,22 +156,22 @@ namespace JERC.Models
                 lines.AddRange(new List<string>()
                 {
                     string.Empty,
-                    string.Concat("\t\"Hostage1_x\"\t\"", float.Parse(Hostage1_x).ToString("N", nfi), "\""),
-                    string.Concat("\t\"Hostage1_y\"\t\"", float.Parse(Hostage1_y).ToString("N", nfi), "\""),
-                    string.Concat("\t\"Hostage2_x\"\t\"", float.Parse(Hostage2_x).ToString("N", nfi), "\""),
-                    string.Concat("\t\"Hostage2_y\"\t\"", float.Parse(Hostage2_y).ToString("N", nfi), "\""),
-                    string.Concat("\t\"Hostage3_x\"\t\"", float.Parse(Hostage3_x).ToString("N", nfi), "\""),
-                    string.Concat("\t\"Hostage3_y\"\t\"", float.Parse(Hostage3_y).ToString("N", nfi), "\""),
-                    string.Concat("\t\"Hostage4_x\"\t\"", float.Parse(Hostage4_x).ToString("N", nfi), "\""),
-                    string.Concat("\t\"Hostage4_y\"\t\"", float.Parse(Hostage4_y).ToString("N", nfi), "\""),
-                    string.Concat("\t\"Hostage5_x\"\t\"", float.Parse(Hostage5_x).ToString("N", nfi), "\""),
-                    string.Concat("\t\"Hostage5_y\"\t\"", float.Parse(Hostage5_y).ToString("N", nfi), "\""),
-                    string.Concat("\t\"Hostage6_x\"\t\"", float.Parse(Hostage6_x).ToString("N", nfi), "\""),
-                    string.Concat("\t\"Hostage6_y\"\t\"", float.Parse(Hostage6_y).ToString("N", nfi), "\""),
-                    string.Concat("\t\"Hostage7_x\"\t\"", float.Parse(Hostage7_x).ToString("N", nfi), "\""),
-                    string.Concat("\t\"Hostage7_y\"\t\"", float.Parse(Hostage7_y).ToString("N", nfi), "\""),
-                    string.Concat("\t\"Hostage8_x\"\t\"", float.Parse(Hostage8_x).ToString("N", nfi), "\""),
-                    string.Concat("\t\"Hostage8_y\"\t\"", float.Parse(Hostage8_y).ToString("N", nfi), "\""),
+                    string.Concat("\t\"Hostage1_x\"\t\"", (Hostage1_x != null ? float.Parse(Hostage1_x).ToString("N", nfi) : string.Empty), "\""),
+                    string.Concat("\t\"Hostage1_y\"\t\"", (Hostage1_y != null ? float.Parse(Hostage1_y).ToString("N", nfi) : string.Empty), "\""),
+                    string.Concat("\t\"Hostage2_x\"\t\"", (Hostage2_x != null ? float.Parse(Hostage2_x).ToString("N", nfi) : string.Empty), "\""),
+                    string.Concat("\t\"Hostage2_y\"\t\"", (Hostage2_y != null ? float.Parse(Hostage2_y).ToString("N", nfi) : string.Empty), "\""),
+                    string.Concat("\t\"Hostage3_x\"\t\"", (Hostage3_x != null ? float.Parse(Hostage3_x).ToString("N", nfi) : string.Empty), "\""),
+                    string.Concat("\t\"Hostage3_y\"\t\"", (Hostage3_y != null ? float.Parse(Hostage3_y).ToString("N", nfi) : string.Empty), "\""),
+                    string.Concat("\t\"Hostage4_x\"\t\"", (Hostage4_x != null ? float.Parse(Hostage4_x).ToString("N", nfi) : string.Empty), "\""),
+                    string.Concat("\t\"Hostage4_y\"\t\"", (Hostage4_y != null ? float.Parse(Hostage4_y).ToString("N", nfi) : string.Empty), "\""),
+                    string.Concat("\t\"Hostage5_x\"\t\"", (Hostage5_x != null ? float.Parse(Hostage5_x).ToString("N", nfi) : string.Empty), "\""),
+                    string.Concat("\t\"Hostage5_y\"\t\"", (Hostage5_y != null ? float.Parse(Hostage5_y).ToString("N", nfi) : string.Empty), "\""),
+                    string.Concat("\t\"Hostage6_x\"\t\"", (Hostage6_x != null ? float.Parse(Hostage6_x).ToString("N", nfi) : string.Empty), "\""),
+                    string.Concat("\t\"Hostage6_y\"\t\"", (Hostage6_y != null ? float.Parse(Hostage6_y).ToString("N", nfi) : string.Empty), "\""),
+                    string.Concat("\t\"Hostage7_x\"\t\"", (Hostage7_x != null ? float.Parse(Hostage7_x).ToString("N", nfi) : string.Empty), "\""),
+                    string.Concat("\t\"Hostage7_y\"\t\"", (Hostage7_y != null ? float.Parse(Hostage7_y).ToString("N", nfi) : string.Empty), "\""),
+                    string.Concat("\t\"Hostage8_x\"\t\"", (Hostage8_x != null ? float.Parse(Hostage8_x).ToString("N", nfi) : string.Empty), "\""),
+                    string.Concat("\t\"Hostage8_y\"\t\"", (Hostage8_y != null ? float.Parse(Hostage8_y).ToString("N", nfi) : string.Empty), "\""),
                 });
             }
 
