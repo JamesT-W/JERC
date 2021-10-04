@@ -395,6 +395,10 @@ namespace JERC
                     newGraphics.Save();
 
                     radarLevelsToSaveList.Add(new RadarLevel(newBmp, radarLevel.levelHeight));
+
+                    // dispose
+                    DisposeGraphics(newGraphics);
+                    DisposeImage(newBmp);
                 }
 
                 // dispose
