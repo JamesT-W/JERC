@@ -94,6 +94,12 @@ namespace JERC
 
             vmfRequiredData = GetVmfRequiredData();
 
+            if (vmfRequiredData == null)
+            {
+                Console.WriteLine("No jerc_config entity found.");
+                return;
+            }
+
             SortScaleStuff();
 
             if (overviewPositionValues == null)
@@ -165,6 +171,9 @@ namespace JERC
             var jercDividerEntities = GetEntitiesByClassname(allEntities, Classnames.JercDivider);
             var jercFloorEntities = GetEntitiesByClassname(allEntities, Classnames.JercFloor);
             var jercCeilingEntities = GetEntitiesByClassname(allEntities, Classnames.JercCeiling);
+
+            if (jercConfigEntities == null || !jercConfigEntities.Any())
+                return null;
 
             var allJercEntities = jercConfigEntities.Concat(jercDividerEntities).Concat(jercFloorEntities).Concat(jercCeilingEntities);
 
