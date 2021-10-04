@@ -437,24 +437,25 @@ namespace JERC
 
             graphics.SetClip(Rectangle.FromLTRB(0, 0, overviewPositionValues.outputResolution, overviewPositionValues.outputResolution));
 
-            // get all brush sides and displacement sides to draw
+            // get all brush sides and displacement sides to draw (brush volumes)
             var brushRemoveList = GetBrushVolumeListWithinLevelHeight(levelHeight, vmfRequiredData.brushesRemove, JercTypes.Remove);
             var displacementRemoveList = GetBrushVolumeListWithinLevelHeight(levelHeight, vmfRequiredData.displacementsRemove, JercTypes.Remove);
 
             var brushCoverList = GetBrushVolumeListWithinLevelHeight(levelHeight, vmfRequiredData.brushesCover, JercTypes.Cover);
             var displacementCoverList = GetBrushVolumeListWithinLevelHeight(levelHeight, vmfRequiredData.displacementsCover, JercTypes.Cover);
 
+            var brushDoorList = GetBrushVolumeListWithinLevelHeight(levelHeight, vmfRequiredData.brushesDoor, JercTypes.Door);
+            var displacementDoorList = GetBrushVolumeListWithinLevelHeight(levelHeight, vmfRequiredData.displacementsDoor, JercTypes.Door);
+
+            var brushLadderList = GetBrushVolumeListWithinLevelHeight(levelHeight, vmfRequiredData.brushesLadder, JercTypes.Ladder);
+            var displacementLadderList = GetBrushVolumeListWithinLevelHeight(levelHeight, vmfRequiredData.displacementsLadder, JercTypes.Ladder);
+
+            // get all brush sides and displacement sides to draw (brush sides)
             var brushPathSideList = GetBrushSideListWithinLevelHeight(levelHeight, vmfRequiredData.brushesSidesPath, JercTypes.Path);
             var displacementPathSideList = GetBrushSideListWithinLevelHeight(levelHeight, vmfRequiredData.displacementsSidesPath, JercTypes.Path);
 
             var brushOverlapSideList = GetBrushSideListWithinLevelHeight(levelHeight, vmfRequiredData.brushesSidesOverlap, JercTypes.Overlap);
             var displacementOverlapSideList = GetBrushSideListWithinLevelHeight(levelHeight, vmfRequiredData.displacementsSidesOverlap, JercTypes.Overlap);
-
-            var brushDoorSideList = GetBrushSideListWithinLevelHeight(levelHeight, vmfRequiredData.brushesSidesDoor, JercTypes.Door);
-            var displacementDoorSideList = GetBrushSideListWithinLevelHeight(levelHeight, vmfRequiredData.displacementsSidesDoor, JercTypes.Door);
-
-            var brushLadderSideList = GetBrushSideListWithinLevelHeight(levelHeight, vmfRequiredData.brushesSidesLadder, JercTypes.Ladder);
-            var displacementLadderSideList = GetBrushSideListWithinLevelHeight(levelHeight, vmfRequiredData.displacementsSidesLadder, JercTypes.Ladder);
 
 
             var brushesToDrawPath = GetBrushesToDraw(boundingBox, brushPathSideList);
@@ -466,11 +467,11 @@ namespace JERC
             var brushesToDrawCover = GetBrushesToDraw(boundingBox, brushCoverList.SelectMany(x => x.brushSides).ToList());
             var displacementsToDrawCover = GetBrushesToDraw(boundingBox, displacementCoverList.SelectMany(x => x.brushSides).ToList());
 
-            var brushesToDrawDoor = GetBrushesToDraw(boundingBox, brushDoorSideList);
-            var displacementsToDrawDoor = GetBrushesToDraw(boundingBox, displacementDoorSideList);
+            var brushesToDrawDoor = GetBrushesToDraw(boundingBox, brushDoorList.SelectMany(x => x.brushSides).ToList());
+            var displacementsToDrawDoor = GetBrushesToDraw(boundingBox, displacementDoorList.SelectMany(x => x.brushSides).ToList());
 
-            var brushesToDrawLadder = GetBrushesToDraw(boundingBox, brushLadderSideList);
-            var displacementsToDrawLadder = GetBrushesToDraw(boundingBox, displacementLadderSideList);
+            var brushesToDrawLadder = GetBrushesToDraw(boundingBox, brushLadderList.SelectMany(x => x.brushSides).ToList());
+            var displacementsToDrawLadder = GetBrushesToDraw(boundingBox, displacementLadderList.SelectMany(x => x.brushSides).ToList());
 
             // get all entity sides to draw
             var entityBrushSideListById = GetEntityBrushSideListWithinLevelHeight(levelHeight);
