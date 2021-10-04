@@ -45,13 +45,13 @@
 		1: "No"
 	]
 
-	strokeAroundEntities(choices) : "Stroke Around Entities" : 0 =
+	strokeAroundEntities(choices) : "Stroke Around Entities" : 0 : Currently, if there are more than one brush in an entity, it will not combine them, so they will keep their individual borders =
 	[
 		0: "Yes"
 		1: "No"
 	]
 
-	defaultLevelNum(integer) : "Default Level Num (int)" : 0 : "The index that the default level is in a multilevel radar. 0 = bottom, 1 = second from bottom, ..."
+	defaultLevelNum(integer) : "Default Level Num (int)" : 0 : "The index that the default level is in a multilevel radar. 0 = bottom level, 1 = second from bottom level, ..."
 
 	levelBackgroundEnabled(choices) : "Enable Levels As Backgrounds" : 0 : "Adds all levels as a background for each level when using multiple radar levels" =
 	[
