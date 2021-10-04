@@ -438,56 +438,56 @@ namespace JERC
             graphics.SetClip(Rectangle.FromLTRB(0, 0, overviewPositionValues.outputResolution, overviewPositionValues.outputResolution));
 
             // get all brush sides and displacement sides to draw
-            var brushRemoveList = GetBrushRemoveVerticesList().Where(x => !(
+            var brushRemoveList = GetBrushVolumeList(vmfRequiredData.brushesRemove, JercTypes.Remove).Where(x => !(
                 (x.brushSides.SelectMany(y => y.vertices).All(y => y.z < levelHeight.zMinForRadar) && x.brushSides.SelectMany(y => y.vertices).All(y => y.z < levelHeight.zMaxForRadar)) ||
                 (x.brushSides.SelectMany(y => y.vertices).All(y => y.z >= levelHeight.zMinForRadar) && x.brushSides.SelectMany(y => y.vertices).All(y => y.z >= levelHeight.zMaxForRadar))
             )).ToList();
-            var displacementRemoveList = GetDisplacementRemoveVerticesList().Where(x => !(
-                (x.brushSides.SelectMany(y => y.vertices).All(y => y.z < levelHeight.zMinForRadar) && x.brushSides.SelectMany(y => y.vertices).All(y => y.z < levelHeight.zMaxForRadar)) ||
-                (x.brushSides.SelectMany(y => y.vertices).All(y => y.z >= levelHeight.zMinForRadar) && x.brushSides.SelectMany(y => y.vertices).All(y => y.z >= levelHeight.zMaxForRadar))
-            )).ToList();
-
-            var brushCoverList = GetBrushCoverVerticesList().Where(x => !(
-                (x.brushSides.SelectMany(y => y.vertices).All(y => y.z < levelHeight.zMinForRadar) && x.brushSides.SelectMany(y => y.vertices).All(y => y.z < levelHeight.zMaxForRadar)) ||
-                (x.brushSides.SelectMany(y => y.vertices).All(y => y.z >= levelHeight.zMinForRadar) && x.brushSides.SelectMany(y => y.vertices).All(y => y.z >= levelHeight.zMaxForRadar))
-            )).ToList();
-            var displacementCoverList = GetDisplacementCoverVerticesList().Where(x => !(
+            var displacementRemoveList = GetBrushVolumeList(vmfRequiredData.displacementsRemove, JercTypes.Remove).Where(x => !(
                 (x.brushSides.SelectMany(y => y.vertices).All(y => y.z < levelHeight.zMinForRadar) && x.brushSides.SelectMany(y => y.vertices).All(y => y.z < levelHeight.zMaxForRadar)) ||
                 (x.brushSides.SelectMany(y => y.vertices).All(y => y.z >= levelHeight.zMinForRadar) && x.brushSides.SelectMany(y => y.vertices).All(y => y.z >= levelHeight.zMaxForRadar))
             )).ToList();
 
-            var brushPathSideList = GetBrushPathSidesVerticesList().Where(x => !(
+            var brushCoverList = GetBrushVolumeList(vmfRequiredData.brushesCover, JercTypes.Cover).Where(x => !(
+                (x.brushSides.SelectMany(y => y.vertices).All(y => y.z < levelHeight.zMinForRadar) && x.brushSides.SelectMany(y => y.vertices).All(y => y.z < levelHeight.zMaxForRadar)) ||
+                (x.brushSides.SelectMany(y => y.vertices).All(y => y.z >= levelHeight.zMinForRadar) && x.brushSides.SelectMany(y => y.vertices).All(y => y.z >= levelHeight.zMaxForRadar))
+            )).ToList();
+            var displacementCoverList = GetBrushVolumeList(vmfRequiredData.displacementsCover, JercTypes.Cover).Where(x => !(
+                (x.brushSides.SelectMany(y => y.vertices).All(y => y.z < levelHeight.zMinForRadar) && x.brushSides.SelectMany(y => y.vertices).All(y => y.z < levelHeight.zMaxForRadar)) ||
+                (x.brushSides.SelectMany(y => y.vertices).All(y => y.z >= levelHeight.zMinForRadar) && x.brushSides.SelectMany(y => y.vertices).All(y => y.z >= levelHeight.zMaxForRadar))
+            )).ToList();
+
+            var brushPathSideList = GetBrushSideList(vmfRequiredData.brushesSidesPath, JercTypes.Path).Where(x => !(
                 (x.vertices.All(y => y.z < levelHeight.zMinForRadar) && x.vertices.All(y => y.z < levelHeight.zMaxForRadar)) ||
                 (x.vertices.All(y => y.z >= levelHeight.zMinForRadar) && x.vertices.All(y => y.z >= levelHeight.zMaxForRadar))
             )).ToList();
-            var displacementPathSideList = GetDisplacementPathSidesVerticesList().Where(x => !(
+            var displacementPathSideList = GetBrushSideList(vmfRequiredData.displacementsSidesPath, JercTypes.Path).Where(x => !(
                 (x.vertices.All(y => y.z < levelHeight.zMinForRadar) && x.vertices.All(y => y.z < levelHeight.zMaxForRadar)) ||
                 (x.vertices.All(y => y.z >= levelHeight.zMinForRadar) && x.vertices.All(y => y.z >= levelHeight.zMaxForRadar))
             )).ToList();
 
-            var brushOverlapSideList = GetBrushOverlapSidesVerticesList().Where(x => !(
+            var brushOverlapSideList = GetBrushSideList(vmfRequiredData.brushesSidesOverlap, JercTypes.Overlap).Where(x => !(
                 (x.vertices.All(y => y.z < levelHeight.zMinForRadar) && x.vertices.All(y => y.z < levelHeight.zMaxForRadar)) ||
                 (x.vertices.All(y => y.z >= levelHeight.zMinForRadar) && x.vertices.All(y => y.z >= levelHeight.zMaxForRadar))
             )).ToList();
-            var displacementOverlapSideList = GetDisplacementOverlapSidesVerticesList().Where(x => !(
-                (x.vertices.All(y => y.z < levelHeight.zMinForRadar) && x.vertices.All(y => y.z < levelHeight.zMaxForRadar)) ||
-                (x.vertices.All(y => y.z >= levelHeight.zMinForRadar) && x.vertices.All(y => y.z >= levelHeight.zMaxForRadar))
-            )).ToList();
-
-            var brushDoorSideList = GetBrushDoorSidesVerticesList().Where(x => !(
-                (x.vertices.All(y => y.z < levelHeight.zMinForRadar) && x.vertices.All(y => y.z < levelHeight.zMaxForRadar)) ||
-                (x.vertices.All(y => y.z >= levelHeight.zMinForRadar) && x.vertices.All(y => y.z >= levelHeight.zMaxForRadar))
-            )).ToList();
-            var displacementDoorSideList = GetDisplacementDoorSidesVerticesList().Where(x => !(
+            var displacementOverlapSideList = GetBrushSideList(vmfRequiredData.displacementsSidesOverlap, JercTypes.Overlap).Where(x => !(
                 (x.vertices.All(y => y.z < levelHeight.zMinForRadar) && x.vertices.All(y => y.z < levelHeight.zMaxForRadar)) ||
                 (x.vertices.All(y => y.z >= levelHeight.zMinForRadar) && x.vertices.All(y => y.z >= levelHeight.zMaxForRadar))
             )).ToList();
 
-            var brushLadderSideList = GetBrushLadderSidesVerticesList().Where(x => !(
+            var brushDoorSideList = GetBrushSideList(vmfRequiredData.brushesSidesDoor, JercTypes.Door).Where(x => !(
                 (x.vertices.All(y => y.z < levelHeight.zMinForRadar) && x.vertices.All(y => y.z < levelHeight.zMaxForRadar)) ||
                 (x.vertices.All(y => y.z >= levelHeight.zMinForRadar) && x.vertices.All(y => y.z >= levelHeight.zMaxForRadar))
             )).ToList();
-            var displacementLadderSideList = GetDisplacementLadderSidesVerticesList().Where(x => !(
+            var displacementDoorSideList = GetBrushSideList(vmfRequiredData.displacementsSidesDoor, JercTypes.Door).Where(x => !(
+                (x.vertices.All(y => y.z < levelHeight.zMinForRadar) && x.vertices.All(y => y.z < levelHeight.zMaxForRadar)) ||
+                (x.vertices.All(y => y.z >= levelHeight.zMinForRadar) && x.vertices.All(y => y.z >= levelHeight.zMaxForRadar))
+            )).ToList();
+
+            var brushLadderSideList = GetBrushSideList(vmfRequiredData.brushesSidesLadder, JercTypes.Ladder).Where(x => !(
+                (x.vertices.All(y => y.z < levelHeight.zMinForRadar) && x.vertices.All(y => y.z < levelHeight.zMaxForRadar)) ||
+                (x.vertices.All(y => y.z >= levelHeight.zMinForRadar) && x.vertices.All(y => y.z >= levelHeight.zMaxForRadar))
+            )).ToList();
+            var displacementLadderSideList = GetBrushSideList(vmfRequiredData.displacementsSidesLadder, JercTypes.Ladder).Where(x => !(
                 (x.vertices.All(y => y.z < levelHeight.zMinForRadar) && x.vertices.All(y => y.z < levelHeight.zMaxForRadar)) ||
                 (x.vertices.All(y => y.z >= levelHeight.zMinForRadar) && x.vertices.All(y => y.z >= levelHeight.zMaxForRadar))
             )).ToList();
@@ -738,9 +738,9 @@ namespace JERC
         {
             var entityBrushSideListById = new Dictionary<int, List<EntityBrushSide>>();
 
-            var entityBuyzoneVerticesListById = GetEntityBuyzoneSidesVerticesList();
-            var entityBombsiteVerticesListById = GetEntityBombsiteSidesVerticesList();
-            var entityRescueZoneVerticesListById = GetEntityRescueZoneSidesVerticesList();
+            var entityBuyzoneVerticesListById = GetEntityBrushSideList(vmfRequiredData.entitiesSidesByEntityBuyzoneId, EntityTypes.Buyzone);
+            var entityBombsiteVerticesListById = GetEntityBrushSideList(vmfRequiredData.entitiesSidesByEntityBombsiteId, EntityTypes.Bombsite);
+            var entityRescueZoneVerticesListById = GetEntityBrushSideList(vmfRequiredData.entitiesSidesByEntityRescueZoneId, EntityTypes.RescueZone);
 
             if (entityBuyzoneVerticesListById != null && entityBuyzoneVerticesListById.Any())
             {
@@ -768,11 +768,11 @@ namespace JERC
         }
 
 
-        private static List<BrushVolume> GetBrushRemoveVerticesList()
+        private static List<BrushVolume> GetBrushVolumeList(List<Models.Brush> brushList, JercTypes jercType)
         {
-            var brushList = new List<BrushVolume>();
+            var brushVolumeList = new List<BrushVolume>();
             
-            foreach (var brush in vmfRequiredData.brushesRemove)
+            foreach (var brush in brushList)
             {
                 var brushNew = new BrushVolume();
                 foreach (var brushSide in brush.side.ToList())
@@ -781,26 +781,26 @@ namespace JERC
                     foreach (var vertices in brushSide.vertices_plus.ToList())
                     {
                         brushSideNew.vertices.Add(new Vertices(vertices.x / Sizes.SizeReductionMultiplier, vertices.y / Sizes.SizeReductionMultiplier, vertices.z));
-                        brushSideNew.jercType = JercTypes.Remove;
+                        brushSideNew.jercType = jercType;
                     }
 
                     brushNew.brushSides.Add(brushSideNew);
                 }
 
-                brushNew.jercType = JercTypes.Remove;
+                brushNew.jercType = jercType;
 
-                brushList.Add(brushNew);
+                brushVolumeList.Add(brushNew);
             }
 
-            return brushList;
+            return brushVolumeList;
         }
 
 
-        /*private static List<BrushSide> GetBrushRemoveSidesVerticesList()
+        private static List<BrushSide> GetBrushSideList(List<Side> sideList, JercTypes jercType)
         {
             var brushSideList = new List<BrushSide>();
 
-            foreach (var side in vmfRequiredData.brushesSidesRemove)
+            foreach (var side in sideList)
             {
                 var brushSide = new BrushSide();
                 for (int i = 0; i < side.vertices_plus.Count(); i++)
@@ -808,29 +808,7 @@ namespace JERC
                     var vert = side.vertices_plus[i];
 
                     brushSide.vertices.Add(new Vertices(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier, vert.z));
-                    brushSide.jercType = JercTypes.Remove;
-                }
-
-                brushSideList.Add(brushSide);
-            }
-
-            return brushSideList;
-        }*/
-
-
-        private static List<BrushSide> GetBrushPathSidesVerticesList()
-        {
-            var brushSideList = new List<BrushSide>();
-
-            foreach (var side in vmfRequiredData.brushesSidesPath)
-            {
-                var brushSide = new BrushSide();
-                for (int i = 0; i < side.vertices_plus.Count(); i++)
-                {
-                    var vert = side.vertices_plus[i];
-
-                    brushSide.vertices.Add(new Vertices(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier, vert.z));
-                    brushSide.jercType = JercTypes.Path;
+                    brushSide.jercType = jercType;
                 }
 
                 brushSideList.Add(brushSide);
@@ -840,315 +818,11 @@ namespace JERC
         }
 
 
-        private static List<BrushVolume> GetBrushCoverVerticesList()
-        {
-            var brushList = new List<BrushVolume>();
-
-            foreach (var brush in vmfRequiredData.brushesCover)
-            {
-                var brushNew = new BrushVolume();
-                foreach (var brushSide in brush.side.ToList())
-                {
-                    var brushSideNew = new BrushSide();
-                    foreach (var vertices in brushSide.vertices_plus.ToList())
-                    {
-                        brushSideNew.vertices.Add(new Vertices(vertices.x / Sizes.SizeReductionMultiplier, vertices.y / Sizes.SizeReductionMultiplier, vertices.z));
-                        brushSideNew.jercType = JercTypes.Cover;
-                    }
-
-                    brushNew.brushSides.Add(brushSideNew);
-                }
-
-                brushNew.jercType = JercTypes.Cover;
-
-                brushList.Add(brushNew);
-            }
-
-            return brushList;
-        }
-
-
-        /*private static List<BrushSide> GetBrushCoverSidesVerticesList()
-        {
-            var brushSideList = new List<BrushSide>();
-
-            foreach (var side in vmfRequiredData.brushesSidesCover)
-            {
-                var brushSide = new BrushSide();
-                for (int i = 0; i < side.vertices_plus.Count(); i++)
-                {
-                    var vert = side.vertices_plus[i];
-
-                    brushSide.vertices.Add(new Vertices(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier, vert.z));
-                    brushSide.jercType = JercTypes.Cover;
-                }
-
-                brushSideList.Add(brushSide);
-            }
-
-            return brushSideList;
-        }*/
-
-
-        private static List<BrushSide> GetBrushOverlapSidesVerticesList()
-        {
-            var brushSideList = new List<BrushSide>();
-
-            foreach (var side in vmfRequiredData.brushesSidesOverlap)
-            {
-                var brushSide = new BrushSide();
-                for (int i = 0; i < side.vertices_plus.Count(); i++)
-                {
-                    var vert = side.vertices_plus[i];
-
-                    brushSide.vertices.Add(new Vertices(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier, vert.z));
-                    brushSide.jercType = JercTypes.Overlap;
-                }
-
-                brushSideList.Add(brushSide);
-            }
-
-            return brushSideList;
-        }
-
-
-        private static List<BrushSide> GetBrushDoorSidesVerticesList()
-        {
-            var brushSideList = new List<BrushSide>();
-
-            foreach (var side in vmfRequiredData.brushesSidesDoor)
-            {
-                var brushSide = new BrushSide();
-                for (int i = 0; i < side.vertices_plus.Count(); i++)
-                {
-                    var vert = side.vertices_plus[i];
-
-                    brushSide.vertices.Add(new Vertices(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier, vert.z));
-                    brushSide.jercType = JercTypes.Door;
-                }
-
-                brushSideList.Add(brushSide);
-            }
-
-            return brushSideList;
-        }
-
-
-        private static List<BrushSide> GetBrushLadderSidesVerticesList()
-        {
-            var brushSideList = new List<BrushSide>();
-
-            foreach (var side in vmfRequiredData.brushesSidesLadder)
-            {
-                var brushSide = new BrushSide();
-                for (int i = 0; i < side.vertices_plus.Count(); i++)
-                {
-                    var vert = side.vertices_plus[i];
-
-                    brushSide.vertices.Add(new Vertices(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier, vert.z));
-                    brushSide.jercType = JercTypes.Ladder;
-                }
-
-                brushSideList.Add(brushSide);
-            }
-
-            return brushSideList;
-        }
-
-
-        private static List<BrushVolume> GetDisplacementRemoveVerticesList()
-        {
-            var displacementList = new List<BrushVolume>();
-
-            foreach (var displacement in vmfRequiredData.displacementsRemove)
-            {
-                var displacementNew = new BrushVolume();
-                foreach (var displacementSide in displacement.side.ToList())
-                {
-                    var displacementSideNew = new BrushSide();
-                    foreach (var vertices in displacementSide.vertices_plus.ToList())
-                    {
-                        displacementSideNew.vertices.Add(new Vertices(vertices.x / Sizes.SizeReductionMultiplier, vertices.y / Sizes.SizeReductionMultiplier, vertices.z));
-                        displacementSideNew.jercType = JercTypes.Remove;
-                    }
-
-                    displacementNew.brushSides.Add(displacementSideNew);
-                }
-
-                displacementNew.jercType = JercTypes.Remove;
-
-                displacementList.Add(displacementNew);
-            }
-
-            return displacementList;
-        }
-
-
-        /*private static List<BrushSide> GetDisplacementRemoveSidesVerticesList()
-        {
-            var displacementSideList = new List<BrushSide>();
-
-            foreach (var side in vmfRequiredData.displacementsSidesRemove)
-            {
-                var displacementSide = new BrushSide();
-                for (int i = 0; i < side.vertices_plus.Count(); i++)
-                {
-                    var vert = side.vertices_plus[i];
-
-                    displacementSide.vertices.Add(new Vertices(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier, vert.z));
-                    displacementSide.jercType = JercTypes.Remove;
-                }
-
-                displacementSideList.Add(displacementSide);
-            }
-
-            return displacementSideList;
-        }*/
-
-
-        private static List<BrushSide> GetDisplacementPathSidesVerticesList()
-        {
-            var displacementSideList = new List<BrushSide>();
-
-            foreach (var side in vmfRequiredData.displacementsSidesPath)
-            {
-                var displacementSide = new BrushSide();
-                for (int i = 0; i < side.vertices_plus.Count(); i++)
-                {
-                    var vert = side.vertices_plus[i];
-
-                    displacementSide.vertices.Add(new Vertices(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier, vert.z));
-                    displacementSide.jercType = JercTypes.Path;
-                }
-
-                displacementSideList.Add(displacementSide);
-            }
-
-            return displacementSideList;
-        }
-
-
-        private static List<BrushVolume> GetDisplacementCoverVerticesList()
-        {
-            var displacementList = new List<BrushVolume>();
-
-            foreach (var displacement in vmfRequiredData.displacementsCover)
-            {
-                var displacementNew = new BrushVolume();
-                foreach (var displacementSide in displacement.side.ToList())
-                {
-                    var displacementSideNew = new BrushSide();
-                    foreach (var vertices in displacementSide.vertices_plus.ToList())
-                    {
-                        displacementSideNew.vertices.Add(new Vertices(vertices.x / Sizes.SizeReductionMultiplier, vertices.y / Sizes.SizeReductionMultiplier, vertices.z));
-                        displacementSideNew.jercType = JercTypes.Cover;
-                    }
-
-                    displacementNew.brushSides.Add(displacementSideNew);
-                }
-
-                displacementNew.jercType = JercTypes.Cover;
-
-                displacementList.Add(displacementNew);
-            }
-
-            return displacementList;
-        }
-
-
-        /*private static List<BrushSide> GetDisplacementCoverSidesVerticesList()
-        {
-            var displacementSideList = new List<BrushSide>();
-
-            foreach (var side in vmfRequiredData.displacementsSidesCover)
-            {
-                var displacementSide = new BrushSide();
-                for (int i = 0; i < side.vertices_plus.Count(); i++)
-                {
-                    var vert = side.vertices_plus[i];
-
-                    displacementSide.vertices.Add(new Vertices(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier, vert.z));
-                    displacementSide.jercType = JercTypes.Cover;
-                }
-
-                displacementSideList.Add(displacementSide);
-            }
-
-            return displacementSideList;
-        }*/
-
-
-        private static List<BrushSide> GetDisplacementOverlapSidesVerticesList()
-        {
-            var displacementSideList = new List<BrushSide>();
-
-            foreach (var side in vmfRequiredData.displacementsSidesOverlap)
-            {
-                var displacementSide = new BrushSide();
-                for (int i = 0; i < side.vertices_plus.Count(); i++)
-                {
-                    var vert = side.vertices_plus[i];
-
-                    displacementSide.vertices.Add(new Vertices(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier, vert.z));
-                    displacementSide.jercType = JercTypes.Overlap;
-                }
-
-                displacementSideList.Add(displacementSide);
-            }
-
-            return displacementSideList;
-        }
-
-
-        private static List<BrushSide> GetDisplacementDoorSidesVerticesList()
-        {
-            var displacementSideList = new List<BrushSide>();
-
-            foreach (var side in vmfRequiredData.displacementsSidesDoor)
-            {
-                var displacementSide = new BrushSide();
-                for (int i = 0; i < side.vertices_plus.Count(); i++)
-                {
-                    var vert = side.vertices_plus[i];
-
-                    displacementSide.vertices.Add(new Vertices(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier, vert.z));
-                    displacementSide.jercType = JercTypes.Door;
-                }
-
-                displacementSideList.Add(displacementSide);
-            }
-
-            return displacementSideList;
-        }
-
-
-        private static List<BrushSide> GetDisplacementLadderSidesVerticesList()
-        {
-            var displacementSideList = new List<BrushSide>();
-
-            foreach (var side in vmfRequiredData.displacementsSidesLadder)
-            {
-                var displacementSide = new BrushSide();
-                for (int i = 0; i < side.vertices_plus.Count(); i++)
-                {
-                    var vert = side.vertices_plus[i];
-
-                    displacementSide.vertices.Add(new Vertices(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier, vert.z));
-                    displacementSide.jercType = JercTypes.Ladder;
-                }
-
-                displacementSideList.Add(displacementSide);
-            }
-
-            return displacementSideList;
-        }
-
-
-        private static Dictionary<int, List<EntityBrushSide>> GetEntityBuyzoneSidesVerticesList()
+        private static Dictionary<int, List<EntityBrushSide>> GetEntityBrushSideList(Dictionary<int, List<Side>> sideListByEntityIdDictionary, EntityTypes entityType)
         {
             var entityBrushSideListById = new Dictionary<int, List<EntityBrushSide>>();
 
-            foreach (var entitySides in vmfRequiredData.entitiesSidesByEntityBuyzoneId)
+            foreach (var entitySides in sideListByEntityIdDictionary)
             {
                 foreach (var side in entitySides.Value)
                 {
@@ -1158,63 +832,7 @@ namespace JERC
                         var vert = side.vertices_plus[i];
 
                         entityBrushSide.vertices.Add(new Vertices(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier, vert.z));
-                        entityBrushSide.entityType = EntityTypes.Buyzone;
-                    }
-
-                    if (entityBrushSideListById.ContainsKey(entitySides.Key))
-                        entityBrushSideListById[entitySides.Key].Add(entityBrushSide);
-                    else
-                        entityBrushSideListById.Add(entitySides.Key, new List<EntityBrushSide>() { entityBrushSide });
-                }
-            }
-
-            return entityBrushSideListById;
-        }
-
-
-        private static Dictionary<int, List<EntityBrushSide>> GetEntityBombsiteSidesVerticesList()
-        {
-            var entityBrushSideListById = new Dictionary<int, List<EntityBrushSide>>();
-
-            foreach (var entitySides in vmfRequiredData.entitiesSidesByEntityBombsiteId)
-            {
-                foreach (var side in entitySides.Value)
-                {
-                    var entityBrushSide = new EntityBrushSide();
-                    for (int i = 0; i < side.vertices_plus.Count(); i++)
-                    {
-                        var vert = side.vertices_plus[i];
-
-                        entityBrushSide.vertices.Add(new Vertices(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier, vert.z));
-                        entityBrushSide.entityType = EntityTypes.Bombsite;
-                    }
-
-                    if (entityBrushSideListById.ContainsKey(entitySides.Key))
-                        entityBrushSideListById[entitySides.Key].Add(entityBrushSide);
-                    else
-                        entityBrushSideListById.Add(entitySides.Key, new List<EntityBrushSide>() { entityBrushSide });
-                }
-            }
-
-            return entityBrushSideListById;
-        }
-
-
-        private static Dictionary<int, List<EntityBrushSide>> GetEntityRescueZoneSidesVerticesList()
-        {
-            var entityBrushSideListById = new Dictionary<int, List<EntityBrushSide>>();
-
-            foreach (var entitySides in vmfRequiredData.entitiesSidesByEntityRescueZoneId)
-            {
-                foreach (var side in entitySides.Value)
-                {
-                    var entityBrushSide = new EntityBrushSide();
-                    for (int i = 0; i < side.vertices_plus.Count(); i++)
-                    {
-                        var vert = side.vertices_plus[i];
-
-                        entityBrushSide.vertices.Add(new Vertices(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier, vert.z));
-                        entityBrushSide.entityType = EntityTypes.RescueZone;
+                        entityBrushSide.entityType = entityType;
                     }
 
                     if (entityBrushSideListById.ContainsKey(entitySides.Key))
