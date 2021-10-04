@@ -438,59 +438,23 @@ namespace JERC
             graphics.SetClip(Rectangle.FromLTRB(0, 0, overviewPositionValues.outputResolution, overviewPositionValues.outputResolution));
 
             // get all brush sides and displacement sides to draw
-            var brushRemoveList = GetBrushVolumeList(vmfRequiredData.brushesRemove, JercTypes.Remove).Where(x => !(
-                (x.brushSides.SelectMany(y => y.vertices).All(y => y.z < levelHeight.zMinForRadar) && x.brushSides.SelectMany(y => y.vertices).All(y => y.z < levelHeight.zMaxForRadar)) ||
-                (x.brushSides.SelectMany(y => y.vertices).All(y => y.z >= levelHeight.zMinForRadar) && x.brushSides.SelectMany(y => y.vertices).All(y => y.z >= levelHeight.zMaxForRadar))
-            )).ToList();
-            var displacementRemoveList = GetBrushVolumeList(vmfRequiredData.displacementsRemove, JercTypes.Remove).Where(x => !(
-                (x.brushSides.SelectMany(y => y.vertices).All(y => y.z < levelHeight.zMinForRadar) && x.brushSides.SelectMany(y => y.vertices).All(y => y.z < levelHeight.zMaxForRadar)) ||
-                (x.brushSides.SelectMany(y => y.vertices).All(y => y.z >= levelHeight.zMinForRadar) && x.brushSides.SelectMany(y => y.vertices).All(y => y.z >= levelHeight.zMaxForRadar))
-            )).ToList();
+            var brushRemoveList = GetBrushVolumeListWithinLevelHeight(levelHeight, vmfRequiredData.brushesRemove, JercTypes.Remove);
+            var displacementRemoveList = GetBrushVolumeListWithinLevelHeight(levelHeight, vmfRequiredData.displacementsRemove, JercTypes.Remove);
 
-            var brushCoverList = GetBrushVolumeList(vmfRequiredData.brushesCover, JercTypes.Cover).Where(x => !(
-                (x.brushSides.SelectMany(y => y.vertices).All(y => y.z < levelHeight.zMinForRadar) && x.brushSides.SelectMany(y => y.vertices).All(y => y.z < levelHeight.zMaxForRadar)) ||
-                (x.brushSides.SelectMany(y => y.vertices).All(y => y.z >= levelHeight.zMinForRadar) && x.brushSides.SelectMany(y => y.vertices).All(y => y.z >= levelHeight.zMaxForRadar))
-            )).ToList();
-            var displacementCoverList = GetBrushVolumeList(vmfRequiredData.displacementsCover, JercTypes.Cover).Where(x => !(
-                (x.brushSides.SelectMany(y => y.vertices).All(y => y.z < levelHeight.zMinForRadar) && x.brushSides.SelectMany(y => y.vertices).All(y => y.z < levelHeight.zMaxForRadar)) ||
-                (x.brushSides.SelectMany(y => y.vertices).All(y => y.z >= levelHeight.zMinForRadar) && x.brushSides.SelectMany(y => y.vertices).All(y => y.z >= levelHeight.zMaxForRadar))
-            )).ToList();
+            var brushCoverList = GetBrushVolumeListWithinLevelHeight(levelHeight, vmfRequiredData.brushesCover, JercTypes.Cover);
+            var displacementCoverList = GetBrushVolumeListWithinLevelHeight(levelHeight, vmfRequiredData.displacementsCover, JercTypes.Cover);
 
-            var brushPathSideList = GetBrushSideList(vmfRequiredData.brushesSidesPath, JercTypes.Path).Where(x => !(
-                (x.vertices.All(y => y.z < levelHeight.zMinForRadar) && x.vertices.All(y => y.z < levelHeight.zMaxForRadar)) ||
-                (x.vertices.All(y => y.z >= levelHeight.zMinForRadar) && x.vertices.All(y => y.z >= levelHeight.zMaxForRadar))
-            )).ToList();
-            var displacementPathSideList = GetBrushSideList(vmfRequiredData.displacementsSidesPath, JercTypes.Path).Where(x => !(
-                (x.vertices.All(y => y.z < levelHeight.zMinForRadar) && x.vertices.All(y => y.z < levelHeight.zMaxForRadar)) ||
-                (x.vertices.All(y => y.z >= levelHeight.zMinForRadar) && x.vertices.All(y => y.z >= levelHeight.zMaxForRadar))
-            )).ToList();
+            var brushPathSideList = GetBrushSideListWithinLevelHeight(levelHeight, vmfRequiredData.brushesSidesPath, JercTypes.Path);
+            var displacementPathSideList = GetBrushSideListWithinLevelHeight(levelHeight, vmfRequiredData.displacementsSidesPath, JercTypes.Path);
 
-            var brushOverlapSideList = GetBrushSideList(vmfRequiredData.brushesSidesOverlap, JercTypes.Overlap).Where(x => !(
-                (x.vertices.All(y => y.z < levelHeight.zMinForRadar) && x.vertices.All(y => y.z < levelHeight.zMaxForRadar)) ||
-                (x.vertices.All(y => y.z >= levelHeight.zMinForRadar) && x.vertices.All(y => y.z >= levelHeight.zMaxForRadar))
-            )).ToList();
-            var displacementOverlapSideList = GetBrushSideList(vmfRequiredData.displacementsSidesOverlap, JercTypes.Overlap).Where(x => !(
-                (x.vertices.All(y => y.z < levelHeight.zMinForRadar) && x.vertices.All(y => y.z < levelHeight.zMaxForRadar)) ||
-                (x.vertices.All(y => y.z >= levelHeight.zMinForRadar) && x.vertices.All(y => y.z >= levelHeight.zMaxForRadar))
-            )).ToList();
+            var brushOverlapSideList = GetBrushSideListWithinLevelHeight(levelHeight, vmfRequiredData.brushesSidesOverlap, JercTypes.Overlap);
+            var displacementOverlapSideList = GetBrushSideListWithinLevelHeight(levelHeight, vmfRequiredData.displacementsSidesOverlap, JercTypes.Overlap);
 
-            var brushDoorSideList = GetBrushSideList(vmfRequiredData.brushesSidesDoor, JercTypes.Door).Where(x => !(
-                (x.vertices.All(y => y.z < levelHeight.zMinForRadar) && x.vertices.All(y => y.z < levelHeight.zMaxForRadar)) ||
-                (x.vertices.All(y => y.z >= levelHeight.zMinForRadar) && x.vertices.All(y => y.z >= levelHeight.zMaxForRadar))
-            )).ToList();
-            var displacementDoorSideList = GetBrushSideList(vmfRequiredData.displacementsSidesDoor, JercTypes.Door).Where(x => !(
-                (x.vertices.All(y => y.z < levelHeight.zMinForRadar) && x.vertices.All(y => y.z < levelHeight.zMaxForRadar)) ||
-                (x.vertices.All(y => y.z >= levelHeight.zMinForRadar) && x.vertices.All(y => y.z >= levelHeight.zMaxForRadar))
-            )).ToList();
+            var brushDoorSideList = GetBrushSideListWithinLevelHeight(levelHeight, vmfRequiredData.brushesSidesDoor, JercTypes.Door);
+            var displacementDoorSideList = GetBrushSideListWithinLevelHeight(levelHeight, vmfRequiredData.displacementsSidesDoor, JercTypes.Door);
 
-            var brushLadderSideList = GetBrushSideList(vmfRequiredData.brushesSidesLadder, JercTypes.Ladder).Where(x => !(
-                (x.vertices.All(y => y.z < levelHeight.zMinForRadar) && x.vertices.All(y => y.z < levelHeight.zMaxForRadar)) ||
-                (x.vertices.All(y => y.z >= levelHeight.zMinForRadar) && x.vertices.All(y => y.z >= levelHeight.zMaxForRadar))
-            )).ToList();
-            var displacementLadderSideList = GetBrushSideList(vmfRequiredData.displacementsSidesLadder, JercTypes.Ladder).Where(x => !(
-                (x.vertices.All(y => y.z < levelHeight.zMinForRadar) && x.vertices.All(y => y.z < levelHeight.zMaxForRadar)) ||
-                (x.vertices.All(y => y.z >= levelHeight.zMinForRadar) && x.vertices.All(y => y.z >= levelHeight.zMaxForRadar))
-            )).ToList();
+            var brushLadderSideList = GetBrushSideListWithinLevelHeight(levelHeight, vmfRequiredData.brushesSidesLadder, JercTypes.Ladder);
+            var displacementLadderSideList = GetBrushSideListWithinLevelHeight(levelHeight, vmfRequiredData.displacementsSidesLadder, JercTypes.Ladder);
 
 
             var brushesToDrawPath = GetBrushesToDraw(boundingBox, brushPathSideList);
@@ -509,15 +473,7 @@ namespace JERC
             var displacementsToDrawLadder = GetBrushesToDraw(boundingBox, displacementLadderSideList);
 
             // get all entity sides to draw
-            var entityBrushSideListByIdUnfiltered = GetEntityVerticesListById();
-            var entityBrushSideListById = new Dictionary<int, List<EntityBrushSide>>();
-            foreach (var entityBrushSideById in entityBrushSideListByIdUnfiltered)
-            {
-                if (entityBrushSideById.Value.Any(x => !((x.vertices.All(y => y.z < levelHeight.zMinForRadar) && x.vertices.All(y => y.z < levelHeight.zMaxForRadar)) || (x.vertices.All(y => y.z >= levelHeight.zMinForRadar) && x.vertices.All(y => y.z >= levelHeight.zMaxForRadar))))) // would this allow entities to be on more than 1 level if their brushes span across level dividers ??
-                {
-                    entityBrushSideListById.Add(entityBrushSideById.Key, entityBrushSideById.Value);
-                }
-            }
+            var entityBrushSideListById = GetEntityBrushSideListWithinLevelHeight(levelHeight);
 
 
             // add remove stuff first to set to graphics' clip
@@ -761,6 +717,41 @@ namespace JERC
                 foreach (var list in entityRescueZoneVerticesListById)
                 {
                     entityBrushSideListById.Add(list.Key, list.Value);
+                }
+            }
+
+            return entityBrushSideListById;
+        }
+
+
+        private static List<BrushVolume> GetBrushVolumeListWithinLevelHeight(LevelHeight levelHeight, List<Models.Brush> brushList, JercTypes jercType)
+        {
+            return GetBrushVolumeList(brushList, jercType).Where(x => !(
+                (x.brushSides.SelectMany(y => y.vertices).All(y => y.z < levelHeight.zMinForRadar) && x.brushSides.SelectMany(y => y.vertices).All(y => y.z < levelHeight.zMaxForRadar)) ||
+                (x.brushSides.SelectMany(y => y.vertices).All(y => y.z >= levelHeight.zMinForRadar) && x.brushSides.SelectMany(y => y.vertices).All(y => y.z >= levelHeight.zMaxForRadar))
+            )).ToList();
+        }
+
+
+        private static List<BrushSide> GetBrushSideListWithinLevelHeight(LevelHeight levelHeight, List<Side> sideList, JercTypes jercType)
+        {
+            return GetBrushSideList(sideList, jercType).Where(x => !(
+                (x.vertices.All(y => y.z < levelHeight.zMinForRadar) && x.vertices.All(y => y.z < levelHeight.zMaxForRadar)) ||
+                (x.vertices.All(y => y.z >= levelHeight.zMinForRadar) && x.vertices.All(y => y.z >= levelHeight.zMaxForRadar))
+            )).ToList();
+        }
+
+
+        private static Dictionary<int, List<EntityBrushSide>> GetEntityBrushSideListWithinLevelHeight(LevelHeight levelHeight)
+        {
+            var entityBrushSideListById = new Dictionary<int, List<EntityBrushSide>>();
+            var entityBrushSideListByIdUnfiltered = GetEntityVerticesListById();
+
+            foreach (var entityBrushSideById in entityBrushSideListByIdUnfiltered)
+            {
+                if (entityBrushSideById.Value.Any(x => !((x.vertices.All(y => y.z < levelHeight.zMinForRadar) && x.vertices.All(y => y.z < levelHeight.zMaxForRadar)) || (x.vertices.All(y => y.z >= levelHeight.zMinForRadar) && x.vertices.All(y => y.z >= levelHeight.zMaxForRadar))))) // would this allow entities to be on more than 1 level if their brushes span across level dividers ??
+                {
+                    entityBrushSideListById.Add(entityBrushSideById.Key, entityBrushSideById.Value);
                 }
             }
 
