@@ -1,4 +1,5 @@
-﻿using System;
+﻿using JERC.Models;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -17,7 +18,8 @@ namespace JERC.Constants
                 GetColour(rgbLow.B, rgbHigh.B, percentageAboveMin)
             );
 
-        public static Color ColourBrushesStroke() => Color.FromArgb(255, 255, 255, 255);
+        public static Color ColourRemoveStroke(Color strokeColour) => strokeColour;
+        public static Color ColourBrushesStroke(Color strokeColour) => strokeColour;
 
         public static Color ColourBuyzones() => Color.FromArgb(75, 0, 255, 0);
         public static Color ColourBombsites() => Color.FromArgb(75, 255, 0, 0);

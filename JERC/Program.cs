@@ -507,7 +507,7 @@ namespace JERC
             {
                 foreach (var brushToRender in brushesToDrawPath.Concat(displacementsToDrawPath).Concat(brushesToDrawOverlap).Concat(displacementsToDrawOverlap).OrderBy(x => x.zAxisAverage))
                 {
-                    DrawStroke(graphics, brushToRender, Colours.ColourBrushesStroke());
+                    DrawStroke(graphics, brushToRender, Colours.ColourBrushesStroke(jercConfigValues.strokeColour));
                 }
             }
 
@@ -1145,7 +1145,7 @@ namespace JERC
             if (jercConfigValues.strokeAroundRemoveMaterials)
             {
                 var strokeSolidBrush = new SolidBrush(Color.Transparent);
-                var strokePen = new Pen(Color.White, jercConfigValues.strokeWidth);
+                var strokePen = new Pen(Colours.ColourRemoveStroke(jercConfigValues.strokeColour), jercConfigValues.strokeWidth);
                 DrawFilledPolygonObjectBrushes(graphics, strokeSolidBrush, strokePen, graphicsPath.PathPoints.Select(x => new Point((int)x.X, (int)x.Y)).ToArray());
             }
 
