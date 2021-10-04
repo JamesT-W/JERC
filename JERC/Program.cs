@@ -1,4 +1,4 @@
-using ImageAlterer;
+﻿using ImageAlterer;
 using JERC.Constants;
 using JERC.Enums;
 using JERC.Models;
@@ -16,6 +16,8 @@ namespace JERC
 {
     class Program
     {
+        private static readonly bool debugging = false;
+
         private static readonly ImageProcessorExtender imageProcessorExtender = new ImageProcessorExtender();
 
         private static readonly string gameBinDirectoryPath = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), @"..\"));
@@ -75,7 +77,15 @@ namespace JERC
 
             mapName = Path.GetFileNameWithoutExtension(gameConfigurationValues.vmfFilepath);
 
-            outputFilepathPrefix = string.Concat(gameOverviewsDirectoryPath, mapName);
+            if (debugging)
+            {
+                outputFilepathPrefix = string.Concat(@"F:\Coding Stuff\GitHub Files\JERC\", mapName);
+            }
+            else
+            {
+                outputFilepathPrefix = string.Concat(gameOverviewsDirectoryPath, mapName);
+            }
+
             outputImageBackgroundLevelsFilepath = string.Concat(outputFilepathPrefix, "_background_levels.png");
 
             vmf = new VMF(lines);
