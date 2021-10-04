@@ -17,9 +17,9 @@
 
 	backgroundFilename(string) : "Background Image Filename" : "default" : "For custom images, place them inside the following folder: /Counter-Strike Global Offensive/bin/jerc/textures/"
 
-	pathColourHigh(color255) : "Path Colour High" : "255 153 62 255" : "Colour of path world brushes at the highest point"
+	pathColourHigh(color255) : "Path Colour High" : "178 113 65 255" : "Colour of path world brushes at the highest point"
 
-	pathColourLow(color255) : "Path Colour Low" : "35 35 35 255" : "Colour of path world brushes at the lowest point"
+	pathColourLow(color255) : "Path Colour Low" : "39 56 79 255" : "Colour of path world brushes at the lowest point"
 
 	coverColourHigh(color255) : "Cover Colour High" : "240 240 240 255" : "Colour of cover world brushes at the highest point"
 
