@@ -109,7 +109,8 @@ namespace JERC
 
             GenerateRadars(levelHeights);
 
-            GenerateTxt(levelHeights);
+            if (jercConfigValues.exportTxt)
+                GenerateTxt(levelHeights);
         }
 
 
@@ -649,12 +650,15 @@ namespace JERC
 
             var radarLevelString = radarLevel.levelHeight.levelName.ToLower() == "default" ? string.Empty : string.Concat("_", radarLevel.levelHeight.levelName.ToLower());
 
-            var outputImageFilepath = string.Concat(outputImageFilepathPart1, radarLevelString, outputImageFilepathPart2);
-            SaveImage(outputImageFilepath, radarLevel.bmp);
-
-            if (!jercConfigValues.onlyOutputToAlternatePath && !string.IsNullOrWhiteSpace(jercConfigValues.alternateOutputPath))
+            if (jercConfigValues.exportDds || jercConfigValues.exportPng)
             {
-                SaveImage(jercConfigValues.alternateOutputPath, radarLevel.bmp);
+                var outputImageFilepath = string.Concat(outputImageFilepathPart1, radarLevelString, outputImageFilepathPart2);
+                SaveImage(outputImageFilepath, radarLevel.bmp);
+
+                if (!jercConfigValues.onlyOutputToAlternatePath && !string.IsNullOrWhiteSpace(jercConfigValues.alternateOutputPath))
+                {
+                    SaveImage(jercConfigValues.alternateOutputPath, radarLevel.bmp);
+                }
             }
         }
 
@@ -1383,8 +1387,11 @@ namespace JERC
             // only create the image if the file is not locked
             if (canSave)
             {
-                bmp.Save(filepath + ".png", ImageFormat.Png);
-                bmp.Save(filepath + ".dds");
+                if (jercConfigValues.exportDds)
+                    bmp.Save(filepath + ".dds");
+
+                if (jercConfigValues.exportPng)
+                    bmp.Save(filepath + ".png", ImageFormat.Png);
             }
         }
 
