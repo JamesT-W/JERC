@@ -42,38 +42,36 @@ namespace JERC.Models
             // jerc_config
 
             alternateOutputPath = string.IsNullOrWhiteSpace(jercEntitySettingsValues["alternateOutputPath"]) ? null : jercEntitySettingsValues["alternateOutputPath"];
-            onlyOutputToAlternatePath = jercEntitySettingsValues["onlyOutputToAlternatePath"] == "0";
+            onlyOutputToAlternatePath = jercEntitySettingsValues.ContainsKey("onlyOutputToAlternatePath") && jercEntitySettingsValues["onlyOutputToAlternatePath"] == "0";
             backgroundFilename = string.IsNullOrWhiteSpace(jercEntitySettingsValues["backgroundFilename"]) ? null : jercEntitySettingsValues["backgroundFilename"];
-            pathColourHigh = GetColourStringAsColour(jercEntitySettingsValues["pathColourHigh"]);
-            pathColourLow = GetColourStringAsColour(jercEntitySettingsValues["pathColourLow"]);
-            coverColourHigh = GetColourStringAsColour(jercEntitySettingsValues["coverColourHigh"]);
-            coverColourLow = GetColourStringAsColour(jercEntitySettingsValues["coverColourLow"]);
-            overlapColourHigh = GetColourStringAsColour(jercEntitySettingsValues["overlapColourHigh"]);
-            overlapColourLow = GetColourStringAsColour(jercEntitySettingsValues["overlapColourLow"]);
-            /*if (!int.TryParse(jercEntitySettingsValues["strokeWidth"], out strokeWidth))
-                strokeWidth = defaultStrokeWidthMultiplier;*/
-            strokeWidth = int.Parse(jercEntitySettingsValues["strokeWidth"]);
-            strokeColour = GetColourStringAsColour(jercEntitySettingsValues["strokeColour"]);
-            strokeAroundLayoutMaterials = jercEntitySettingsValues["strokeAroundLayoutMaterials"] == "0";
-            strokeAroundRemoveMaterials = jercEntitySettingsValues["strokeAroundRemoveMaterials"] == "0";
-            strokeAroundEntities = jercEntitySettingsValues["strokeAroundEntities"] == "0";
+            pathColourHigh = jercEntitySettingsValues.ContainsKey("pathColourHigh") ? GetColourStringAsColour(jercEntitySettingsValues["pathColourHigh"]) : Colours.ColourError;
+            pathColourLow = jercEntitySettingsValues.ContainsKey("pathColourLow") ? GetColourStringAsColour(jercEntitySettingsValues["pathColourLow"]) : Colours.ColourError;
+            coverColourHigh = jercEntitySettingsValues.ContainsKey("coverColourHigh") ? GetColourStringAsColour(jercEntitySettingsValues["coverColourHigh"]) : Colours.ColourError;
+            coverColourLow = jercEntitySettingsValues.ContainsKey("coverColourLow") ? GetColourStringAsColour(jercEntitySettingsValues["coverColourLow"]) : Colours.ColourError;
+            overlapColourHigh = jercEntitySettingsValues.ContainsKey("overlapColourHigh") ? GetColourStringAsColour(jercEntitySettingsValues["overlapColourHigh"]) : Colours.ColourError;
+            overlapColourLow = jercEntitySettingsValues.ContainsKey("overlapColourLow") ? GetColourStringAsColour(jercEntitySettingsValues["overlapColourLow"]) : Colours.ColourError;
+            strokeWidth = jercEntitySettingsValues.ContainsKey("strokeWidth") ? int.Parse(jercEntitySettingsValues["strokeWidth"]) : 0;
+            strokeColour = jercEntitySettingsValues.ContainsKey("strokeColour") ? GetColourStringAsColour(jercEntitySettingsValues["strokeColour"]) : Colours.ColourError;
+            strokeAroundLayoutMaterials = jercEntitySettingsValues.ContainsKey("strokeAroundLayoutMaterials") && jercEntitySettingsValues["strokeAroundLayoutMaterials"] == "0";
+            strokeAroundRemoveMaterials = jercEntitySettingsValues.ContainsKey("strokeAroundRemoveMaterials") && jercEntitySettingsValues["strokeAroundRemoveMaterials"] == "0";
+            strokeAroundEntities = jercEntitySettingsValues.ContainsKey("strokeAroundEntities") && jercEntitySettingsValues["strokeAroundEntities"] == "0";
 
-            defaultLevelNum = int.Parse(jercEntitySettingsValues["defaultLevelNum"]);
+            defaultLevelNum = jercEntitySettingsValues.ContainsKey("defaultLevelNum") ? int.Parse(jercEntitySettingsValues["defaultLevelNum"]) : 0;
             if (defaultLevelNum < 0)
                 defaultLevelNum = 0;
             else if (defaultLevelNum > jercDividerCount)
                 defaultLevelNum = jercDividerCount;
 
-            levelBackgroundEnabled = jercEntitySettingsValues["levelBackgroundEnabled"] == "0";
-            levelBackgroundDarkenAlpha = Math.Clamp(int.Parse(jercEntitySettingsValues["levelBackgroundDarkenAlpha"]), 0, 255);
-            levelBackgroundBlurAmount = int.Parse(jercEntitySettingsValues["levelBackgroundBlurAmount"]);
+            levelBackgroundEnabled = jercEntitySettingsValues.ContainsKey("levelBackgroundEnabled") && jercEntitySettingsValues["levelBackgroundEnabled"] == "0";
+            levelBackgroundDarkenAlpha = jercEntitySettingsValues.ContainsKey("levelBackgroundDarkenAlpha") ? Math.Clamp(int.Parse(jercEntitySettingsValues["levelBackgroundDarkenAlpha"]), 0, 255) : 0;
+            levelBackgroundBlurAmount = jercEntitySettingsValues.ContainsKey("levelBackgroundBlurAmount") ? int.Parse(jercEntitySettingsValues["levelBackgroundBlurAmount"]) : 0;
             higherLevelOutputName = string.IsNullOrWhiteSpace(jercEntitySettingsValues["higherLevelOutputName"]) ? null : jercEntitySettingsValues["higherLevelOutputName"];
             lowerLevelOutputName = string.IsNullOrWhiteSpace(jercEntitySettingsValues["lowerLevelOutputName"]) ? null : jercEntitySettingsValues["lowerLevelOutputName"];
-            exportTxt = jercEntitySettingsValues["exportTxt"] == "0";
-            exportDds = jercEntitySettingsValues["exportDds"] == "0";
-            exportPng = jercEntitySettingsValues["exportPng"] == "0";
-            exportRadarAsSeparateLevels = jercEntitySettingsValues["exportRadarAsSeparateLevels"] == "0";
-            exportBackgroundLevelsImage = jercEntitySettingsValues["exportBackgroundLevelsImage"] == "0";
+            exportTxt = jercEntitySettingsValues.ContainsKey("exportTxt") && jercEntitySettingsValues["exportTxt"] == "0";
+            exportDds = jercEntitySettingsValues.ContainsKey("exportDds") && jercEntitySettingsValues["exportDds"] == "0";
+            exportPng = jercEntitySettingsValues.ContainsKey("exportPng") && jercEntitySettingsValues["exportPng"] == "0";
+            exportRadarAsSeparateLevels = jercEntitySettingsValues.ContainsKey("exportRadarAsSeparateLevels") && jercEntitySettingsValues["exportRadarAsSeparateLevels"] == "0";
+            exportBackgroundLevelsImage = jercEntitySettingsValues.ContainsKey("exportBackgroundLevelsImage") && jercEntitySettingsValues["exportBackgroundLevelsImage"] == "0";
 
 
             // 
@@ -87,7 +85,7 @@ namespace JERC.Models
             var colourStringSplit = colourString.Split(" ");
 
             if (colourStringSplit.Length != 3)
-                return Color.DarkRed; // error, must be 3 values only
+                return Colours.ColourError; // error, must be 3 values only
 
             var argb = new int[4] { 255, int.Parse(colourStringSplit[0]), int.Parse(colourStringSplit[1]), int.Parse(colourStringSplit[2]) };
 
