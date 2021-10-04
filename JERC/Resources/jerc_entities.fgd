@@ -39,7 +39,7 @@
 		1: "No"
 	]
 
-	strokeAroundRemoveMaterials(choices) : "Stroke Around Remove Materials" : 1 =
+	strokeAroundRemoveMaterials(choices) : "Stroke Around Remove Materials" : 0 =
 	[
 		0: "Yes"
 		1: "No"
