@@ -15,7 +15,7 @@
 		1: "No"
 	]
 
-	backgroundFilename(string) : "Background Image Filename" : "grid.png" : "For custom images, place them inside the following folder: /Counter-Strike Global Offensive/bin/jerc/textures/"
+	backgroundFilename(string) : "Background Image Filename" : "default" : "For custom images, place them inside the following folder: /Counter-Strike Global Offensive/bin/jerc/textures/"
 	
 	pathColourHigh(color255) : "Path Colour High" : "180 180 180 255" : "Colour of path world brushes at the highest point"
 
