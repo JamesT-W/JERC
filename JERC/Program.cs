@@ -623,8 +623,20 @@ namespace JERC
             var imageFactoryBlurred = imageProcessorExtender.GetBlurredImage(backgroundBmp, jercConfigValues.levelBackgroundBlurAmount); //blur the image
             backgroundBmp = new Bitmap(backgroundBmp, overviewPositionValues.outputResolution, overviewPositionValues.outputResolution);
 
+
             if (jercConfigValues.exportBackgroundLevelsImage)
-                imageFactoryBlurred.Save(outputImageBackgroundLevelsFilepath);
+            {
+                if (!jercConfigValues.onlyOutputToAlternatePath)
+                {
+                    imageFactoryBlurred.Save(outputImageBackgroundLevelsFilepath);
+                }
+
+                if (!string.IsNullOrWhiteSpace(jercConfigValues.alternateOutputPath) && Directory.Exists(jercConfigValues.alternateOutputPath))
+                {
+                    var outputImageBackgroundLevelsFilepath = string.Concat(jercConfigValues.alternateOutputPath, mapName, "_background_levels.png");
+                    imageFactoryBlurred.Save(outputImageBackgroundLevelsFilepath);
+                }
+            }
 
             imageFactoryBlurred.Dispose();
 
