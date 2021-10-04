@@ -1109,6 +1109,15 @@ namespace JERC
         }
 
 
+        private static Vertices GetCorrectedVerticesPositionInWorld(Vertices vertices)
+        {
+            vertices.x = (vertices.x - overviewPositionValues.brushVerticesPosMinX + overviewPositionValues.brushVerticesOffsetX) / Sizes.SizeReductionMultiplier;
+            vertices.y = (vertices.y - overviewPositionValues.brushVerticesPosMinY + overviewPositionValues.brushVerticesOffsetY) / Sizes.SizeReductionMultiplier;
+
+            return vertices;
+        }
+
+
         private static void AddRemoveRegion(Bitmap bmp, Graphics graphics, List<BrushVolume> brushList)
         {
             foreach (var brush in brushList)
@@ -1116,14 +1125,13 @@ namespace JERC
                 if (brush.jercType != JercTypes.Remove)
                     continue;
 
-                // corrects the verts to tax into account the movement from space in world to the space in the image (which starts at (0,0))
+                // corrects the verts by taking into account the movement from space in world to the space in the image (which starts at (0,0))
                 foreach (var side in brush.brushSides)
                 {
                     var verticesOffset = side.vertices;
                     for (var i = 0; i < verticesOffset.Count(); i++)
                     {
-                        verticesOffset[i].x = verticesOffset[i].x - overviewPositionValues.brushVerticesPosMinX + overviewPositionValues.brushVerticesOffsetX;
-                        verticesOffset[i].y = verticesOffset[i].y - overviewPositionValues.brushVerticesPosMinY + overviewPositionValues.brushVerticesOffsetY;
+                        verticesOffset[i] = GetCorrectedVerticesPositionInWorld(verticesOffset[i]);
                     }
 
                     AddRemoveRegion(bmp, graphics, side);
@@ -1190,9 +1198,7 @@ namespace JERC
                     var gradientValue = Math.Clamp((int)Math.Round((float)percentageAboveMin * 255, 0), 1, 255);
 
                     // corrects the verts by taking into account the movement from space in world to the space in the image (which starts at (0,0))
-                    var verticesOffset = vertices;
-                    verticesOffset.x = verticesOffset.x - overviewPositionValues.brushVerticesPosMinX + overviewPositionValues.brushVerticesOffsetX;
-                    verticesOffset.y = verticesOffset.y - overviewPositionValues.brushVerticesPosMinY + overviewPositionValues.brushVerticesOffsetY;
+                    var verticesOffset = GetCorrectedVerticesPositionInWorld(vertices);
 
                     Color colour = brushSide.jercType switch
                     {
@@ -1226,10 +1232,8 @@ namespace JERC
 
                     foreach (var vertices in entityBrushSide.vertices)
                     {
-                        // corrects the verts to tax into account the movement from space in world to the space in the image (which starts at (0,0))
-                        var verticesOffset = vertices;
-                        verticesOffset.x = verticesOffset.x - overviewPositionValues.brushVerticesPosMinX + overviewPositionValues.brushVerticesOffsetX;
-                        verticesOffset.y = verticesOffset.y - overviewPositionValues.brushVerticesPosMinY + overviewPositionValues.brushVerticesOffsetY;
+                        // corrects the verts by taking into account the movement from space in world to the space in the image (which starts at (0,0))
+                        var verticesOffset = GetCorrectedVerticesPositionInWorld(vertices);
 
                         Color colour = entityBrushSide.entityType switch
                         {
