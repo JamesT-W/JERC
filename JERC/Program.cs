@@ -660,8 +660,7 @@ namespace JERC
 
         private static Bitmap AddBackgroundImage(RadarLevel radarLevel)
         {
-            //var backgroundImageFilepath = string.Concat(gameCsgoDirectoryPath, "materials/jerc/backgrounds/", jercConfigValues.backgroundFilename, ".tga"); // TODO: uncomment before release!!!
-            var backgroundImageFilepath = string.Concat("F:/Coding Stuff/GitHub Files/JERC/JERC/Resources/materials/jerc/backgrounds/", jercConfigValues.backgroundFilename, ".bmp"); // TODO: remove before release!!!
+            var backgroundImageFilepath = string.Concat(gameCsgoDirectoryPath, "materials/jerc/backgrounds/", jercConfigValues.backgroundFilename, ".tga");
 
             if (!File.Exists(backgroundImageFilepath))
                 return radarLevel.bmp;
