@@ -45,7 +45,7 @@
 		1: "No"
 	]
 
-	strokeAroundEntities(choices) : "Stroke Around Entities" : 0 : Currently, if there are more than one brush in an entity, it will not combine them, so they will keep their individual borders =
+	strokeAroundEntities(choices) : "Stroke Around Entities" : 0 : "Currently, if there are more than one brush in an entity, it will not combine them, so they will keep their individual borders" =
 	[
 		0: "Yes"
 		1: "No"
