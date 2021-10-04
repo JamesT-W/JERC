@@ -651,6 +651,9 @@ namespace JERC
         {
             radarLevel.bmp = new Bitmap(radarLevel.bmp, Sizes.FinalOutputImageResolution, Sizes.FinalOutputImageResolution);
 
+            if (!string.IsNullOrWhiteSpace(jercConfigValues.backgroundFilename))
+                radarLevel.bmp = AddBackgroundImage(radarLevel);
+
             var radarLevelString = radarLevel.levelHeight.levelName.ToLower() == "default" ? string.Empty : string.Concat("_", radarLevel.levelHeight.levelName.ToLower());
 
             var outputImageFilepath = string.Concat(outputImageFilepathPart1, radarLevelString, outputImageFilepathPart2);
@@ -660,6 +663,39 @@ namespace JERC
             {
                 SaveImage(jercConfigValues.alternateOutputPath, radarLevel.bmp);
             }
+        }
+
+
+        private static Bitmap AddBackgroundImage(RadarLevel radarLevel)
+        {
+            //var backgroundImageFilepath = string.Concat(gameCsgoDirectoryPath, "materials/jerc/backgrounds/", jercConfigValues.backgroundFilename, ".tga"); // TODO: uncomment before release!!!
+            var backgroundImageFilepath = string.Concat("F:/Coding Stuff/GitHub Files/JERC/JERC/Resources/materials/jerc/backgrounds/", jercConfigValues.backgroundFilename, ".bmp"); // TODO: remove before release!!!
+
+            if (!File.Exists(backgroundImageFilepath))
+                return radarLevel.bmp;
+
+            Bitmap newBmp = new Bitmap(radarLevel.bmp);
+            Graphics newGraphics = Graphics.FromImage(newBmp);
+
+            Bitmap backgroundBmp = new Bitmap(backgroundImageFilepath);
+            backgroundBmp = new Bitmap(backgroundBmp, Sizes.FinalOutputImageResolution, Sizes.FinalOutputImageResolution);
+            Graphics backgroundGraphics = Graphics.FromImage(backgroundBmp);
+
+            newGraphics.CompositingMode = CompositingMode.SourceCopy;
+            newGraphics.DrawImage(backgroundBmp, 0, 0);
+            newGraphics.Save();
+            newGraphics.CompositingMode = CompositingMode.SourceOver;
+            newGraphics.DrawImage(radarLevel.bmp, 0, 0);
+            newGraphics.Save();
+
+            // dispose
+            DisposeGraphics(backgroundGraphics);
+            DisposeImage(backgroundBmp);
+
+            DisposeGraphics(radarLevel.graphics);
+            DisposeImage(radarLevel.bmp);
+
+            return newBmp;
         }
 
 
