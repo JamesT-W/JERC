@@ -86,10 +86,10 @@ namespace JERC.Models
         {
             var colourStringSplit = colourString.Split(" ");
 
-            if (colourStringSplit.Length != 4)
-                return Color.Red;
+            if (colourStringSplit.Length != 3)
+                return Color.DarkRed; // error, must be 3 values only
 
-            var argb = new int[4] { int.Parse(colourStringSplit[3]), int.Parse(colourStringSplit[0]), int.Parse(colourStringSplit[1]), int.Parse(colourStringSplit[2]) };
+            var argb = new int[4] { 255, int.Parse(colourStringSplit[0]), int.Parse(colourStringSplit[1]), int.Parse(colourStringSplit[2]) };
 
             return Color.FromArgb(argb[0], argb[1], argb[2], argb[3]);
         }
