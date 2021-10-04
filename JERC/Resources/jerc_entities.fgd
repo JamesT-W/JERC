@@ -85,7 +85,7 @@
 		1: "No"
 	]
 
-	exportBackgroundLevelsImage(choices) : "Export Background Levels Image" : 1 : "Exports background levels image (if there are any jerc_divider entities)" =
+	exportBackgroundLevelsImage(choices) : "Export Background Levels Image" : 1 : "Exports background levels image (if 'Export Multilevel Radar' is selected and there are any jerc_divider entities)" =
 	[
 		0: "Yes"
 		1: "No"
