@@ -311,7 +311,7 @@ namespace JERC
             /*if (jercDividerEntities.Count() == 0)
                 return null;*/
 
-            var numOfOverviewLevels = jercDividerEntities.Count() + 1;
+            var numOfOverviewLevels = jercConfigValues.exportRadarAsSeparateLevels ? jercDividerEntities.Count() + 1 : 1;
             for (int i = 0; i < numOfOverviewLevels; i++)
             {
                 var overviewLevelName = string.Empty;
@@ -330,11 +330,15 @@ namespace JERC
                 var zMinForRadar = i == 0 ? vmfRequiredData.GetLowestVerticesZ() : levelHeights.ElementAt(i - 1).zMaxForRadar;
                 var zMaxForRadar = i == (numOfOverviewLevels - 1) ? vmfRequiredData.GetHighestVerticesZ() : new Vertices(jercDividerEntities.ElementAt(i).origin).z;
 
-                var jercFloorEntitiesInsideLevel = vmfRequiredData.jercFloorEntities.Where(x => new Vertices(x.origin).z >= zMinForRadar && new Vertices(x.origin).z < zMaxForRadar).ToList();
-                var zMinForGradient = jercFloorEntitiesInsideLevel.Any() ? jercFloorEntitiesInsideLevel.Select(x => new Vertices(x.origin).z).FirstOrDefault() : zMinForRadar;
+                var jercFloorEntitiesInsideLevel = jercConfigValues.exportRadarAsSeparateLevels
+                    ? (vmfRequiredData.jercFloorEntities.Where(x => new Vertices(x.origin).z >= zMinForRadar && new Vertices(x.origin).z < zMaxForRadar).ToList())
+                    : vmfRequiredData.jercFloorEntities;
+                var zMinForGradient = jercFloorEntitiesInsideLevel.Any() ? jercFloorEntitiesInsideLevel.OrderBy(x => new Vertices(x.origin).z).Select(x => new Vertices(x.origin).z).FirstOrDefault() : zMinForRadar; // takes the lowest (first) in the level if there are more than one
 
-                var jercCeilingEntitiesInsideLevel = vmfRequiredData.jercCeilingEntities.Where(x => new Vertices(x.origin).z >= zMinForRadar && new Vertices(x.origin).z < zMaxForRadar).ToList();
-                var zMaxForGradient = jercCeilingEntitiesInsideLevel.Any() ? jercCeilingEntitiesInsideLevel.Select(x => new Vertices(x.origin).z).FirstOrDefault() : zMaxForRadar;
+                var jercCeilingEntitiesInsideLevel = jercConfigValues.exportRadarAsSeparateLevels
+                    ? vmfRequiredData.jercCeilingEntities.Where(x => new Vertices(x.origin).z >= zMinForRadar && new Vertices(x.origin).z < zMaxForRadar).ToList()
+                    : vmfRequiredData.jercCeilingEntities;
+                var zMaxForGradient = jercCeilingEntitiesInsideLevel.Any() ? jercCeilingEntitiesInsideLevel.OrderBy(x => new Vertices(x.origin).z).Select(x => new Vertices(x.origin).z).LastOrDefault() : zMaxForRadar; // takes the highest (last) in the level if there are more than one
 
                 levelHeights.Add(new LevelHeight(levelHeights.Count(), overviewLevelName, zMinForTxt, zMaxForTxt, zMinForRadar, zMaxForRadar, zMinForGradient, zMaxForGradient));
             }
