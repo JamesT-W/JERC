@@ -43,6 +43,9 @@ namespace JERC.Models
             // jerc_config
 
             alternateOutputPath = string.IsNullOrWhiteSpace(jercEntitySettingsValues["alternateOutputPath"]) ? null : jercEntitySettingsValues["alternateOutputPath"];
+            if (!string.IsNullOrWhiteSpace(alternateOutputPath) && (alternateOutputPath.LastOrDefault() != '\\' || alternateOutputPath.LastOrDefault() != '/'))
+                alternateOutputPath += '/';
+
             onlyOutputToAlternatePath = jercEntitySettingsValues.ContainsKey("onlyOutputToAlternatePath") && jercEntitySettingsValues["onlyOutputToAlternatePath"] == "0";
             exportRadarAsSeparateLevels = jercEntitySettingsValues.ContainsKey("exportRadarAsSeparateLevels") && jercEntitySettingsValues["exportRadarAsSeparateLevels"] == "0";
             useSeparateGradientEachLevel = jercEntitySettingsValues.ContainsKey("useSeparateGradientEachLevel") && jercEntitySettingsValues["useSeparateGradientEachLevel"] == "0";

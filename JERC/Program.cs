@@ -22,10 +22,8 @@ namespace JERC
         private static readonly string gameCsgoDirectoryPath = Path.GetFullPath(Path.Combine(Path.Combine(gameBinDirectoryPath, @"..\"), @"csgo\"));
         private static readonly string gameOverviewsDirectoryPath = Path.GetFullPath(Path.Combine(gameCsgoDirectoryPath, @"resource\overviews\"));
 
-        private static string outputImageFilepathPart1;
-        private static string outputImageFilepathPart2;
+        private static string outputFilepathPrefix;
         private static string outputImageBackgroundLevelsFilepath;
-        private static string outputTxtFilepath;
 
         private static readonly string visgroupName = "JERC";
 
@@ -77,19 +75,8 @@ namespace JERC
 
             mapName = Path.GetFileNameWithoutExtension(gameConfigurationValues.vmfFilepath);
 
-
-            // TODO: uncomment for release
-            /*
-            outputImageFilepathPart1 = string.Concat(gameOverviewsDirectoryPath, mapName);
-            outputImageFilepathPart2 = "_radar";
-            outputImageBackgroundLevelsFilepath = string.Concat(outputImageFilepathPart1, "_background_levels.png");
-            outputTxtFilepath = string.Concat(gameOverviewsDirectoryPath, mapName, ".txt");
-            */
-            outputImageFilepathPart1 = @"F:\Coding Stuff\GitHub Files\JERC\jerc_test_map";
-            outputImageFilepathPart2 = "_radar";
-            outputImageBackgroundLevelsFilepath = @"F:\Coding Stuff\GitHub Files\JERC\jerc_test_map_background_levels.png";
-            outputTxtFilepath = @"F:\Coding Stuff\GitHub Files\JERC\jerc_test_map.txt";
-
+            outputFilepathPrefix = string.Concat(gameOverviewsDirectoryPath, mapName);
+            outputImageBackgroundLevelsFilepath = string.Concat(outputFilepathPrefix, "_background_levels.png");
 
             vmf = new VMF(lines);
 
@@ -653,12 +640,16 @@ namespace JERC
 
             if (jercConfigValues.exportDds || jercConfigValues.exportPng)
             {
-                var outputImageFilepath = string.Concat(outputImageFilepathPart1, radarLevelString, outputImageFilepathPart2);
-                SaveImage(outputImageFilepath, radarLevel.bmp);
-
-                if (!jercConfigValues.onlyOutputToAlternatePath && !string.IsNullOrWhiteSpace(jercConfigValues.alternateOutputPath))
+                if (!jercConfigValues.onlyOutputToAlternatePath)
                 {
-                    SaveImage(jercConfigValues.alternateOutputPath, radarLevel.bmp);
+                    var outputImageFilepath = string.Concat(outputFilepathPrefix, radarLevelString, "_radar");
+                    SaveImage(outputImageFilepath, radarLevel.bmp);
+                }
+
+                if (!string.IsNullOrWhiteSpace(jercConfigValues.alternateOutputPath) && Directory.Exists(jercConfigValues.alternateOutputPath))
+                {
+                    var outputImageFilepath = string.Concat(jercConfigValues.alternateOutputPath, mapName, radarLevelString, "_radar");
+                    SaveImage(outputImageFilepath, radarLevel.bmp);
                 }
             }
         }
@@ -1475,7 +1466,17 @@ namespace JERC
 
             var lines = overviewTxt.GetInExportableFormat(jercConfigValues, levelHeights, mapName);
 
-            SaveOutputTxtFile(outputTxtFilepath, lines);
+            if (!jercConfigValues.onlyOutputToAlternatePath)
+            {
+                var outputTxtFilepath = string.Concat(outputFilepathPrefix, ".txt");
+                SaveOutputTxtFile(outputTxtFilepath, lines);
+            }
+
+            if (!string.IsNullOrWhiteSpace(jercConfigValues.alternateOutputPath) && Directory.Exists(jercConfigValues.alternateOutputPath))
+            {
+                var outputTxtFilepath = string.Concat(jercConfigValues.alternateOutputPath, mapName, ".txt");
+                SaveOutputTxtFile(outputTxtFilepath, lines);
+            }
         }
 
 
@@ -1662,6 +1663,9 @@ namespace JERC
 
         private static void SaveOutputTxtFile(string filepath, List<string> lines)
         {
+            if (!filepath.Contains(".txt"))
+                filepath += ".txt";
+
             var canSave = false;
 
             // check if the files are locked
