@@ -13,5 +13,7 @@ namespace JERC.Enums
         Path = 4,
         Cover = 8,
         Overlap = 16,
+        Door = 32,
+        Ladder = 64,
     }
 }

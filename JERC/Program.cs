@@ -131,12 +131,16 @@ namespace JERC
             var brushesPath = GetBrushesByTextureName(allWorldBrushesInVisgroup, TextureNames.PathTextureName);
             var brushesCover = GetBrushesByTextureName(allWorldBrushesInVisgroup, TextureNames.CoverTextureName);
             var brushesOverlap = GetBrushesByTextureName(allWorldBrushesInVisgroup, TextureNames.OverlapTextureName);
+            var brushesDoor = GetBrushesByTextureName(allWorldBrushesInVisgroup, TextureNames.DoorTextureName);
+            var brushesLadder = GetBrushesByTextureName(allWorldBrushesInVisgroup, TextureNames.LadderTextureName);
 
             // displacements
             var displacementsRemove = GetDisplacementsByTextureName(allWorldBrushesInVisgroup, TextureNames.RemoveTextureName);
             var displacementsPath = GetDisplacementsByTextureName(allWorldBrushesInVisgroup, TextureNames.PathTextureName);
             var displacementsCover = GetDisplacementsByTextureName(allWorldBrushesInVisgroup, TextureNames.CoverTextureName);
             var displacementsOverlap = GetDisplacementsByTextureName(allWorldBrushesInVisgroup, TextureNames.OverlapTextureName);
+            var displacementsDoor = GetDisplacementsByTextureName(allWorldBrushesInVisgroup, TextureNames.DoorTextureName);
+            var displacementsLadder = GetDisplacementsByTextureName(allWorldBrushesInVisgroup, TextureNames.LadderTextureName);
 
             // entities (in game)
             var buyzoneBrushEntities = GetEntitiesByClassname(allEntities, Classnames.ClassnameBuyzone);
@@ -157,8 +161,8 @@ namespace JERC
             jercConfigValues = new JercConfigValues(GetSettingsValuesFromJercEntities(allJercEntities), jercDividerEntities.Count());
 
             return new VmfRequiredData(
-                brushesRemove, brushesPath, brushesCover, brushesOverlap,
-                displacementsRemove, displacementsPath, displacementsCover, displacementsOverlap,
+                brushesRemove, brushesPath, brushesCover, brushesOverlap, brushesDoor, brushesLadder,
+                displacementsRemove, displacementsPath, displacementsCover, displacementsOverlap, displacementsDoor, displacementsLadder,
                 buyzoneBrushEntities, bombsiteBrushEntities, rescueZoneBrushEntities, hostageEntities, ctSpawnEntities, tSpawnEntities,
                 jercConfigEntities, jercDividerEntities, jercFloorEntities, jercCeilingEntities
             );
@@ -183,6 +187,8 @@ namespace JERC
             jercEntitySettingsValues.Add("coverColourLow", jercConfig.FirstOrDefault(x => x.Name == "coverColourLow")?.Value);
             jercEntitySettingsValues.Add("overlapColourHigh", jercConfig.FirstOrDefault(x => x.Name == "overlapColourHigh")?.Value);
             jercEntitySettingsValues.Add("overlapColourLow", jercConfig.FirstOrDefault(x => x.Name == "overlapColourLow")?.Value);
+            jercEntitySettingsValues.Add("doorColour", jercConfig.FirstOrDefault(x => x.Name == "doorColour")?.Value);
+            jercEntitySettingsValues.Add("ladderColour", jercConfig.FirstOrDefault(x => x.Name == "ladderColour")?.Value);
             jercEntitySettingsValues.Add("strokeWidth", jercConfig.FirstOrDefault(x => x.Name == "strokeWidth")?.Value);
             jercEntitySettingsValues.Add("strokeColour", jercConfig.FirstOrDefault(x => x.Name == "strokeColour")?.Value);
             jercEntitySettingsValues.Add("strokeAroundLayoutMaterials", jercConfig.FirstOrDefault(x => x.Name == "strokeAroundLayoutMaterials")?.Value);
@@ -249,9 +255,13 @@ namespace JERC
             var allWorldBrushesAndDisplacementsExceptRemove = vmfRequiredData.brushesSidesPath
                 .Concat(vmfRequiredData.brushesSidesCover)
                 .Concat(vmfRequiredData.brushesSidesOverlap)
+                .Concat(vmfRequiredData.brushesSidesDoor)
+                .Concat(vmfRequiredData.brushesSidesLadder)
                 .Concat(vmfRequiredData.displacementsSidesPath)
                 .Concat(vmfRequiredData.displacementsSidesCover)
-                .Concat(vmfRequiredData.displacementsSidesOverlap);
+                .Concat(vmfRequiredData.displacementsSidesOverlap)
+                .Concat(vmfRequiredData.displacementsSidesDoor)
+                .Concat(vmfRequiredData.displacementsSidesLadder);
             //var allWorldBrushes = vmfRequiredData.brushesSidesRemove.Concat(vmfRequiredData.displacementsSidesRemove).Concat(allWorldBrushesAndDisplacementsExceptRemove);
 
             if (allWorldBrushesAndDisplacementsExceptRemove == null || allWorldBrushesAndDisplacementsExceptRemove.Count() == 0)
@@ -464,6 +474,24 @@ namespace JERC
                 (x.vertices.All(y => y.z >= levelHeight.zMinForRadar) && x.vertices.All(y => y.z >= levelHeight.zMaxForRadar))
             )).ToList();
 
+            var brushDoorSideList = GetBrushDoorSidesVerticesList().Where(x => !(
+                (x.vertices.All(y => y.z < levelHeight.zMinForRadar) && x.vertices.All(y => y.z < levelHeight.zMaxForRadar)) ||
+                (x.vertices.All(y => y.z >= levelHeight.zMinForRadar) && x.vertices.All(y => y.z >= levelHeight.zMaxForRadar))
+            )).ToList();
+            var displacementDoorSideList = GetDisplacementDoorSidesVerticesList().Where(x => !(
+                (x.vertices.All(y => y.z < levelHeight.zMinForRadar) && x.vertices.All(y => y.z < levelHeight.zMaxForRadar)) ||
+                (x.vertices.All(y => y.z >= levelHeight.zMinForRadar) && x.vertices.All(y => y.z >= levelHeight.zMaxForRadar))
+            )).ToList();
+
+            var brushLadderSideList = GetBrushLadderSidesVerticesList().Where(x => !(
+                (x.vertices.All(y => y.z < levelHeight.zMinForRadar) && x.vertices.All(y => y.z < levelHeight.zMaxForRadar)) ||
+                (x.vertices.All(y => y.z >= levelHeight.zMinForRadar) && x.vertices.All(y => y.z >= levelHeight.zMaxForRadar))
+            )).ToList();
+            var displacementLadderSideList = GetDisplacementLadderSidesVerticesList().Where(x => !(
+                (x.vertices.All(y => y.z < levelHeight.zMinForRadar) && x.vertices.All(y => y.z < levelHeight.zMaxForRadar)) ||
+                (x.vertices.All(y => y.z >= levelHeight.zMinForRadar) && x.vertices.All(y => y.z >= levelHeight.zMaxForRadar))
+            )).ToList();
+
 
             var brushesToDrawPath = GetBrushesToDraw(boundingBox, brushPathSideList);
             var displacementsToDrawPath = GetBrushesToDraw(boundingBox, displacementPathSideList);
@@ -473,6 +501,12 @@ namespace JERC
 
             var brushesToDrawCover = GetBrushesToDraw(boundingBox, brushCoverList.SelectMany(x => x.brushSides).ToList());
             var displacementsToDrawCover = GetBrushesToDraw(boundingBox, displacementCoverList.SelectMany(x => x.brushSides).ToList());
+
+            var brushesToDrawDoor = GetBrushesToDraw(boundingBox, brushDoorSideList);
+            var displacementsToDrawDoor = GetBrushesToDraw(boundingBox, displacementDoorSideList);
+
+            var brushesToDrawLadder = GetBrushesToDraw(boundingBox, brushLadderSideList);
+            var displacementsToDrawLadder = GetBrushesToDraw(boundingBox, displacementLadderSideList);
 
             // get all entity sides to draw
             var entityBrushSideListByIdUnfiltered = GetEntityVerticesListById();
@@ -507,6 +541,18 @@ namespace JERC
 
             // cover and overlap brush stuff
             foreach (var brushToRender in brushesToDrawOverlap.Concat(displacementsToDrawOverlap).Concat(brushesToDrawCover).Concat(displacementsToDrawCover).OrderBy(x => x.zAxisAverage))
+            {
+                DrawFilledPolygonGradient(graphics, brushToRender, false);
+            }
+
+            // door stuff
+            foreach (var brushToRender in brushesToDrawDoor.Concat(displacementsToDrawDoor).OrderBy(x => x.zAxisAverage))
+            {
+                DrawFilledPolygonGradient(graphics, brushToRender, false);
+            }
+
+            // ladder stuff
+            foreach (var brushToRender in brushesToDrawLadder.Concat(displacementsToDrawLadder).OrderBy(x => x.zAxisAverage))
             {
                 DrawFilledPolygonGradient(graphics, brushToRender, false);
             }
@@ -866,6 +912,50 @@ namespace JERC
         }
 
 
+        private static List<BrushSide> GetBrushDoorSidesVerticesList()
+        {
+            var brushSideList = new List<BrushSide>();
+
+            foreach (var side in vmfRequiredData.brushesSidesDoor)
+            {
+                var brushSide = new BrushSide();
+                for (int i = 0; i < side.vertices_plus.Count(); i++)
+                {
+                    var vert = side.vertices_plus[i];
+
+                    brushSide.vertices.Add(new Vertices(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier, vert.z));
+                    brushSide.jercType = JercTypes.Door;
+                }
+
+                brushSideList.Add(brushSide);
+            }
+
+            return brushSideList;
+        }
+
+
+        private static List<BrushSide> GetBrushLadderSidesVerticesList()
+        {
+            var brushSideList = new List<BrushSide>();
+
+            foreach (var side in vmfRequiredData.brushesSidesLadder)
+            {
+                var brushSide = new BrushSide();
+                for (int i = 0; i < side.vertices_plus.Count(); i++)
+                {
+                    var vert = side.vertices_plus[i];
+
+                    brushSide.vertices.Add(new Vertices(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier, vert.z));
+                    brushSide.jercType = JercTypes.Ladder;
+                }
+
+                brushSideList.Add(brushSide);
+            }
+
+            return brushSideList;
+        }
+
+
         private static List<BrushVolume> GetDisplacementRemoveVerticesList()
         {
             var displacementList = new List<BrushVolume>();
@@ -1001,6 +1091,50 @@ namespace JERC
 
                     displacementSide.vertices.Add(new Vertices(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier, vert.z));
                     displacementSide.jercType = JercTypes.Overlap;
+                }
+
+                displacementSideList.Add(displacementSide);
+            }
+
+            return displacementSideList;
+        }
+
+
+        private static List<BrushSide> GetDisplacementDoorSidesVerticesList()
+        {
+            var displacementSideList = new List<BrushSide>();
+
+            foreach (var side in vmfRequiredData.displacementsSidesDoor)
+            {
+                var displacementSide = new BrushSide();
+                for (int i = 0; i < side.vertices_plus.Count(); i++)
+                {
+                    var vert = side.vertices_plus[i];
+
+                    displacementSide.vertices.Add(new Vertices(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier, vert.z));
+                    displacementSide.jercType = JercTypes.Door;
+                }
+
+                displacementSideList.Add(displacementSide);
+            }
+
+            return displacementSideList;
+        }
+
+
+        private static List<BrushSide> GetDisplacementLadderSidesVerticesList()
+        {
+            var displacementSideList = new List<BrushSide>();
+
+            foreach (var side in vmfRequiredData.displacementsSidesLadder)
+            {
+                var displacementSide = new BrushSide();
+                for (int i = 0; i < side.vertices_plus.Count(); i++)
+                {
+                    var vert = side.vertices_plus[i];
+
+                    displacementSide.vertices.Add(new Vertices(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier, vert.z));
+                    displacementSide.jercType = JercTypes.Ladder;
                 }
 
                 displacementSideList.Add(displacementSide);
@@ -1189,6 +1323,8 @@ namespace JERC
                         JercTypes.Path => Colours.ColourBrush(jercConfigValues.pathColourLow, jercConfigValues.pathColourHigh, percentageAboveMin),
                         JercTypes.Cover => Colours.ColourBrush(jercConfigValues.coverColourLow, jercConfigValues.coverColourHigh, percentageAboveMin),
                         JercTypes.Overlap => Colours.ColourBrush(jercConfigValues.overlapColourLow, jercConfigValues.overlapColourHigh, percentageAboveMin),
+                        JercTypes.Door => jercConfigValues.doorColour,
+                        JercTypes.Ladder => jercConfigValues.ladderColour
                     };
 
                     verticesOffsetsToUse = verticesOffsetsToUse.Distinct().ToList(); // TODO: doesn't seem to work

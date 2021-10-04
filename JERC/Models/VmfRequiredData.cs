@@ -11,21 +11,29 @@ namespace JERC.Models
         public List<Brush> brushesPath;
         public List<Brush> brushesCover;
         public List<Brush> brushesOverlap;
+        public List<Brush> brushesDoor;
+        public List<Brush> brushesLadder;
 
         public List<Side> brushesSidesRemove;
         public List<Side> brushesSidesPath;
         public List<Side> brushesSidesCover;
         public List<Side> brushesSidesOverlap;
+        public List<Side> brushesSidesDoor;
+        public List<Side> brushesSidesLadder;
 
         public List<Brush> displacementsRemove;
         public List<Brush> displacementsPath;
         public List<Brush> displacementsCover;
         public List<Brush> displacementsOverlap;
+        public List<Brush> displacementsDoor;
+        public List<Brush> displacementsLadder;
 
         public List<Side> displacementsSidesRemove;
         public List<Side> displacementsSidesPath;
         public List<Side> displacementsSidesCover;
         public List<Side> displacementsSidesOverlap;
+        public List<Side> displacementsSidesDoor;
+        public List<Side> displacementsSidesLadder;
 
         public List<Entity> buyzoneBrushEntities;
         public List<Entity> bombsiteBrushEntities;
@@ -45,8 +53,8 @@ namespace JERC.Models
 
 
         public VmfRequiredData(
-            IEnumerable<IVNode> brushesRemoveIVNodes, IEnumerable<IVNode> brushesPathIVNodes, IEnumerable<IVNode> brushesCoverIVNodes, IEnumerable<IVNode> brushesOverlapIVNodes,
-            IEnumerable<IVNode> displacementsRemoveIVNodes, IEnumerable<IVNode> displacementsPathIVNodes, IEnumerable<IVNode> displacementsCoverIVNodes, IEnumerable<IVNode> displacementsOverlapIVNodes,
+            IEnumerable<IVNode> brushesRemoveIVNodes, IEnumerable<IVNode> brushesPathIVNodes, IEnumerable<IVNode> brushesCoverIVNodes, IEnumerable<IVNode> brushesOverlapIVNodes, IEnumerable<IVNode> brushesDoorIVNodes, IEnumerable<IVNode> brushesLadderIVNodes,
+            IEnumerable<IVNode> displacementsRemoveIVNodes, IEnumerable<IVNode> displacementsPathIVNodes, IEnumerable<IVNode> displacementsCoverIVNodes, IEnumerable<IVNode> displacementsOverlapIVNodes, IEnumerable<IVNode> displacementsDoorIVNodes, IEnumerable<IVNode> displacementsLadderIVNodes,
             IEnumerable<IVNode> buyzoneBrushEntitiesIVNodes, IEnumerable<IVNode> bombsiteBrushEntitiesIVNodes, IEnumerable<IVNode> rescueZoneBrushEntitiesIVNodes, IEnumerable<IVNode> hostageEntitiesIVNodes, IEnumerable<IVNode> ctSpawnEntitiesIVNodes, IEnumerable<IVNode> tSpawnEntitiesIVNodes,
             IEnumerable<IVNode> jercConfigEntitiesIVNodes, IEnumerable<IVNode> jercDividerEntitiesIVNodes, IEnumerable<IVNode> jercFloorEntitiesIVNodes, IEnumerable<IVNode> jercCeilingEntitiesIVNodes
         )
@@ -56,32 +64,44 @@ namespace JERC.Models
             brushesPath = brushesPathIVNodes.Any() ? brushesPathIVNodes.Select(x => new Brush(x)).ToList() : new List<Brush>();
             brushesCover = brushesCoverIVNodes.Any() ? brushesCoverIVNodes.Select(x => new Brush(x)).ToList() : new List<Brush>();
             brushesOverlap = brushesOverlapIVNodes.Any() ? brushesOverlapIVNodes.Select(x => new Brush(x)).ToList() : new List<Brush>();
+            brushesDoor = brushesDoorIVNodes.Any() ? brushesDoorIVNodes.Select(x => new Brush(x)).ToList() : new List<Brush>();
+            brushesLadder = brushesLadderIVNodes.Any() ? brushesLadderIVNodes.Select(x => new Brush(x)).ToList() : new List<Brush>();
 
             var brushesSidesRemoveUnordered = brushesRemove.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.RemoveTextureName)).ToList();
             var brushesSidesPathUnordered = brushesPath.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.PathTextureName)).ToList();
             var brushesSidesCoverUnordered = brushesCover.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.CoverTextureName)).ToList();
             var brushesSidesOverlapUnordered = brushesOverlap.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.OverlapTextureName)).ToList();
+            var brushesSidesDoorUnordered = brushesDoor.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.DoorTextureName)).ToList();
+            var brushesSidesLadderUnordered = brushesLadder.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.LadderTextureName)).ToList();
 
             brushesSidesRemove = OrderListOfSidesByVerticesMin(brushesSidesRemoveUnordered);
             brushesSidesPath = OrderListOfSidesByVerticesMin(brushesSidesPathUnordered);
             brushesSidesCover = OrderListOfSidesByVerticesMin(brushesSidesCoverUnordered);
             brushesSidesOverlap = OrderListOfSidesByVerticesMin(brushesSidesOverlapUnordered);
+            brushesSidesDoor = OrderListOfSidesByVerticesMin(brushesSidesDoorUnordered);
+            brushesSidesLadder = OrderListOfSidesByVerticesMin(brushesSidesLadderUnordered);
 
             // displacements
             displacementsRemove = displacementsRemoveIVNodes.Any() ? displacementsRemoveIVNodes.Select(x => new Brush(x)).ToList() : new List<Brush>();
             displacementsPath = displacementsPathIVNodes.Any() ? displacementsPathIVNodes.Select(x => new Brush(x)).ToList() : new List<Brush>();
             displacementsCover = displacementsCoverIVNodes.Any() ? displacementsCoverIVNodes.Select(x => new Brush(x)).ToList() : new List<Brush>();
             displacementsOverlap = displacementsOverlapIVNodes.Any() ? displacementsOverlapIVNodes.Select(x => new Brush(x)).ToList() : new List<Brush>();
+            displacementsDoor = displacementsDoorIVNodes.Any() ? displacementsDoorIVNodes.Select(x => new Brush(x)).ToList() : new List<Brush>();
+            displacementsLadder = displacementsLadderIVNodes.Any() ? displacementsLadderIVNodes.Select(x => new Brush(x)).ToList() : new List<Brush>();
 
             var displacementsSidesRemoveUnordered = displacementsRemove.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.RemoveTextureName)).ToList();
             var displacementsSidesPathUnordered = displacementsPath.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.PathTextureName)).ToList();
             var displacementsSidesCoverUnordered = displacementsCover.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.CoverTextureName)).ToList();
             var displacementsSidesOverlapUnordered = displacementsOverlap.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.OverlapTextureName)).ToList();
+            var displacementsSidesDoorUnordered = displacementsDoor.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.DoorTextureName)).ToList();
+            var displacementsSidesLadderUnordered = displacementsLadder.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.LadderTextureName)).ToList();
 
             displacementsSidesRemove = OrderListOfSidesByVerticesMin(displacementsSidesRemoveUnordered);
             displacementsSidesPath = OrderListOfSidesByVerticesMin(displacementsSidesPathUnordered);
             displacementsSidesCover = OrderListOfSidesByVerticesMin(displacementsSidesCoverUnordered);
             displacementsSidesOverlap = OrderListOfSidesByVerticesMin(displacementsSidesOverlapUnordered);
+            displacementsSidesDoor = OrderListOfSidesByVerticesMin(displacementsSidesDoorUnordered);
+            displacementsSidesLadder = OrderListOfSidesByVerticesMin(displacementsSidesLadderUnordered);
 
             // entities
             buyzoneBrushEntities = buyzoneBrushEntitiesIVNodes.Any() ? buyzoneBrushEntitiesIVNodes.Select(x => new Entity(x)).ToList() : new List<Entity>();
@@ -147,9 +167,13 @@ namespace JERC.Models
             return brushesPath
                 .Concat(brushesCover)
                 .Concat(brushesOverlap)
+                .Concat(brushesDoor)
+                .Concat(brushesLadder)
                 .Concat(displacementsPath)
                 .Concat(displacementsCover)
                 .Concat(displacementsOverlap)
+                .Concat(displacementsDoor)
+                .Concat(displacementsLadder)
                 .Concat(bombsiteBrushEntities.SelectMany(x => x.brushes))
                 .Concat(buyzoneBrushEntities.SelectMany(x => x.brushes))
                 .Concat(rescueZoneBrushEntities.SelectMany(x => x.brushes))
@@ -162,9 +186,13 @@ namespace JERC.Models
             return brushesSidesPath
                 .Concat(brushesSidesCover)
                 .Concat(brushesSidesOverlap)
+                .Concat(brushesSidesDoor)
+                .Concat(brushesSidesLadder)
                 .Concat(displacementsSidesPath)
                 .Concat(displacementsSidesCover)
                 .Concat(displacementsSidesOverlap)
+                .Concat(displacementsSidesDoor)
+                .Concat(displacementsSidesLadder)
                 .Concat(entitiesSidesByEntityBuyzoneId.SelectMany(x => x.Value))
                 .Concat(entitiesSidesByEntityBombsiteId.SelectMany(x => x.Value))
                 .Concat(entitiesSidesByEntityRescueZoneId.SelectMany(x => x.Value))

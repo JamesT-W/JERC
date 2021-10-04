@@ -35,6 +35,10 @@
 
 	overlapColourLow(color255) : "Overlap Colour Low" : "91 21 91" : "Colour of overlap world brushes at the lowest point"
 
+	doorColour(color255) : "Door Colour" : "235 250 0" : "Colour of door world brushes"
+
+	ladderColour(color255) : "Ladder Colour" : "145 0 145" : "Colour of ladder world brushes"
+
 	strokeWidth(integer) : "Stroke Width (int)" : 10 : "Width of stroke to use"
 
 	strokeColour(color255) : "Stroke Colour" : "255 255 255" : "Colour of the stroke"
