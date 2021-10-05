@@ -24,6 +24,7 @@ namespace JERC
         private static readonly string gameCsgoDirectoryPath = Path.GetFullPath(Path.Combine(Path.Combine(gameBinDirectoryPath, @"..\"), @"csgo\"));
         private static readonly string gameOverviewsDirectoryPath = Path.GetFullPath(Path.Combine(gameCsgoDirectoryPath, @"resource\overviews\"));
 
+        private static string backgroundImagesDirectory;
         private static string outputFilepathPrefix;
         private static string outputImageBackgroundLevelsFilepath;
 
@@ -79,10 +80,12 @@ namespace JERC
 
             if (debugging)
             {
+                backgroundImagesDirectory = @"F:\Coding Stuff\GitHub Files\JERC\JERC\Resources\materials\jerc\backgrounds\";
                 outputFilepathPrefix = string.Concat(@"F:\Coding Stuff\GitHub Files\JERC\", mapName);
             }
             else
             {
+                backgroundImagesDirectory = string.Concat(gameCsgoDirectoryPath, @"materials\jerc\backgrounds\");
                 outputFilepathPrefix = string.Concat(gameOverviewsDirectoryPath, mapName);
             }
 
@@ -98,6 +101,11 @@ namespace JERC
             {
                 Console.WriteLine("No jerc_config entity found.");
                 return;
+            }
+
+            if (debugging && !string.IsNullOrWhiteSpace(jercConfigValues.alternateOutputPath))
+            {
+                jercConfigValues.alternateOutputPath = string.Empty;
             }
 
             SortScaleStuff();
@@ -691,7 +699,7 @@ namespace JERC
 
         private static Bitmap AddBackgroundImage(RadarLevel radarLevel)
         {
-            var backgroundImageFilepath = string.Concat(gameCsgoDirectoryPath, "materials/jerc/backgrounds/", jercConfigValues.backgroundFilename, ".tga");
+            var backgroundImageFilepath = string.Concat(backgroundImagesDirectory, jercConfigValues.backgroundFilename, ".bmp");
 
             if (!File.Exists(backgroundImageFilepath))
                 return radarLevel.bmp;
@@ -1286,7 +1294,7 @@ namespace JERC
                 CTSpawn_x = FlipOverviewTxtValues(xPercent, true);
                 CTSpawn_y = FlipOverviewTxtValues(yPercent, false);
             }
-            
+
             if (vmfRequiredData.tSpawnEntities.Any())
             {
                 var origins = vmfRequiredData.tSpawnEntities.Select(x => new Vertices(x.origin));
