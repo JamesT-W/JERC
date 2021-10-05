@@ -135,9 +135,12 @@ namespace JERC.Models
         // Then, it reverses, so it is ascending (MIN value first)
         private static List<Side> OrderListOfSidesByVerticesMin(List<Side> sides)
         {
+            if (sides == null || !sides.Any())
+                return sides;
+
             var sidesNew = (from x in sides
-                            from y in x.vertices_plus
-                            orderby y.z descending
+                            from y in x?.vertices_plus
+                            orderby y?.z descending
                             select x).Distinct().ToList();
 
             sidesNew.Reverse();
