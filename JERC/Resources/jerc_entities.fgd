@@ -31,9 +31,9 @@
 
 	coverColourLow(color255) : "Cover Colour Low" : "160 160 160" : "Colour of cover world brushes at the lowest point"
 
-	overlapColourHigh(color255) : "Overlap Colour High" : "159 28 147" : "Colour of overlap world brushes at the highest point"
+	overlapColourHigh(color255) : "Overlap Colour High" : "7 60 180" : "Colour of overlap world brushes at the highest point"
 
-	overlapColourLow(color255) : "Overlap Colour Low" : "91 21 91" : "Colour of overlap world brushes at the lowest point"
+	overlapColourLow(color255) : "Overlap Colour Low" : "10 103 84" : "Colour of overlap world brushes at the lowest point"
 
 	doorColour(color255) : "Door Colour" : "235 250 0" : "Colour of door world brushes"
 
