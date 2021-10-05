@@ -1301,7 +1301,7 @@ namespace JERC
             {
                 var bombsites = vmfRequiredData.bombsiteBrushEntities;
 
-                if (vmfRequiredData.bombsiteBrushEntities.LastOrDefault().targetname.ToLower().Contains("bombsite_a"))
+                if (!string.IsNullOrWhiteSpace(vmfRequiredData.bombsiteBrushEntities.LastOrDefault().targetname) && vmfRequiredData.bombsiteBrushEntities.LastOrDefault().targetname.ToLower().Contains("bombsite_a"))
                 {
                     bombsites.Reverse();
                 }
