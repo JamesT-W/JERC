@@ -3,22 +3,22 @@
 [
 	alternateOutputPath(string) report : "Alternate Output Directory" : "" : "DO NOT USE BACKSLACHES. An alternate output directory. Leave blank if you want to output to /csgo/resources/overviews only. Eg. C:/Dropbox/JERC/resource/overviews/"
 
-	onlyOutputToAlternatePath(choices) : "Only Output to Alternate Path" : 1 =
+	onlyOutputToAlternatePath(choices) : "Only Output to Alternate Path" : 0 =
 	[
-		0: "Yes"
-		1: "No"
+		0: "No"
+		1: "Yes"
 	]
 
-	exportRadarAsSeparateLevels(choices) : "Export Multilevel Radar" : 0 : "Exports multiple separate radars (if there are any jerc_divider entities)" =
+	exportRadarAsSeparateLevels(choices) : "Export Multilevel Radar" : 1 : "Exports multiple separate radars (if there are any jerc_divider entities)" =
 	[
-		0: "Yes"
-		1: "No"
+		0: "No"
+		1: "Yes"
 	]
 
-	useSeparateGradientEachLevel(choices) : "Separate Multilevel Radar Gradients" : 1 : "Uses a new gradient for each level instead of one gradient for all levels combined" =
+	useSeparateGradientEachLevel(choices) : "Separate Multilevel Radar Gradients" : 0 : "Uses a new gradient for each level instead of one gradient for all levels combined" =
 	[
-		0: "Yes"
-		1: "No"
+		0: "No"
+		1: "Yes"
 	]
 
 	backgroundFilename(string) : "Background Image Filename" : "default" : "For custom images, place them inside the following folder: /Counter-Strike Global Offensive/bin/jerc/textures/"
@@ -43,30 +43,30 @@
 
 	strokeColour(color255) : "Stroke Colour" : "255 255 255" : "Colour of the stroke"
 
-	strokeAroundLayoutMaterials(choices) : "Stroke Around Path and Overlap Materials" : 0 =
+	strokeAroundLayoutMaterials(choices) : "Stroke Around Path and Overlap Materials" : 1 =
 	[
-		0: "Yes"
-		1: "No"
+		0: "No"
+		1: "Yes"
 	]
 
-	strokeAroundRemoveMaterials(choices) : "Stroke Around Remove Materials" : 0 =
+	strokeAroundRemoveMaterials(choices) : "Stroke Around Remove Materials" : 1 =
 	[
-		0: "Yes"
-		1: "No"
+		0: "No"
+		1: "Yes"
 	]
 
-	strokeAroundEntities(choices) : "Stroke Around Entities" : 0 : "Currently, if there are more than one brush in an entity, it will not combine them, so they will keep their individual borders" =
+	strokeAroundEntities(choices) : "Stroke Around Entities" : 1 : "Currently, if there are more than one brush in an entity, it will not combine them, so they will keep their individual borders" =
 	[
-		0: "Yes"
-		1: "No"
+		0: "No"
+		1: "Yes"
 	]
 
 	defaultLevelNum(integer) : "Default Level Num (int)" : 0 : "The index that the default level is in a multilevel radar. 0 = bottom level, 1 = second from bottom level, ..."
 
-	levelBackgroundEnabled(choices) : "Enable Levels As Backgrounds" : 0 : "Adds all levels as a background for each level when using multiple radar levels" =
+	levelBackgroundEnabled(choices) : "Enable Levels As Backgrounds" : 1 : "Adds all levels as a background for each level when using multiple radar levels" =
 	[
-		0: "Yes"
-		1: "No"
+		0: "No"
+		1: "Yes"
 	]
 
 	levelBackgroundDarkenAlpha(integer) : "Levels Background Darken Alpha (int)" : 200 : "The alpha value of the black overlay to apply onto the background levels (0-255)"
@@ -77,28 +77,28 @@
 
 	lowerLevelOutputName(string) : "Lower Level Output Name" : "lower" : "The lower level radar name JERC uses for naming"
 
-	exportTxt(choices) : "Export .TXT" : 0 =
+	exportTxt(choices) : "Export .TXT" : 1 =
 	[
-		0: "Yes"
-		1: "No"
+		0: "No"
+		1: "Yes"
 	]
 
-	exportDds(choices) : "Export .DDS" : 0 =
+	exportDds(choices) : "Export .DDS" : 1 =
 	[
-		0: "Yes"
-		1: "No"
+		0: "No"
+		1: "Yes"
 	]
 
-	exportPng(choices) : "Export .PNG" : 1 =
+	exportPng(choices) : "Export .PNG" : 0 =
 	[
-		0: "Yes"
-		1: "No"
+		0: "No"
+		1: "Yes"
 	]
 
-	exportBackgroundLevelsImage(choices) : "Export Background Levels Image" : 1 : "Exports background levels image (if 'Export Multilevel Radar' is selected and there are any jerc_divider entities)" =
+	exportBackgroundLevelsImage(choices) : "Export Background Levels Image" : 0 : "Exports background levels image (if 'Export Multilevel Radar' is selected and there are any jerc_divider entities)" =
 	[
-		0: "Yes"
-		1: "No"
+		0: "No"
+		1: "Yes"
 	]
 ]
 
