@@ -106,16 +106,16 @@ namespace JERC.Models
                 string.Concat("\"", mapName, "\""),
                 "{",
                     string.Concat("\t\"material\"\t\t\"overviews/", material, "\""),
-                    string.Concat("\t\"pos_x\"\t\t\t\"", pos_x.ToString(Globalization.Culture), "\""),
-                    string.Concat("\t\"pos_y\"\t\t\t\"", pos_y.ToString(Globalization.Culture), "\""),
-                    string.Concat("\t\"scale\"\t\t\t\"", scale.ToString(Globalization.Culture), "\""),
-                    //string.Concat("\t\t\t\"rotate\"\t\"", rotate.ToString(Globalization.Culture), "\""),
-                    //string.Concat("\t\t\t\"zoom\"\t\"", zoom.ToString(Globalization.Culture), "\""),
+                    string.Concat("\t\"pos_x\"\t\t\t\"", pos_x?.ToString(Globalization.Culture), "\""),
+                    string.Concat("\t\"pos_y\"\t\t\t\"", pos_y?.ToString(Globalization.Culture), "\""),
+                    string.Concat("\t\"scale\"\t\t\t\"", scale?.ToString(Globalization.Culture), "\""),
+                    //string.Concat("\t\t\t\"rotate\"\t\"", rotate?.ToString(Globalization.Culture), "\""),
+                    //string.Concat("\t\t\t\"zoom\"\t\"", zoom?.ToString(Globalization.Culture), "\""),
                     string.Empty,
-                    //string.Concat("\t\"inset_left\"\t\"", inset_left.ToString(Globalization.Culture), "\""),
-                    //string.Concat("\t\"inset_top\"\t\t\"", inset_top.ToString(Globalization.Culture), "\""),
-                    //string.Concat("\t\"inset_right\"\t\"", inset_right.ToString(Globalization.Culture), "\""),
-                    //string.Concat("\t\"inset_bottom\"\t\"", inset_bottom.ToString(Globalization.Culture), "\""),
+                    //string.Concat("\t\"inset_left\"\t\"", inset_left?.ToString(Globalization.Culture), "\""),
+                    //string.Concat("\t\"inset_top\"\t\t\"", inset_top?.ToString(Globalization.Culture), "\""),
+                    //string.Concat("\t\"inset_right\"\t\"", inset_right?.ToString(Globalization.Culture), "\""),
+                    //string.Concat("\t\"inset_bottom\"\t\"", inset_bottom?.ToString(Globalization.Culture), "\""),
                     //string.Empty,
             };
 
@@ -123,8 +123,8 @@ namespace JERC.Models
             {
                 lines.AddRange(new List<string>()
                 {
-                    string.Concat("\t\"CTSpawn_x\"\t\t\"", CTSpawn_x.ToString(Globalization.Culture), "\""),
-                    string.Concat("\t\"CTSpawn_y\"\t\t\"", CTSpawn_y.ToString(Globalization.Culture), "\""),
+                    string.Concat("\t\"CTSpawn_x\"\t\t\"", CTSpawn_x?.ToString(Globalization.Culture), "\""),
+                    string.Concat("\t\"CTSpawn_y\"\t\t\"", CTSpawn_y?.ToString(Globalization.Culture), "\""),
                 });
             }
 
@@ -132,8 +132,8 @@ namespace JERC.Models
             {
                 lines.AddRange(new List<string>()
                 {
-                    string.Concat("\t\"TSpawn_x\"\t\t\"", TSpawn_x.ToString(Globalization.Culture), "\""),
-                    string.Concat("\t\"TSpawn_y\"\t\t\"", TSpawn_y.ToString(Globalization.Culture), "\""),
+                    string.Concat("\t\"TSpawn_x\"\t\t\"", TSpawn_x?.ToString(Globalization.Culture), "\""),
+                    string.Concat("\t\"TSpawn_y\"\t\t\"", TSpawn_y?.ToString(Globalization.Culture), "\""),
                 });
             }
 
@@ -142,10 +142,10 @@ namespace JERC.Models
                 lines.AddRange(new List<string>()
                 {
                     string.Empty,
-                    string.Concat("\t\"bombA_x\"\t\t\"", bombA_x.ToString(Globalization.Culture), "\""),
-                    string.Concat("\t\"bombA_y\"\t\t\"", bombA_y.ToString(Globalization.Culture), "\""),
-                    string.Concat("\t\"bombB_x\"\t\t\"", bombB_x.ToString(Globalization.Culture), "\""),
-                    string.Concat("\t\"bombB_y\"\t\t\"", bombB_y.ToString(Globalization.Culture), "\""),
+                    string.Concat("\t\"bombA_x\"\t\t\"", bombA_x?.ToString(Globalization.Culture), "\""),
+                    string.Concat("\t\"bombA_y\"\t\t\"", bombA_y?.ToString(Globalization.Culture), "\""),
+                    string.Concat("\t\"bombB_x\"\t\t\"", bombB_x?.ToString(Globalization.Culture), "\""),
+                    string.Concat("\t\"bombB_y\"\t\t\"", bombB_y?.ToString(Globalization.Culture), "\""),
                 });
             }
 
@@ -154,22 +154,22 @@ namespace JERC.Models
                 lines.AddRange(new List<string>()
                 {
                     string.Empty,
-                    string.Concat("\t\"Hostage1_x\"\t\"", Hostage1_x.ToString(Globalization.Culture), "\""),
-                    string.Concat("\t\"Hostage1_y\"\t\"", Hostage1_y.ToString(Globalization.Culture), "\""),
-                    string.Concat("\t\"Hostage2_x\"\t\"", Hostage2_x.ToString(Globalization.Culture), "\""),
-                    string.Concat("\t\"Hostage2_y\"\t\"", Hostage2_y.ToString(Globalization.Culture), "\""),
-                    string.Concat("\t\"Hostage3_x\"\t\"", Hostage3_x.ToString(Globalization.Culture), "\""),
-                    string.Concat("\t\"Hostage3_y\"\t\"", Hostage3_y.ToString(Globalization.Culture), "\""),
-                    string.Concat("\t\"Hostage4_x\"\t\"", Hostage4_x.ToString(Globalization.Culture), "\""),
-                    string.Concat("\t\"Hostage4_y\"\t\"", Hostage4_y.ToString(Globalization.Culture), "\""),
-                    string.Concat("\t\"Hostage5_x\"\t\"", Hostage5_x.ToString(Globalization.Culture), "\""),
-                    string.Concat("\t\"Hostage5_y\"\t\"", Hostage5_y.ToString(Globalization.Culture), "\""),
-                    string.Concat("\t\"Hostage6_x\"\t\"", Hostage6_x.ToString(Globalization.Culture), "\""),
-                    string.Concat("\t\"Hostage6_y\"\t\"", Hostage6_y.ToString(Globalization.Culture), "\""),
-                    string.Concat("\t\"Hostage7_x\"\t\"", Hostage7_x.ToString(Globalization.Culture), "\""),
-                    string.Concat("\t\"Hostage7_y\"\t\"", Hostage7_y.ToString(Globalization.Culture), "\""),
-                    string.Concat("\t\"Hostage8_x\"\t\"", Hostage8_x.ToString(Globalization.Culture), "\""),
-                    string.Concat("\t\"Hostage8_y\"\t\"", Hostage8_y.ToString(Globalization.Culture), "\""),
+                    string.Concat("\t\"Hostage1_x\"\t\"", Hostage1_x?.ToString(Globalization.Culture), "\""),
+                    string.Concat("\t\"Hostage1_y\"\t\"", Hostage1_y?.ToString(Globalization.Culture), "\""),
+                    string.Concat("\t\"Hostage2_x\"\t\"", Hostage2_x?.ToString(Globalization.Culture), "\""),
+                    string.Concat("\t\"Hostage2_y\"\t\"", Hostage2_y?.ToString(Globalization.Culture), "\""),
+                    string.Concat("\t\"Hostage3_x\"\t\"", Hostage3_x?.ToString(Globalization.Culture), "\""),
+                    string.Concat("\t\"Hostage3_y\"\t\"", Hostage3_y?.ToString(Globalization.Culture), "\""),
+                    string.Concat("\t\"Hostage4_x\"\t\"", Hostage4_x?.ToString(Globalization.Culture), "\""),
+                    string.Concat("\t\"Hostage4_y\"\t\"", Hostage4_y?.ToString(Globalization.Culture), "\""),
+                    string.Concat("\t\"Hostage5_x\"\t\"", Hostage5_x?.ToString(Globalization.Culture), "\""),
+                    string.Concat("\t\"Hostage5_y\"\t\"", Hostage5_y?.ToString(Globalization.Culture), "\""),
+                    string.Concat("\t\"Hostage6_x\"\t\"", Hostage6_x?.ToString(Globalization.Culture), "\""),
+                    string.Concat("\t\"Hostage6_y\"\t\"", Hostage6_y?.ToString(Globalization.Culture), "\""),
+                    string.Concat("\t\"Hostage7_x\"\t\"", Hostage7_x?.ToString(Globalization.Culture), "\""),
+                    string.Concat("\t\"Hostage7_y\"\t\"", Hostage7_y?.ToString(Globalization.Culture), "\""),
+                    string.Concat("\t\"Hostage8_x\"\t\"", Hostage8_x?.ToString(Globalization.Culture), "\""),
+                    string.Concat("\t\"Hostage8_y\"\t\"", Hostage8_y?.ToString(Globalization.Culture), "\""),
                 });
             }
 
