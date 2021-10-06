@@ -18,9 +18,12 @@ namespace JERC.Models
             if (verticesSplit.Count() != 3)
                 return;
 
-            float.TryParse(verticesSplit[0], out x);
-            float.TryParse(verticesSplit[1], out y);
-            float.TryParse(verticesSplit[2], out z);
+            var style = System.Globalization.NumberStyles.Number;
+            var culture = System.Globalization.CultureInfo.CreateSpecificCulture("en-GB");
+
+            float.TryParse(verticesSplit[0], style, culture, out x);
+            float.TryParse(verticesSplit[1], style, culture, out y);
+            float.TryParse(verticesSplit[2], style, culture, out z);
         }
 
         public Vertices(float x, float y, float z)
