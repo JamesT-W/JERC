@@ -1,4 +1,5 @@
-﻿using System;
+﻿using JERC.Constants;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,9 +19,9 @@ namespace JERC.Models
             if (verticesSplit.Count() != 3)
                 return;
 
-            float.TryParse(verticesSplit[0], out x);
-            float.TryParse(verticesSplit[1], out y);
-            float.TryParse(verticesSplit[2], out z);
+            float.TryParse(verticesSplit[0], Globalization.Style, Globalization.Culture, out x);
+            float.TryParse(verticesSplit[1], Globalization.Style, Globalization.Culture, out y);
+            float.TryParse(verticesSplit[2], Globalization.Style, Globalization.Culture, out z);
         }
 
         public Vertices(float x, float y, float z)

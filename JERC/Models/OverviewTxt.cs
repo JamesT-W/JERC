@@ -101,23 +101,21 @@ namespace JERC.Models
 
         public List<string> GetInExportableFormat(JercConfigValues jercConfigValues, List<LevelHeight> levelHeights, string mapName)
         {
-            NumberFormatInfo nfi = new CultureInfo("en-US", false).NumberFormat;
-
             var lines = new List<string>()
             {
                 string.Concat("\"", mapName, "\""),
                 "{",
                     string.Concat("\t\"material\"\t\t\"overviews/", material, "\""),
-                    string.Concat("\t\"pos_x\"\t\t\t\"", pos_x, "\""),
-                    string.Concat("\t\"pos_y\"\t\t\t\"", pos_y, "\""),
-                    string.Concat("\t\"scale\"\t\t\t\"", float.Parse(scale).ToString("N", nfi), "\""),
-                    //string.Concat("\t\t\t\"rotate\"\t\"", float.Parse(rotate).ToString("N", nfi), "\""),
-                    //string.Concat("\t\t\t\"zoom\"\t\"", float.Parse(zoom).ToString("N", nfi), "\""),
+                    string.Concat("\t\"pos_x\"\t\t\t\"", pos_x?.ToString(Globalization.Culture), "\""),
+                    string.Concat("\t\"pos_y\"\t\t\t\"", pos_y?.ToString(Globalization.Culture), "\""),
+                    string.Concat("\t\"scale\"\t\t\t\"", scale?.ToString(Globalization.Culture), "\""),
+                    //string.Concat("\t\t\t\"rotate\"\t\"", rotate?.ToString(Globalization.Culture), "\""),
+                    //string.Concat("\t\t\t\"zoom\"\t\"", zoom?.ToString(Globalization.Culture), "\""),
                     string.Empty,
-                    //string.Concat("\t\"inset_left\"\t\"", float.Parse(inset_left).ToString("N", nfi), "\""),
-                    //string.Concat("\t\"inset_top\"\t\t\"", float.Parse(inset_top).ToString("N", nfi), "\""),
-                    //string.Concat("\t\"inset_right\"\t\"", float.Parse(inset_right).ToString("N", nfi), "\""),
-                    //string.Concat("\t\"inset_bottom\"\t\"", float.Parse(inset_bottom).ToString("N", nfi), "\""),
+                    //string.Concat("\t\"inset_left\"\t\"", inset_left?.ToString(Globalization.Culture), "\""),
+                    //string.Concat("\t\"inset_top\"\t\t\"", inset_top?.ToString(Globalization.Culture), "\""),
+                    //string.Concat("\t\"inset_right\"\t\"", inset_right?.ToString(Globalization.Culture), "\""),
+                    //string.Concat("\t\"inset_bottom\"\t\"", inset_bottom?.ToString(Globalization.Culture), "\""),
                     //string.Empty,
             };
 
@@ -125,8 +123,8 @@ namespace JERC.Models
             {
                 lines.AddRange(new List<string>()
                 {
-                    string.Concat("\t\"CTSpawn_x\"\t\t\"", (CTSpawn_x != null ? float.Parse(CTSpawn_x).ToString("N", nfi) : string.Empty), "\""),
-                    string.Concat("\t\"CTSpawn_y\"\t\t\"", (CTSpawn_y != null ? float.Parse(CTSpawn_y).ToString("N", nfi) : string.Empty), "\""),
+                    string.Concat("\t\"CTSpawn_x\"\t\t\"", CTSpawn_x?.ToString(Globalization.Culture), "\""),
+                    string.Concat("\t\"CTSpawn_y\"\t\t\"", CTSpawn_y?.ToString(Globalization.Culture), "\""),
                 });
             }
 
@@ -134,8 +132,8 @@ namespace JERC.Models
             {
                 lines.AddRange(new List<string>()
                 {
-                    string.Concat("\t\"TSpawn_x\"\t\t\"", (TSpawn_x != null ? float.Parse(TSpawn_x).ToString("N", nfi) : string.Empty), "\""),
-                    string.Concat("\t\"TSpawn_y\"\t\t\"", (TSpawn_y != null ? float.Parse(TSpawn_y).ToString("N", nfi) : string.Empty), "\""),
+                    string.Concat("\t\"TSpawn_x\"\t\t\"", TSpawn_x?.ToString(Globalization.Culture), "\""),
+                    string.Concat("\t\"TSpawn_y\"\t\t\"", TSpawn_y?.ToString(Globalization.Culture), "\""),
                 });
             }
 
@@ -144,10 +142,10 @@ namespace JERC.Models
                 lines.AddRange(new List<string>()
                 {
                     string.Empty,
-                    string.Concat("\t\"bombA_x\"\t\t\"", (bombA_x != null ? float.Parse(bombA_x).ToString("N", nfi) : string.Empty), "\""),
-                    string.Concat("\t\"bombA_y\"\t\t\"", (bombA_y != null ? float.Parse(bombA_y).ToString("N", nfi) : string.Empty), "\""),
-                    string.Concat("\t\"bombB_x\"\t\t\"", (bombB_x != null ? float.Parse(bombB_x).ToString("N", nfi) : string.Empty), "\""),
-                    string.Concat("\t\"bombB_y\"\t\t\"", (bombB_y != null ? float.Parse(bombB_y).ToString("N", nfi) : string.Empty), "\""),
+                    string.Concat("\t\"bombA_x\"\t\t\"", bombA_x?.ToString(Globalization.Culture), "\""),
+                    string.Concat("\t\"bombA_y\"\t\t\"", bombA_y?.ToString(Globalization.Culture), "\""),
+                    string.Concat("\t\"bombB_x\"\t\t\"", bombB_x?.ToString(Globalization.Culture), "\""),
+                    string.Concat("\t\"bombB_y\"\t\t\"", bombB_y?.ToString(Globalization.Culture), "\""),
                 });
             }
 
@@ -156,22 +154,22 @@ namespace JERC.Models
                 lines.AddRange(new List<string>()
                 {
                     string.Empty,
-                    string.Concat("\t\"Hostage1_x\"\t\"", (Hostage1_x != null ? float.Parse(Hostage1_x).ToString("N", nfi) : string.Empty), "\""),
-                    string.Concat("\t\"Hostage1_y\"\t\"", (Hostage1_y != null ? float.Parse(Hostage1_y).ToString("N", nfi) : string.Empty), "\""),
-                    string.Concat("\t\"Hostage2_x\"\t\"", (Hostage2_x != null ? float.Parse(Hostage2_x).ToString("N", nfi) : string.Empty), "\""),
-                    string.Concat("\t\"Hostage2_y\"\t\"", (Hostage2_y != null ? float.Parse(Hostage2_y).ToString("N", nfi) : string.Empty), "\""),
-                    string.Concat("\t\"Hostage3_x\"\t\"", (Hostage3_x != null ? float.Parse(Hostage3_x).ToString("N", nfi) : string.Empty), "\""),
-                    string.Concat("\t\"Hostage3_y\"\t\"", (Hostage3_y != null ? float.Parse(Hostage3_y).ToString("N", nfi) : string.Empty), "\""),
-                    string.Concat("\t\"Hostage4_x\"\t\"", (Hostage4_x != null ? float.Parse(Hostage4_x).ToString("N", nfi) : string.Empty), "\""),
-                    string.Concat("\t\"Hostage4_y\"\t\"", (Hostage4_y != null ? float.Parse(Hostage4_y).ToString("N", nfi) : string.Empty), "\""),
-                    string.Concat("\t\"Hostage5_x\"\t\"", (Hostage5_x != null ? float.Parse(Hostage5_x).ToString("N", nfi) : string.Empty), "\""),
-                    string.Concat("\t\"Hostage5_y\"\t\"", (Hostage5_y != null ? float.Parse(Hostage5_y).ToString("N", nfi) : string.Empty), "\""),
-                    string.Concat("\t\"Hostage6_x\"\t\"", (Hostage6_x != null ? float.Parse(Hostage6_x).ToString("N", nfi) : string.Empty), "\""),
-                    string.Concat("\t\"Hostage6_y\"\t\"", (Hostage6_y != null ? float.Parse(Hostage6_y).ToString("N", nfi) : string.Empty), "\""),
-                    string.Concat("\t\"Hostage7_x\"\t\"", (Hostage7_x != null ? float.Parse(Hostage7_x).ToString("N", nfi) : string.Empty), "\""),
-                    string.Concat("\t\"Hostage7_y\"\t\"", (Hostage7_y != null ? float.Parse(Hostage7_y).ToString("N", nfi) : string.Empty), "\""),
-                    string.Concat("\t\"Hostage8_x\"\t\"", (Hostage8_x != null ? float.Parse(Hostage8_x).ToString("N", nfi) : string.Empty), "\""),
-                    string.Concat("\t\"Hostage8_y\"\t\"", (Hostage8_y != null ? float.Parse(Hostage8_y).ToString("N", nfi) : string.Empty), "\""),
+                    string.Concat("\t\"Hostage1_x\"\t\"", Hostage1_x?.ToString(Globalization.Culture), "\""),
+                    string.Concat("\t\"Hostage1_y\"\t\"", Hostage1_y?.ToString(Globalization.Culture), "\""),
+                    string.Concat("\t\"Hostage2_x\"\t\"", Hostage2_x?.ToString(Globalization.Culture), "\""),
+                    string.Concat("\t\"Hostage2_y\"\t\"", Hostage2_y?.ToString(Globalization.Culture), "\""),
+                    string.Concat("\t\"Hostage3_x\"\t\"", Hostage3_x?.ToString(Globalization.Culture), "\""),
+                    string.Concat("\t\"Hostage3_y\"\t\"", Hostage3_y?.ToString(Globalization.Culture), "\""),
+                    string.Concat("\t\"Hostage4_x\"\t\"", Hostage4_x?.ToString(Globalization.Culture), "\""),
+                    string.Concat("\t\"Hostage4_y\"\t\"", Hostage4_y?.ToString(Globalization.Culture), "\""),
+                    string.Concat("\t\"Hostage5_x\"\t\"", Hostage5_x?.ToString(Globalization.Culture), "\""),
+                    string.Concat("\t\"Hostage5_y\"\t\"", Hostage5_y?.ToString(Globalization.Culture), "\""),
+                    string.Concat("\t\"Hostage6_x\"\t\"", Hostage6_x?.ToString(Globalization.Culture), "\""),
+                    string.Concat("\t\"Hostage6_y\"\t\"", Hostage6_y?.ToString(Globalization.Culture), "\""),
+                    string.Concat("\t\"Hostage7_x\"\t\"", Hostage7_x?.ToString(Globalization.Culture), "\""),
+                    string.Concat("\t\"Hostage7_y\"\t\"", Hostage7_y?.ToString(Globalization.Culture), "\""),
+                    string.Concat("\t\"Hostage8_x\"\t\"", Hostage8_x?.ToString(Globalization.Culture), "\""),
+                    string.Concat("\t\"Hostage8_y\"\t\"", Hostage8_y?.ToString(Globalization.Culture), "\""),
                 });
             }
 
