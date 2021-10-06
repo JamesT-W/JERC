@@ -1,4 +1,4 @@
-﻿using ImageAlterer;
+using ImageAlterer;
 using JERC.Constants;
 using JERC.Enums;
 using JERC.Models;
@@ -47,32 +47,17 @@ namespace JERC
         {
             gameConfigurationValues = new GameConfigurationValues(args);
 
-            if (gameConfigurationValues == null || !gameConfigurationValues.VerifyAllValuesSet())
+            if (!debugging && (gameConfigurationValues == null || !gameConfigurationValues.VerifyAllValuesSet()))
             {
                 Console.WriteLine("Game configuration files missing. Check the compile configuration's parameters.");
                 return;
             }
 
-            // TODO: uncomment for release
-            /*
-            if (gameBinDirectoryPath.Split(@"\").LastOrDefault() != "bin")
+            if (!debugging && (gameBinDirectoryPath.Split(@"\").LastOrDefault() != "bin" || gameBinDirectoryPath.Replace("/", @"\").Replace(@"\\", @"\").Contains(@"\csgo\bin")))
             {
                 Console.WriteLine(@"JERC's folder should be placed in ...\Counter-Strike Global Offensive\bin");
                 return;
             }
-
-            if (csgoBinDirectoryPath.Split(@"\").LastOrDefault() != "csgo")
-            {
-                Console.WriteLine(@"JERC's folder should be placed in ...\Counter-Strike Global Offensive\bin");
-                return;
-            }
-
-            if (gameOverviewsDirectoryPath.Split(@"\").LastOrDefault() != "overviews")
-            {
-                Console.WriteLine(@"JERC's folder should be placed in ...\Counter-Strike Global Offensive\bin");
-                return;
-            }
-            */
 
             var lines = File.ReadAllLines(gameConfigurationValues.vmfFilepath);
 
