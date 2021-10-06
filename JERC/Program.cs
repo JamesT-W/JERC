@@ -1,4 +1,4 @@
-using ImageAlterer;
+﻿using ImageAlterer;
 using JERC.Constants;
 using JERC.Enums;
 using JERC.Models;
@@ -53,7 +53,7 @@ namespace JERC
                 return;
             }
 
-            if (!debugging && (gameBinDirectoryPath.Split(@"\").LastOrDefault() != "bin" || gameBinDirectoryPath.Replace("/", @"\").Replace(@"\\", @"\").Contains(@"\csgo\bin")))
+            if (!debugging && (gameBinDirectoryPath.Split(@"\").Reverse().Skip(1).FirstOrDefault() != "bin" || gameBinDirectoryPath.Replace("/", @"\").Replace(@"\\", @"\").Contains(@"\csgo\bin")))
             {
                 Console.WriteLine(@"JERC's folder should be placed in ...\Counter-Strike Global Offensive\bin");
                 return;
