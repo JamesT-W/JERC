@@ -66,7 +66,18 @@ namespace JERC.Models
             strokeAroundRemoveMaterials = jercEntitySettingsValues.ContainsKey("strokeAroundRemoveMaterials") && jercEntitySettingsValues["strokeAroundRemoveMaterials"] == "0";
             strokeAroundEntities = jercEntitySettingsValues.ContainsKey("strokeAroundEntities") && jercEntitySettingsValues["strokeAroundEntities"] == "0";
 
-            defaultLevelNum = jercEntitySettingsValues.ContainsKey("defaultLevelNum") ? int.Parse(jercEntitySettingsValues["defaultLevelNum"]) : 0;
+            if (jercEntitySettingsValues.ContainsKey("defaultLevelNum"))
+            {
+                // Yes Jim, this can be null
+                if(jercEntitySettingsValues["defaultLevelNum"] == null)
+                {
+                    defaultLevelNum = 0;
+                }
+                else
+                {
+                    defaultLevelNum = int.Parse(jercEntitySettingsValues["defaultLevelNum"]);
+                }
+            }
             if (defaultLevelNum < 0)
                 defaultLevelNum = 0;
             else if (defaultLevelNum > jercDividerCount)
@@ -77,9 +88,9 @@ namespace JERC.Models
             levelBackgroundBlurAmount = jercEntitySettingsValues.ContainsKey("levelBackgroundBlurAmount") ? int.Parse(jercEntitySettingsValues["levelBackgroundBlurAmount"]) : 0;
             higherLevelOutputName = string.IsNullOrWhiteSpace(jercEntitySettingsValues["higherLevelOutputName"]) ? null : jercEntitySettingsValues["higherLevelOutputName"];
             lowerLevelOutputName = string.IsNullOrWhiteSpace(jercEntitySettingsValues["lowerLevelOutputName"]) ? null : jercEntitySettingsValues["lowerLevelOutputName"];
-            exportTxt = jercEntitySettingsValues.ContainsKey("exportTxt") && jercEntitySettingsValues["exportTxt"] == "0";
-            exportDds = jercEntitySettingsValues.ContainsKey("exportDds") && jercEntitySettingsValues["exportDds"] == "0";
-            exportPng = jercEntitySettingsValues.ContainsKey("exportPng") && jercEntitySettingsValues["exportPng"] == "0";
+            exportTxt = jercEntitySettingsValues.ContainsKey("exportTxt") && jercEntitySettingsValues["exportTxt"] == "1";
+            exportDds = jercEntitySettingsValues.ContainsKey("exportDds") && jercEntitySettingsValues["exportDds"] == "1";
+            exportPng = jercEntitySettingsValues.ContainsKey("exportPng") && jercEntitySettingsValues["exportPng"] == "1";
             exportBackgroundLevelsImage = jercEntitySettingsValues.ContainsKey("exportBackgroundLevelsImage") && jercEntitySettingsValues["exportBackgroundLevelsImage"] == "0";
 
 

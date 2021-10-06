@@ -16,13 +16,14 @@ namespace JERC
 {
     class Program
     {
-        private static readonly bool debugging = false;
-
         private static readonly ImageProcessorExtender imageProcessorExtender = new ImageProcessorExtender();
 
         private static readonly string gameBinDirectoryPath = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), @"..\"));
         private static readonly string gameCsgoDirectoryPath = Path.GetFullPath(Path.Combine(Path.Combine(gameBinDirectoryPath, @"..\"), @"csgo\"));
         private static readonly string gameOverviewsDirectoryPath = Path.GetFullPath(Path.Combine(gameCsgoDirectoryPath, @"resource\overviews\"));
+
+        //private static readonly string debugOutputPath = @"F:\Coding Stuff\GitHub Files\JERC\";   // For Jim
+        private static readonly string debugOutputPath = @"C:\Users\Quinton\source\repos\JERC\outputTest\"; // For Squid
 
         private static string outputFilepathPrefix;
         private static string outputImageBackgroundLevelsFilepath;
@@ -52,8 +53,8 @@ namespace JERC
                 return;
             }
 
-            // TODO: uncomment for release
-            /*
+
+#if !DEBUG // If release
             if (gameBinDirectoryPath.Split(@"\").LastOrDefault() != "bin")
             {
                 Console.WriteLine(@"JERC's folder should be placed in ...\Counter-Strike Global Offensive\bin");
@@ -71,20 +72,16 @@ namespace JERC
                 Console.WriteLine(@"JERC's folder should be placed in ...\Counter-Strike Global Offensive\bin");
                 return;
             }
-            */
-
+#endif
             var lines = File.ReadAllLines(gameConfigurationValues.vmfFilepath);
 
             mapName = Path.GetFileNameWithoutExtension(gameConfigurationValues.vmfFilepath);
 
-            if (debugging)
-            {
-                outputFilepathPrefix = string.Concat(@"F:\Coding Stuff\GitHub Files\JERC\", mapName);
-            }
-            else
-            {
-                outputFilepathPrefix = string.Concat(gameOverviewsDirectoryPath, mapName);
-            }
+#if DEBUG
+            outputFilepathPrefix = string.Concat(debugOutputPath, mapName);
+#else
+            outputFilepathPrefix = string.Concat(gameOverviewsDirectoryPath, mapName);
+#endif
 
             outputImageBackgroundLevelsFilepath = string.Concat(outputFilepathPrefix, "_background_levels.png");
 
