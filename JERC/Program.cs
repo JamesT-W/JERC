@@ -20,10 +20,6 @@ namespace JERC
 
         private static readonly ImageProcessorExtender imageProcessorExtender = new ImageProcessorExtender();
 
-        private static readonly string gameBinDirectoryPath = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), @"..\"));
-        private static readonly string gameCsgoDirectoryPath = Path.GetFullPath(Path.Combine(Path.Combine(gameBinDirectoryPath, @"..\"), @"csgo\"));
-        private static readonly string gameOverviewsDirectoryPath = Path.GetFullPath(Path.Combine(gameCsgoDirectoryPath, @"resource\overviews\"));
-
         private static string backgroundImagesDirectory;
         private static string outputFilepathPrefix;
         private static string outputImageBackgroundLevelsFilepath;
@@ -55,7 +51,7 @@ namespace JERC
                 return;
             }
 
-            if (!debugging && (gameBinDirectoryPath.Split(@"\").Reverse().Skip(1).FirstOrDefault() != "bin" || gameBinDirectoryPath.Replace("/", @"\").Replace(@"\\", @"\").Contains(@"\csgo\bin")))
+            if (!debugging && (gameConfigurationValues.binFolderPath.Split(@"\").Reverse().Skip(1).FirstOrDefault() != "bin" || gameConfigurationValues.binFolderPath.Replace("/", @"\").Replace(@"\\", @"\").Contains(@"\csgo\bin")))
             {
                 Console.WriteLine(@"JERC's folder should be placed in ...\Counter-Strike Global Offensive\bin");
                 return;
@@ -72,8 +68,8 @@ namespace JERC
             }
             else
             {
-                backgroundImagesDirectory = string.Concat(gameCsgoDirectoryPath, @"materials\jerc\backgrounds\");
-                outputFilepathPrefix = string.Concat(gameOverviewsDirectoryPath, mapName);
+                backgroundImagesDirectory = string.Concat(gameConfigurationValues.csgoFolderPath, @"materials\jerc\backgrounds\");
+                outputFilepathPrefix = string.Concat(gameConfigurationValues.overviewsFolderPath, mapName);
             }
 
             outputImageBackgroundLevelsFilepath = string.Concat(outputFilepathPrefix, "_background_levels.png");
