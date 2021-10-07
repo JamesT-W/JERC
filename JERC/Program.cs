@@ -158,26 +158,26 @@ namespace JERC
                     if (originIVNode != null)
                         MoveAndRotateVertices(instance, originIVNode);
 
-                    var allBrushesInEntity = entity.Body.Where(x => x.Name == "solid").SelectMany(x => x.Body.Where(y => y.Name == "side").Select(y => y.Body)).ToList();
-                    MoveAndRotateAllBrushes(instance, allBrushesInEntity);
+                    var allBrushSidesInEntity = entity.Body.Where(x => x.Name == "solid").SelectMany(x => x.Body.Where(y => y.Name == "side").Select(y => y.Body)).ToList();
+                    MoveAndRotateAllBrushSides(instance, allBrushSidesInEntity);
                 }
 
-                var allWorldBrushes = newVmf.World.Body.Where(x => x.Name == "solid").SelectMany(x => x.Body.Where(y => y.Name == "side").Select(y => y.Body)).ToList();
-                MoveAndRotateAllBrushes(instance, allWorldBrushes);
+                var allWorldBrushSides = newVmf.World.Body.Where(x => x.Name == "solid").SelectMany(x => x.Body.Where(y => y.Name == "side").Select(y => y.Body)).ToList();
+                MoveAndRotateAllBrushSides(instance, allWorldBrushSides);
 
                 instanceEntityIdsByVmf.Add(newVmf, instance.id);
             }
         }
 
 
-        private static void MoveAndRotateAllBrushes(FuncInstance instance, List<IList<IVNode>> brushIVNodeList)
+        private static void MoveAndRotateAllBrushSides(FuncInstance instance, List<IList<IVNode>> brushSideIVNodeList)
         {
-            foreach (var brush in brushIVNodeList)
+            foreach (var brushSide in brushSideIVNodeList)
             {
                 // brush id is not changed
                 // rotation is not changed
 
-                foreach (var verticesPlusIVNode in brush.Where(x => x.Name == "vertices_plus").SelectMany(x => x.Body))
+                foreach (var verticesPlusIVNode in brushSide.Where(x => x.Name == "vertices_plus").SelectMany(x => x.Body))
                 {
                     MoveAndRotateVertices(instance, verticesPlusIVNode);
                 }
