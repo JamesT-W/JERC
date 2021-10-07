@@ -7,6 +7,6 @@ namespace VMFParser
     {
         string Name { get; }
         IList<IVNode> Body { get; }
-        string Value { get; }
+        string Value { get; set; }
     }
 }

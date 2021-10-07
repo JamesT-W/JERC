@@ -8,7 +8,11 @@ namespace VMFParser
     {
         public string Name { get; private set; }
         //public IList<IVNode> Body { get; protected set; }
-        public string Value { get; private set; }
+        public string Value
+        {
+            get;
+            set;
+        }
 
         /// <summary>Initializes a new instance of the <see cref="VBlock"/> class from its name and a list of IVNodes.</summary>
         public VBlock(string name, IList<IVNode> body = null)
