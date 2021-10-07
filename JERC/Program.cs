@@ -1,4 +1,4 @@
-﻿using ImageAlterer;
+using ImageAlterer;
 using JERC.Constants;
 using JERC.Enums;
 using JERC.Models;
@@ -156,7 +156,7 @@ namespace JERC
 
                     var originIVNode = entity.Body.FirstOrDefault(x => x.Name == "origin");
                     if (originIVNode != null)
-                        originIVNode.Value = MergeVerticesToString(instance.origin, originIVNode.Value); // removes the offset that being in an instances causes
+                        MoveAndRotateVertices(instance, originIVNode);
 
                     var allBrushesInEntity = entity.Body.Where(x => x.Name == "solid").SelectMany(x => x.Body.Where(y => y.Name == "side").Select(y => y.Body)).ToList();
                     MoveAndRotateAllBrushes(instance, allBrushesInEntity);
@@ -179,10 +179,16 @@ namespace JERC
 
                 foreach (var verticesPlusIVNode in brush.Where(x => x.Name == "vertices_plus").SelectMany(x => x.Body))
                 {
-                    verticesPlusIVNode.Value = MergeVerticesToString(instance.origin, verticesPlusIVNode.Value); // removes the offset that being in an instances causes
-                    verticesPlusIVNode.Value = GetRotatedVerticesNewPositionAsString(new Vertices(verticesPlusIVNode.Value), instance.origin, instance.angles.yaw); // removes the rotation that being in an instances causes
+                    MoveAndRotateVertices(instance, verticesPlusIVNode);
                 }
             }
+        }
+
+
+        private static void MoveAndRotateVertices(FuncInstance instance, IVNode ivNode)
+        {
+            ivNode.Value = MergeVerticesToString(instance.origin, ivNode.Value); // removes the offset that being in an instances causes
+            ivNode.Value = GetRotatedVerticesNewPositionAsString(new Vertices(ivNode.Value), instance.origin, instance.angles.yaw); // removes the rotation that being in an instances causes
         }
 
 
