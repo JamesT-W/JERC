@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,6 +11,7 @@ namespace JERC.Models
     {
         public string csgoFolderPath;
         public string vmfFilepath;
+        public string vmfFilepathDirectory;
 
 
         public GameConfigurationValues(string[] args)
@@ -28,6 +30,7 @@ namespace JERC.Models
                         vmfFilepath = args[i + 1];
                         if (!vmfFilepath.Contains(".vmf"))
                             vmfFilepath += ".vmf";
+                        vmfFilepathDirectory = Path.GetDirectoryName(vmfFilepath);
                         break;
                     default:
                         return;
@@ -39,7 +42,22 @@ namespace JERC.Models
         public bool VerifyAllValuesSet()
         {
             if (string.IsNullOrWhiteSpace(csgoFolderPath) ||
-                string.IsNullOrWhiteSpace(vmfFilepath)
+                string.IsNullOrWhiteSpace(vmfFilepath) ||
+                string.IsNullOrWhiteSpace(vmfFilepathDirectory)
+            )
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+
+        public bool VerifyAllDirectoriesAndFilesExist()
+        {
+            if (!Directory.Exists(csgoFolderPath) ||
+                !Directory.Exists(vmfFilepathDirectory) ||
+                !File.Exists(vmfFilepathDirectory)
             )
             {
                 return false;

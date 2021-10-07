@@ -34,11 +34,13 @@ namespace JERC
 
         private static JercConfigValues jercConfigValues;
 
-        private static string visgroupId;
+        private static int visgroupIdMainVmf;
+        private static readonly Dictionary<int, int> visgroupIdsByInstanceEntityIds = new Dictionary<int, int>();
 
         private static string mapName;
 
         private static VMF vmf;
+        private static readonly Dictionary<VMF, int> instanceEntityIdsByVmf = new Dictionary<VMF, int>();
         private static VmfRequiredData vmfRequiredData;
         private static OverviewPositionValues overviewPositionValues;
 
@@ -47,7 +49,7 @@ namespace JERC
         {
             gameConfigurationValues = new GameConfigurationValues(args);
 
-            if (!debugging && (gameConfigurationValues == null || !gameConfigurationValues.VerifyAllValuesSet()))
+            if (!debugging && (gameConfigurationValues == null || !gameConfigurationValues.VerifyAllValuesSet() || !gameConfigurationValues.VerifyAllDirectoriesAndFilesExist()))
             {
                 Console.WriteLine("Game configuration files missing. Check the compile configuration's parameters.");
                 return;
@@ -78,17 +80,26 @@ namespace JERC
 
             vmf = new VMF(lines);
 
-            SetVisgroupId();
+            if (vmf == null)
+            {
+                Console.WriteLine("Error parsing vmf, aborting.");
+                return;
+            }
+
+            SortInstances(vmf);
+
+            SetVisgroupIdMainVmf();
+            SetVisgroupIdInstancesByEntityId();
 
             vmfRequiredData = GetVmfRequiredData();
 
             if (vmfRequiredData == null)
             {
-                Console.WriteLine("No jerc_config entity found.");
+                Console.WriteLine("No jerc_config entity found, aborting.");
                 return;
             }
 
-            if (debugging && !string.IsNullOrWhiteSpace(jercConfigValues.alternateOutputPath))
+            if (debugging)
             {
                 jercConfigValues.alternateOutputPath = string.Empty;
             }
@@ -110,21 +121,194 @@ namespace JERC
         }
 
 
-        private static void SetVisgroupId()
+        private static void SortInstances(VMF vmf)
         {
-            visgroupId = (from x in vmf.VisGroups.Body
+            var instanceEntities = vmf.Body.Where(x => x.Name == "entity").Where(x => x.Body.Any(y => y.Name == "classname" && y.Value == "func_instance")).ToList();
+
+            // create FuncInstances from the entity key values
+            var funcInstances = new List<FuncInstance>();
+            foreach (var instanceEntity in instanceEntities)
+            {
+                var newInstance = new FuncInstance(instanceEntity);
+
+                if (newInstance != null && !string.IsNullOrWhiteSpace(newInstance.file) && newInstance.angles != null && newInstance.origin != null)
+                {
+                    funcInstances.Add(newInstance);
+                }
+            }
+
+            // Parse the instance VMFs
+            foreach (var instance in funcInstances)
+            {
+                var filepath = string.Concat(gameConfigurationValues.vmfFilepathDirectory, @"\", instance.file);
+
+                if (!File.Exists(filepath))
+                    continue;
+
+                var lines = File.ReadAllLines(filepath);
+
+                var newVmf = new VMF(lines);
+
+                if (newVmf == null)
+                    continue;
+
+                // correct origins and angles
+                foreach (var entity in newVmf.Body.Where(x => x.Name == "entity"))
+                {
+                    // entity id is not changed
+                    // brush rotation is not changed
+
+                    var originIVNode = entity.Body.FirstOrDefault(x => x.Name == "origin");
+                    if (originIVNode != null)
+                        originIVNode.Value = MergeVerticesToString(instance.origin, originIVNode.Value); // removes the offset that being in an instances causes
+
+                    var allBrushesInEntity = entity.Body.Where(x => x.Name == "solid").SelectMany(x => x.Body.Where(y => y.Name == "side").Select(y => y.Body)).ToList();
+                    MoveAndRotateAllBrushes(instance, allBrushesInEntity);
+                }
+
+                var allWorldBrushes = newVmf.World.Body.Where(x => x.Name == "solid").SelectMany(x => x.Body.Where(y => y.Name == "side").Select(y => y.Body)).ToList();
+                MoveAndRotateAllBrushes(instance, allWorldBrushes);
+
+                instanceEntityIdsByVmf.Add(newVmf, instance.id);
+            }
+        }
+
+
+        private static void MoveAndRotateAllBrushes(FuncInstance instance, List<IList<IVNode>> brushIVNodeList)
+        {
+            foreach (var brush in brushIVNodeList)
+            {
+                // brush id is not changed
+                // rotation is not changed
+
+                foreach (var verticesPlusIVNode in brush.Where(x => x.Name == "vertices_plus").SelectMany(x => x.Body))
+                {
+                    verticesPlusIVNode.Value = MergeVerticesToString(instance.origin, verticesPlusIVNode.Value); // removes the offset that being in an instances causes
+                    verticesPlusIVNode.Value = GetRotatedVerticesNewPositionAsString(new Vertices(verticesPlusIVNode.Value), instance.origin, instance.angles.yaw); // removes the rotation that being in an instances causes
+                }
+            }
+        }
+
+
+        public static string MergeVerticesToString(Vertices vertices, string verticesString)
+        {
+            var verticesNew = GetVerticesFromString(verticesString);
+
+            var xNew = vertices.x + verticesNew.x;
+            var yNew = vertices.y + verticesNew.y;
+            var zNew = vertices.z + verticesNew.z;
+
+            return string.Concat(xNew, " ", yNew, " ", zNew);
+        }
+
+
+        public static string MergeAnglesToString(Angle angle, string anglesString)
+        {
+            var anglesNew = GetAnglesFromString(anglesString);
+
+            var pitchNew = angle.pitch + anglesNew.pitch;
+            var yawNew = angle.yaw + anglesNew.yaw;
+            var rollNew = angle.roll + anglesNew.roll;
+
+            return string.Concat(pitchNew, " ", yawNew, " ", rollNew);
+        }
+
+
+        private static Vertices GetVerticesFromString(string verticesString)
+        {
+            var verticesStringSplit = verticesString.Split(" ");
+
+            if (verticesStringSplit.Count() != 3)
+                return null;
+
+            float.TryParse(verticesStringSplit[0], Globalization.Style, Globalization.Culture, out var xCasted);
+            float.TryParse(verticesStringSplit[1], Globalization.Style, Globalization.Culture, out var yCasted);
+            float.TryParse(verticesStringSplit[2], Globalization.Style, Globalization.Culture, out var zCasted);
+
+            return new Vertices(xCasted, yCasted, zCasted);
+        }
+
+
+        private static Angle GetAnglesFromString(string anglesString)
+        {
+            var anglesStringSplit = anglesString.Split(" ");
+
+            if (anglesStringSplit.Count() != 3)
+                return null;
+
+            float.TryParse(anglesStringSplit[0], Globalization.Style, Globalization.Culture, out var pitchCasted);
+            float.TryParse(anglesStringSplit[1], Globalization.Style, Globalization.Culture, out var yawCasted);
+            float.TryParse(anglesStringSplit[2], Globalization.Style, Globalization.Culture, out var rollCasted);
+
+            return new Angle(pitchCasted, yawCasted, rollCasted);
+        }
+
+
+        private static string GetRotatedVerticesNewPositionAsString(Vertices verticesToRotate, Vertices centerVertices, float angleInDegrees)
+        {
+            double angleInRadians = angleInDegrees * (Math.PI / 180);
+            double cosTheta = Math.Cos(angleInRadians);
+            double sinTheta = Math.Sin(angleInRadians);
+
+            var newVertices = new Vertices(
+                (int)(cosTheta * (verticesToRotate.x - centerVertices.x) - sinTheta * (verticesToRotate.y - centerVertices.y) + centerVertices.x),
+                (int)(sinTheta * (verticesToRotate.x - centerVertices.x) + cosTheta * (verticesToRotate.y - centerVertices.y) + centerVertices.y),
+                verticesToRotate.z
+            );
+
+            return newVertices.x + " " + newVertices.y + " " + newVertices.z;
+        }
+
+
+        private static void SetVisgroupIdMainVmf()
+        {
+            visgroupIdMainVmf = GetJercVisgroupIdFromVmf(vmf);
+        }
+
+
+        private static void SetVisgroupIdInstancesByEntityId()
+        {
+            if (instanceEntityIdsByVmf != null && instanceEntityIdsByVmf.Any())
+            {
+                foreach (var instance in instanceEntityIdsByVmf)
+                {
+                    var id = GetJercVisgroupIdFromVmf(instance.Key);
+
+                    visgroupIdsByInstanceEntityIds.Add(instance.Value, id);
+                }
+            }
+        }
+
+
+        private static int GetJercVisgroupIdFromVmf(VMF vmf)
+        {
+            int.TryParse((from x in vmf.VisGroups.Body
                           from y in x.Body
                           where y.Name == "name"
                           where y.Value.ToLower() == visgroupName.ToLower()
                           select x.Body.FirstOrDefault(y => y.Name == "visgroupid").Value)
-                          .FirstOrDefault();
+            .FirstOrDefault(),
+            Globalization.Style, Globalization.Culture, out var id);
+
+            return id;
         }
 
 
         private static VmfRequiredData GetVmfRequiredData()
         {
+            // main vmf contents
             var allWorldBrushes = vmf.World.Body.Where(x => x.Name == "solid");
             var allEntities = vmf.Body.Where(x => x.Name == "entity");
+
+            // instances contents
+            if (instanceEntityIdsByVmf != null && instanceEntityIdsByVmf.Any())
+            {
+                foreach (var instance in instanceEntityIdsByVmf.Keys)
+                {
+                    allWorldBrushes = allWorldBrushes.Concat(instance.World.Body.Where(x => x.Name == "solid"));
+                    allEntities = allEntities.Concat(instance.Body.Where(x => x.Name == "entity"));
+                }
+            }
 
             // used for both world brushes and displacements
             var allWorldBrushesInVisgroup = from x in allWorldBrushes
@@ -132,7 +316,8 @@ namespace JERC
                                             where y.Name == "editor"
                                             from z in y.Body
                                             where z.Name == "visgroupid"
-                                            where z.Value == visgroupId
+                                            where int.Parse(z.Value, Globalization.Style, Globalization.Culture) == visgroupIdMainVmf ||
+                                                visgroupIdsByInstanceEntityIds.Values.Any(a => a == int.Parse(z.Value, Globalization.Style, Globalization.Culture))
                                             select x;
 
             // brushes
