@@ -1,4 +1,4 @@
-﻿using ImageAlterer;
+using ImageAlterer;
 using JERC.Constants;
 using JERC.Enums;
 using JERC.Models;
@@ -330,7 +330,9 @@ namespace JERC
             var brushesDoor = GetBrushesByTextureName(allWorldBrushesInVisgroup, TextureNames.DoorTextureName);
             var brushesLadder = new List<IVNode>();
             foreach (var ladderTextureName in TextureNames.LadderTextureNames)
+            {
                 brushesLadder.AddRange(GetBrushesByTextureName(allWorldBrushesInVisgroup, ladderTextureName));
+            }
 
             // displacements
             var displacementsRemove = GetDisplacementsByTextureName(allWorldBrushesInVisgroup, TextureNames.RemoveTextureName);
@@ -340,7 +342,9 @@ namespace JERC
             var displacementsDoor = GetDisplacementsByTextureName(allWorldBrushesInVisgroup, TextureNames.DoorTextureName);
             var displacementsLadder = new List<IVNode>();
             foreach (var ladderTextureName in TextureNames.LadderTextureNames)
+            {
                 displacementsLadder.AddRange(GetDisplacementsByTextureName(allWorldBrushesInVisgroup, ladderTextureName));
+            }
 
             // entities (in game)
             var buyzoneBrushEntities = GetEntitiesByClassname(allEntities, Classnames.Buyzone);
@@ -359,14 +363,19 @@ namespace JERC
 
             var allBrushesBrushEntities = funcBrushBrushEntities.Concat(funcDetailBrushEntities).Concat(funcDoorBrushEntities).Concat(funcDoorBrushRotatingEntities).Concat(funcLadderBrushEntities);
 
-            var brushesRemoveBrushEntities = GetEntityBrushesByTextureName(allBrushesBrushEntities, TextureNames.RemoveTextureName);
-            var brushesPathBrushEntities = GetEntityBrushesByTextureName(allBrushesBrushEntities, TextureNames.PathTextureName);
-            var brushesCoverBrushEntities = GetEntityBrushesByTextureName(allBrushesBrushEntities, TextureNames.CoverTextureName);
-            var brushesOverlapBrushEntities = GetEntityBrushesByTextureName(allBrushesBrushEntities, TextureNames.OverlapTextureName);
-            var brushesDoorBrushEntities = GetEntityBrushesByTextureName(allBrushesBrushEntities, TextureNames.DoorTextureName);
-            var brushesLadderBrushEntities = new List<IVNode>();
+            var brushesRemoveBrushEntities = GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLadders(allBrushesBrushEntities, TextureNames.RemoveTextureName);
+            var brushesPathBrushEntities = GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLadders(allBrushesBrushEntities, TextureNames.PathTextureName);
+            var brushesCoverBrushEntities = GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLadders(allBrushesBrushEntities, TextureNames.CoverTextureName);
+            var brushesOverlapBrushEntities = GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLadders(allBrushesBrushEntities, TextureNames.OverlapTextureName);
+            var brushesDoorBrushEntities = GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLadders(allBrushesBrushEntities, TextureNames.DoorTextureName)
+                .Concat(GetBrushEntityBrushesByClassname(allBrushesBrushEntities, Classnames.FuncDoor))
+                .Concat(GetBrushEntityBrushesByClassname(allBrushesBrushEntities, Classnames.FuncDoorRotating));
+            var brushesLadderBrushEntities = GetBrushEntityBrushesByClassname(allBrushesBrushEntities, Classnames.FuncLadder).ToList();
             foreach (var ladderTextureName in TextureNames.LadderTextureNames)
-                brushesLadderBrushEntities.AddRange(GetEntityBrushesByTextureName(allBrushesBrushEntities, ladderTextureName));
+            {
+                brushesLadderBrushEntities.AddRange(GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLadders(allBrushesBrushEntities, ladderTextureName));
+            }
+
 
             // brush entities (JERC)
             var jercBoxBrushEntities = GetEntitiesByClassname(allEntities, Classnames.JercBox);
@@ -454,31 +463,46 @@ namespace JERC
         }
 
 
-        private static IEnumerable<IVNode> GetEntityBrushesByTextureName(IEnumerable<IVNode> allBrushEntities, string textureName)
-        {
-            return (from x in allBrushEntities
-                    from y in x.Body
-                    where y.Name == "solid"
-                    from z in y.Body
-                    where z.Name == "side"
-                    where !z.Body.Any(a => a.Name == "dispinfo")
-                    from a in z.Body
-                    where a.Name == "material"
-                    where a.Value.ToLower() == textureName.ToLower()
-                    select y).Distinct();
-        }
-
-
         private static IEnumerable<IVNode> GetDisplacementsByTextureName(IEnumerable<IVNode> allWorldBrushesInVisgroup, string textureName)
         {
             return (from x in allWorldBrushesInVisgroup
-                   from y in x.Body
-                   where y.Name == "side"
-                   where y.Body.Any(z => z.Name == "dispinfo")
-                   from z in y.Body
-                   where z.Name == "material"
-                   where z.Value.ToLower() == textureName.ToLower()
-                   select x).Distinct();
+                    from y in x.Body
+                    where y.Name == "side"
+                    where y.Body.Any(z => z.Name == "dispinfo")
+                    from z in y.Body
+                    where z.Name == "material"
+                    where z.Value.ToLower() == textureName.ToLower()
+                    select x).Distinct();
+        }
+
+
+        private static IEnumerable<IVNode> GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLadders(IEnumerable<IVNode> allBrushEntities, string textureName)
+        {
+            return (from x in allBrushEntities
+                    from y in x.Body
+                    where y.Name == "classname"
+                    where y.Value.ToLower() != Classnames.FuncDoor && y.Value.ToLower() != Classnames.FuncDoorRotating && y.Value.ToLower() != Classnames.FuncLadder
+                    from z in x.Body
+                    where z.Name == "solid"
+                    from a in z.Body
+                    where a.Name == "side"
+                    where !a.Body.Any(b => b.Name == "dispinfo")
+                    from b in a.Body
+                    where b.Name == "material"
+                    where b.Value.ToLower() == textureName.ToLower()
+                    select z).Distinct();
+        }
+
+
+        private static IEnumerable<IVNode> GetBrushEntityBrushesByClassname(IEnumerable<IVNode> allBrushEntities, string classname)
+        {
+            return (from x in allBrushEntities
+                    from y in x.Body
+                    where y.Name == "classname"
+                    where y.Value.ToLower() == classname.ToLower()
+                    from z in x.Body
+                    where z.Name == "solid"
+                    select z).Distinct();
         }
 
 
