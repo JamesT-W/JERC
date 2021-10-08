@@ -1,0 +1,10 @@
+UnlitGeneric
+{
+	$basetexture "jerc/JERC_Remove"
+
+	$additive 1
+
+	%keywords "jerc,tool,tools,radar,overview,remove"
+
+	%compileskip 1
+}
