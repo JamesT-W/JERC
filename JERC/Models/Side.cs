@@ -1,4 +1,5 @@
-﻿using System;
+﻿using JERC.Constants;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -26,7 +27,7 @@ namespace JERC.Models
             material = side.Body.FirstOrDefault(x => x.Name == "material")?.Value;
             uaxis = side.Body.FirstOrDefault(x => x.Name == "uaxis")?.Value;
             vaxis = side.Body.FirstOrDefault(x => x.Name == "vaxis")?.Value;
-            rotation = int.Parse(side.Body.FirstOrDefault(x => x.Name == "rotation")?.Value);
+            rotation = int.Parse(side.Body.FirstOrDefault(x => x.Name == "rotation")?.Value, Globalization.Style, Globalization.Culture);
             smoothing_groups = int.Parse(side.Body.FirstOrDefault(x => x.Name == "smoothing_groups")?.Value);
 
             var displacementsStuff = side.Body.FirstOrDefault(x => x.Name == "dispinfo");

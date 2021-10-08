@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -28,7 +28,7 @@ namespace JERC.Models
             classname = entity.Body.FirstOrDefault(x => x.Name == "classname")?.Value;
             angles = entity.Body.FirstOrDefault(x => x.Name == "angles")?.Value;
             model = entity.Body.FirstOrDefault(x => x.Name == "model")?.Value;
-            uniformscale = entity.Body.Any(x => x.Name == "uniformscale") ? int.Parse(entity.Body.FirstOrDefault(x => x.Name == "uniformscale")?.Value) : null;
+            uniformscale = entity.Body.Any(x => x.Name == "uniformscale") ? int.Parse(entity.Body.FirstOrDefault(x => x.Name == "uniformscale")?.Value, Globalization.Style, Globalization.Culture) : null;
             origin = entity.Body.FirstOrDefault(x => x.Name == "origin")?.Value;
             editor = new Editor(entity.Body.FirstOrDefault(x => x.Name == "editor"));
 
