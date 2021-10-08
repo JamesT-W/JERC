@@ -1,4 +1,4 @@
-using ImageAlterer;
+﻿using ImageAlterer;
 using JERC.Constants;
 using JERC.Enums;
 using JERC.Models;
@@ -339,15 +339,15 @@ namespace JERC
             var displacementsLadder = GetDisplacementsByTextureName(allWorldBrushesInVisgroup, TextureNames.LadderTextureName);
 
             // entities (in game)
-            var buyzoneBrushEntities = GetEntitiesByClassname(allEntities, Classnames.ClassnameBuyzone);
-            var bombsiteBrushEntities = GetEntitiesByClassname(allEntities, Classnames.ClassnameBombsite);
-            var rescueZoneBrushEntities = GetEntitiesByClassname(allEntities, Classnames.ClassnameRescueZone);
-            var hostageEntities = GetEntitiesByClassname(allEntities, Classnames.ClassnameHostage);
-            var ctSpawnEntities = GetEntitiesByClassname(allEntities, Classnames.ClassnameCTSpawn);
-            var tSpawnEntities = GetEntitiesByClassname(allEntities, Classnames.ClassnameTSpawn);
+            var buyzoneBrushEntities = GetEntitiesByClassname(allEntities, Classnames.Buyzone);
+            var bombsiteBrushEntities = GetEntitiesByClassname(allEntities, Classnames.Bombsite);
+            var rescueZoneBrushEntities = GetEntitiesByClassname(allEntities, Classnames.RescueZone);
+            var hostageEntities = GetEntitiesByClassname(allEntities, Classnames.Hostage);
+            var ctSpawnEntities = GetEntitiesByClassname(allEntities, Classnames.CTSpawn);
+            var tSpawnEntities = GetEntitiesByClassname(allEntities, Classnames.TSpawn);
 
             // brush entities (JERC)
-            var jercBoxBrushEntities = GetEntitiesByClassname(allEntities, Classnames.ClassnameJercBox);
+            var jercBoxBrushEntities = GetEntitiesByClassname(allEntities, Classnames.JercBox);
 
             // entities (JERC)
             var jercConfigEntities = GetEntitiesByClassname(allEntities, Classnames.JercConfig);
