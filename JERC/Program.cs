@@ -16,7 +16,7 @@ namespace JERC
 {
     class Program
     {
-        private static readonly bool debugging = false;
+        private static readonly bool debugging = true;
 
         private static readonly ImageProcessorExtender imageProcessorExtender = new ImageProcessorExtender();
 
@@ -346,6 +346,22 @@ namespace JERC
             var ctSpawnEntities = GetEntitiesByClassname(allEntities, Classnames.CTSpawn);
             var tSpawnEntities = GetEntitiesByClassname(allEntities, Classnames.TSpawn);
 
+            // brush entities
+            var funcBrushBrushEntities = GetEntitiesByClassname(allEntities, Classnames.FuncBrush);
+            var funcDetailBrushEntities = GetEntitiesByClassname(allEntities, Classnames.FuncDetail);
+            var funcDoorBrushEntities = GetEntitiesByClassname(allEntities, Classnames.FuncDoor);
+            var funcDoorBrushRotatingEntities = GetEntitiesByClassname(allEntities, Classnames.FuncDoorRotating);
+            var funcLadderBrushEntities = GetEntitiesByClassname(allEntities, Classnames.FuncLadder);
+
+            var allBrushesBrushEntities = funcBrushBrushEntities.Concat(funcDetailBrushEntities).Concat(funcDoorBrushEntities).Concat(funcDoorBrushRotatingEntities).Concat(funcLadderBrushEntities);
+
+            var brushesRemoveBrushEntities = GetEntityBrushesByTextureName(allBrushesBrushEntities, TextureNames.RemoveTextureName);
+            var brushesPathBrushEntities = GetEntityBrushesByTextureName(allBrushesBrushEntities, TextureNames.PathTextureName);
+            var brushesCoverBrushEntities = GetEntityBrushesByTextureName(allBrushesBrushEntities, TextureNames.CoverTextureName);
+            var brushesOverlapBrushEntities = GetEntityBrushesByTextureName(allBrushesBrushEntities, TextureNames.OverlapTextureName);
+            var brushesDoorBrushEntities = GetEntityBrushesByTextureName(allBrushesBrushEntities, TextureNames.DoorTextureName);
+            var brushesLadderBrushEntities = GetEntityBrushesByTextureName(allBrushesBrushEntities, TextureNames.LadderTextureName);
+
             // brush entities (JERC)
             var jercBoxBrushEntities = GetEntitiesByClassname(allEntities, Classnames.JercBox);
 
@@ -366,6 +382,7 @@ namespace JERC
                 brushesRemove, brushesPath, brushesCover, brushesOverlap, brushesDoor, brushesLadder,
                 displacementsRemove, displacementsPath, displacementsCover, displacementsOverlap, displacementsDoor, displacementsLadder,
                 buyzoneBrushEntities, bombsiteBrushEntities, rescueZoneBrushEntities, hostageEntities, ctSpawnEntities, tSpawnEntities,
+                brushesRemoveBrushEntities, brushesPathBrushEntities, brushesCoverBrushEntities, brushesOverlapBrushEntities, brushesDoorBrushEntities, brushesLadderBrushEntities,
                 jercBoxBrushEntities,
                 jercConfigEntities, jercDividerEntities, jercFloorEntities, jercCeilingEntities
             );
@@ -428,6 +445,21 @@ namespace JERC
                    where z.Name == "material"
                    where z.Value.ToLower() == textureName.ToLower()
                    select x).Distinct();
+        }
+
+
+        private static IEnumerable<IVNode> GetEntityBrushesByTextureName(IEnumerable<IVNode> allBrushEntities, string textureName)
+        {
+            return (from x in allBrushEntities
+                    from y in x.Body
+                    where y.Name == "solid"
+                    from z in y.Body
+                    where z.Name == "side"
+                    where !z.Body.Any(a => a.Name == "dispinfo")
+                    from a in z.Body
+                    where a.Name == "material"
+                    where a.Value.ToLower() == textureName.ToLower()
+                    select y).Distinct();
         }
 
 

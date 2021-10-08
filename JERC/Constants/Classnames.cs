@@ -13,6 +13,12 @@ namespace JERC.Constants
         public static readonly string CTSpawn = "info_player_counterterrorist";
         public static readonly string TSpawn = "info_player_terrorist";
 
+        public static readonly string FuncBrush = "func_brush";
+        public static readonly string FuncDetail = "func_detail";
+        public static readonly string FuncDoor = "func_door";
+        public static readonly string FuncDoorRotating = "func_door_rotating";
+        public static readonly string FuncLadder = "func_ladder";
+
         public static readonly string JercBox = "jerc_box";
 
         public static readonly string JercConfig = "jerc_config";

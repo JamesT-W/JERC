@@ -62,17 +62,31 @@ namespace JERC.Models
             IEnumerable<IVNode> brushesRemoveIVNodes, IEnumerable<IVNode> brushesPathIVNodes, IEnumerable<IVNode> brushesCoverIVNodes, IEnumerable<IVNode> brushesOverlapIVNodes, IEnumerable<IVNode> brushesDoorIVNodes, IEnumerable<IVNode> brushesLadderIVNodes,
             IEnumerable<IVNode> displacementsRemoveIVNodes, IEnumerable<IVNode> displacementsPathIVNodes, IEnumerable<IVNode> displacementsCoverIVNodes, IEnumerable<IVNode> displacementsOverlapIVNodes, IEnumerable<IVNode> displacementsDoorIVNodes, IEnumerable<IVNode> displacementsLadderIVNodes,
             IEnumerable<IVNode> buyzoneBrushEntitiesIVNodes, IEnumerable<IVNode> bombsiteBrushEntitiesIVNodes, IEnumerable<IVNode> rescueZoneBrushEntitiesIVNodes, IEnumerable<IVNode> hostageEntitiesIVNodes, IEnumerable<IVNode> ctSpawnEntitiesIVNodes, IEnumerable<IVNode> tSpawnEntitiesIVNodes,
+            IEnumerable<IVNode> brushesRemoveBrushEntitiesIVNodes, IEnumerable<IVNode> brushesPathBrushEntitiesIVNodes, IEnumerable<IVNode> brushesCoverBrushEntitiesIVNodes, IEnumerable<IVNode> brushesOverlapBrushEntitiesIVNodes, IEnumerable<IVNode> brushesDoorBrushEntitiesIVNodes, IEnumerable<IVNode> brushesLadderBrushEntitiesIVNodes,
             IEnumerable<IVNode> jercBoxBrushEntitiesIVNodes,
             IEnumerable<IVNode> jercConfigEntitiesIVNodes, IEnumerable<IVNode> jercDividerEntitiesIVNodes, IEnumerable<IVNode> jercFloorEntitiesIVNodes, IEnumerable<IVNode> jercCeilingEntitiesIVNodes
         )
         {
-            // world brushes
+            // world brushes (brush entity brushes are concatinated on)
             brushesRemove = brushesRemoveIVNodes.Any() ? brushesRemoveIVNodes.Select(x => new Brush(x)).ToList() : new List<Brush>();
             brushesPath = brushesPathIVNodes.Any() ? brushesPathIVNodes.Select(x => new Brush(x)).ToList() : new List<Brush>();
             brushesCover = brushesCoverIVNodes.Any() ? brushesCoverIVNodes.Select(x => new Brush(x)).ToList() : new List<Brush>();
             brushesOverlap = brushesOverlapIVNodes.Any() ? brushesOverlapIVNodes.Select(x => new Brush(x)).ToList() : new List<Brush>();
             brushesDoor = brushesDoorIVNodes.Any() ? brushesDoorIVNodes.Select(x => new Brush(x)).ToList() : new List<Brush>();
             brushesLadder = brushesLadderIVNodes.Any() ? brushesLadderIVNodes.Select(x => new Brush(x)).ToList() : new List<Brush>();
+
+            if (brushesRemoveBrushEntitiesIVNodes.Any())
+                brushesRemove.AddRange(brushesRemoveBrushEntitiesIVNodes.Select(x => new Brush(x)).ToList()); // adds to world brushes from certain brush entities that use the corresponding textures
+            if (brushesPathBrushEntitiesIVNodes.Any())
+                brushesPath.AddRange(brushesPathBrushEntitiesIVNodes.Select(x => new Brush(x)).ToList());
+            if (brushesCoverBrushEntitiesIVNodes.Any())
+                brushesCover.AddRange(brushesCoverBrushEntitiesIVNodes.Select(x => new Brush(x)).ToList());
+            if (brushesOverlapBrushEntitiesIVNodes.Any())
+                brushesOverlap.AddRange(brushesOverlapBrushEntitiesIVNodes.Select(x => new Brush(x)).ToList());
+            if (brushesDoorBrushEntitiesIVNodes.Any())
+                brushesDoor.AddRange(brushesDoorBrushEntitiesIVNodes.Select(x => new Brush(x)).ToList());
+            if (brushesLadderBrushEntitiesIVNodes.Any())
+                brushesLadder.AddRange(brushesLadderBrushEntitiesIVNodes.Select(x => new Brush(x)).ToList());
 
             var brushesSidesRemoveUnordered = brushesRemove.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.RemoveTextureName)).ToList();
             var brushesSidesPathUnordered = brushesPath.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.PathTextureName)).ToList();
