@@ -138,11 +138,11 @@
 		1 : "Remove on fire" : 1
 	]
 	
-	colour(color255) : "Colour (R G B)" : "255 213 83"
+	colour(color255) : "Colour (R G B)" : "255 195 0"
 
 	colourAlpha(integer) : "Colour Alpha (int)" : 255 : "The alpha value of the jerc box (0-255)"
 	
-	colourStroke(color255) : "Colour (R G B)" : "255 138 32"
+	colourStroke(color255) : "Colour (R G B)" : "221 138 0"
 
 	colourStrokeAlpha(integer) : "Colour Stroke Alpha (int)" : 255 : "The alpha value of the jerc box stroke (0-255)"
 
