@@ -328,7 +328,9 @@ namespace JERC
             var brushesCover = GetBrushesByTextureName(allWorldBrushesInVisgroup, TextureNames.CoverTextureName);
             var brushesOverlap = GetBrushesByTextureName(allWorldBrushesInVisgroup, TextureNames.OverlapTextureName);
             var brushesDoor = GetBrushesByTextureName(allWorldBrushesInVisgroup, TextureNames.DoorTextureName);
-            var brushesLadder = GetBrushesByTextureName(allWorldBrushesInVisgroup, TextureNames.LadderTextureName);
+            var brushesLadder = new List<IVNode>();
+            foreach (var ladderTextureName in TextureNames.LadderTextureNames)
+                brushesLadder.AddRange(GetBrushesByTextureName(allWorldBrushesInVisgroup, ladderTextureName));
 
             // displacements
             var displacementsRemove = GetDisplacementsByTextureName(allWorldBrushesInVisgroup, TextureNames.RemoveTextureName);
@@ -336,7 +338,9 @@ namespace JERC
             var displacementsCover = GetDisplacementsByTextureName(allWorldBrushesInVisgroup, TextureNames.CoverTextureName);
             var displacementsOverlap = GetDisplacementsByTextureName(allWorldBrushesInVisgroup, TextureNames.OverlapTextureName);
             var displacementsDoor = GetDisplacementsByTextureName(allWorldBrushesInVisgroup, TextureNames.DoorTextureName);
-            var displacementsLadder = GetDisplacementsByTextureName(allWorldBrushesInVisgroup, TextureNames.LadderTextureName);
+            var displacementsLadder = new List<IVNode>();
+            foreach (var ladderTextureName in TextureNames.LadderTextureNames)
+                displacementsLadder.AddRange(GetDisplacementsByTextureName(allWorldBrushesInVisgroup, ladderTextureName));
 
             // entities (in game)
             var buyzoneBrushEntities = GetEntitiesByClassname(allEntities, Classnames.Buyzone);
@@ -360,7 +364,9 @@ namespace JERC
             var brushesCoverBrushEntities = GetEntityBrushesByTextureName(allBrushesBrushEntities, TextureNames.CoverTextureName);
             var brushesOverlapBrushEntities = GetEntityBrushesByTextureName(allBrushesBrushEntities, TextureNames.OverlapTextureName);
             var brushesDoorBrushEntities = GetEntityBrushesByTextureName(allBrushesBrushEntities, TextureNames.DoorTextureName);
-            var brushesLadderBrushEntities = GetEntityBrushesByTextureName(allBrushesBrushEntities, TextureNames.LadderTextureName);
+            var brushesLadderBrushEntities = new List<IVNode>();
+            foreach (var ladderTextureName in TextureNames.LadderTextureNames)
+                brushesLadderBrushEntities.AddRange(GetEntityBrushesByTextureName(allBrushesBrushEntities, ladderTextureName));
 
             // brush entities (JERC)
             var jercBoxBrushEntities = GetEntitiesByClassname(allEntities, Classnames.JercBox);

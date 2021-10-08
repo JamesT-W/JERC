@@ -11,6 +11,6 @@ namespace JERC.Constants
         public static readonly string CoverTextureName = "jerc/cover";
         public static readonly string OverlapTextureName = "jerc/overlap";
         public static readonly string DoorTextureName = "jerc/door";
-        public static readonly string LadderTextureName = "jerc/ladder";
+        public static readonly List<string> LadderTextureNames = new List<string>() { "jerc/ladder", "tools/toolsinvisibleladder" };
     }
 }

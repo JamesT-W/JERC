@@ -93,7 +93,7 @@ namespace JERC.Models
             var brushesSidesCoverUnordered = brushesCover.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.CoverTextureName)).ToList();
             var brushesSidesOverlapUnordered = brushesOverlap.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.OverlapTextureName)).ToList();
             var brushesSidesDoorUnordered = brushesDoor.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.DoorTextureName)).ToList();
-            var brushesSidesLadderUnordered = brushesLadder.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.LadderTextureName)).ToList();
+            var brushesSidesLadderUnordered = brushesLadder.SelectMany(x => x.side.Where(y => TextureNames.LadderTextureNames.Any(z => z == y.material.ToLower()))).ToList();
 
             brushesSidesRemove = OrderListOfSidesByVerticesMin(brushesSidesRemoveUnordered);
             brushesSidesPath = OrderListOfSidesByVerticesMin(brushesSidesPathUnordered);
@@ -115,7 +115,7 @@ namespace JERC.Models
             var displacementsSidesCoverUnordered = displacementsCover.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.CoverTextureName)).ToList();
             var displacementsSidesOverlapUnordered = displacementsOverlap.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.OverlapTextureName)).ToList();
             var displacementsSidesDoorUnordered = displacementsDoor.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.DoorTextureName)).ToList();
-            var displacementsSidesLadderUnordered = displacementsLadder.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.LadderTextureName)).ToList();
+            var displacementsSidesLadderUnordered = displacementsLadder.SelectMany(x => x.side.Where(y => TextureNames.LadderTextureNames.Any(z => z == y.material.ToLower()))).ToList();
 
             displacementsSidesRemove = OrderListOfSidesByVerticesMin(displacementsSidesRemoveUnordered);
             displacementsSidesPath = OrderListOfSidesByVerticesMin(displacementsSidesPathUnordered);
