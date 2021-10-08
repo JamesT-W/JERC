@@ -61,6 +61,12 @@
 		1: "Yes"
 	]
 
+	strokeAroundBrushEntities(choices) : "Stroke Around Brush Entities" : 1 : "Currently, if there are more than one brush in an entity, it will not combine them, so they will keep their individual borders" =
+	[
+		0: "No"
+		1: "Yes"
+	]
+
 	defaultLevelNum(integer) : "Default Level Num (int)" : 0 : "The index that the default level is in a multilevel radar. 0 = bottom level, 1 = second from bottom level, ..."
 
 	levelBackgroundEnabled(choices) : "Enable Levels As Backgrounds" : 1 : "Adds all levels as a background for each level when using multiple radar levels" =
@@ -121,4 +127,36 @@
 	"JERC - Overrides the maximum height value of a radar level that is used for gradients."
 [
 	
+]
+
+
+@SolidClass base(Origin, PaintableBrush) = jerc_box : 
+	"JERC - A brush that can specify showing a unique colour when displated in a radar." 
+[
+	spawnflags(Flags) =
+	[
+		1 : "Remove on fire" : 1
+	]
+	
+	colour(color255) : "Colour (R G B)" : "255 213 83"
+
+	colourAlpha(integer) : "Colour Alpha (int)" : 255 : "The alpha value of the jerc box (0-255)"
+	
+	colourStroke(color255) : "Colour (R G B)" : "255 138 32"
+
+	colourStrokeAlpha(integer) : "Colour Stroke Alpha (int)" : 255 : "The alpha value of the jerc box stroke (0-255)"
+
+	strokeWidth(integer) : "Stroke Width (int)" : 10 : "Width of stroke to use"
+]
+
+
+@AutoVisGroup = "Entities"
+[
+    "JERC"
+    [
+        "JERC_config"
+        "JERC_divider"
+        "JERC_floor"
+        "JERC_ceiling"
+    ]
 ]

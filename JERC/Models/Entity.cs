@@ -1,3 +1,4 @@
+﻿using JERC.Constants;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,6 +20,13 @@ namespace JERC.Models
 
         public List<Brush> brushes;
 
+        // jerc_box
+        public string colour;
+        public string colourAlpha;
+        public string colourStroke;
+        public string colourStrokeAlpha;
+        public string strokeWidth;
+
         public Entity(IVNode entity)
         {
             // ignoring a lot of other values
@@ -33,6 +41,12 @@ namespace JERC.Models
             editor = new Editor(entity.Body.FirstOrDefault(x => x.Name == "editor"));
 
             brushes = entity.Body.Any(x => x.Name == "solid") ? entity.Body.Where(x => x.Name == "solid").Select(x => new Brush(x)).ToList() : null;
+
+            colour = entity.Body.FirstOrDefault(x => x.Name == "colour")?.Value;
+            colourAlpha = entity.Body.FirstOrDefault(x => x.Name == "colourAlpha")?.Value;
+            colourStroke = entity.Body.FirstOrDefault(x => x.Name == "colourStroke")?.Value;
+            colourStrokeAlpha = entity.Body.FirstOrDefault(x => x.Name == "colourStrokeAlpha")?.Value;
+            strokeWidth = entity.Body.FirstOrDefault(x => x.Name == "strokeWidth")?.Value;
         }
     }
 }

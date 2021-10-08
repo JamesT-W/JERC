@@ -346,6 +346,9 @@ namespace JERC
             var ctSpawnEntities = GetEntitiesByClassname(allEntities, Classnames.ClassnameCTSpawn);
             var tSpawnEntities = GetEntitiesByClassname(allEntities, Classnames.ClassnameTSpawn);
 
+            // brush entities (JERC)
+            var jercBoxBrushEntities = GetEntitiesByClassname(allEntities, Classnames.ClassnameJercBox);
+
             // entities (JERC)
             var jercConfigEntities = GetEntitiesByClassname(allEntities, Classnames.JercConfig);
             var jercDividerEntities = GetEntitiesByClassname(allEntities, Classnames.JercDivider);
@@ -363,6 +366,7 @@ namespace JERC
                 brushesRemove, brushesPath, brushesCover, brushesOverlap, brushesDoor, brushesLadder,
                 displacementsRemove, displacementsPath, displacementsCover, displacementsOverlap, displacementsDoor, displacementsLadder,
                 buyzoneBrushEntities, bombsiteBrushEntities, rescueZoneBrushEntities, hostageEntities, ctSpawnEntities, tSpawnEntities,
+                jercBoxBrushEntities,
                 jercConfigEntities, jercDividerEntities, jercFloorEntities, jercCeilingEntities
             );
         }
@@ -393,6 +397,7 @@ namespace JERC
             jercEntitySettingsValues.Add("strokeAroundLayoutMaterials", jercConfig.FirstOrDefault(x => x.Name == "strokeAroundLayoutMaterials")?.Value);
             jercEntitySettingsValues.Add("strokeAroundRemoveMaterials", jercConfig.FirstOrDefault(x => x.Name == "strokeAroundRemoveMaterials")?.Value);
             jercEntitySettingsValues.Add("strokeAroundEntities", jercConfig.FirstOrDefault(x => x.Name == "strokeAroundEntities")?.Value);
+            jercEntitySettingsValues.Add("strokeAroundBrushEntities", jercConfig.FirstOrDefault(x => x.Name == "strokeAroundBrushEntities")?.Value);
             jercEntitySettingsValues.Add("defaultLevelNum", jercConfig.FirstOrDefault(x => x.Name == "defaultLevelNum")?.Value);
             jercEntitySettingsValues.Add("levelBackgroundEnabled", jercConfig.FirstOrDefault(x => x.Name == "levelBackgroundEnabled")?.Value);
             jercEntitySettingsValues.Add("levelBackgroundDarkenAlpha", jercConfig.FirstOrDefault(x => x.Name == "levelBackgroundDarkenAlpha")?.Value);
@@ -675,6 +680,9 @@ namespace JERC
             // get all entity sides to draw
             var entityBrushSideListById = GetEntityBrushSideListWithinLevelHeight(levelHeight);
 
+            // get all brush entity sides to draw
+            var brushEntityBrushSideListById = GetBrushEntityBrushSideListWithinLevelHeight(levelHeight);
+
 
             // add remove stuff first to set to graphics' clip
             AddRemoveRegion(bmp, graphics, brushRemoveList);
@@ -719,36 +727,64 @@ namespace JERC
 
 
             // entities next
-            var entitiesToDraw = GetEntitiesToDraw(overviewPositionValues, entityBrushSideListById);
+            var entitySidesToDraw = GetEntitiesToDraw(overviewPositionValues, entityBrushSideListById);
+
+            // normal
+            foreach (var entityToRender in entitySidesToDraw)
+            {
+                DrawFilledPolygonGradient(graphics, entityToRender, true);
+            }
 
             // stroke
             if (jercConfigValues.strokeAroundEntities)
             {
-                foreach (var entityToRender in entitiesToDraw)
+                foreach (var entitySideToRender in entitySidesToDraw)
                 {
-                    Color colour = Color.White;
+                    Color colourStroke = Color.White;
 
-                    switch (entityToRender.entityType)
+                    switch (entitySideToRender.entityType)
                     {
                         case EntityTypes.Buyzone:
-                            colour = Colours.ColourBuyzonesStroke();
+                            colourStroke = Colours.ColourBuyzonesStroke();
                             break;
                         case EntityTypes.Bombsite:
-                            colour = Colours.ColourBombsitesStroke();
+                            colourStroke = Colours.ColourBombsitesStroke();
                             break;
                         case EntityTypes.RescueZone:
-                            colour = Colours.ColourRescueZonesStroke();
+                            colourStroke = Colours.ColourRescueZonesStroke();
                             break;
                     }
 
-                    DrawStroke(graphics, entityToRender, colour);
+                    DrawStroke(graphics, entitySideToRender, colourStroke);
                 }
             }
 
+
+            // brush entities (JERC)
+            var brushEntitySidesToDraw = GetBrushEntitiesToDraw(overviewPositionValues, brushEntityBrushSideListById);
+
             // normal
-            foreach (var entityToRender in entitiesToDraw)
+            foreach (var brushEntityToRender in brushEntitySidesToDraw)
             {
-                DrawFilledPolygonGradient(graphics, entityToRender, true);
+                DrawFilledPolygonGradient(graphics, brushEntityToRender, true);
+            }
+
+            // stroke
+            if (jercConfigValues.strokeAroundBrushEntities)
+            {
+                foreach (var brushEntitySideToRender in brushEntitySidesToDraw)
+                {
+                    Color colour = Color.White;
+
+                    switch (brushEntitySideToRender.entityType)
+                    {
+                        case EntityTypes.JercBox:
+                            colour = (Color)brushEntitySideToRender.colourStroke;
+                            break;
+                    }
+
+                    DrawStroke(graphics, brushEntitySideToRender, colour, brushEntitySideToRender.strokeWidth);
+                }
             }
 
             graphics.Save();
@@ -757,11 +793,11 @@ namespace JERC
         }
 
 
-        private static void DrawStroke(Graphics graphics, ObjectToDraw objectToDraw, Color colourStroke)
+        private static void DrawStroke(Graphics graphics, ObjectToDraw objectToDraw, Color colourStroke, int? strokeWidthOverride = null)
         {
             var strokeSolidBrush = new SolidBrush(Color.Transparent);
             var strokePen = new Pen(colourStroke);
-            strokePen.Width *= jercConfigValues.strokeWidth;
+            strokePen.Width *= strokeWidthOverride == null ? jercConfigValues.strokeWidth : (int)strokeWidthOverride;
 
             DrawFilledPolygonObjectBrushes(graphics, strokeSolidBrush, strokePen, objectToDraw.verticesToDraw.Select(x => x.vertices).ToArray());
 
@@ -935,6 +971,28 @@ namespace JERC
         }
 
 
+        private static Dictionary<int, List<EntityBrushSide>> GetBrushEntityVerticesListById()
+        {
+            /* use this code if another new JERC brush entity is added in future */
+
+            /*var brushEntityBrushSideListById = new Dictionary<int, List<EntityBrushSide>>();
+
+            var brushEntityJercBoxVerticesListById = GetBrushEntityBrushSideList(vmfRequiredData.entitiesSidesByEntityJercBoxId, EntityTypes.JercBox);
+
+            if (brushEntityJercBoxVerticesListById != null && brushEntityJercBoxVerticesListById.Any())
+            {
+                foreach (var list in brushEntityJercBoxVerticesListById)
+                {
+                    brushEntityBrushSideListById.Add(list.Key, list.Value);
+                }
+            }
+
+            return brushEntityBrushSideListById;*/
+
+            return GetBrushEntityBrushSideList(vmfRequiredData.entitiesSidesByEntityJercBoxId, EntityTypes.JercBox);
+        }
+
+
         private static List<BrushVolume> GetBrushVolumeListWithinLevelHeight(LevelHeight levelHeight, List<Models.Brush> brushList, JercTypes jercType)
         {
             return GetBrushVolumeList(brushList, jercType).Where(x => !(
@@ -967,6 +1025,23 @@ namespace JERC
             }
 
             return entityBrushSideListById;
+        }
+
+
+        private static Dictionary<int, List<EntityBrushSide>> GetBrushEntityBrushSideListWithinLevelHeight(LevelHeight levelHeight)
+        {
+            var brushEntityBrushSideListById = new Dictionary<int, List<EntityBrushSide>>();
+            var brushEntityBrushSideListByIdUnfiltered = GetBrushEntityVerticesListById();
+
+            foreach (var brushEntityBrushSideById in brushEntityBrushSideListByIdUnfiltered)
+            {
+                if (brushEntityBrushSideById.Value.Any(x => !((x.vertices.All(y => y.z < levelHeight.zMinForRadar) && x.vertices.All(y => y.z < levelHeight.zMaxForRadar)) || (x.vertices.All(y => y.z >= levelHeight.zMinForRadar) && x.vertices.All(y => y.z >= levelHeight.zMaxForRadar))))) // would this allow entities to be on more than 1 level if their brushes span across level dividers ??
+                {
+                    brushEntityBrushSideListById.Add(brushEntityBrushSideById.Key, brushEntityBrushSideById.Value);
+                }
+            }
+
+            return brushEntityBrushSideListById;
         }
 
 
@@ -1035,6 +1110,40 @@ namespace JERC
 
                         entityBrushSide.vertices.Add(new Vertices(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier, vert.z));
                         entityBrushSide.entityType = entityType;
+                    }
+
+                    if (entityBrushSideListById.ContainsKey(entitySides.Key))
+                        entityBrushSideListById[entitySides.Key].Add(entityBrushSide);
+                    else
+                        entityBrushSideListById.Add(entitySides.Key, new List<EntityBrushSide>() { entityBrushSide });
+                }
+            }
+
+            return entityBrushSideListById;
+        }
+
+
+        private static Dictionary<int, List<EntityBrushSide>> GetBrushEntityBrushSideList(Dictionary<int, List<Side>> sideListByEntityIdDictionary, EntityTypes entityType)
+        {
+            var entityBrushSideListById = new Dictionary<int, List<EntityBrushSide>>();
+
+            foreach (var entitySides in sideListByEntityIdDictionary)
+            {
+                foreach (var side in entitySides.Value)
+                {
+                    var entityBrushSide = new EntityBrushSide
+                    {
+                        entityType = entityType,
+                        colour = vmfRequiredData.jercBoxByEntityJercBoxId[entitySides.Key].colour,
+                        colourStroke = vmfRequiredData.jercBoxByEntityJercBoxId[entitySides.Key].colourStroke,
+                        strokeWidth = vmfRequiredData.jercBoxByEntityJercBoxId[entitySides.Key].strokeWidth
+                    };
+
+                    for (int i = 0; i < side.vertices_plus.Count(); i++)
+                    {
+                        var vert = side.vertices_plus[i];
+
+                        entityBrushSide.vertices.Add(new Vertices(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier, vert.z));
                     }
 
                     if (entityBrushSideListById.ContainsKey(entitySides.Key))
@@ -1187,6 +1296,34 @@ namespace JERC
                     verticesOffsetsToUse = verticesOffsetsToUse.Distinct().ToList(); // TODO: doesn't seem to work
 
                     entitiesToDraw.Add(new ObjectToDraw(verticesOffsetsToUse, (int)verticesOffsetsToUse.Select(x => x.zAxis).Average(x => x), entityBrushSide.entityType));
+                }
+            }
+
+            return entitiesToDraw;
+        }
+
+
+        private static List<ObjectToDraw> GetBrushEntitiesToDraw(OverviewPositionValues overviewPositionValues, Dictionary<int, List<EntityBrushSide>> brushEntityBrushSideListById)
+        {
+            var entitiesToDraw = new List<ObjectToDraw>();
+
+            foreach (var brushEntityBrushSideByBrush in brushEntityBrushSideListById.Values)
+            {
+                foreach (var brushEntityBrushSide in brushEntityBrushSideByBrush)
+                {
+                    var verticesOffsetsToUse = new List<VerticesToDraw>();
+
+                    foreach (var vertices in brushEntityBrushSide.vertices)
+                    {
+                        // corrects the verts by taking into account the movement from space in world to the space in the image (which starts at (0,0))
+                        var verticesOffset = GetCorrectedVerticesPositionInWorld(vertices);
+
+                        verticesOffsetsToUse.Add(new VerticesToDraw(new Point((int)verticesOffset.x, (int)verticesOffset.y), (int)verticesOffset.z, brushEntityBrushSide.colour));
+                    }
+
+                    verticesOffsetsToUse = verticesOffsetsToUse.Distinct().ToList(); // TODO: doesn't seem to work
+
+                    entitiesToDraw.Add(new ObjectToDraw(verticesOffsetsToUse, (int)verticesOffsetsToUse.Select(x => x.zAxis).Average(x => x), brushEntityBrushSide.entityType, brushEntityBrushSide.colour, brushEntityBrushSide.colourStroke, brushEntityBrushSide.strokeWidth));
                 }
             }
 

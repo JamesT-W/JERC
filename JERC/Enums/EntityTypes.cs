@@ -11,6 +11,7 @@ namespace JERC.Enums
         None = 1,
         Buyzone = 2,
         Bombsite = 4,
-        RescueZone = 8
+        RescueZone = 8,
+        JercBox = 16
     }
 }

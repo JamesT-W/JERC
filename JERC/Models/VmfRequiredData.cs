@@ -42,9 +42,15 @@ namespace JERC.Models
         public List<Entity> ctSpawnEntities;
         public List<Entity> tSpawnEntities;
 
+        public List<Entity> jercBoxBrushEntities;
+
         public Dictionary<int, List<Side>> entitiesSidesByEntityBuyzoneId = new Dictionary<int, List<Side>>();
         public Dictionary<int, List<Side>> entitiesSidesByEntityBombsiteId = new Dictionary<int, List<Side>>();
         public Dictionary<int, List<Side>> entitiesSidesByEntityRescueZoneId = new Dictionary<int, List<Side>>();
+
+        public Dictionary<int, List<Side>> entitiesSidesByEntityJercBoxId = new Dictionary<int, List<Side>>();
+
+        public Dictionary<int, JercBox> jercBoxByEntityJercBoxId = new Dictionary<int, JercBox>();
 
         public List<Entity> jercConfigEntities;
         public List<Entity> jercDividerEntities;
@@ -56,6 +62,7 @@ namespace JERC.Models
             IEnumerable<IVNode> brushesRemoveIVNodes, IEnumerable<IVNode> brushesPathIVNodes, IEnumerable<IVNode> brushesCoverIVNodes, IEnumerable<IVNode> brushesOverlapIVNodes, IEnumerable<IVNode> brushesDoorIVNodes, IEnumerable<IVNode> brushesLadderIVNodes,
             IEnumerable<IVNode> displacementsRemoveIVNodes, IEnumerable<IVNode> displacementsPathIVNodes, IEnumerable<IVNode> displacementsCoverIVNodes, IEnumerable<IVNode> displacementsOverlapIVNodes, IEnumerable<IVNode> displacementsDoorIVNodes, IEnumerable<IVNode> displacementsLadderIVNodes,
             IEnumerable<IVNode> buyzoneBrushEntitiesIVNodes, IEnumerable<IVNode> bombsiteBrushEntitiesIVNodes, IEnumerable<IVNode> rescueZoneBrushEntitiesIVNodes, IEnumerable<IVNode> hostageEntitiesIVNodes, IEnumerable<IVNode> ctSpawnEntitiesIVNodes, IEnumerable<IVNode> tSpawnEntitiesIVNodes,
+            IEnumerable<IVNode> jercBoxBrushEntitiesIVNodes,
             IEnumerable<IVNode> jercConfigEntitiesIVNodes, IEnumerable<IVNode> jercDividerEntitiesIVNodes, IEnumerable<IVNode> jercFloorEntitiesIVNodes, IEnumerable<IVNode> jercCeilingEntitiesIVNodes
         )
         {
@@ -124,6 +131,16 @@ namespace JERC.Models
                 entitiesSidesByEntityRescueZoneId.Add(entity.id, entity.brushes.SelectMany(x => x.side).ToList());
             }
 
+            // brush entities (JERC)
+            jercBoxBrushEntities = jercBoxBrushEntitiesIVNodes.Any() ? jercBoxBrushEntitiesIVNodes.Select(x => new Entity(x)).ToList() : new List<Entity>();
+
+            foreach (var entity in jercBoxBrushEntities)
+            {
+                entitiesSidesByEntityJercBoxId.Add(entity.id, entity.brushes.SelectMany(x => x.side).ToList());
+                jercBoxByEntityJercBoxId.Add(entity.id, new JercBox(entity));
+            }
+
+            // entities (JERC)
             jercConfigEntities = jercConfigEntitiesIVNodes.Any() ? jercConfigEntitiesIVNodes.Select(x => new Entity(x)).ToList() : new List<Entity>();
             jercDividerEntities = jercDividerEntitiesIVNodes.Any() ? jercDividerEntitiesIVNodes.Select(x => new Entity(x)).OrderBy(x => new Vertices(x.origin).z).ToList() : new List<Entity>(); // order by lowest height first
             jercFloorEntities = jercFloorEntitiesIVNodes.Any() ? jercFloorEntitiesIVNodes.Select(x => new Entity(x)).OrderBy(x => new Vertices(x.origin).z).ToList() : new List<Entity>(); // order by lowest height first
@@ -180,6 +197,7 @@ namespace JERC.Models
                 .Concat(bombsiteBrushEntities.SelectMany(x => x.brushes))
                 .Concat(buyzoneBrushEntities.SelectMany(x => x.brushes))
                 .Concat(rescueZoneBrushEntities.SelectMany(x => x.brushes))
+                .Concat(jercBoxBrushEntities.SelectMany(x => x.brushes))
                 .ToList();
         }
 
@@ -199,6 +217,7 @@ namespace JERC.Models
                 .Concat(entitiesSidesByEntityBuyzoneId.SelectMany(x => x.Value))
                 .Concat(entitiesSidesByEntityBombsiteId.SelectMany(x => x.Value))
                 .Concat(entitiesSidesByEntityRescueZoneId.SelectMany(x => x.Value))
+                .Concat(entitiesSidesByEntityJercBoxId.SelectMany(x => x.Value))
                 .ToList();
         }
     }
