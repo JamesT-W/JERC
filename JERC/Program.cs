@@ -16,7 +16,7 @@ namespace JERC
 {
     class Program
     {
-        private static readonly bool debugging = true;
+        private static readonly bool debugging = false;
 
         private static readonly ImageProcessorExtender imageProcessorExtender = new ImageProcessorExtender();
 
