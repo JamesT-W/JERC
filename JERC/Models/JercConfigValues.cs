@@ -23,6 +23,7 @@ namespace JERC.Models
         public Color overlapColourLow;
         public Color doorColour;
         public Color ladderColour;
+        public int outerEdgeMargin;
         public int strokeWidth;
         public Color strokeColour;
         public bool strokeAroundLayoutMaterials;
@@ -61,6 +62,7 @@ namespace JERC.Models
             overlapColourLow = jercEntitySettingsValues.ContainsKey("overlapColourLow") ? GetColourStringAsColour(jercEntitySettingsValues["overlapColourLow"]) : Colours.ColourError;
             doorColour = jercEntitySettingsValues.ContainsKey("doorColour") ? GetColourStringAsColour(jercEntitySettingsValues["doorColour"]) : Colours.ColourError;
             ladderColour = jercEntitySettingsValues.ContainsKey("ladderColour") ? GetColourStringAsColour(jercEntitySettingsValues["ladderColour"]) : Colours.ColourError;
+            outerEdgeMargin = jercEntitySettingsValues.ContainsKey("outerEdgeMargin") ? int.Parse(jercEntitySettingsValues["outerEdgeMargin"]) : 0;
             strokeWidth = jercEntitySettingsValues.ContainsKey("strokeWidth") ? int.Parse(jercEntitySettingsValues["strokeWidth"]) : 0;
             strokeColour = jercEntitySettingsValues.ContainsKey("strokeColour") ? GetColourStringAsColour(jercEntitySettingsValues["strokeColour"]) : Colours.ColourError;
             strokeAroundLayoutMaterials = jercEntitySettingsValues.ContainsKey("strokeAroundLayoutMaterials") && jercEntitySettingsValues["strokeAroundLayoutMaterials"] == "1";

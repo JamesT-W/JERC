@@ -43,8 +43,8 @@ namespace JERC.Models
             this.brushVerticesPosMinY = brushVerticesPosMinY;
             this.brushVerticesPosMaxY = brushVerticesPosMaxY;
 
-            width = (int)Math.Ceiling(brushVerticesPosMaxX - brushVerticesPosMinX) + (jercConfigValues.strokeWidth * 2); // adds the stroke width mutliplier value as a padding at left and right
-            height = (int)Math.Ceiling(brushVerticesPosMaxY - brushVerticesPosMinY) + (jercConfigValues.strokeWidth * 2); // adds the stroke width mutliplier value as a padding at top and bottom
+            width = (int)Math.Ceiling(brushVerticesPosMaxX - brushVerticesPosMinX) + (jercConfigValues.strokeWidth * 2) + (jercConfigValues.outerEdgeMargin * 2); // adds the stroke width mutliplier value as a padding at left and right
+            height = (int)Math.Ceiling(brushVerticesPosMaxY - brushVerticesPosMinY) + (jercConfigValues.strokeWidth * 2) + (jercConfigValues.outerEdgeMargin * 2); // adds the stroke width mutliplier value as a padding at top and bottom
 
             outputResolution = width >= height ? width : height;
 
@@ -54,16 +54,16 @@ namespace JERC.Models
             paddingPercentageX = (float)paddingSizeX / (float)outputResolution;
             paddingPercentageY = (float)paddingSizeY / (float)outputResolution;
 
-            brushVerticesOffsetX = width < height ? ((height - width) / 2) + jercConfigValues.strokeWidth : 0 + jercConfigValues.strokeWidth;
-            brushVerticesOffsetY = height < width ? ((width - height) / 2) + jercConfigValues.strokeWidth : 0 + jercConfigValues.strokeWidth;
+            brushVerticesOffsetX = width < height ? ((height - width) / 2) + jercConfigValues.strokeWidth + jercConfigValues.outerEdgeMargin : 0 + jercConfigValues.strokeWidth + jercConfigValues.outerEdgeMargin;
+            brushVerticesOffsetY = height < width ? ((width - height) / 2) + jercConfigValues.strokeWidth + jercConfigValues.outerEdgeMargin : 0 + jercConfigValues.strokeWidth + jercConfigValues.outerEdgeMargin;
 
-            offsetPercentageX = brushVerticesOffsetX / width;
-            offsetPercentageY = brushVerticesOffsetY / height;
+            offsetPercentageX = (brushVerticesOffsetX / width);
+            offsetPercentageY = (brushVerticesOffsetY / height);
 
             /*posX = ((brushVerticesPosMaxX - brushVerticesPosMinX) + OverviewOffsets.GetCenteredValueByScalePosX(scale)) - 1024 + 256; // - 1024 for resolution, + 256 for offset (because cl_leveloverview is used at 1280x1024)
             posY = ((brushVerticesPosMaxY - brushVerticesPosMinY) + OverviewOffsets.GetCenteredValueByScalePosY(scale)) - 1024;*/ // - 1024 for resolution
-            posX = brushVerticesPosMinX - brushVerticesOffsetX;
-            posY = brushVerticesPosMinY + (scale * 1024) - brushVerticesOffsetY;
+            posX = brushVerticesPosMinX - brushVerticesOffsetX + jercConfigValues.outerEdgeMargin;
+            posY = brushVerticesPosMinY + (scale * 1024) - brushVerticesOffsetY + jercConfigValues.outerEdgeMargin;
 
             this.scale = scale;
         }

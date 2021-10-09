@@ -39,6 +39,8 @@
 
 	ladderColour(color255) : "Ladder Colour" : "145 0 145" : "Colour of ladder world brushes"
 
+	outerEdgeMargin(integer) : "Outer Edge Margin (int)" : 100 : "Number of units to add around the edge of the radar"
+
 	strokeWidth(integer) : "Stroke Width (int)" : 10 : "Width of stroke to use"
 
 	strokeColour(color255) : "Stroke Colour" : "255 255 255" : "Colour of the stroke"
