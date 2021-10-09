@@ -15,5 +15,6 @@ namespace JERC.Enums
         Overlap = 16,
         Door = 32,
         Ladder = 64,
+        Ignore = 128,
     }
 }
