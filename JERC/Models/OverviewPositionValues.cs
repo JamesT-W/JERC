@@ -20,6 +20,7 @@ namespace JERC.Models
         public int paddingSizeX;
         public int paddingSizeY;
 
+        // calculated by looking at difference between width and height
         public float paddingPercentageX;
         public float paddingPercentageY;
 
