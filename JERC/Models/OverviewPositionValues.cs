@@ -43,8 +43,14 @@ namespace JERC.Models
             this.brushVerticesPosMinY = brushVerticesPosMinY;
             this.brushVerticesPosMaxY = brushVerticesPosMaxY;
 
-            width = (int)Math.Ceiling(brushVerticesPosMaxX - brushVerticesPosMinX) + (jercConfigValues.strokeWidth * 2) + (jercConfigValues.outerEdgeMargin * 2); // adds the stroke width mutliplier value as a padding at left and right
-            height = (int)Math.Ceiling(brushVerticesPosMaxY - brushVerticesPosMinY) + (jercConfigValues.strokeWidth * 2) + (jercConfigValues.outerEdgeMargin * 2); // adds the stroke width mutliplier value as a padding at top and bottom
+            var widthBeforeMultiplier = (int)(Math.Ceiling(brushVerticesPosMaxX - brushVerticesPosMinX) + (jercConfigValues.strokeWidth * 2)); // adds the stroke width mutliplier value as a padding at left and right
+            var heightBeforeMultiplier = (int)(Math.Ceiling(brushVerticesPosMaxY - brushVerticesPosMinY) + (jercConfigValues.strokeWidth * 2)); // adds the stroke width mutliplier value as a padding at top and bottom
+
+            width = (int)(widthBeforeMultiplier / jercConfigValues.radarSizeMultiplier);
+            height = (int)(heightBeforeMultiplier / jercConfigValues.radarSizeMultiplier);
+
+            var radarSizeMultiplierChangeAmountWidth = widthBeforeMultiplier - width;
+            var radarSizeMultiplierChangeAmountHeight = heightBeforeMultiplier - height;
 
             outputResolution = width >= height ? width : height;
 
@@ -54,16 +60,16 @@ namespace JERC.Models
             paddingPercentageX = (float)paddingSizeX / (float)outputResolution;
             paddingPercentageY = (float)paddingSizeY / (float)outputResolution;
 
-            brushVerticesOffsetX = width < height ? ((height - width) / 2) + jercConfigValues.strokeWidth + jercConfigValues.outerEdgeMargin : 0 + jercConfigValues.strokeWidth + jercConfigValues.outerEdgeMargin;
-            brushVerticesOffsetY = height < width ? ((width - height) / 2) + jercConfigValues.strokeWidth + jercConfigValues.outerEdgeMargin : 0 + jercConfigValues.strokeWidth + jercConfigValues.outerEdgeMargin;
+            brushVerticesOffsetX = width < height ? ((height - width) / 2) + jercConfigValues.strokeWidth - (radarSizeMultiplierChangeAmountWidth / 2) : 0 + jercConfigValues.strokeWidth - (radarSizeMultiplierChangeAmountWidth / 2);
+            brushVerticesOffsetY = height < width ? ((width - height) / 2) + jercConfigValues.strokeWidth - (radarSizeMultiplierChangeAmountHeight / 2) : 0 + jercConfigValues.strokeWidth - (radarSizeMultiplierChangeAmountHeight / 2);
 
             offsetPercentageX = (brushVerticesOffsetX / width);
             offsetPercentageY = (brushVerticesOffsetY / height);
 
             /*posX = ((brushVerticesPosMaxX - brushVerticesPosMinX) + OverviewOffsets.GetCenteredValueByScalePosX(scale)) - 1024 + 256; // - 1024 for resolution, + 256 for offset (because cl_leveloverview is used at 1280x1024)
             posY = ((brushVerticesPosMaxY - brushVerticesPosMinY) + OverviewOffsets.GetCenteredValueByScalePosY(scale)) - 1024;*/ // - 1024 for resolution
-            posX = brushVerticesPosMinX - brushVerticesOffsetX + jercConfigValues.outerEdgeMargin;
-            posY = brushVerticesPosMinY + (scale * 1024) - brushVerticesOffsetY + jercConfigValues.outerEdgeMargin;
+            posX = brushVerticesPosMinX - brushVerticesOffsetX;
+            posY = brushVerticesPosMinY + (scale * 1024) - brushVerticesOffsetY;
 
             this.scale = scale;
         }
