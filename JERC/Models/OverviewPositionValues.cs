@@ -29,8 +29,8 @@ namespace JERC.Models
         public float brushVerticesOffsetX;
         public float brushVerticesOffsetY;
 
-        public float offsetPercentageX;
-        public float offsetPercentageY;
+        //public float offsetPercentageX;
+        //public float offsetPercentageY;
 
         public float posX;
         public float posY;
@@ -63,8 +63,8 @@ namespace JERC.Models
             brushVerticesOffsetX = width < height ? ((height - width) / 2) + jercConfigValues.strokeWidth - (radarSizeMultiplierChangeAmountWidth / 2) : 0 + jercConfigValues.strokeWidth - (radarSizeMultiplierChangeAmountWidth / 2);
             brushVerticesOffsetY = height < width ? ((width - height) / 2) + jercConfigValues.strokeWidth - (radarSizeMultiplierChangeAmountHeight / 2) : 0 + jercConfigValues.strokeWidth - (radarSizeMultiplierChangeAmountHeight / 2);
 
-            offsetPercentageX = (brushVerticesOffsetX / width);
-            offsetPercentageY = (brushVerticesOffsetY / height);
+            //offsetPercentageX = (brushVerticesOffsetX / width);
+            //offsetPercentageY = (brushVerticesOffsetY / height);
 
             /*posX = ((brushVerticesPosMaxX - brushVerticesPosMinX) + OverviewOffsets.GetCenteredValueByScalePosX(scale)) - 1024 + 256; // - 1024 for resolution, + 256 for offset (because cl_leveloverview is used at 1280x1024)
             posY = ((brushVerticesPosMaxY - brushVerticesPosMinY) + OverviewOffsets.GetCenteredValueByScalePosY(scale)) - 1024;*/ // - 1024 for resolution
