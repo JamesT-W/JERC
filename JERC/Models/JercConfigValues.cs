@@ -65,7 +65,7 @@ namespace JERC.Models
 
             radarSizeMultiplier = jercEntitySettingsValues.ContainsKey("radarSizeMultiplier") && jercEntitySettingsValues["radarSizeMultiplier"] != null ? float.Parse(jercEntitySettingsValues["radarSizeMultiplier"], Globalization.Style, Globalization.Culture) : 0.95f;
             if (radarSizeMultiplier < 0.01)
-                radarSizeMultiplier = 0.01;
+                radarSizeMultiplier = 0.01f;
             else if (radarSizeMultiplier > 1)
                 radarSizeMultiplier = 1;
 
