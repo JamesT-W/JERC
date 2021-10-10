@@ -1713,80 +1713,46 @@ namespace JERC
 
             if (vmfRequiredData.hostageEntities.Any())
             {
-                var origin1 = new Vertices(vmfRequiredData.hostageEntities.FirstOrDefault().origin);
-                var xPercent1 = Math.Abs((Math.Abs(Math.Abs(origin1.x) - Math.Abs(overviewPositionValues.brushVerticesPosMinX)) - (overviewPositionValues.radarSizeMultiplierChangeAmountWidth / 2)) / overviewPositionValues.outputResolution) + paddingPercentageEachSideX;
-                var yPercent1 = Math.Abs((Math.Abs(Math.Abs(origin1.y) - Math.Abs(overviewPositionValues.brushVerticesPosMinY)) - (overviewPositionValues.radarSizeMultiplierChangeAmountHeight / 2)) / overviewPositionValues.outputResolution) + paddingPercentageEachSideY;
-
-                Hostage1_x = FlipOverviewTxtValues(xPercent1, true);
-                Hostage1_y = FlipOverviewTxtValues(yPercent1, false);
-
-                if (vmfRequiredData.hostageEntities.Count() > 1)
+                for (var i = 1; i <= vmfRequiredData.hostageEntities.Count(); i++)
                 {
-                    var origin2 = new Vertices(vmfRequiredData.hostageEntities.Skip(1).FirstOrDefault().origin);
-                    var xPercent2 = Math.Abs((Math.Abs(Math.Abs(origin2.x) - Math.Abs(overviewPositionValues.brushVerticesPosMinX)) - (overviewPositionValues.radarSizeMultiplierChangeAmountWidth / 2)) / overviewPositionValues.outputResolution) + paddingPercentageEachSideX;
-                    var yPercent2 = Math.Abs((Math.Abs(Math.Abs(origin2.y) - Math.Abs(overviewPositionValues.brushVerticesPosMinY)) - (overviewPositionValues.radarSizeMultiplierChangeAmountHeight / 2)) / overviewPositionValues.outputResolution) + paddingPercentageEachSideY;
+                    var origin = new Vertices(vmfRequiredData.hostageEntities.ElementAt(i-1).origin);
+                    var xPercent = Math.Abs((Math.Abs(Math.Abs(origin.x) - Math.Abs(overviewPositionValues.brushVerticesPosMinX)) - (overviewPositionValues.radarSizeMultiplierChangeAmountWidth / 2)) / overviewPositionValues.outputResolution) + paddingPercentageEachSideX;
+                    var yPercent = Math.Abs((Math.Abs(Math.Abs(origin.y) - Math.Abs(overviewPositionValues.brushVerticesPosMinY)) - (overviewPositionValues.radarSizeMultiplierChangeAmountHeight / 2)) / overviewPositionValues.outputResolution) + paddingPercentageEachSideY;
 
-                    Hostage2_x = FlipOverviewTxtValues(xPercent2, true);
-                    Hostage2_y = FlipOverviewTxtValues(yPercent2, false);
-
-                    if (vmfRequiredData.hostageEntities.Count() > 2)
+                    switch (i)
                     {
-                        var origin3 = new Vertices(vmfRequiredData.hostageEntities.Skip(2).FirstOrDefault().origin);
-                        var xPercent3 = Math.Abs((Math.Abs(Math.Abs(origin3.x) - Math.Abs(overviewPositionValues.brushVerticesPosMinX)) - (overviewPositionValues.radarSizeMultiplierChangeAmountWidth / 2)) / overviewPositionValues.outputResolution) + paddingPercentageEachSideX;
-                        var yPercent3 = Math.Abs((Math.Abs(Math.Abs(origin3.y) - Math.Abs(overviewPositionValues.brushVerticesPosMinY)) - (overviewPositionValues.radarSizeMultiplierChangeAmountHeight / 2)) / overviewPositionValues.outputResolution) + paddingPercentageEachSideY;
-
-                        Hostage3_x = FlipOverviewTxtValues(xPercent3, true);
-                        Hostage3_y = FlipOverviewTxtValues(yPercent3, false);
-
-                        if (vmfRequiredData.hostageEntities.Count() > 3)
-                        {
-                            var origin4 = new Vertices(vmfRequiredData.hostageEntities.Skip(3).FirstOrDefault().origin);
-                            var xPercent4 = Math.Abs((Math.Abs(Math.Abs(origin4.x) - Math.Abs(overviewPositionValues.brushVerticesPosMinX)) - (overviewPositionValues.radarSizeMultiplierChangeAmountWidth / 2)) / overviewPositionValues.outputResolution) + paddingPercentageEachSideX;
-                            var yPercent4 = Math.Abs((Math.Abs(Math.Abs(origin4.y) - Math.Abs(overviewPositionValues.brushVerticesPosMinY)) - (overviewPositionValues.radarSizeMultiplierChangeAmountHeight / 2)) / overviewPositionValues.outputResolution) + paddingPercentageEachSideY;
-
-                            Hostage4_x = FlipOverviewTxtValues(xPercent4, true);
-                            Hostage4_y = FlipOverviewTxtValues(yPercent4, false);
-
-                            if (vmfRequiredData.hostageEntities.Count() > 4)
-                            {
-                                var origin5 = new Vertices(vmfRequiredData.hostageEntities.Skip(3).FirstOrDefault().origin);
-                                var xPercent5 = Math.Abs((Math.Abs(Math.Abs(origin5.x) - Math.Abs(overviewPositionValues.brushVerticesPosMinX)) - (overviewPositionValues.radarSizeMultiplierChangeAmountWidth / 2)) / overviewPositionValues.outputResolution) + paddingPercentageEachSideX;
-                                var yPercent5 = Math.Abs((Math.Abs(Math.Abs(origin5.y) - Math.Abs(overviewPositionValues.brushVerticesPosMinY)) - (overviewPositionValues.radarSizeMultiplierChangeAmountHeight / 2)) / overviewPositionValues.outputResolution) + paddingPercentageEachSideY;
-
-                                Hostage5_x = FlipOverviewTxtValues(xPercent5, true);
-                                Hostage5_y = FlipOverviewTxtValues(yPercent5, false);
-
-                                if (vmfRequiredData.hostageEntities.Count() > 5)
-                                {
-                                    var origin6 = new Vertices(vmfRequiredData.hostageEntities.Skip(3).FirstOrDefault().origin);
-                                    var xPercent6 = Math.Abs((Math.Abs(Math.Abs(origin6.x) - Math.Abs(overviewPositionValues.brushVerticesPosMinX)) - (overviewPositionValues.radarSizeMultiplierChangeAmountWidth / 2)) / overviewPositionValues.outputResolution) + paddingPercentageEachSideX;
-                                    var yPercent6 = Math.Abs((Math.Abs(Math.Abs(origin6.y) - Math.Abs(overviewPositionValues.brushVerticesPosMinY)) - (overviewPositionValues.radarSizeMultiplierChangeAmountHeight / 2)) / overviewPositionValues.outputResolution) + paddingPercentageEachSideY;
-
-                                    Hostage6_x = FlipOverviewTxtValues(xPercent6, true);
-                                    Hostage6_y = FlipOverviewTxtValues(yPercent6, false);
-
-                                    if (vmfRequiredData.hostageEntities.Count() > 6)
-                                    {
-                                        var origin7 = new Vertices(vmfRequiredData.hostageEntities.Skip(3).FirstOrDefault().origin);
-                                        var xPercent7 = Math.Abs((Math.Abs(Math.Abs(origin7.x) - Math.Abs(overviewPositionValues.brushVerticesPosMinX)) - (overviewPositionValues.radarSizeMultiplierChangeAmountWidth / 2)) / overviewPositionValues.outputResolution) + paddingPercentageEachSideX;
-                                        var yPercent7 = Math.Abs((Math.Abs(Math.Abs(origin7.y) - Math.Abs(overviewPositionValues.brushVerticesPosMinY)) - (overviewPositionValues.radarSizeMultiplierChangeAmountHeight / 2)) / overviewPositionValues.outputResolution) + paddingPercentageEachSideY;
-
-                                        Hostage7_x = FlipOverviewTxtValues(xPercent7, true);
-                                        Hostage7_y = FlipOverviewTxtValues(yPercent7, false);
-
-                                        if (vmfRequiredData.hostageEntities.Count() > 7)
-                                        {
-                                            var origin8 = new Vertices(vmfRequiredData.hostageEntities.Skip(3).FirstOrDefault().origin);
-                                            var xPercent8 = Math.Abs((Math.Abs(Math.Abs(origin8.x) - Math.Abs(overviewPositionValues.brushVerticesPosMinX)) - (overviewPositionValues.radarSizeMultiplierChangeAmountWidth / 2)) / overviewPositionValues.outputResolution) + paddingPercentageEachSideX;
-                                            var yPercent8 = Math.Abs((Math.Abs(Math.Abs(origin8.y) - Math.Abs(overviewPositionValues.brushVerticesPosMinY)) - (overviewPositionValues.radarSizeMultiplierChangeAmountHeight / 2)) / overviewPositionValues.outputResolution) + paddingPercentageEachSideY;
-
-                                            Hostage8_x = FlipOverviewTxtValues(xPercent8, true);
-                                            Hostage8_y = FlipOverviewTxtValues(yPercent8, false);
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                        case 1:
+                            Hostage1_x = FlipOverviewTxtValues(xPercent, true);
+                            Hostage1_y = FlipOverviewTxtValues(yPercent, false);
+                            break;
+                        case 2:
+                            Hostage2_x = FlipOverviewTxtValues(xPercent, true);
+                            Hostage2_y = FlipOverviewTxtValues(yPercent, false);
+                            break;
+                        case 3:
+                            Hostage3_x = FlipOverviewTxtValues(xPercent, true);
+                            Hostage3_y = FlipOverviewTxtValues(yPercent, false);
+                            break;
+                        case 4:
+                            Hostage4_x = FlipOverviewTxtValues(xPercent, true);
+                            Hostage4_y = FlipOverviewTxtValues(yPercent, false);
+                            break;
+                        case 5:
+                            Hostage5_x = FlipOverviewTxtValues(xPercent, true);
+                            Hostage5_y = FlipOverviewTxtValues(yPercent, false);
+                            break;
+                        case 6:
+                            Hostage6_x = FlipOverviewTxtValues(xPercent, true);
+                            Hostage6_y = FlipOverviewTxtValues(yPercent, false);
+                            break;
+                        case 7:
+                            Hostage7_x = FlipOverviewTxtValues(xPercent, true);
+                            Hostage7_y = FlipOverviewTxtValues(yPercent, false);
+                            break;
+                        case 8:
+                            Hostage8_x = FlipOverviewTxtValues(xPercent, true);
+                            Hostage8_y = FlipOverviewTxtValues(yPercent, false);
+                            break;
                     }
                 }
             }
