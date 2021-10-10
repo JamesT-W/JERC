@@ -62,7 +62,13 @@ namespace JERC.Models
             overlapColourLow = jercEntitySettingsValues.ContainsKey("overlapColourLow") ? GetColourStringAsColour(jercEntitySettingsValues["overlapColourLow"]) : Colours.ColourError;
             doorColour = jercEntitySettingsValues.ContainsKey("doorColour") ? GetColourStringAsColour(jercEntitySettingsValues["doorColour"]) : Colours.ColourError;
             ladderColour = jercEntitySettingsValues.ContainsKey("ladderColour") ? GetColourStringAsColour(jercEntitySettingsValues["ladderColour"]) : Colours.ColourError;
+
             radarSizeMultiplier = jercEntitySettingsValues.ContainsKey("radarSizeMultiplier") && jercEntitySettingsValues["radarSizeMultiplier"] != null ? float.Parse(jercEntitySettingsValues["radarSizeMultiplier"], Globalization.Style, Globalization.Culture) : 0.95f;
+            if (radarSizeMultiplier < 0.01)
+                radarSizeMultiplier = 0.01;
+            else if (radarSizeMultiplier > 1)
+                radarSizeMultiplier = 1;
+
             strokeWidth = jercEntitySettingsValues.ContainsKey("strokeWidth") && jercEntitySettingsValues["strokeWidth"] != null ? int.Parse(jercEntitySettingsValues["strokeWidth"]) : 0;
             strokeColour = jercEntitySettingsValues.ContainsKey("strokeColour") ? GetColourStringAsColour(jercEntitySettingsValues["strokeColour"]) : Colours.ColourError;
             strokeAroundLayoutMaterials = jercEntitySettingsValues.ContainsKey("strokeAroundLayoutMaterials") && jercEntitySettingsValues["strokeAroundLayoutMaterials"] == "1";
