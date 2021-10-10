@@ -1,4 +1,4 @@
-﻿using ImageAlterer;
+using ImageAlterer;
 using JERC.Constants;
 using JERC.Enums;
 using JERC.Models;
@@ -1262,11 +1262,39 @@ namespace JERC
             var graphicsPath = new GraphicsPath();
             graphicsPath.AddPolygon(verticesToUse);
 
+            if (graphicsPath.GetBounds().Width == 0 || graphicsPath.GetBounds().Height == 0)
+                return;
+
             // add stroke
             if (jercConfigValues.strokeAroundRemoveMaterials)
             {
+                // adds the stroke to the outside of the brush instead of the inside
+                var averagePointsX = graphicsPath.PathPoints.Average(x => x.X);
+                var averagePointsY = graphicsPath.PathPoints.Average(x => x.Y);
+
+                // scale
+                var scaleX = (jercConfigValues.strokeWidth / 2 / graphicsPath.GetBounds().Width) + 1;
+                var scaleY = (jercConfigValues.strokeWidth / 2 / graphicsPath.GetBounds().Height) + 1;
+
+                Matrix matrix = new Matrix();
+                matrix.Scale(scaleX, scaleY, MatrixOrder.Append);
+                graphicsPath.Transform(matrix);
+
+
+                // move position after scaling away from (0,0)
+                var averageNewPointsX = graphicsPath.PathPoints.Average(x => x.X);
+                var averageNewPointsY = graphicsPath.PathPoints.Average(x => x.Y);
+
+                var translateX = -(averageNewPointsX - averagePointsX);
+                var translateY = -(averageNewPointsY - averagePointsY);
+
+                matrix = new Matrix();
+                matrix.Translate(translateX, translateY, MatrixOrder.Append);
+                graphicsPath.Transform(matrix);
+
+                // draw the stroke
                 var strokeSolidBrush = new SolidBrush(Color.Transparent);
-                var strokePen = new Pen(Colours.ColourRemoveStroke(jercConfigValues.strokeColour), jercConfigValues.strokeWidth);
+                var strokePen = new Pen(Colours.ColourRemoveStroke(jercConfigValues.strokeColour), jercConfigValues.strokeWidth / 2);
                 DrawFilledPolygonObjectBrushes(graphics, strokeSolidBrush, strokePen, graphicsPath.PathPoints.Select(x => new Point((int)x.X, (int)x.Y)).ToArray());
             }
 
