@@ -1660,8 +1660,8 @@ namespace JERC
             if (vmfRequiredData.ctSpawnEntities.Any())
             {
                 var origins = vmfRequiredData.ctSpawnEntities.Select(x => new Vertices(x.origin));
-                var xPercent = Math.Abs((Math.Abs(Math.Abs(origins.Average(x => x.x)) - Math.Abs(overviewPositionValues.brushVerticesPosMinX))) / overviewPositionValues.outputResolution) + paddingPercentageEachSideX;
-                var yPercent = Math.Abs((Math.Abs(Math.Abs(origins.Average(x => x.y)) - Math.Abs(overviewPositionValues.brushVerticesPosMinY))) / overviewPositionValues.outputResolution) + paddingPercentageEachSideY;
+                var xPercent = Math.Abs((Math.Abs(Math.Abs(origins.Average(x => x.x)) - Math.Abs(overviewPositionValues.brushVerticesPosMinX)) - (overviewPositionValues.radarSizeMultiplierChangeAmountWidth / 2)) / overviewPositionValues.outputResolution) + paddingPercentageEachSideX;
+                var yPercent = Math.Abs((Math.Abs(Math.Abs(origins.Average(x => x.y)) - Math.Abs(overviewPositionValues.brushVerticesPosMinY)) - (overviewPositionValues.radarSizeMultiplierChangeAmountHeight / 2)) / overviewPositionValues.outputResolution) + paddingPercentageEachSideY;
 
                 CTSpawn_x = FlipOverviewTxtValues(xPercent, true);
                 CTSpawn_y = FlipOverviewTxtValues(yPercent, false);
@@ -1670,8 +1670,8 @@ namespace JERC
             if (vmfRequiredData.tSpawnEntities.Any())
             {
                 var origins = vmfRequiredData.tSpawnEntities.Select(x => new Vertices(x.origin));
-                var xPercent = Math.Abs((Math.Abs(Math.Abs(origins.Average(x => x.x)) - Math.Abs(overviewPositionValues.brushVerticesPosMinX))) / overviewPositionValues.outputResolution) + paddingPercentageEachSideX;
-                var yPercent = Math.Abs((Math.Abs(Math.Abs(origins.Average(x => x.y)) - Math.Abs(overviewPositionValues.brushVerticesPosMinY))) / overviewPositionValues.outputResolution) + paddingPercentageEachSideY;
+                var xPercent = Math.Abs((Math.Abs(Math.Abs(origins.Average(x => x.x)) - Math.Abs(overviewPositionValues.brushVerticesPosMinX)) - (overviewPositionValues.radarSizeMultiplierChangeAmountWidth / 2)) / overviewPositionValues.outputResolution) + paddingPercentageEachSideX;
+                var yPercent = Math.Abs((Math.Abs(Math.Abs(origins.Average(x => x.y)) - Math.Abs(overviewPositionValues.brushVerticesPosMinY)) - (overviewPositionValues.radarSizeMultiplierChangeAmountHeight / 2)) / overviewPositionValues.outputResolution) + paddingPercentageEachSideY;
 
                 TSpawn_x = FlipOverviewTxtValues(xPercent, true);
                 TSpawn_y = FlipOverviewTxtValues(yPercent, false);
@@ -1691,8 +1691,8 @@ namespace JERC
                 var xAverage1 = xAllValues1.Average();
                 var yAverage1 = yAllValues1.Average();
                 //var xPercent1 = Math.Abs((xAverage1 - (overviewPositionValues.brushVerticesPosMinX + overviewPositionValues.paddingSizeX)) / overviewPositionValues.outputResolution);
-                var xPercent1 = Math.Abs((Math.Abs(Math.Abs(xAverage1) - Math.Abs(overviewPositionValues.brushVerticesPosMinX))) / overviewPositionValues.outputResolution) + paddingPercentageEachSideX;
-                var yPercent1 = Math.Abs((Math.Abs(Math.Abs(yAverage1) - Math.Abs(overviewPositionValues.brushVerticesPosMinY))) / overviewPositionValues.outputResolution) + paddingPercentageEachSideY;
+                var xPercent1 = Math.Abs((Math.Abs(Math.Abs(xAverage1) - Math.Abs(overviewPositionValues.brushVerticesPosMinX)) - (overviewPositionValues.radarSizeMultiplierChangeAmountWidth / 2)) / overviewPositionValues.outputResolution) + paddingPercentageEachSideX;
+                var yPercent1 = Math.Abs((Math.Abs(Math.Abs(yAverage1) - Math.Abs(overviewPositionValues.brushVerticesPosMinY)) - (overviewPositionValues.radarSizeMultiplierChangeAmountHeight / 2)) / overviewPositionValues.outputResolution) + paddingPercentageEachSideY;
 
                 bombA_x = FlipOverviewTxtValues(xPercent1, true);
                 bombA_y = FlipOverviewTxtValues(yPercent1, false);
@@ -1703,8 +1703,8 @@ namespace JERC
                     var yAllValues2 = bombsites.Skip(1).FirstOrDefault().brushes.SelectMany(x => x.side.SelectMany(y => y.vertices_plus.Select(x => x.y)));
                     var xAverage2 = xAllValues2.Average();
                     var yAverage2 = yAllValues2.Average();
-                    var xPercent2 = Math.Abs((Math.Abs(Math.Abs(xAverage2) - Math.Abs(overviewPositionValues.brushVerticesPosMinX))) / overviewPositionValues.outputResolution) + paddingPercentageEachSideX;
-                    var yPercent2 = Math.Abs((Math.Abs(Math.Abs(yAverage2) - Math.Abs(overviewPositionValues.brushVerticesPosMinY))) / overviewPositionValues.outputResolution) + paddingPercentageEachSideY;
+                    var xPercent2 = Math.Abs((Math.Abs(Math.Abs(xAverage2) - Math.Abs(overviewPositionValues.brushVerticesPosMinX)) - (overviewPositionValues.radarSizeMultiplierChangeAmountWidth / 2)) / overviewPositionValues.outputResolution) + paddingPercentageEachSideX;
+                    var yPercent2 = Math.Abs((Math.Abs(Math.Abs(yAverage2) - Math.Abs(overviewPositionValues.brushVerticesPosMinY)) - (overviewPositionValues.radarSizeMultiplierChangeAmountHeight / 2)) / overviewPositionValues.outputResolution) + paddingPercentageEachSideY;
 
                     bombB_x = FlipOverviewTxtValues(xPercent2, true);
                     bombB_y = FlipOverviewTxtValues(yPercent2, false);
@@ -1714,8 +1714,8 @@ namespace JERC
             if (vmfRequiredData.hostageEntities.Any())
             {
                 var origin1 = new Vertices(vmfRequiredData.hostageEntities.FirstOrDefault().origin);
-                var xPercent1 = Math.Abs((Math.Abs(Math.Abs(origin1.x) - Math.Abs(overviewPositionValues.brushVerticesPosMinX))) / overviewPositionValues.outputResolution) + paddingPercentageEachSideX;
-                var yPercent1 = Math.Abs((Math.Abs(Math.Abs(origin1.y) - Math.Abs(overviewPositionValues.brushVerticesPosMinY))) / overviewPositionValues.outputResolution) + paddingPercentageEachSideY;
+                var xPercent1 = Math.Abs((Math.Abs(Math.Abs(origin1.x) - Math.Abs(overviewPositionValues.brushVerticesPosMinX)) - (overviewPositionValues.radarSizeMultiplierChangeAmountWidth / 2)) / overviewPositionValues.outputResolution) + paddingPercentageEachSideX;
+                var yPercent1 = Math.Abs((Math.Abs(Math.Abs(origin1.y) - Math.Abs(overviewPositionValues.brushVerticesPosMinY)) - (overviewPositionValues.radarSizeMultiplierChangeAmountHeight / 2)) / overviewPositionValues.outputResolution) + paddingPercentageEachSideY;
 
                 Hostage1_x = FlipOverviewTxtValues(xPercent1, true);
                 Hostage1_y = FlipOverviewTxtValues(yPercent1, false);
@@ -1723,8 +1723,8 @@ namespace JERC
                 if (vmfRequiredData.hostageEntities.Count() > 1)
                 {
                     var origin2 = new Vertices(vmfRequiredData.hostageEntities.Skip(1).FirstOrDefault().origin);
-                    var xPercent2 = Math.Abs((Math.Abs(Math.Abs(origin2.x) - Math.Abs(overviewPositionValues.brushVerticesPosMinX))) / overviewPositionValues.outputResolution) + paddingPercentageEachSideX;
-                    var yPercent2 = Math.Abs((Math.Abs(Math.Abs(origin2.y) - Math.Abs(overviewPositionValues.brushVerticesPosMinY))) / overviewPositionValues.outputResolution) + paddingPercentageEachSideY;
+                    var xPercent2 = Math.Abs((Math.Abs(Math.Abs(origin2.x) - Math.Abs(overviewPositionValues.brushVerticesPosMinX)) - (overviewPositionValues.radarSizeMultiplierChangeAmountWidth / 2)) / overviewPositionValues.outputResolution) + paddingPercentageEachSideX;
+                    var yPercent2 = Math.Abs((Math.Abs(Math.Abs(origin2.y) - Math.Abs(overviewPositionValues.brushVerticesPosMinY)) - (overviewPositionValues.radarSizeMultiplierChangeAmountHeight / 2)) / overviewPositionValues.outputResolution) + paddingPercentageEachSideY;
 
                     Hostage2_x = FlipOverviewTxtValues(xPercent2, true);
                     Hostage2_y = FlipOverviewTxtValues(yPercent2, false);
@@ -1732,8 +1732,8 @@ namespace JERC
                     if (vmfRequiredData.hostageEntities.Count() > 2)
                     {
                         var origin3 = new Vertices(vmfRequiredData.hostageEntities.Skip(2).FirstOrDefault().origin);
-                        var xPercent3 = Math.Abs((Math.Abs(Math.Abs(origin3.x) - Math.Abs(overviewPositionValues.brushVerticesPosMinX))) / overviewPositionValues.outputResolution) + paddingPercentageEachSideX;
-                        var yPercent3 = Math.Abs((Math.Abs(Math.Abs(origin3.y) - Math.Abs(overviewPositionValues.brushVerticesPosMinY))) / overviewPositionValues.outputResolution) + paddingPercentageEachSideY;
+                        var xPercent3 = Math.Abs((Math.Abs(Math.Abs(origin3.x) - Math.Abs(overviewPositionValues.brushVerticesPosMinX)) - (overviewPositionValues.radarSizeMultiplierChangeAmountWidth / 2)) / overviewPositionValues.outputResolution) + paddingPercentageEachSideX;
+                        var yPercent3 = Math.Abs((Math.Abs(Math.Abs(origin3.y) - Math.Abs(overviewPositionValues.brushVerticesPosMinY)) - (overviewPositionValues.radarSizeMultiplierChangeAmountHeight / 2)) / overviewPositionValues.outputResolution) + paddingPercentageEachSideY;
 
                         Hostage3_x = FlipOverviewTxtValues(xPercent3, true);
                         Hostage3_y = FlipOverviewTxtValues(yPercent3, false);
@@ -1741,8 +1741,8 @@ namespace JERC
                         if (vmfRequiredData.hostageEntities.Count() > 3)
                         {
                             var origin4 = new Vertices(vmfRequiredData.hostageEntities.Skip(3).FirstOrDefault().origin);
-                            var xPercent4 = Math.Abs((Math.Abs(Math.Abs(origin4.x) - Math.Abs(overviewPositionValues.brushVerticesPosMinX))) / overviewPositionValues.outputResolution) + paddingPercentageEachSideX;
-                            var yPercent4 = Math.Abs((Math.Abs(Math.Abs(origin4.y) - Math.Abs(overviewPositionValues.brushVerticesPosMinY))) / overviewPositionValues.outputResolution) + paddingPercentageEachSideY;
+                            var xPercent4 = Math.Abs((Math.Abs(Math.Abs(origin4.x) - Math.Abs(overviewPositionValues.brushVerticesPosMinX)) - (overviewPositionValues.radarSizeMultiplierChangeAmountWidth / 2)) / overviewPositionValues.outputResolution) + paddingPercentageEachSideX;
+                            var yPercent4 = Math.Abs((Math.Abs(Math.Abs(origin4.y) - Math.Abs(overviewPositionValues.brushVerticesPosMinY)) - (overviewPositionValues.radarSizeMultiplierChangeAmountHeight / 2)) / overviewPositionValues.outputResolution) + paddingPercentageEachSideY;
 
                             Hostage4_x = FlipOverviewTxtValues(xPercent4, true);
                             Hostage4_y = FlipOverviewTxtValues(yPercent4, false);
@@ -1750,8 +1750,8 @@ namespace JERC
                             if (vmfRequiredData.hostageEntities.Count() > 4)
                             {
                                 var origin5 = new Vertices(vmfRequiredData.hostageEntities.Skip(3).FirstOrDefault().origin);
-                                var xPercent5 = Math.Abs((Math.Abs(Math.Abs(origin5.x) - Math.Abs(overviewPositionValues.brushVerticesPosMinX))) / overviewPositionValues.outputResolution) + paddingPercentageEachSideX;
-                                var yPercent5 = Math.Abs((Math.Abs(Math.Abs(origin5.y) - Math.Abs(overviewPositionValues.brushVerticesPosMinY))) / overviewPositionValues.outputResolution) + paddingPercentageEachSideY;
+                                var xPercent5 = Math.Abs((Math.Abs(Math.Abs(origin5.x) - Math.Abs(overviewPositionValues.brushVerticesPosMinX)) - (overviewPositionValues.radarSizeMultiplierChangeAmountWidth / 2)) / overviewPositionValues.outputResolution) + paddingPercentageEachSideX;
+                                var yPercent5 = Math.Abs((Math.Abs(Math.Abs(origin5.y) - Math.Abs(overviewPositionValues.brushVerticesPosMinY)) - (overviewPositionValues.radarSizeMultiplierChangeAmountHeight / 2)) / overviewPositionValues.outputResolution) + paddingPercentageEachSideY;
 
                                 Hostage5_x = FlipOverviewTxtValues(xPercent5, true);
                                 Hostage5_y = FlipOverviewTxtValues(yPercent5, false);
@@ -1759,8 +1759,8 @@ namespace JERC
                                 if (vmfRequiredData.hostageEntities.Count() > 5)
                                 {
                                     var origin6 = new Vertices(vmfRequiredData.hostageEntities.Skip(3).FirstOrDefault().origin);
-                                    var xPercent6 = Math.Abs((Math.Abs(Math.Abs(origin6.x) - Math.Abs(overviewPositionValues.brushVerticesPosMinX))) / overviewPositionValues.outputResolution) + paddingPercentageEachSideX;
-                                    var yPercent6 = Math.Abs((Math.Abs(Math.Abs(origin6.y) - Math.Abs(overviewPositionValues.brushVerticesPosMinY))) / overviewPositionValues.outputResolution) + paddingPercentageEachSideY;
+                                    var xPercent6 = Math.Abs((Math.Abs(Math.Abs(origin6.x) - Math.Abs(overviewPositionValues.brushVerticesPosMinX)) - (overviewPositionValues.radarSizeMultiplierChangeAmountWidth / 2)) / overviewPositionValues.outputResolution) + paddingPercentageEachSideX;
+                                    var yPercent6 = Math.Abs((Math.Abs(Math.Abs(origin6.y) - Math.Abs(overviewPositionValues.brushVerticesPosMinY)) - (overviewPositionValues.radarSizeMultiplierChangeAmountHeight / 2)) / overviewPositionValues.outputResolution) + paddingPercentageEachSideY;
 
                                     Hostage6_x = FlipOverviewTxtValues(xPercent6, true);
                                     Hostage6_y = FlipOverviewTxtValues(yPercent6, false);
@@ -1768,8 +1768,8 @@ namespace JERC
                                     if (vmfRequiredData.hostageEntities.Count() > 6)
                                     {
                                         var origin7 = new Vertices(vmfRequiredData.hostageEntities.Skip(3).FirstOrDefault().origin);
-                                        var xPercent7 = Math.Abs((Math.Abs(Math.Abs(origin7.x) - Math.Abs(overviewPositionValues.brushVerticesPosMinX))) / overviewPositionValues.outputResolution) + paddingPercentageEachSideX;
-                                        var yPercent7 = Math.Abs((Math.Abs(Math.Abs(origin7.y) - Math.Abs(overviewPositionValues.brushVerticesPosMinY))) / overviewPositionValues.outputResolution) + paddingPercentageEachSideY;
+                                        var xPercent7 = Math.Abs((Math.Abs(Math.Abs(origin7.x) - Math.Abs(overviewPositionValues.brushVerticesPosMinX)) - (overviewPositionValues.radarSizeMultiplierChangeAmountWidth / 2)) / overviewPositionValues.outputResolution) + paddingPercentageEachSideX;
+                                        var yPercent7 = Math.Abs((Math.Abs(Math.Abs(origin7.y) - Math.Abs(overviewPositionValues.brushVerticesPosMinY)) - (overviewPositionValues.radarSizeMultiplierChangeAmountHeight / 2)) / overviewPositionValues.outputResolution) + paddingPercentageEachSideY;
 
                                         Hostage7_x = FlipOverviewTxtValues(xPercent7, true);
                                         Hostage7_y = FlipOverviewTxtValues(yPercent7, false);
@@ -1777,8 +1777,8 @@ namespace JERC
                                         if (vmfRequiredData.hostageEntities.Count() > 7)
                                         {
                                             var origin8 = new Vertices(vmfRequiredData.hostageEntities.Skip(3).FirstOrDefault().origin);
-                                            var xPercent8 = Math.Abs((Math.Abs(Math.Abs(origin8.x) - Math.Abs(overviewPositionValues.brushVerticesPosMinX))) / overviewPositionValues.outputResolution) + paddingPercentageEachSideX;
-                                            var yPercent8 = Math.Abs((Math.Abs(Math.Abs(origin8.y) - Math.Abs(overviewPositionValues.brushVerticesPosMinY))) / overviewPositionValues.outputResolution) + paddingPercentageEachSideY;
+                                            var xPercent8 = Math.Abs((Math.Abs(Math.Abs(origin8.x) - Math.Abs(overviewPositionValues.brushVerticesPosMinX)) - (overviewPositionValues.radarSizeMultiplierChangeAmountWidth / 2)) / overviewPositionValues.outputResolution) + paddingPercentageEachSideX;
+                                            var yPercent8 = Math.Abs((Math.Abs(Math.Abs(origin8.y) - Math.Abs(overviewPositionValues.brushVerticesPosMinY)) - (overviewPositionValues.radarSizeMultiplierChangeAmountHeight / 2)) / overviewPositionValues.outputResolution) + paddingPercentageEachSideY;
 
                                             Hostage8_x = FlipOverviewTxtValues(xPercent8, true);
                                             Hostage8_y = FlipOverviewTxtValues(yPercent8, false);

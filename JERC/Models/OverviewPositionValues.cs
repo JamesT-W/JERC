@@ -20,6 +20,10 @@ namespace JERC.Models
         public int paddingSizeX;
         public int paddingSizeY;
 
+        // calculated using radarSizeMultiplier in jerc_config
+        public float radarSizeMultiplierChangeAmountWidth;
+        public float radarSizeMultiplierChangeAmountHeight;
+
         // calculated by looking at difference between width and height
         public float paddingPercentageX;
         public float paddingPercentageY;
@@ -50,8 +54,8 @@ namespace JERC.Models
             width = (int)(widthBeforeMultiplier / jercConfigValues.radarSizeMultiplier);
             height = (int)(heightBeforeMultiplier / jercConfigValues.radarSizeMultiplier);
 
-            var radarSizeMultiplierChangeAmountWidth = widthBeforeMultiplier - width;
-            var radarSizeMultiplierChangeAmountHeight = heightBeforeMultiplier - height;
+            radarSizeMultiplierChangeAmountWidth = widthBeforeMultiplier - width;
+            radarSizeMultiplierChangeAmountHeight = heightBeforeMultiplier - height;
 
             outputResolution = width >= height ? width : height;
 
