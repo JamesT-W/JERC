@@ -23,23 +23,23 @@
 
 	backgroundFilename(string) : "Background Image Filename" : "default" : "For custom images, place them inside the following folder: /Counter-Strike Global Offensive/bin/jerc/textures/"
 
+	radarSizeMultiplier(float) : "Radar Size Multiplier (float)" : "0.95" : "A multiplier for altering the size of the level in the radar"
+
 	pathColourHigh(color255) : "Path Colour High" : "178 113 65" : "Colour of path world brushes at the highest point"
 
 	pathColourLow(color255) : "Path Colour Low" : "39 56 79" : "Colour of path world brushes at the lowest point"
-
-	coverColourHigh(color255) : "Cover Colour High" : "240 240 240" : "Colour of cover world brushes at the highest point"
-
-	coverColourLow(color255) : "Cover Colour Low" : "160 160 160" : "Colour of cover world brushes at the lowest point"
 
 	overlapColourHigh(color255) : "Overlap Colour High" : "7 60 180" : "Colour of overlap world brushes at the highest point"
 
 	overlapColourLow(color255) : "Overlap Colour Low" : "10 103 84" : "Colour of overlap world brushes at the lowest point"
 
+	coverColourHigh(color255) : "Cover Colour High" : "240 240 240" : "Colour of cover world brushes at the highest point"
+
+	coverColourLow(color255) : "Cover Colour Low" : "160 160 160" : "Colour of cover world brushes at the lowest point"
+
 	doorColour(color255) : "Door Colour" : "235 250 0" : "Colour of door world brushes"
 
 	ladderColour(color255) : "Ladder Colour" : "145 0 145" : "Colour of ladder world brushes"
-
-	radarSizeMultiplier(float) : "Radar Size Multiplier (float)" : "0.95" : "A multiplier for altering the size of the level in the radar "
 
 	strokeWidth(integer) : "Stroke Width (int)" : 10 : "Width of stroke to use"
 

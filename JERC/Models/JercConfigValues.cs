@@ -15,15 +15,15 @@ namespace JERC.Models
         public bool exportRadarAsSeparateLevels;
         public bool useSeparateGradientEachLevel;
         public string backgroundFilename;
+        public float radarSizeMultiplier;
         public Color pathColourHigh;
         public Color pathColourLow;
-        public Color coverColourHigh;
-        public Color coverColourLow;
         public Color overlapColourHigh;
         public Color overlapColourLow;
+        public Color coverColourHigh;
+        public Color coverColourLow;
         public Color doorColour;
         public Color ladderColour;
-        public float radarSizeMultiplier;
         public int strokeWidth;
         public Color strokeColour;
         public bool strokeAroundLayoutMaterials;
@@ -54,14 +54,6 @@ namespace JERC.Models
             exportRadarAsSeparateLevels = jercEntitySettingsValues.ContainsKey("exportRadarAsSeparateLevels") && jercEntitySettingsValues["exportRadarAsSeparateLevels"] == "1";
             useSeparateGradientEachLevel = jercEntitySettingsValues.ContainsKey("useSeparateGradientEachLevel") && jercEntitySettingsValues["useSeparateGradientEachLevel"] == "1";
             backgroundFilename = string.IsNullOrWhiteSpace(jercEntitySettingsValues["backgroundFilename"]) ? null : jercEntitySettingsValues["backgroundFilename"];
-            pathColourHigh = jercEntitySettingsValues.ContainsKey("pathColourHigh") ? GetColourStringAsColour(jercEntitySettingsValues["pathColourHigh"]) : Colours.ColourError;
-            pathColourLow = jercEntitySettingsValues.ContainsKey("pathColourLow") ? GetColourStringAsColour(jercEntitySettingsValues["pathColourLow"]) : Colours.ColourError;
-            coverColourHigh = jercEntitySettingsValues.ContainsKey("coverColourHigh") ? GetColourStringAsColour(jercEntitySettingsValues["coverColourHigh"]) : Colours.ColourError;
-            coverColourLow = jercEntitySettingsValues.ContainsKey("coverColourLow") ? GetColourStringAsColour(jercEntitySettingsValues["coverColourLow"]) : Colours.ColourError;
-            overlapColourHigh = jercEntitySettingsValues.ContainsKey("overlapColourHigh") ? GetColourStringAsColour(jercEntitySettingsValues["overlapColourHigh"]) : Colours.ColourError;
-            overlapColourLow = jercEntitySettingsValues.ContainsKey("overlapColourLow") ? GetColourStringAsColour(jercEntitySettingsValues["overlapColourLow"]) : Colours.ColourError;
-            doorColour = jercEntitySettingsValues.ContainsKey("doorColour") ? GetColourStringAsColour(jercEntitySettingsValues["doorColour"]) : Colours.ColourError;
-            ladderColour = jercEntitySettingsValues.ContainsKey("ladderColour") ? GetColourStringAsColour(jercEntitySettingsValues["ladderColour"]) : Colours.ColourError;
 
             radarSizeMultiplier = jercEntitySettingsValues.ContainsKey("radarSizeMultiplier") && jercEntitySettingsValues["radarSizeMultiplier"] != null ? float.Parse(jercEntitySettingsValues["radarSizeMultiplier"], Globalization.Style, Globalization.Culture) : 0.95f;
             if (radarSizeMultiplier < 0.01)
@@ -69,6 +61,14 @@ namespace JERC.Models
             else if (radarSizeMultiplier > 1)
                 radarSizeMultiplier = 1;
 
+            pathColourHigh = jercEntitySettingsValues.ContainsKey("pathColourHigh") ? GetColourStringAsColour(jercEntitySettingsValues["pathColourHigh"]) : Colours.ColourError;
+            pathColourLow = jercEntitySettingsValues.ContainsKey("pathColourLow") ? GetColourStringAsColour(jercEntitySettingsValues["pathColourLow"]) : Colours.ColourError;
+            overlapColourHigh = jercEntitySettingsValues.ContainsKey("overlapColourHigh") ? GetColourStringAsColour(jercEntitySettingsValues["overlapColourHigh"]) : Colours.ColourError;
+            overlapColourLow = jercEntitySettingsValues.ContainsKey("overlapColourLow") ? GetColourStringAsColour(jercEntitySettingsValues["overlapColourLow"]) : Colours.ColourError;
+            coverColourHigh = jercEntitySettingsValues.ContainsKey("coverColourHigh") ? GetColourStringAsColour(jercEntitySettingsValues["coverColourHigh"]) : Colours.ColourError;
+            coverColourLow = jercEntitySettingsValues.ContainsKey("coverColourLow") ? GetColourStringAsColour(jercEntitySettingsValues["coverColourLow"]) : Colours.ColourError;
+            doorColour = jercEntitySettingsValues.ContainsKey("doorColour") ? GetColourStringAsColour(jercEntitySettingsValues["doorColour"]) : Colours.ColourError;
+            ladderColour = jercEntitySettingsValues.ContainsKey("ladderColour") ? GetColourStringAsColour(jercEntitySettingsValues["ladderColour"]) : Colours.ColourError;
             strokeWidth = jercEntitySettingsValues.ContainsKey("strokeWidth") && jercEntitySettingsValues["strokeWidth"] != null ? int.Parse(jercEntitySettingsValues["strokeWidth"]) : 0;
             strokeColour = jercEntitySettingsValues.ContainsKey("strokeColour") ? GetColourStringAsColour(jercEntitySettingsValues["strokeColour"]) : Colours.ColourError;
             strokeAroundLayoutMaterials = jercEntitySettingsValues.ContainsKey("strokeAroundLayoutMaterials") && jercEntitySettingsValues["strokeAroundLayoutMaterials"] == "1";
