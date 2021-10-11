@@ -8,7 +8,7 @@ namespace JERC.Models
         public Entity entity;
 
         public int id;
-        public Color colour;
+        public Color rendercolor;
         public Color colourStroke;
         public int strokeWidth;
 
@@ -18,11 +18,11 @@ namespace JERC.Models
 
             id = entity.id;
 
-            entity.colour ??= "255 0 0";
+            entity.rendercolor ??= "255 0 0";
             entity.colourAlpha ??= "255";
 
-            var colourSplit = entity.colour.Split(" ");
-            colour = Color.FromArgb(
+            var colourSplit = entity.rendercolor.Split(" ");
+            rendercolor = Color.FromArgb(
                 int.Parse(entity.colourAlpha, Globalization.Style, Globalization.Culture),
                 int.Parse(colourSplit[0], Globalization.Style, Globalization.Culture),
                 int.Parse(colourSplit[1], Globalization.Style, Globalization.Culture),

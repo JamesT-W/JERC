@@ -1,4 +1,4 @@
-using JERC.Enums;
+﻿using JERC.Enums;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -12,7 +12,7 @@ namespace JERC.Models
     {
         public List<Vertices> vertices = new List<Vertices>();
         public EntityTypes entityType;
-        public Color colour;
+        public Color rendercolor;
         public Color colourStroke;
         public int strokeWidth;
         public string material;

@@ -1310,7 +1310,7 @@ namespace JERC
                     var entityBrushSide = new EntityBrushSide
                     {
                         entityType = entityType,
-                        colour = vmfRequiredData.jercBoxByEntityJercBoxId[entitySides.Key].colour,
+                        rendercolor = vmfRequiredData.jercBoxByEntityJercBoxId[entitySides.Key].rendercolor,
                         colourStroke = vmfRequiredData.jercBoxByEntityJercBoxId[entitySides.Key].colourStroke,
                         strokeWidth = vmfRequiredData.jercBoxByEntityJercBoxId[entitySides.Key].strokeWidth,
                         material = side.material
@@ -1515,7 +1515,7 @@ namespace JERC
                             EntityTypes.Buyzone => Colours.ColourBuyzones(),
                             EntityTypes.Bombsite => Colours.ColourBombsites(),
                             EntityTypes.RescueZone => Colours.ColourRescueZones(),
-                            EntityTypes.JercBox => brushEntityBrushSide.colour,
+                            EntityTypes.JercBox => brushEntityBrushSide.rendercolor,
                         };
 
                         verticesOffsetsToUse.Add(new VerticesToDraw(new Point((int)verticesOffset.x, (int)verticesOffset.y), (int)verticesOffset.z, colour));
@@ -1525,7 +1525,7 @@ namespace JERC
 
                     if (brushEntityBrushSide.entityType == EntityTypes.JercBox)
                     {
-                        brushEntitiesToDraw.Add(new ObjectToDraw(verticesOffsetsToUse, (int)verticesOffsetsToUse.Select(x => x.zAxis).Average(x => x), brushEntityBrushSide.entityType, brushEntityBrushSide.colour, brushEntityBrushSide.colourStroke, brushEntityBrushSide.strokeWidth));
+                        brushEntitiesToDraw.Add(new ObjectToDraw(verticesOffsetsToUse, (int)verticesOffsetsToUse.Select(x => x.zAxis).Average(x => x), brushEntityBrushSide.entityType, brushEntityBrushSide.rendercolor, brushEntityBrushSide.colourStroke, brushEntityBrushSide.strokeWidth));
                     }
                     else
                     {
