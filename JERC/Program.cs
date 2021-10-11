@@ -1146,7 +1146,9 @@ namespace JERC
         {
             /* use this code if another new JERC brush entity is added in future */
 
-            /*var brushEntityBrushSideListById = new Dictionary<int, List<EntityBrushSide>>();
+
+            /*
+            var brushEntityBrushSideListById = new Dictionary<int, List<EntityBrushSide>>();
 
             var brushEntityJercBoxVerticesListById = GetBrushEntityBrushSideList(vmfRequiredData.entitiesSidesByEntityJercBoxId, EntityTypes.JercBox);
 
@@ -1158,7 +1160,8 @@ namespace JERC
                 }
             }
 
-            return brushEntityBrushSideListById;*/
+            return brushEntityBrushSideListById;
+            */
 
             return GetBrushEntityBrushSideList(vmfRequiredData.entitiesSidesByEntityJercBoxId, EntityTypes.JercBox);
         }
