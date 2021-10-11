@@ -154,11 +154,13 @@
 
 @AutoVisGroup = "Entities"
 [
-    "JERC"
+    "JERC Entities"
     [
         "jerc_config"
         "jerc_divider"
         "jerc_floor"
         "jerc_ceiling"
+
+        "jerc_box"
     ]
 ]
