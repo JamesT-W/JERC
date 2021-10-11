@@ -21,7 +21,7 @@
 		1: "Yes"
 	]
 
-	backgroundFilename(string) : "Background Image Filename" : "default" : "For custom images, place them inside the following folder: /Counter-Strike Global Offensive/bin/jerc/textures/"
+	backgroundFilename(string) : "Background Image Filename" : "default" : "For custom images, place them inside the following folder: .../Counter-Strike Global Offensive/csgo/materials/JERC/backgrounds/"
 
 	radarSizeMultiplier(float) : "Radar Size Multiplier (float)" : "0.95" : "A multiplier for altering the size of the level in the radar"
 
@@ -142,11 +142,11 @@
 
 	rendercolor(color255) : "Colour (R G B)" : "255 255 255"
 
-	colourAlpha(integer) : "Colour Alpha (int)" : 255 : "The alpha value of the jerc box (0-255)"
+	colourAlpha(integer) : "Colour Alpha (int)" : 255 : "The alpha value of the JERC box (0-255)"
 
 	colourStroke(color255) : "Colour (R G B)" : "221 138 0"
 
-	colourStrokeAlpha(integer) : "Colour Stroke Alpha (int)" : 255 : "The alpha value of the jerc box stroke (0-255)"
+	colourStrokeAlpha(integer) : "Colour Stroke Alpha (int)" : 255 : "The alpha value of the JERC box stroke (0-255)"
 
 	strokeWidth(integer) : "Stroke Width (int)" : 10 : "Width of stroke to use"
 ]
