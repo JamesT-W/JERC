@@ -334,6 +334,14 @@ namespace JERC
                 brushesLadder.AddRange(GetBrushesByTextureName(allWorldBrushesInVisgroup, ladderTextureName));
             }
 
+            var brushesBuyzone = GetBrushesByTextureName(allWorldBrushesInVisgroup, TextureNames.BuyzoneTextureName);
+            var brushesBombsiteA = GetBrushesByTextureName(allWorldBrushesInVisgroup, TextureNames.BombsiteATextureName);
+            var brushesBombsiteB = GetBrushesByTextureName(allWorldBrushesInVisgroup, TextureNames.BombsiteBTextureName);
+            var brushesRescueZone = GetBrushesByTextureName(allWorldBrushesInVisgroup, TextureNames.RescueZoneTextureName);
+            var brushesHostage = GetBrushesByTextureName(allWorldBrushesInVisgroup, TextureNames.HostageTextureName);
+            var brushesTSpawn = GetBrushesByTextureName(allWorldBrushesInVisgroup, TextureNames.TSpawnTextureName);
+            var brushesCTSpawn = GetBrushesByTextureName(allWorldBrushesInVisgroup, TextureNames.CTSpawnTextureName);
+
             // displacements
             var displacementsRemove = GetDisplacementsByTextureName(allWorldBrushesInVisgroup, TextureNames.RemoveTextureName);
             var displacementsPath = GetDisplacementsByTextureName(allWorldBrushesInVisgroup, TextureNames.PathTextureName);
@@ -346,22 +354,39 @@ namespace JERC
                 displacementsLadder.AddRange(GetDisplacementsByTextureName(allWorldBrushesInVisgroup, ladderTextureName));
             }
 
-            // entities (in game)
+            var displacementsBuyzone = GetDisplacementsByTextureName(allWorldBrushesInVisgroup, TextureNames.BuyzoneTextureName);
+            var displacementsBombsiteA = GetDisplacementsByTextureName(allWorldBrushesInVisgroup, TextureNames.BombsiteATextureName);
+            var displacementsBombsiteB = GetDisplacementsByTextureName(allWorldBrushesInVisgroup, TextureNames.BombsiteBTextureName);
+            var displacementsRescueZone = GetDisplacementsByTextureName(allWorldBrushesInVisgroup, TextureNames.RescueZoneTextureName);
+            var displacementsHostage = GetDisplacementsByTextureName(allWorldBrushesInVisgroup, TextureNames.HostageTextureName);
+            var displacementsTSpawn = GetDisplacementsByTextureName(allWorldBrushesInVisgroup, TextureNames.TSpawnTextureName);
+            var displacementsCTSpawn = GetDisplacementsByTextureName(allWorldBrushesInVisgroup, TextureNames.CTSpawnTextureName);
+
+            // brush entities (in game)
             var buyzoneBrushEntities = GetEntitiesByClassname(allEntities, Classnames.Buyzone, true);
             var bombsiteBrushEntities = GetEntitiesByClassname(allEntities, Classnames.Bombsite, true);
             var rescueZoneBrushEntities = GetEntitiesByClassname(allEntities, Classnames.RescueZone, true);
-            var hostageEntities = GetEntitiesByClassname(allEntities, Classnames.Hostage, true);
-            var ctSpawnEntities = GetEntitiesByClassname(allEntities, Classnames.CTSpawn, true);
-            var tSpawnEntities = GetEntitiesByClassname(allEntities, Classnames.TSpawn, true);
 
-            // brush entities
+            // entities (in game)
+            var hostageEntities = GetEntitiesByClassname(allEntities, Classnames.Hostage, true);
+            var tSpawnEntities = GetEntitiesByClassname(allEntities, Classnames.TSpawn, true);
+            var ctSpawnEntities = GetEntitiesByClassname(allEntities, Classnames.CTSpawn, true);
+
+            // brush entities (JERC)
             var funcBrushBrushEntities = GetEntitiesByClassname(allEntities, Classnames.FuncBrush, true);
             var funcDetailBrushEntities = GetEntitiesByClassname(allEntities, Classnames.FuncDetail, true);
             var funcDoorBrushEntities = GetEntitiesByClassname(allEntities, Classnames.FuncDoor, true);
             var funcDoorBrushRotatingEntities = GetEntitiesByClassname(allEntities, Classnames.FuncDoorRotating, true);
             var funcLadderBrushEntities = GetEntitiesByClassname(allEntities, Classnames.FuncLadder, true);
 
-            var allBrushesBrushEntities = funcBrushBrushEntities.Concat(funcDetailBrushEntities).Concat(funcDoorBrushEntities).Concat(funcDoorBrushRotatingEntities).Concat(funcLadderBrushEntities);
+            var allBrushesBrushEntities = buyzoneBrushEntities
+                .Concat(bombsiteBrushEntities)
+                .Concat(rescueZoneBrushEntities)
+                .Concat(funcBrushBrushEntities)
+                .Concat(funcDetailBrushEntities)
+                .Concat(funcDoorBrushEntities)
+                .Concat(funcDoorBrushRotatingEntities)
+                .Concat(funcLadderBrushEntities);
 
             var brushesRemoveBrushEntities = GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLadders(allBrushesBrushEntities, TextureNames.RemoveTextureName);
             var brushesPathBrushEntities = GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLadders(allBrushesBrushEntities, TextureNames.PathTextureName);
@@ -375,6 +400,13 @@ namespace JERC
             {
                 brushesLadderBrushEntities.AddRange(GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLadders(allBrushesBrushEntities, ladderTextureName));
             }
+            var brushesBuyzoneBrushEntities = GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLadders(allBrushesBrushEntities, TextureNames.BuyzoneTextureName);
+            var brushesBombsiteABrushEntities = GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLadders(allBrushesBrushEntities, TextureNames.BombsiteATextureName);
+            var brushesBombsiteBBrushEntities = GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLadders(allBrushesBrushEntities, TextureNames.BombsiteBTextureName);
+            var brushesRescueZoneBrushEntities = GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLadders(allBrushesBrushEntities, TextureNames.RescueZoneTextureName);
+            var brushesHostageBrushEntities = GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLadders(allBrushesBrushEntities, TextureNames.HostageTextureName);
+            var brushesTSpawnBrushEntities = GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLadders(allBrushesBrushEntities, TextureNames.TSpawnTextureName);
+            var brushesCTSpawnBrushEntities = GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLadders(allBrushesBrushEntities, TextureNames.CTSpawnTextureName);
 
 
             // brush entities (JERC)
@@ -395,9 +427,12 @@ namespace JERC
 
             return new VmfRequiredData(
                 brushesRemove, brushesPath, brushesCover, brushesOverlap, brushesDoor, brushesLadder,
+                brushesBuyzone, brushesBombsiteA, brushesBombsiteB, brushesRescueZone, brushesHostage, brushesTSpawn, brushesCTSpawn,
                 displacementsRemove, displacementsPath, displacementsCover, displacementsOverlap, displacementsDoor, displacementsLadder,
+                displacementsBuyzone, displacementsBombsiteA, displacementsBombsiteB, displacementsRescueZone, displacementsHostage, displacementsTSpawn, displacementsCTSpawn,
                 buyzoneBrushEntities, bombsiteBrushEntities, rescueZoneBrushEntities, hostageEntities, ctSpawnEntities, tSpawnEntities,
                 brushesRemoveBrushEntities, brushesPathBrushEntities, brushesCoverBrushEntities, brushesOverlapBrushEntities, brushesDoorBrushEntities, brushesLadderBrushEntities,
+                brushesBuyzoneBrushEntities, brushesBombsiteABrushEntities, brushesBombsiteBBrushEntities, brushesRescueZoneBrushEntities, brushesHostageBrushEntities, brushesTSpawnBrushEntities, brushesCTSpawnBrushEntities,
                 jercBoxBrushEntities,
                 jercConfigEntities, jercDividerEntities, jercFloorEntities, jercCeilingEntities
             );
@@ -734,6 +769,18 @@ namespace JERC
             var brushLadderList = GetBrushVolumeListWithinLevelHeight(levelHeight, vmfRequiredData.brushesLadder, JercTypes.Ladder);
             var displacementLadderList = GetBrushVolumeListWithinLevelHeight(levelHeight, vmfRequiredData.displacementsLadder, JercTypes.Ladder);
 
+            var brushBuyzoneList = GetBrushVolumeListWithinLevelHeight(levelHeight, vmfRequiredData.brushesBuyzone, JercTypes.Buyzone);
+            var displacementBuyzoneList = GetBrushVolumeListWithinLevelHeight(levelHeight, vmfRequiredData.displacementsBuyzone, JercTypes.Buyzone);
+
+            var brushBombsiteAList = GetBrushVolumeListWithinLevelHeight(levelHeight, vmfRequiredData.brushesBombsiteA, JercTypes.BombsiteA);
+            var displacementBombsiteAList = GetBrushVolumeListWithinLevelHeight(levelHeight, vmfRequiredData.displacementsBombsiteA, JercTypes.BombsiteA);
+
+            var brushBombsiteBList = GetBrushVolumeListWithinLevelHeight(levelHeight, vmfRequiredData.brushesBombsiteB, JercTypes.BombsiteB);
+            var displacementBombsiteBList = GetBrushVolumeListWithinLevelHeight(levelHeight, vmfRequiredData.displacementsBombsiteB, JercTypes.BombsiteB);
+
+            var brushRescueZoneList = GetBrushVolumeListWithinLevelHeight(levelHeight, vmfRequiredData.brushesRescueZone, JercTypes.RescueZone);
+            var displacementRescueZoneList = GetBrushVolumeListWithinLevelHeight(levelHeight, vmfRequiredData.displacementsRescueZone, JercTypes.RescueZone);
+
             // get all brush sides and displacement sides to draw (brush sides)
             var brushPathSideList = GetBrushSideListWithinLevelHeight(levelHeight, vmfRequiredData.brushesSidesPath, JercTypes.Path);
             var displacementPathSideList = GetBrushSideListWithinLevelHeight(levelHeight, vmfRequiredData.displacementsSidesPath, JercTypes.Path);
@@ -741,7 +788,7 @@ namespace JERC
             var brushOverlapSideList = GetBrushSideListWithinLevelHeight(levelHeight, vmfRequiredData.brushesSidesOverlap, JercTypes.Overlap);
             var displacementOverlapSideList = GetBrushSideListWithinLevelHeight(levelHeight, vmfRequiredData.displacementsSidesOverlap, JercTypes.Overlap);
 
-
+            // get all brushes and displacements to draw (brushes)
             var brushesToDrawPath = GetBrushesToDraw(boundingBox, brushPathSideList);
             var displacementsToDrawPath = GetBrushesToDraw(boundingBox, displacementPathSideList);
 
@@ -756,6 +803,18 @@ namespace JERC
 
             var brushesToDrawLadder = GetBrushesToDraw(boundingBox, brushLadderList.SelectMany(x => x.brushSides).ToList());
             var displacementsToDrawLadder = GetBrushesToDraw(boundingBox, displacementLadderList.SelectMany(x => x.brushSides).ToList());
+
+            var brushesToDrawBuyzone = GetBrushesToDraw(boundingBox, brushBuyzoneList.SelectMany(x => x.brushSides).ToList());
+            var displacementsToDrawBuyzone = GetBrushesToDraw(boundingBox, displacementBuyzoneList.SelectMany(x => x.brushSides).ToList());
+
+            var brushesToDrawBombsiteA = GetBrushesToDraw(boundingBox, brushBombsiteAList.SelectMany(x => x.brushSides).ToList());
+            var displacementsToDrawBombsiteA = GetBrushesToDraw(boundingBox, displacementBombsiteAList.SelectMany(x => x.brushSides).ToList());
+
+            var brushesToDrawBombsiteB = GetBrushesToDraw(boundingBox, brushBombsiteBList.SelectMany(x => x.brushSides).ToList());
+            var displacementsToDrawBombsiteB = GetBrushesToDraw(boundingBox, displacementBombsiteBList.SelectMany(x => x.brushSides).ToList());
+
+            var brushesToDrawRescueZone = GetBrushesToDraw(boundingBox, brushRescueZoneList.SelectMany(x => x.brushSides).ToList());
+            var displacementsToDrawRescueZone = GetBrushesToDraw(boundingBox, displacementRescueZoneList.SelectMany(x => x.brushSides).ToList());
 
             // get all entity sides to draw
             var entityBrushSideListById = GetEntityBrushSideListWithinLevelHeight(levelHeight);
@@ -797,6 +856,38 @@ namespace JERC
 
             // ladder stuff
             foreach (var brushToRender in brushesToDrawLadder.Concat(displacementsToDrawLadder).OrderBy(x => x.zAxisAverage))
+            {
+                DrawFilledPolygonGradient(graphics, brushToRender, false);
+            }
+
+            // brush entity stuff (in game)
+            if (jercConfigValues.strokeAroundBrushEntities)
+            {
+                foreach (var brushToRender in brushesToDrawBuyzone.Concat(displacementsToDrawBuyzone)
+                    .Concat(brushesToDrawBombsiteA).Concat(displacementsToDrawBombsiteA)
+                    .Concat(brushesToDrawBombsiteB).Concat(displacementsToDrawBombsiteB)
+                    .Concat(brushesToDrawRescueZone).Concat(displacementsToDrawRescueZone)
+                    .OrderBy(x => x.zAxisAverage))
+                {
+                    Color colourStroke = brushToRender.jercType switch
+                    {
+                        JercTypes.Buyzone => Colours.ColourBuyzonesStroke(),
+                        JercTypes.Bombsite => Colours.ColourBombsitesStroke(),
+                        JercTypes.BombsiteA => Colours.ColourBombsitesStroke(),
+                        JercTypes.BombsiteB => Colours.ColourBombsitesStroke(),
+                        JercTypes.RescueZone => Colours.ColourRescueZonesStroke()
+                    };
+
+                    DrawStroke(graphics, brushToRender, Colours.ColourBrushesStroke(colourStroke));
+                }
+            }
+
+            // brush entity stuff (in game)
+            foreach (var brushToRender in brushesToDrawBuyzone.Concat(displacementsToDrawBuyzone)
+                .Concat(brushesToDrawBombsiteA).Concat(displacementsToDrawBombsiteA)
+                .Concat(brushesToDrawBombsiteB).Concat(displacementsToDrawBombsiteB)
+                .Concat(brushesToDrawRescueZone).Concat(displacementsToDrawRescueZone)
+                .OrderBy(x => x.zAxisAverage))
             {
                 DrawFilledPolygonGradient(graphics, brushToRender, false);
             }
@@ -1361,7 +1452,12 @@ namespace JERC
                         JercTypes.Cover => Colours.ColourBrush(jercConfigValues.coverColourLow, jercConfigValues.coverColourHigh, percentageAboveMin),
                         JercTypes.Overlap => Colours.ColourBrush(jercConfigValues.overlapColourLow, jercConfigValues.overlapColourHigh, percentageAboveMin),
                         JercTypes.Door => jercConfigValues.doorColour,
-                        JercTypes.Ladder => jercConfigValues.ladderColour
+                        JercTypes.Ladder => jercConfigValues.ladderColour,
+                        JercTypes.Buyzone => Colours.ColourBuyzones(),
+                        JercTypes.Bombsite => Colours.ColourBombsites(),
+                        JercTypes.BombsiteA => Colours.ColourBombsites(),
+                        JercTypes.BombsiteB => Colours.ColourBombsites(),
+                        JercTypes.RescueZone => Colours.ColourRescueZones()
                     };
 
                     verticesOffsetsToUse = verticesOffsetsToUse.Distinct().ToList(); // TODO: doesn't seem to work
@@ -1702,7 +1798,23 @@ namespace JERC
             var paddingPercentageEachSideX = overviewPositionValues.paddingPercentageX == 0 ? 0 : (overviewPositionValues.paddingPercentageX / 2);
             var paddingPercentageEachSideY = overviewPositionValues.paddingPercentageY == 0 ? 0 : (overviewPositionValues.paddingPercentageY / 2);
 
-            if (vmfRequiredData.ctSpawnEntities.Any())
+            // ct spawns
+            if (vmfRequiredData.brushesCTSpawn.Any() || vmfRequiredData.displacementsCTSpawn.Any())
+            {
+                var vertices = vmfRequiredData.brushesCTSpawn.Concat(vmfRequiredData.displacementsCTSpawn).SelectMany(x => x.side.SelectMany(y => y.vertices_plus));
+
+                var xAllValues = vertices.Select(x => x.x);
+                var yAllValues = vertices.Select(x => x.y);
+                var xAverage = xAllValues.Average();
+                var yAverage = yAllValues.Average();
+                //var xPercent = Math.Abs((xAverage - (overviewPositionValues.brushVerticesPosMinX + overviewPositionValues.paddingSizeX)) / overviewPositionValues.outputResolution);
+                var xPercent = Math.Abs((Math.Abs(Math.Abs(xAverage) - Math.Abs(overviewPositionValues.brushVerticesPosMinX)) - (overviewPositionValues.radarSizeMultiplierChangeAmountWidth / 2)) / overviewPositionValues.outputResolution) + paddingPercentageEachSideX;
+                var yPercent = Math.Abs((Math.Abs(Math.Abs(yAverage) - Math.Abs(overviewPositionValues.brushVerticesPosMinY)) - (overviewPositionValues.radarSizeMultiplierChangeAmountHeight / 2)) / overviewPositionValues.outputResolution) + paddingPercentageEachSideY;
+
+                CTSpawn_x = FlipOverviewTxtValues(xPercent, true);
+                CTSpawn_y = FlipOverviewTxtValues(yPercent, false);
+            }
+            else if (vmfRequiredData.ctSpawnEntities.Any())
             {
                 var origins = vmfRequiredData.ctSpawnEntities.Select(x => new Vertices(x.origin));
                 var xPercent = Math.Abs((Math.Abs(Math.Abs(origins.Average(x => x.x)) - Math.Abs(overviewPositionValues.brushVerticesPosMinX)) - (overviewPositionValues.radarSizeMultiplierChangeAmountWidth / 2)) / overviewPositionValues.outputResolution) + paddingPercentageEachSideX;
@@ -1711,8 +1823,25 @@ namespace JERC
                 CTSpawn_x = FlipOverviewTxtValues(xPercent, true);
                 CTSpawn_y = FlipOverviewTxtValues(yPercent, false);
             }
+            //
 
-            if (vmfRequiredData.tSpawnEntities.Any())
+            // t spawns
+            if (vmfRequiredData.brushesTSpawn.Any() || vmfRequiredData.displacementsTSpawn.Any())
+            {
+                var vertices = vmfRequiredData.brushesTSpawn.Concat(vmfRequiredData.displacementsTSpawn).SelectMany(x => x.side.SelectMany(y => y.vertices_plus));
+
+                var xAllValues = vertices.Select(x => x.x);
+                var yAllValues = vertices.Select(x => x.y);
+                var xAverage = xAllValues.Average();
+                var yAverage = yAllValues.Average();
+                //var xPercent = Math.Abs((xAverage - (overviewPositionValues.brushVerticesPosMinX + overviewPositionValues.paddingSizeX)) / overviewPositionValues.outputResolution);
+                var xPercent = Math.Abs((Math.Abs(Math.Abs(xAverage) - Math.Abs(overviewPositionValues.brushVerticesPosMinX)) - (overviewPositionValues.radarSizeMultiplierChangeAmountWidth / 2)) / overviewPositionValues.outputResolution) + paddingPercentageEachSideX;
+                var yPercent = Math.Abs((Math.Abs(Math.Abs(yAverage) - Math.Abs(overviewPositionValues.brushVerticesPosMinY)) - (overviewPositionValues.radarSizeMultiplierChangeAmountHeight / 2)) / overviewPositionValues.outputResolution) + paddingPercentageEachSideY;
+
+                TSpawn_x = FlipOverviewTxtValues(xPercent, true);
+                TSpawn_y = FlipOverviewTxtValues(yPercent, false);
+            }
+            else if (vmfRequiredData.tSpawnEntities.Any())
             {
                 var origins = vmfRequiredData.tSpawnEntities.Select(x => new Vertices(x.origin));
                 var xPercent = Math.Abs((Math.Abs(Math.Abs(origins.Average(x => x.x)) - Math.Abs(overviewPositionValues.brushVerticesPosMinX)) - (overviewPositionValues.radarSizeMultiplierChangeAmountWidth / 2)) / overviewPositionValues.outputResolution) + paddingPercentageEachSideX;
@@ -1721,18 +1850,54 @@ namespace JERC
                 TSpawn_x = FlipOverviewTxtValues(xPercent, true);
                 TSpawn_y = FlipOverviewTxtValues(yPercent, false);
             }
+            //
 
-            if (vmfRequiredData.bombsiteBrushEntities.Any())
+
+            // bombsites
+            if (vmfRequiredData.brushesBombsiteA.Any() || vmfRequiredData.displacementsBombsiteA.Any() || vmfRequiredData.brushesBombsiteB.Any() || vmfRequiredData.displacementsBombsiteB.Any())
             {
-                var bombsites = vmfRequiredData.bombsiteBrushEntities;
+                // bombsite a
+                var vertices1 = vmfRequiredData.brushesBombsiteA.Any() || vmfRequiredData.displacementsBombsiteA.Any()
+                    ? vmfRequiredData.brushesBombsiteA.Concat(vmfRequiredData.displacementsBombsiteA).SelectMany(x => x.side.SelectMany(y => y.vertices_plus))
+                    : null;
+
+                var xAllValues1 = vertices1.Select(x => x.x);
+                var yAllValues1 = vertices1.Select(x => x.y);
+                var xAverage1 = xAllValues1.Average();
+                var yAverage1 = yAllValues1.Average();
+                //var xPercent1 = Math.Abs((xAverage1 - (overviewPositionValues.brushVerticesPosMinX + overviewPositionValues.paddingSizeX)) / overviewPositionValues.outputResolution);
+                var xPercent1 = Math.Abs((Math.Abs(Math.Abs(xAverage1) - Math.Abs(overviewPositionValues.brushVerticesPosMinX)) - (overviewPositionValues.radarSizeMultiplierChangeAmountWidth / 2)) / overviewPositionValues.outputResolution) + paddingPercentageEachSideX;
+                var yPercent1 = Math.Abs((Math.Abs(Math.Abs(yAverage1) - Math.Abs(overviewPositionValues.brushVerticesPosMinY)) - (overviewPositionValues.radarSizeMultiplierChangeAmountHeight / 2)) / overviewPositionValues.outputResolution) + paddingPercentageEachSideY;
+
+                bombA_x = FlipOverviewTxtValues(xPercent1, true);
+                bombA_y = FlipOverviewTxtValues(yPercent1, false);
+
+                // bombsite b
+                var vertices2 = vmfRequiredData.brushesBombsiteB.Any() || vmfRequiredData.displacementsBombsiteB.Any()
+                    ? vmfRequiredData.brushesBombsiteB.Concat(vmfRequiredData.displacementsBombsiteB).SelectMany(x => x.side.SelectMany(y => y.vertices_plus))
+                    : null;
+
+                var xAllValues2 = vertices2.Select(x => x.x);
+                var yAllValues2 = vertices2.Select(x => x.y);
+                var xAverage2 = xAllValues2.Average();
+                var yAverage2 = yAllValues2.Average();
+                var xPercent2 = Math.Abs((Math.Abs(Math.Abs(xAverage2) - Math.Abs(overviewPositionValues.brushVerticesPosMinX)) - (overviewPositionValues.radarSizeMultiplierChangeAmountWidth / 2)) / overviewPositionValues.outputResolution) + paddingPercentageEachSideX;
+                var yPercent2 = Math.Abs((Math.Abs(Math.Abs(yAverage2) - Math.Abs(overviewPositionValues.brushVerticesPosMinY)) - (overviewPositionValues.radarSizeMultiplierChangeAmountHeight / 2)) / overviewPositionValues.outputResolution) + paddingPercentageEachSideY;
+
+                bombB_x = FlipOverviewTxtValues(xPercent2, true);
+                bombB_y = FlipOverviewTxtValues(yPercent2, false);
+            }
+            else if (vmfRequiredData.bombsiteBrushEntities.Any()) // won't do bombsite entities if JERC bombsite materials are found on brushes
+            {
+                var bombsiteEntities = vmfRequiredData.bombsiteBrushEntities;
 
                 if (!string.IsNullOrWhiteSpace(vmfRequiredData.bombsiteBrushEntities.LastOrDefault().targetname) && vmfRequiredData.bombsiteBrushEntities.LastOrDefault().targetname.ToLower().Contains("bombsite_a"))
                 {
-                    bombsites.Reverse();
+                    bombsiteEntities.Reverse();
                 }
 
-                var xAllValues1 = bombsites.FirstOrDefault().brushes.SelectMany(x => x.side.SelectMany(y => y.vertices_plus.Select(x => x.x)));
-                var yAllValues1 = bombsites.FirstOrDefault().brushes.SelectMany(x => x.side.SelectMany(y => y.vertices_plus.Select(x => x.y)));
+                var xAllValues1 = bombsiteEntities.FirstOrDefault().brushes.SelectMany(x => x.side.SelectMany(y => y.vertices_plus.Select(x => x.x)));
+                var yAllValues1 = bombsiteEntities.FirstOrDefault().brushes.SelectMany(x => x.side.SelectMany(y => y.vertices_plus.Select(x => x.y)));
                 var xAverage1 = xAllValues1.Average();
                 var yAverage1 = yAllValues1.Average();
                 //var xPercent1 = Math.Abs((xAverage1 - (overviewPositionValues.brushVerticesPosMinX + overviewPositionValues.paddingSizeX)) / overviewPositionValues.outputResolution);
@@ -1744,8 +1909,8 @@ namespace JERC
 
                 if (vmfRequiredData.bombsiteBrushEntities.Count() > 1)
                 {
-                    var xAllValues2 = bombsites.Skip(1).FirstOrDefault().brushes.SelectMany(x => x.side.SelectMany(y => y.vertices_plus.Select(x => x.x)));
-                    var yAllValues2 = bombsites.Skip(1).FirstOrDefault().brushes.SelectMany(x => x.side.SelectMany(y => y.vertices_plus.Select(x => x.y)));
+                    var xAllValues2 = bombsiteEntities.Skip(1).FirstOrDefault().brushes.SelectMany(x => x.side.SelectMany(y => y.vertices_plus.Select(x => x.x)));
+                    var yAllValues2 = bombsiteEntities.Skip(1).FirstOrDefault().brushes.SelectMany(x => x.side.SelectMany(y => y.vertices_plus.Select(x => x.y)));
                     var xAverage2 = xAllValues2.Average();
                     var yAverage2 = yAllValues2.Average();
                     var xPercent2 = Math.Abs((Math.Abs(Math.Abs(xAverage2) - Math.Abs(overviewPositionValues.brushVerticesPosMinX)) - (overviewPositionValues.radarSizeMultiplierChangeAmountWidth / 2)) / overviewPositionValues.outputResolution) + paddingPercentageEachSideX;
@@ -1755,8 +1920,62 @@ namespace JERC
                     bombB_y = FlipOverviewTxtValues(yPercent2, false);
                 }
             }
+            //
 
-            if (vmfRequiredData.hostageEntities.Any())
+            // hostage spawns
+            if (vmfRequiredData.brushesHostage.Any() || vmfRequiredData.displacementsHostage.Any())
+            {
+                var brushSpawns = vmfRequiredData.brushesHostage.Concat(vmfRequiredData.displacementsHostage).ToList();
+                for (var i = 1; i <= brushSpawns.Count(); i++)
+                {
+                    var vertices = brushSpawns[i-1].side.SelectMany(y => y.vertices_plus);
+
+                    var xAllValues = vertices.Select(x => x.x);
+                    var yAllValues = vertices.Select(x => x.y);
+                    var xAverage = xAllValues.Average();
+                    var yAverage = yAllValues.Average();
+                    //var xPercent = Math.Abs((xAverage - (overviewPositionValues.brushVerticesPosMinX + overviewPositionValues.paddingSizeX)) / overviewPositionValues.outputResolution);
+                    var xPercent = Math.Abs((Math.Abs(Math.Abs(xAverage) - Math.Abs(overviewPositionValues.brushVerticesPosMinX)) - (overviewPositionValues.radarSizeMultiplierChangeAmountWidth / 2)) / overviewPositionValues.outputResolution) + paddingPercentageEachSideX;
+                    var yPercent = Math.Abs((Math.Abs(Math.Abs(yAverage) - Math.Abs(overviewPositionValues.brushVerticesPosMinY)) - (overviewPositionValues.radarSizeMultiplierChangeAmountHeight / 2)) / overviewPositionValues.outputResolution) + paddingPercentageEachSideY;
+
+                    switch (i)
+                    {
+                        case 1:
+                            Hostage1_x = FlipOverviewTxtValues(xPercent, true);
+                            Hostage1_y = FlipOverviewTxtValues(yPercent, false);
+                            break;
+                        case 2:
+                            Hostage2_x = FlipOverviewTxtValues(xPercent, true);
+                            Hostage2_y = FlipOverviewTxtValues(yPercent, false);
+                            break;
+                        case 3:
+                            Hostage3_x = FlipOverviewTxtValues(xPercent, true);
+                            Hostage3_y = FlipOverviewTxtValues(yPercent, false);
+                            break;
+                        case 4:
+                            Hostage4_x = FlipOverviewTxtValues(xPercent, true);
+                            Hostage4_y = FlipOverviewTxtValues(yPercent, false);
+                            break;
+                        case 5:
+                            Hostage5_x = FlipOverviewTxtValues(xPercent, true);
+                            Hostage5_y = FlipOverviewTxtValues(yPercent, false);
+                            break;
+                        case 6:
+                            Hostage6_x = FlipOverviewTxtValues(xPercent, true);
+                            Hostage6_y = FlipOverviewTxtValues(yPercent, false);
+                            break;
+                        case 7:
+                            Hostage7_x = FlipOverviewTxtValues(xPercent, true);
+                            Hostage7_y = FlipOverviewTxtValues(yPercent, false);
+                            break;
+                        case 8:
+                            Hostage8_x = FlipOverviewTxtValues(xPercent, true);
+                            Hostage8_y = FlipOverviewTxtValues(yPercent, false);
+                            break;
+                    }
+                }
+            }
+            else if (vmfRequiredData.hostageEntities.Any())
             {
                 for (var i = 1; i <= vmfRequiredData.hostageEntities.Count(); i++)
                 {
@@ -1801,6 +2020,7 @@ namespace JERC
                     }
                 }
             }
+            //
 
 
             return new OverviewTxt(

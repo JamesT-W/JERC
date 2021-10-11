@@ -16,5 +16,13 @@ namespace JERC.Enums
         Door = 32,
         Ladder = 64,
         Ignore = 128,
+        Buyzone = 256,
+        Bombsite = 512,
+        BombsiteA = 1024,
+        BombsiteB = 2048,
+        RescueZone = 4096,
+        Hostage = 8192,
+        TSpawn = 16384,
+        CTSpawn = 32768
     }
 }

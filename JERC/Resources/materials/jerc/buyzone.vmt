@@ -1,0 +1,10 @@
+UnlitGeneric
+{
+	$basetexture "jerc/JERC_Buyzone"
+
+	$additive 1
+
+	%keywords "jerc,tool,tools,radar,overview,buyzone"
+
+	%compileskip 1
+}

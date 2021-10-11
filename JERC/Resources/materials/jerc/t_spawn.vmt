@@ -1,0 +1,10 @@
+UnlitGeneric
+{
+	$basetexture "jerc/JERC_T_Spawn"
+
+	//$additive 1
+
+	%keywords "jerc,tool,tools,radar,overview,t,spawn"
+
+	%compileskip 1
+}
