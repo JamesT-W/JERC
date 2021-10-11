@@ -16,6 +16,7 @@ namespace JERC.Models
         public bool useSeparateGradientEachLevel;
         public string backgroundFilename;
         public float radarSizeMultiplier;
+        public int overlapAlpha;
         public Color pathColourHigh;
         public Color pathColourLow;
         public Color overlapColourHigh;
@@ -61,6 +62,7 @@ namespace JERC.Models
             else if (radarSizeMultiplier > 1)
                 radarSizeMultiplier = 1;
 
+            overlapAlpha = jercEntitySettingsValues.ContainsKey("overlapAlpha") && jercEntitySettingsValues["overlapAlpha"] != null ? Math.Clamp(int.Parse(jercEntitySettingsValues["overlapAlpha"]), 0, 255) : 0;
             pathColourHigh = jercEntitySettingsValues.ContainsKey("pathColourHigh") ? GetColourStringAsColour(jercEntitySettingsValues["pathColourHigh"]) : Colours.ColourError;
             pathColourLow = jercEntitySettingsValues.ContainsKey("pathColourLow") ? GetColourStringAsColour(jercEntitySettingsValues["pathColourLow"]) : Colours.ColourError;
             overlapColourHigh = jercEntitySettingsValues.ContainsKey("overlapColourHigh") ? GetColourStringAsColour(jercEntitySettingsValues["overlapColourHigh"]) : Colours.ColourError;

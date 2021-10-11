@@ -452,6 +452,7 @@ namespace JERC
             jercEntitySettingsValues.Add("useSeparateGradientEachLevel", jercConfig.FirstOrDefault(x => x.Name == "useSeparateGradientEachLevel")?.Value);
             jercEntitySettingsValues.Add("backgroundFilename", jercConfig.FirstOrDefault(x => x.Name == "backgroundFilename")?.Value ?? string.Empty);
             jercEntitySettingsValues.Add("radarSizeMultiplier", jercConfig.FirstOrDefault(x => x.Name == "radarSizeMultiplier")?.Value);
+            jercEntitySettingsValues.Add("overlapAlpha", jercConfig.FirstOrDefault(x => x.Name == "overlapAlpha")?.Value);
             jercEntitySettingsValues.Add("pathColourHigh", jercConfig.FirstOrDefault(x => x.Name == "pathColourHigh")?.Value);
             jercEntitySettingsValues.Add("pathColourLow", jercConfig.FirstOrDefault(x => x.Name == "pathColourLow")?.Value);
             jercEntitySettingsValues.Add("overlapColourHigh", jercConfig.FirstOrDefault(x => x.Name == "overlapColourHigh")?.Value);
@@ -1456,7 +1457,7 @@ namespace JERC
                         //JercTypes.Remove => Colours.ColourRemove(percentageAboveMin),
                         JercTypes.Path => Colours.ColourBrush(jercConfigValues.pathColourLow, jercConfigValues.pathColourHigh, percentageAboveMin),
                         JercTypes.Cover => Colours.ColourBrush(jercConfigValues.coverColourLow, jercConfigValues.coverColourHigh, percentageAboveMin),
-                        JercTypes.Overlap => Colours.ColourBrush(jercConfigValues.overlapColourLow, jercConfigValues.overlapColourHigh, percentageAboveMin),
+                        JercTypes.Overlap => Colours.ColourBrush(jercConfigValues.overlapColourLow, jercConfigValues.overlapColourHigh, percentageAboveMin, jercConfigValues.overlapAlpha),
                         JercTypes.Door => jercConfigValues.doorColour,
                         JercTypes.Ladder => jercConfigValues.ladderColour,
                         JercTypes.Buyzone => Colours.ColourBuyzones(),

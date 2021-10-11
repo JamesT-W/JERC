@@ -13,8 +13,8 @@ namespace JERC.Constants
         public static Color ColourError => Color.DarkRed;
 
         public static Color ColourRemove() => Color.Transparent;
-        public static Color ColourBrush(Color rgbLow, Color rgbHigh, float percentageAboveMin) =>
-            Color.FromArgb(255,
+        public static Color ColourBrush(Color rgbLow, Color rgbHigh, float percentageAboveMin, int? alphaOverride = null) =>
+            Color.FromArgb(alphaOverride == null ? 255 : (int)alphaOverride,
                 GetColour(rgbLow.R, rgbHigh.R, percentageAboveMin),
                 GetColour(rgbLow.G, rgbHigh.G, percentageAboveMin),
                 GetColour(rgbLow.B, rgbHigh.B, percentageAboveMin)
