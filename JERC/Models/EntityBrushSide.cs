@@ -1,4 +1,4 @@
-﻿using JERC.Enums;
+using JERC.Enums;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -15,6 +15,7 @@ namespace JERC.Models
         public Color colour;
         public Color colourStroke;
         public int strokeWidth;
+        public string material;
 
         public EntityBrushSide() {}
     }

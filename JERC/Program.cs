@@ -1283,8 +1283,10 @@ namespace JERC
                         var vert = side.vertices_plus[i];
 
                         entityBrushSide.vertices.Add(new Vertices(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier, vert.z));
-                        entityBrushSide.entityType = entityType;
                     }
+
+                    entityBrushSide.entityType = entityType;
+                    entityBrushSide.material = side.material;
 
                     if (entityBrushSideListById.ContainsKey(entitySides.Key))
                         entityBrushSideListById[entitySides.Key].Add(entityBrushSide);
@@ -1310,7 +1312,8 @@ namespace JERC
                         entityType = entityType,
                         colour = vmfRequiredData.jercBoxByEntityJercBoxId[entitySides.Key].colour,
                         colourStroke = vmfRequiredData.jercBoxByEntityJercBoxId[entitySides.Key].colourStroke,
-                        strokeWidth = vmfRequiredData.jercBoxByEntityJercBoxId[entitySides.Key].strokeWidth
+                        strokeWidth = vmfRequiredData.jercBoxByEntityJercBoxId[entitySides.Key].strokeWidth,
+                        material = side.material
                     };
 
                     for (int i = 0; i < side.vertices_plus.Count(); i++)
@@ -1483,6 +1486,23 @@ namespace JERC
             {
                 foreach (var brushEntityBrushSide in brushEntityBrushSideByBrush)
                 {
+                    // if a brush side is using the corresponding material, it has already been drawn previously, so don't draw it again
+                    switch (brushEntityBrushSide.entityType)
+                    {
+                        case EntityTypes.Buyzone:
+                            if (brushEntityBrushSide.material.ToLower() == TextureNames.BuyzoneTextureName)
+                                continue;
+                            break;
+                        case EntityTypes.Bombsite:
+                            if (TextureNames.AllBombsiteTextureNames.Any(x => x.ToLower() == brushEntityBrushSide.material.ToLower()))
+                                continue;
+                            break;
+                        case EntityTypes.RescueZone:
+                            if (brushEntityBrushSide.material.ToLower() == TextureNames.RescueZoneTextureName)
+                                continue;
+                            break;
+                    }
+
                     var verticesOffsetsToUse = new List<VerticesToDraw>();
 
                     foreach (var vertices in brushEntityBrushSide.vertices)
