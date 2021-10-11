@@ -347,19 +347,19 @@ namespace JERC
             }
 
             // entities (in game)
-            var buyzoneBrushEntities = GetEntitiesByClassname(allEntities, Classnames.Buyzone);
-            var bombsiteBrushEntities = GetEntitiesByClassname(allEntities, Classnames.Bombsite);
-            var rescueZoneBrushEntities = GetEntitiesByClassname(allEntities, Classnames.RescueZone);
-            var hostageEntities = GetEntitiesByClassname(allEntities, Classnames.Hostage);
-            var ctSpawnEntities = GetEntitiesByClassname(allEntities, Classnames.CTSpawn);
-            var tSpawnEntities = GetEntitiesByClassname(allEntities, Classnames.TSpawn);
+            var buyzoneBrushEntities = GetEntitiesByClassname(allEntities, Classnames.Buyzone, true);
+            var bombsiteBrushEntities = GetEntitiesByClassname(allEntities, Classnames.Bombsite, true);
+            var rescueZoneBrushEntities = GetEntitiesByClassname(allEntities, Classnames.RescueZone, true);
+            var hostageEntities = GetEntitiesByClassname(allEntities, Classnames.Hostage, true);
+            var ctSpawnEntities = GetEntitiesByClassname(allEntities, Classnames.CTSpawn, true);
+            var tSpawnEntities = GetEntitiesByClassname(allEntities, Classnames.TSpawn, true);
 
             // brush entities
-            var funcBrushBrushEntities = GetEntitiesByClassname(allEntities, Classnames.FuncBrush);
-            var funcDetailBrushEntities = GetEntitiesByClassname(allEntities, Classnames.FuncDetail);
-            var funcDoorBrushEntities = GetEntitiesByClassname(allEntities, Classnames.FuncDoor);
-            var funcDoorBrushRotatingEntities = GetEntitiesByClassname(allEntities, Classnames.FuncDoorRotating);
-            var funcLadderBrushEntities = GetEntitiesByClassname(allEntities, Classnames.FuncLadder);
+            var funcBrushBrushEntities = GetEntitiesByClassname(allEntities, Classnames.FuncBrush, true);
+            var funcDetailBrushEntities = GetEntitiesByClassname(allEntities, Classnames.FuncDetail, true);
+            var funcDoorBrushEntities = GetEntitiesByClassname(allEntities, Classnames.FuncDoor, true);
+            var funcDoorBrushRotatingEntities = GetEntitiesByClassname(allEntities, Classnames.FuncDoorRotating, true);
+            var funcLadderBrushEntities = GetEntitiesByClassname(allEntities, Classnames.FuncLadder, true);
 
             var allBrushesBrushEntities = funcBrushBrushEntities.Concat(funcDetailBrushEntities).Concat(funcDoorBrushEntities).Concat(funcDoorBrushRotatingEntities).Concat(funcLadderBrushEntities);
 
@@ -378,13 +378,13 @@ namespace JERC
 
 
             // brush entities (JERC)
-            var jercBoxBrushEntities = GetEntitiesByClassname(allEntities, Classnames.JercBox);
+            var jercBoxBrushEntities = GetEntitiesByClassname(allEntities, Classnames.JercBox, true);
 
             // entities (JERC)
-            var jercConfigEntities = GetEntitiesByClassname(allEntities, Classnames.JercConfig);
-            var jercDividerEntities = GetEntitiesByClassname(allEntities, Classnames.JercDivider);
-            var jercFloorEntities = GetEntitiesByClassname(allEntities, Classnames.JercFloor);
-            var jercCeilingEntities = GetEntitiesByClassname(allEntities, Classnames.JercCeiling);
+            var jercConfigEntities = GetEntitiesByClassname(allEntities, Classnames.JercConfig, false);
+            var jercDividerEntities = GetEntitiesByClassname(allEntities, Classnames.JercDivider, false);
+            var jercFloorEntities = GetEntitiesByClassname(allEntities, Classnames.JercFloor, false);
+            var jercCeilingEntities = GetEntitiesByClassname(allEntities, Classnames.JercCeiling, false);
 
             if (jercConfigEntities == null || !jercConfigEntities.Any())
                 return null;
@@ -507,13 +507,30 @@ namespace JERC
         }
 
 
-        private static IEnumerable<IVNode> GetEntitiesByClassname(IEnumerable<IVNode> allEntities, string classname)
+        private static IEnumerable<IVNode> GetEntitiesByClassname(IEnumerable<IVNode> allEntities, string classname, bool onlyIncludeIfInVisgroup)
         {
-            return (from x in allEntities
-                   from y in x.Body
-                   where y.Name == "classname"
-                   where y.Value.ToLower() == classname.ToLower()
-                   select x).Distinct();
+            if (onlyIncludeIfInVisgroup)
+            {
+                return (from x in allEntities
+                        from y in x.Body
+                        where y.Name == "classname"
+                        where y.Value.ToLower() == classname.ToLower()
+                        from z in x.Body
+                        where z.Name == "editor"
+                        from a in z.Body
+                        where a.Name == "visgroupid"
+                        where int.Parse(a.Value, Globalization.Style, Globalization.Culture) == visgroupIdMainVmf ||
+                        visgroupIdsByInstanceEntityIds.Values.Any(b => b == int.Parse(a.Value, Globalization.Style, Globalization.Culture))
+                        select x).Distinct();
+            }
+            else
+            {
+                return (from x in allEntities
+                        from y in x.Body
+                        where y.Name == "classname"
+                        where y.Value.ToLower() == classname.ToLower()
+                        select x).Distinct();
+            }
         }
 
 
