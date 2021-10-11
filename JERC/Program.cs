@@ -897,8 +897,8 @@ namespace JERC
             ////graphics.ResetClip();
 
 
-            // entities next
-            var entitySidesToDraw = GetEntitiesToDraw(overviewPositionValues, entityBrushSideListById);
+            // brush entities next
+            var entitySidesToDraw = GetBrushEntitiesToDraw(overviewPositionValues, entityBrushSideListById);
 
             // normal
             foreach (var entityToRender in entitySidesToDraw)
@@ -1472,44 +1472,9 @@ namespace JERC
         }
 
 
-        private static List<ObjectToDraw> GetEntitiesToDraw(OverviewPositionValues overviewPositionValues, Dictionary<int, List<EntityBrushSide>> entityBrushSideListById)
-        {
-            var entitiesToDraw = new List<ObjectToDraw>();
-
-            foreach (var entityBrushSideByBrush in entityBrushSideListById.Values)
-            {
-                foreach (var entityBrushSide in entityBrushSideByBrush)
-                {
-                    var verticesOffsetsToUse = new List<VerticesToDraw>();
-
-                    foreach (var vertices in entityBrushSide.vertices)
-                    {
-                        // corrects the verts by taking into account the movement from space in world to the space in the image (which starts at (0,0))
-                        var verticesOffset = GetCorrectedVerticesPositionInWorld(vertices);
-
-                        Color colour = entityBrushSide.entityType switch
-                        {
-                            EntityTypes.Buyzone => Colours.ColourBuyzones(),
-                            EntityTypes.Bombsite => Colours.ColourBombsites(),
-                            EntityTypes.RescueZone => Colours.ColourRescueZones(),
-                        };
-
-                        verticesOffsetsToUse.Add(new VerticesToDraw(new Point((int)verticesOffset.x, (int)verticesOffset.y), (int)verticesOffset.z, colour));
-                    }
-
-                    verticesOffsetsToUse = verticesOffsetsToUse.Distinct().ToList(); // TODO: doesn't seem to work
-
-                    entitiesToDraw.Add(new ObjectToDraw(verticesOffsetsToUse, (int)verticesOffsetsToUse.Select(x => x.zAxis).Average(x => x), entityBrushSide.entityType));
-                }
-            }
-
-            return entitiesToDraw;
-        }
-
-
         private static List<ObjectToDraw> GetBrushEntitiesToDraw(OverviewPositionValues overviewPositionValues, Dictionary<int, List<EntityBrushSide>> brushEntityBrushSideListById)
         {
-            var entitiesToDraw = new List<ObjectToDraw>();
+            var brushEntitiesToDraw = new List<ObjectToDraw>();
 
             foreach (var brushEntityBrushSideByBrush in brushEntityBrushSideListById.Values)
             {
@@ -1522,16 +1487,31 @@ namespace JERC
                         // corrects the verts by taking into account the movement from space in world to the space in the image (which starts at (0,0))
                         var verticesOffset = GetCorrectedVerticesPositionInWorld(vertices);
 
-                        verticesOffsetsToUse.Add(new VerticesToDraw(new Point((int)verticesOffset.x, (int)verticesOffset.y), (int)verticesOffset.z, brushEntityBrushSide.colour));
+                        Color colour = brushEntityBrushSide.entityType switch
+                        {
+                            EntityTypes.Buyzone => Colours.ColourBuyzones(),
+                            EntityTypes.Bombsite => Colours.ColourBombsites(),
+                            EntityTypes.RescueZone => Colours.ColourRescueZones(),
+                            EntityTypes.JercBox => brushEntityBrushSide.colour,
+                        };
+
+                        verticesOffsetsToUse.Add(new VerticesToDraw(new Point((int)verticesOffset.x, (int)verticesOffset.y), (int)verticesOffset.z, colour));
                     }
 
                     verticesOffsetsToUse = verticesOffsetsToUse.Distinct().ToList(); // TODO: doesn't seem to work
 
-                    entitiesToDraw.Add(new ObjectToDraw(verticesOffsetsToUse, (int)verticesOffsetsToUse.Select(x => x.zAxis).Average(x => x), brushEntityBrushSide.entityType, brushEntityBrushSide.colour, brushEntityBrushSide.colourStroke, brushEntityBrushSide.strokeWidth));
+                    if (brushEntityBrushSide.entityType == EntityTypes.JercBox)
+                    {
+                        brushEntitiesToDraw.Add(new ObjectToDraw(verticesOffsetsToUse, (int)verticesOffsetsToUse.Select(x => x.zAxis).Average(x => x), brushEntityBrushSide.entityType, brushEntityBrushSide.colour, brushEntityBrushSide.colourStroke, brushEntityBrushSide.strokeWidth));
+                    }
+                    else
+                    {
+                        brushEntitiesToDraw.Add(new ObjectToDraw(verticesOffsetsToUse, (int)verticesOffsetsToUse.Select(x => x.zAxis).Average(x => x), brushEntityBrushSide.entityType));
+                    }
                 }
             }
 
-            return entitiesToDraw;
+            return brushEntitiesToDraw;
         }
 
 
