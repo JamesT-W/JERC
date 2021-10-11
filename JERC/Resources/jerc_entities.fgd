@@ -156,9 +156,9 @@
 [
     "JERC"
     [
-        "JERC_config"
-        "JERC_divider"
-        "JERC_floor"
-        "JERC_ceiling"
+        "jerc_config"
+        "jerc_divider"
+        "jerc_floor"
+        "jerc_ceiling"
     ]
 ]
