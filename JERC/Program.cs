@@ -1,4 +1,4 @@
-using ImageAlterer;
+﻿using ImageAlterer;
 using JERC.Constants;
 using JERC.Enums;
 using JERC.Models;
@@ -17,6 +17,7 @@ namespace JERC
     class Program
     {
         private static readonly bool debugging = false;
+        private static readonly string debuggingJercPath = @"F:\Coding Stuff\GitHub Files\JERC\";
 
         private static readonly ImageProcessorExtender imageProcessorExtender = new ImageProcessorExtender();
 
@@ -47,13 +48,13 @@ namespace JERC
 
             if (!debugging && (gameConfigurationValues == null || !gameConfigurationValues.VerifyAllValuesSet() || !gameConfigurationValues.VerifyAllDirectoriesAndFilesExist()))
             {
-                Console.WriteLine("Game configuration files missing. Check the compile configuration's parameters.");
+                Logger.LogError("Game configuration files missing. Check the compile configuration's parameters.");
                 return;
             }
 
             if (!debugging && (gameConfigurationValues.binFolderPath.Split(@"\").Reverse().Skip(1).FirstOrDefault() != "bin" || gameConfigurationValues.binFolderPath.Replace("/", @"\").Replace(@"\\", @"\").Contains(@"\csgo\bin")))
             {
-                Console.WriteLine(@"JERC's folder should be placed in ...\Counter-Strike Global Offensive\bin");
+                Logger.LogError(@"JERC's folder should be placed in ...\Counter-Strike Global Offensive\bin");
                 return;
             }
 
@@ -63,8 +64,11 @@ namespace JERC
 
             if (debugging)
             {
-                backgroundImagesDirectory = @"F:\Coding Stuff\GitHub Files\JERC\JERC\Resources\materials\jerc\backgrounds\";
-                outputFilepathPrefix = string.Concat(@"F:\Coding Stuff\GitHub Files\JERC\", mapName);
+                Logger.LogDebugInfo("Setting backgroundImagesDirectory to empty string");
+                Logger.LogDebugInfo("Setting outputFilepathPrefix to empty string");
+
+                backgroundImagesDirectory = string.Concat(debuggingJercPath, @"JERC\Resources\materials\jerc\backgrounds\");
+                outputFilepathPrefix = string.Concat(debuggingJercPath, mapName);
             }
             else
             {
@@ -78,9 +82,12 @@ namespace JERC
 
             if (vmf == null)
             {
-                Console.WriteLine("Error parsing vmf, aborting.");
+                Logger.LogError("Error parsing VMF, aborting");
                 return;
             }
+
+            Logger.LogNewLine();
+            Logger.LogMessage("VMF parsed sucessfully");
 
             SortInstances(vmf);
 
@@ -91,26 +98,39 @@ namespace JERC
 
             if (vmfRequiredData == null)
             {
-                Console.WriteLine("No jerc_config entity found, aborting.");
+                Logger.LogError("No jerc_config entity found, aborting");
                 return;
             }
 
             if (debugging)
             {
+                Logger.LogDebugInfo("Setting alternateOutputPath to empty string");
+
                 jercConfigValues.alternateOutputPath = string.Empty;
             }
+
+            Logger.LogNewLine();
 
             SortScaleStuff();
 
             if (overviewPositionValues == null)
             {
-                Console.WriteLine("---- No brushes or displacements found, exiting. ----");
+                Logger.LogError("No brushes or displacements found, exiting");
                 return;
             }
 
             var levelHeights = GetLevelHeights();
 
+            if (levelHeights == null || !levelHeights.Any())
+                Logger.LogImportantWarning("Number of level heights found: 0");
+            else
+                Logger.LogMessage(string.Concat("Number of level heights found: ", levelHeights.Count()));
+
+            Logger.LogNewLine();
+
             GenerateRadars(levelHeights);
+
+            Logger.LogNewLine();
 
             if (jercConfigValues.exportTxt)
                 GenerateTxt(levelHeights);
@@ -120,6 +140,8 @@ namespace JERC
         private static void SortInstances(VMF vmf)
         {
             var instanceEntities = vmf.Body.Where(x => x.Name == "entity").Where(x => x.Body.Any(y => y.Name == "classname" && y.Value == "func_instance")).ToList();
+
+            Logger.LogMessage(string.Concat(instanceEntities.Count(), " instance", instanceEntities.Count() == 1 ? string.Empty : "s", " found"));
 
             // create FuncInstances from the entity key values
             var funcInstances = new List<FuncInstance>();
@@ -167,6 +189,8 @@ namespace JERC
 
                 instanceEntityIdsByVmf.Add(newVmf, instance.id);
             }
+
+            Logger.LogMessage(string.Concat(instanceEntityIdsByVmf.Count(), " instance", instanceEntityIdsByVmf.Count() == 1 ? string.Empty : "s", " successfully parsed."));
         }
 
 
@@ -298,6 +322,9 @@ namespace JERC
 
         private static VmfRequiredData GetVmfRequiredData()
         {
+            Logger.LogNewLine();
+            Logger.LogMessage("Getting required data from the vmf and instances");
+
             // main vmf contents
             var allWorldBrushes = vmf.World.Body.Where(x => x.Name == "solid");
             var allEntities = vmf.Body.Where(x => x.Name == "entity");
@@ -424,6 +451,9 @@ namespace JERC
             var allJercEntities = jercConfigEntities.Concat(jercDividerEntities).Concat(jercFloorEntities).Concat(jercCeilingEntities);
 
             jercConfigValues = new JercConfigValues(GetSettingsValuesFromJercEntities(allJercEntities), jercDividerEntities.Count());
+
+            Logger.LogMessage("Retrieved data from the vmf and instances");
+            Logger.LogNewLine();
 
             return new VmfRequiredData(
                 brushesRemove, brushesPath, brushesCover, brushesOverlap, brushesDoor, brushesLadder,
@@ -658,6 +688,8 @@ namespace JERC
 
         private static void GenerateRadars(List<LevelHeight> levelHeights)
         {
+            Logger.LogMessage("Generating radars");
+
             var radarLevels = new List<RadarLevel>();
 
             // get overview for each separate level if levelBackgroundEnabled == true
@@ -736,11 +768,15 @@ namespace JERC
                 DisposeGraphics(radarLevel.graphics);
                 DisposeImage(radarLevel.bmp);
             }
+
+            Logger.LogMessage("Generating radars complete");
         }
 
 
         private static RadarLevel GenerateRadarLevel(LevelHeight levelHeight)
         {
+            Logger.LogMessage(string.Concat("Generating radar level ", levelHeight.levelNum));
+
             Bitmap bmp = new Bitmap(overviewPositionValues.outputResolution, overviewPositionValues.outputResolution);
 
             var graphics = Graphics.FromImage(bmp);
@@ -961,6 +997,8 @@ namespace JERC
 
             graphics.Save();
 
+            Logger.LogMessage(string.Concat("Generating radar level ", levelHeight.levelNum, " complete"));
+
             return new RadarLevel(bmp, levelHeight);
         }
 
@@ -1082,7 +1120,10 @@ namespace JERC
             var backgroundImageFilepath = string.Concat(backgroundImagesDirectory, jercConfigValues.backgroundFilename, ".bmp");
 
             if (!File.Exists(backgroundImageFilepath))
+            {
+                Logger.LogImportantWarning("Background image does not exist");
                 return radarLevel.bmp;
+            }
 
             Bitmap newBmp = new Bitmap(radarLevel.bmp);
             Graphics newGraphics = Graphics.FromImage(newBmp);
@@ -1733,14 +1774,14 @@ namespace JERC
 
                 if (retries < maxRetries)
                 {
-                    Console.WriteLine(string.Concat("File has been locked ", retries, " time(s). Waiting ", waitTimeSeconds, " seconds before trying again. Filepath: ", filepath));
+                    Logger.LogWarning(string.Concat("File has been locked ", retries, " time(s). Waiting ", waitTimeSeconds, " seconds before trying again. Filepath: ", filepath));
 
                     Thread.Sleep(waitTimeSeconds * 1000);
                     continue;
                 }
             }
 
-            Console.WriteLine("SKIPPING! File has been locked ", maxRetries, " times. Filepath: ", filepath);
+            Logger.LogImportantWarning(string.Concat("SKIPPING! File has been locked ", maxRetries, " times. Filepath: ", filepath));
 
             return false;
         }
@@ -1763,6 +1804,8 @@ namespace JERC
 
         private static void GenerateTxt(List<LevelHeight> levelHeights)
         {
+            Logger.LogMessage("Generating txt");
+
             var overviewTxt = GetOverviewTxt(overviewPositionValues);
 
             var lines = overviewTxt.GetInExportableFormat(jercConfigValues, levelHeights, mapName);
@@ -1778,6 +1821,8 @@ namespace JERC
                 var outputTxtFilepath = string.Concat(jercConfigValues.alternateOutputPath, mapName, ".txt");
                 SaveOutputTxtFile(outputTxtFilepath, lines);
             }
+
+            Logger.LogMessage("Generating txt complete");
         }
 
 

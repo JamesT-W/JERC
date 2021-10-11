@@ -1,4 +1,5 @@
-﻿using System;
+﻿using JERC.Constants;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -47,11 +48,18 @@ namespace JERC.Models
                 }
             }
 
-            Console.WriteLine("csgo Directory: " + csgoFolderPath);
-            Console.WriteLine("bin Directory: " + binFolderPath);
-            Console.WriteLine("overviews Directory: " + overviewsFolderPath);
-            Console.WriteLine("vmf Filepath: " + vmfFilepath);
-            Console.WriteLine("vmf Directory: " + vmfFilepathDirectory);
+            Logger.LogMessage("---- Game Configuration Values ----");
+            Logger.LogMessageKey("csgo Directory: ");
+            Logger.LogMessage(csgoFolderPath);
+            Logger.LogMessageKey("bin Directory: ");
+            Logger.LogMessage(binFolderPath);
+            Logger.LogMessageKey("overviews Directory: ");
+            Logger.LogMessage(overviewsFolderPath);
+            Logger.LogMessageKey("vmf Filepath: ");
+            Logger.LogMessage(vmfFilepath);
+            Logger.LogMessageKey("vmf Directory: ");
+            Logger.LogMessage(vmfFilepathDirectory);
+            Logger.LogNewLine();
         }
 
 
