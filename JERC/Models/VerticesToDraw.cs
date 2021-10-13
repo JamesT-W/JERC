@@ -9,14 +9,12 @@ namespace JERC.Models
 {
     public class VerticesToDraw
     {
-        public Point vertices;
-        public int zAxis;
+        public Vertices vertices;
         public Color colour;
 
-        public VerticesToDraw(Point vertices, int zAxis, Color colour)
+        public VerticesToDraw(Vertices vertices, Color colour)
         {
             this.vertices = vertices;
-            this.zAxis = zAxis;
             this.colour = colour;
         }
     }

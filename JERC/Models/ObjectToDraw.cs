@@ -19,26 +19,26 @@ namespace JERC.Models
         public int? strokeWidth; // brush entities only
 
 
-        public ObjectToDraw(List<VerticesToDraw> verticesToDraw, int zAxisAverage, JercTypes jercType)
+        public ObjectToDraw(List<VerticesToDraw> verticesToDraw, JercTypes jercType)
         {
             this.verticesToDraw = verticesToDraw;
-            this.zAxisAverage = zAxisAverage;
+            zAxisAverage = (int)verticesToDraw.Select(x => x.vertices.z).Average();
             this.jercType = jercType;
         }
 
 
-        public ObjectToDraw(List<VerticesToDraw> verticesToDraw, int zAxisAverage, EntityTypes entityType)
+        public ObjectToDraw(List<VerticesToDraw> verticesToDraw, EntityTypes entityType)
         {
             this.verticesToDraw = verticesToDraw;
-            this.zAxisAverage = zAxisAverage;
+            zAxisAverage = (int)verticesToDraw.Select(x => x.vertices.z).Average();
             this.entityType = entityType;
         }
 
 
-        public ObjectToDraw(List<VerticesToDraw> verticesToDraw, int zAxisAverage, EntityTypes entityType, Color colour, Color colourStroke, int strokeWidth)
+        public ObjectToDraw(List<VerticesToDraw> verticesToDraw, EntityTypes entityType, Color colour, Color colourStroke, int strokeWidth)
         {
             this.verticesToDraw = verticesToDraw;
-            this.zAxisAverage = zAxisAverage;
+            zAxisAverage = (int)verticesToDraw.Select(x => x.vertices.z).Average();
             this.entityType = entityType;
             this.colour = colour;
             this.colourStroke = colourStroke;
@@ -52,10 +52,9 @@ namespace JERC.Models
 
             foreach (var verticesToDraw in objectToDraw.verticesToDraw)
             {
-                verticesToDrawNew.Add(new VerticesToDraw(verticesToDraw.vertices, verticesToDraw.zAxis, verticesToDraw.colour));
+                verticesToDrawNew.Add(new VerticesToDraw(new Vertices(verticesToDraw.vertices.x, verticesToDraw.vertices.y, (float)verticesToDraw.vertices.z), verticesToDraw.colour));
             }
 
-            var zAxisAverageNew = objectToDraw.zAxisAverage;
             var jercTypeNew = objectToDraw.jercType;
             var entityTypeNew = objectToDraw.entityType;
             var colourNew = objectToDraw.colour;
@@ -63,12 +62,12 @@ namespace JERC.Models
             var strokeWidthNew = objectToDraw.strokeWidth;
 
             if (jercTypeNew != null)
-                return new ObjectToDraw(verticesToDrawNew, zAxisAverageNew, (JercTypes)jercTypeNew);
+                return new ObjectToDraw(verticesToDrawNew, (JercTypes)jercTypeNew);
             else if (entityTypeNew != null)
                 if (colourNew == null || colourStrokeNew == null || strokeWidthNew == null)
-                    return new ObjectToDraw(verticesToDrawNew, zAxisAverageNew, (EntityTypes)entityTypeNew);
+                    return new ObjectToDraw(verticesToDrawNew, (EntityTypes)entityTypeNew);
                 else
-                    return new ObjectToDraw(verticesToDrawNew, zAxisAverageNew, (EntityTypes)entityTypeNew, (Color)colourNew, (Color)colourStrokeNew, (int)strokeWidthNew);
+                    return new ObjectToDraw(verticesToDrawNew, (EntityTypes)entityTypeNew, (Color)colourNew, (Color)colourStrokeNew, (int)strokeWidthNew);
             else
                 return null;
         }

@@ -279,7 +279,7 @@ namespace JERC
             var newVertices = new Vertices(
                 (int)(cosTheta * (verticesToRotate.x - centerVertices.x) - sinTheta * (verticesToRotate.y - centerVertices.y) + centerVertices.x),
                 (int)(sinTheta * (verticesToRotate.x - centerVertices.x) + cosTheta * (verticesToRotate.y - centerVertices.y) + centerVertices.y),
-                verticesToRotate.z
+                (float)verticesToRotate.z
             );
 
             return newVertices.x + " " + newVertices.y + " " + newVertices.z;
@@ -476,6 +476,7 @@ namespace JERC
             // jerc_config
             var jercConfig = jercEntities.FirstOrDefault(x => x.Body.Any(y => y.Name == "classname" && y.Value == Classnames.JercConfig)).Body;
 
+            jercEntitySettingsValues.Add("outputRawMasks", jercConfig.FirstOrDefault(x => x.Name == "outputRawMasks")?.Value);
             jercEntitySettingsValues.Add("alternateOutputPath", jercConfig.FirstOrDefault(x => x.Name == "alternateOutputPath")?.Value ?? string.Empty);
             jercEntitySettingsValues.Add("onlyOutputToAlternatePath", jercConfig.FirstOrDefault(x => x.Name == "onlyOutputToAlternatePath")?.Value);
             jercEntitySettingsValues.Add("exportRadarAsSeparateLevels", jercConfig.FirstOrDefault(x => x.Name == "exportRadarAsSeparateLevels")?.Value);
@@ -667,19 +668,19 @@ namespace JERC
                 var zMaxForTxt = i == (numOfOverviewLevels - 1) ? (Sizes.MaxHammerGridSize / 2) : new Vertices(jercDividerEntities.ElementAt(i).origin).z;
 
                 var zMinForRadar = i == 0 ? vmfRequiredData.GetLowestVerticesZ() : levelHeights.ElementAt(i - 1).zMaxForRadar;
-                var zMaxForRadar = i == (numOfOverviewLevels - 1) ? vmfRequiredData.GetHighestVerticesZ() : new Vertices(jercDividerEntities.ElementAt(i).origin).z;
+                var zMaxForRadar = i == (numOfOverviewLevels - 1) ? vmfRequiredData.GetHighestVerticesZ() : (float)(new Vertices(jercDividerEntities.ElementAt(i).origin).z);
 
                 var jercFloorEntitiesInsideLevel = jercConfigValues.exportRadarAsSeparateLevels && jercConfigValues.useSeparateGradientEachLevel
                     ? vmfRequiredData.jercFloorEntities.Where(x => new Vertices(x.origin).z >= zMinForRadar && new Vertices(x.origin).z < zMaxForRadar).ToList()
                     : vmfRequiredData.jercFloorEntities;
-                var zMinForGradient = jercFloorEntitiesInsideLevel.Any() ? jercFloorEntitiesInsideLevel.OrderBy(x => new Vertices(x.origin).z).Select(x => new Vertices(x.origin).z).FirstOrDefault() : zMinForRadar; // takes the lowest (first) in the level if there are more than one
+                var zMinForGradient = jercFloorEntitiesInsideLevel.Any() ? jercFloorEntitiesInsideLevel.OrderBy(x => new Vertices(x.origin).z).Select(x => (float)(new Vertices(x.origin).z)).FirstOrDefault() : zMinForRadar; // takes the lowest (first) in the level if there are more than one
 
                 var jercCeilingEntitiesInsideLevel = jercConfigValues.exportRadarAsSeparateLevels && jercConfigValues.useSeparateGradientEachLevel
                     ? vmfRequiredData.jercCeilingEntities.Where(x => new Vertices(x.origin).z >= zMinForRadar && new Vertices(x.origin).z < zMaxForRadar).ToList()
                     : vmfRequiredData.jercCeilingEntities;
-                var zMaxForGradient = jercCeilingEntitiesInsideLevel.Any() ? jercCeilingEntitiesInsideLevel.OrderBy(x => new Vertices(x.origin).z).Select(x => new Vertices(x.origin).z).LastOrDefault() : zMaxForRadar; // takes the highest (last) in the level if there are more than one
+                var zMaxForGradient = jercCeilingEntitiesInsideLevel.Any() ? jercCeilingEntitiesInsideLevel.OrderBy(x => new Vertices(x.origin).z).Select(x => (float)(new Vertices(x.origin).z)).LastOrDefault() : zMaxForRadar; // takes the highest (last) in the level if there are more than one
 
-                levelHeights.Add(new LevelHeight(levelHeights.Count(), overviewLevelName, zMinForTxt, zMaxForTxt, zMinForRadar, zMaxForRadar, zMinForGradient, zMaxForGradient));
+                levelHeights.Add(new LevelHeight(levelHeights.Count(), overviewLevelName, zMinForTxt, (float)zMaxForTxt, zMinForRadar, zMaxForRadar, zMinForGradient, zMaxForGradient));
             }
 
             return levelHeights;
@@ -728,7 +729,7 @@ namespace JERC
 
                 foreach (var radarLevel in radarLevels)
                 {
-                    Bitmap newBmp = new Bitmap(radarLevels.FirstOrDefault().bmp);
+                    Bitmap newBmp = new Bitmap(radarLevels.FirstOrDefault().bmpRadar);
                     Graphics newGraphics = Graphics.FromImage(newBmp);
 
                     // apply blurred background levels to new image
@@ -736,10 +737,10 @@ namespace JERC
                     newGraphics.DrawImage(backgroundBmp, 0, 0);
                     newGraphics.Save();
                     newGraphics.CompositingMode = CompositingMode.SourceOver;
-                    newGraphics.DrawImage(radarLevel.bmp, 0, 0);
+                    newGraphics.DrawImage(radarLevel.bmpRadar, 0, 0);
                     newGraphics.Save();
 
-                    radarLevelsToSaveList.Add(new RadarLevel(newBmp, radarLevel.levelHeight));
+                    radarLevelsToSaveList.Add(new RadarLevel(newBmp, radarLevel.levelHeight, radarLevel.bmpRawMasksByName));
 
                     // dispose
                     DisposeGraphics(newGraphics);
@@ -757,16 +758,30 @@ namespace JERC
             // save overview levels
             foreach (var radarLevel in radarLevelsToSaveList)
             {
-                FlipImage(radarLevel.bmp);
+                FlipImage(radarLevel.bmpRadar);
 
                 SaveRadarLevel(radarLevel);
+            }
+
+            // save overview levels raw masks
+            if (jercConfigValues.outputRawMasks)
+            {
+                foreach (var radarLevel in radarLevelsToSaveList)
+                {
+                    foreach (var bmpRawMask in radarLevel.bmpRawMasksByName)
+                    {
+                        FlipImage(bmpRawMask.Value);
+
+                        SaveRadarLevelRawMask(radarLevel, bmpRawMask.Value, bmpRawMask.Key);
+                    }
+                }
             }
 
             // dispose
             foreach (var radarLevel in radarLevels.Concat(radarLevelsToSaveList))
             {
-                DisposeGraphics(radarLevel.graphics);
-                DisposeImage(radarLevel.bmp);
+                DisposeGraphics(radarLevel.graphicsRadar);
+                DisposeImage(radarLevel.bmpRadar);
             }
 
             Logger.LogMessage("Generating radars complete");
@@ -778,8 +793,9 @@ namespace JERC
             Logger.LogMessage(string.Concat("Generating radar level ", levelHeight.levelNum));
 
             Bitmap bmp = new Bitmap(overviewPositionValues.outputResolution, overviewPositionValues.outputResolution);
-
             var graphics = Graphics.FromImage(bmp);
+
+            var bmpRawMaskByNameDictionary = GetNewBmpRawMaskByNameDictionary();
 
             var boundingBox = new BoundingBox(
                 overviewPositionValues.brushVerticesPosMinX, overviewPositionValues.brushVerticesPosMaxX,
@@ -897,19 +913,20 @@ namespace JERC
                 DrawFilledPolygonGradient(graphics, brushToRender, false);
             }
 
-            // brush entity stuff (in game)
+            // brush entity texture stuff (in game)
+            var allObjectiveAndBuyzoneBrushes = brushesToDrawBuyzone.Concat(displacementsToDrawBuyzone)
+                .Concat(brushesToDrawBombsiteA).Concat(displacementsToDrawBombsiteA)
+                .Concat(brushesToDrawBombsiteB).Concat(displacementsToDrawBombsiteB)
+                .Concat(brushesToDrawRescueZone).Concat(displacementsToDrawRescueZone);
+
+            // stroke
             if (jercConfigValues.strokeAroundBrushEntities)
             {
-                foreach (var brushToRender in brushesToDrawBuyzone.Concat(displacementsToDrawBuyzone)
-                    .Concat(brushesToDrawBombsiteA).Concat(displacementsToDrawBombsiteA)
-                    .Concat(brushesToDrawBombsiteB).Concat(displacementsToDrawBombsiteB)
-                    .Concat(brushesToDrawRescueZone).Concat(displacementsToDrawRescueZone)
-                    .OrderBy(x => x.zAxisAverage))
+                foreach (var brushToRender in allObjectiveAndBuyzoneBrushes.OrderBy(x => x.zAxisAverage))
                 {
                     Color colourStroke = brushToRender.jercType switch
                     {
                         JercTypes.Buyzone => Colours.ColourBuyzonesStroke(),
-                        JercTypes.Bombsite => Colours.ColourBombsitesStroke(),
                         JercTypes.BombsiteA => Colours.ColourBombsitesStroke(),
                         JercTypes.BombsiteB => Colours.ColourBombsitesStroke(),
                         JercTypes.RescueZone => Colours.ColourRescueZonesStroke()
@@ -919,28 +936,58 @@ namespace JERC
                 }
             }
 
-            // brush entity stuff (in game)
-            foreach (var brushToRender in brushesToDrawBuyzone.Concat(displacementsToDrawBuyzone)
-                .Concat(brushesToDrawBombsiteA).Concat(displacementsToDrawBombsiteA)
-                .Concat(brushesToDrawBombsiteB).Concat(displacementsToDrawBombsiteB)
-                .Concat(brushesToDrawRescueZone).Concat(displacementsToDrawRescueZone)
-                .OrderBy(x => x.zAxisAverage))
+            // normal
+            foreach (var brushToRender in allObjectiveAndBuyzoneBrushes.OrderBy(x => x.zAxisAverage))
             {
                 DrawFilledPolygonGradient(graphics, brushToRender, false);
             }
+
+            // raw masks
+            if (jercConfigValues.outputRawMasks)
+            {
+                var brushEntitySides = allObjectiveAndBuyzoneBrushes.OrderBy(x => x.zAxisAverage).Where(x => new List<JercTypes>() { JercTypes.Buyzone, JercTypes.BombsiteA, JercTypes.BombsiteB, JercTypes.RescueZone }.Any(y => y == x.jercType));
+
+                using (Graphics graphicsRawMask = Graphics.FromImage(bmpRawMaskByNameDictionary["buyzones_and_objectives"]))
+                {
+                    foreach (var brushEntitySide in brushEntitySides)
+                    {
+                        DrawFilledPolygonGradient(graphicsRawMask, brushEntitySide, true, levelHeight);
+                    }
+
+                    graphicsRawMask.Save();
+                }
+            }
+
 
 
             // reset the clip so that entity brushes can render anywhere
             ////graphics.ResetClip();
 
 
+
             // brush entities next
             var entitySidesToDraw = GetBrushEntitiesToDraw(overviewPositionValues, entityBrushSideListById);
 
             // normal
-            foreach (var entityToRender in entitySidesToDraw)
+            foreach (var entitySideToRender in entitySidesToDraw)
             {
-                DrawFilledPolygonGradient(graphics, entityToRender, true);
+                DrawFilledPolygonGradient(graphics, entitySideToRender, true);
+            }
+
+            // raw masks
+            if (jercConfigValues.outputRawMasks)
+            {
+                var entitySides = entitySidesToDraw.Where(x => x.entityType != EntityTypes.None);
+
+                using (Graphics graphicsRawMask = Graphics.FromImage(bmpRawMaskByNameDictionary["buyzones_and_objectives"]))
+                {
+                    foreach (var entitySide in entitySides)
+                    {
+                        DrawFilledPolygonGradient(graphicsRawMask, entitySide, true, levelHeight);
+                    }
+
+                    graphicsRawMask.Save();
+                }
             }
 
             // stroke
@@ -972,9 +1019,9 @@ namespace JERC
             var brushEntitySidesToDraw = GetBrushEntitiesToDraw(overviewPositionValues, brushEntityBrushSideListById);
 
             // normal
-            foreach (var brushEntityToRender in brushEntitySidesToDraw)
+            foreach (var brushEntitySideToRender in brushEntitySidesToDraw)
             {
-                DrawFilledPolygonGradient(graphics, brushEntityToRender, true);
+                DrawFilledPolygonGradient(graphics, brushEntitySideToRender, true);
             }
 
             // stroke
@@ -999,7 +1046,19 @@ namespace JERC
 
             Logger.LogMessage(string.Concat("Generating radar level ", levelHeight.levelNum, " complete"));
 
-            return new RadarLevel(bmp, levelHeight);
+            return new RadarLevel(bmp, levelHeight, bmpRawMaskByNameDictionary);
+        }
+
+
+        private static Dictionary<string, Bitmap> GetNewBmpRawMaskByNameDictionary()
+        {
+            return new Dictionary<string, Bitmap>()
+            {
+                { "path", new Bitmap(overviewPositionValues.outputResolution, overviewPositionValues.outputResolution) },
+                { "cover", new Bitmap(overviewPositionValues.outputResolution, overviewPositionValues.outputResolution) },
+                { "overlap", new Bitmap(overviewPositionValues.outputResolution, overviewPositionValues.outputResolution) },
+                { "buyzones_and_objectives", new Bitmap(overviewPositionValues.outputResolution, overviewPositionValues.outputResolution) },
+            };
         }
 
 
@@ -1009,7 +1068,7 @@ namespace JERC
             var strokePen = new Pen(colourStroke);
             strokePen.Width *= strokeWidthOverride == null ? jercConfigValues.strokeWidth : (int)strokeWidthOverride;
 
-            DrawFilledPolygonObjectBrushes(graphics, strokeSolidBrush, strokePen, objectToDraw.verticesToDraw.Select(x => x.vertices).ToArray());
+            DrawFilledPolygonObjectBrushes(graphics, strokeSolidBrush, strokePen, objectToDraw.verticesToDraw.Select(x => new Point((int)x.vertices.x, (int)x.vertices.y)).ToArray());
 
             // dispose
             strokeSolidBrush?.Dispose();
@@ -1019,9 +1078,9 @@ namespace JERC
 
         private static Bitmap GetBackgroundToRadarLevels(List<RadarLevel> radarLevels)
         {
-            var allGraphics = radarLevels.Select(x => x.graphics);
+            var allGraphics = radarLevels.Select(x => x.graphicsRadar);
 
-            Bitmap backgroundBmp = new Bitmap(radarLevels.FirstOrDefault().bmp);
+            Bitmap backgroundBmp = new Bitmap(radarLevels.FirstOrDefault().bmpRadar);
             Graphics backgroundGraphics = Graphics.FromImage(backgroundBmp);
             backgroundGraphics.ResetClip();
             backgroundGraphics.Clear(Color.Transparent);
@@ -1031,7 +1090,7 @@ namespace JERC
             {
                 //radarLevel.graphics.ResetClip();
                 backgroundGraphics.CompositingMode = CompositingMode.SourceOver;
-                backgroundGraphics.DrawImage(radarLevel.bmp, 0, 0);
+                backgroundGraphics.DrawImage(radarLevel.bmpRadar, 0, 0);
             }
 
             // get transparent pixels
@@ -1091,27 +1150,53 @@ namespace JERC
 
         private static void SaveRadarLevel(RadarLevel radarLevel)
         {
-            radarLevel.bmp = new Bitmap(radarLevel.bmp, Sizes.FinalOutputImageResolution, Sizes.FinalOutputImageResolution);
+            radarLevel.bmpRadar = new Bitmap(radarLevel.bmpRadar, Sizes.FinalOutputImageResolution, Sizes.FinalOutputImageResolution);
 
             if (!string.IsNullOrWhiteSpace(jercConfigValues.backgroundFilename))
-                radarLevel.bmp = AddBackgroundImage(radarLevel);
+                radarLevel.bmpRadar = AddBackgroundImage(radarLevel);
 
-            var radarLevelString = radarLevel.levelHeight.levelName.ToLower() == "default" ? string.Empty : string.Concat("_", radarLevel.levelHeight.levelName.ToLower());
+            var radarLevelString = GetRadarLevelString(radarLevel);
 
             if (jercConfigValues.exportDds || jercConfigValues.exportPng)
             {
                 if (!jercConfigValues.onlyOutputToAlternatePath)
                 {
                     var outputImageFilepath = string.Concat(outputFilepathPrefix, radarLevelString, "_radar");
-                    SaveImage(outputImageFilepath, radarLevel.bmp);
+                    SaveImage(outputImageFilepath, radarLevel.bmpRadar);
                 }
 
                 if (!string.IsNullOrWhiteSpace(jercConfigValues.alternateOutputPath) && Directory.Exists(jercConfigValues.alternateOutputPath))
                 {
                     var outputImageFilepath = string.Concat(jercConfigValues.alternateOutputPath, mapName, radarLevelString, "_radar");
-                    SaveImage(outputImageFilepath, radarLevel.bmp);
+                    SaveImage(outputImageFilepath, radarLevel.bmpRadar);
                 }
             }
+        }
+
+
+        private static void SaveRadarLevelRawMask(RadarLevel radarLevel, Bitmap bmpRawMask, string rawMaskType)
+        {
+            bmpRawMask = new Bitmap(bmpRawMask, Sizes.FinalOutputImageResolution, Sizes.FinalOutputImageResolution);
+
+            var radarLevelString = GetRadarLevelString(radarLevel);
+
+            if (!jercConfigValues.onlyOutputToAlternatePath)
+            {
+                var outputImageFilepath = string.Concat(outputFilepathPrefix, radarLevelString, "_", rawMaskType, "_radar_mask");
+                SaveImage(outputImageFilepath, bmpRawMask, true);
+            }
+
+            if (!string.IsNullOrWhiteSpace(jercConfigValues.alternateOutputPath) && Directory.Exists(jercConfigValues.alternateOutputPath))
+            {
+                var outputImageFilepath = string.Concat(jercConfigValues.alternateOutputPath, mapName, radarLevelString, "_", rawMaskType, "_radar_mask");
+                SaveImage(outputImageFilepath, bmpRawMask, true);
+            }
+        }
+
+
+        private static string GetRadarLevelString(RadarLevel radarLevel)
+        {
+            return radarLevel.levelHeight.levelName.ToLower() == "default" ? string.Empty : string.Concat("_", radarLevel.levelHeight.levelName.ToLower());
         }
 
 
@@ -1122,10 +1207,10 @@ namespace JERC
             if (!File.Exists(backgroundImageFilepath))
             {
                 Logger.LogImportantWarning("Background image does not exist");
-                return radarLevel.bmp;
+                return radarLevel.bmpRadar;
             }
 
-            Bitmap newBmp = new Bitmap(radarLevel.bmp);
+            Bitmap newBmp = new Bitmap(radarLevel.bmpRadar);
             Graphics newGraphics = Graphics.FromImage(newBmp);
 
             Bitmap backgroundBmp = new Bitmap(backgroundImageFilepath);
@@ -1136,15 +1221,15 @@ namespace JERC
             newGraphics.DrawImage(backgroundBmp, 0, 0);
             newGraphics.Save();
             newGraphics.CompositingMode = CompositingMode.SourceOver;
-            newGraphics.DrawImage(radarLevel.bmp, 0, 0);
+            newGraphics.DrawImage(radarLevel.bmpRadar, 0, 0);
             newGraphics.Save();
 
             // dispose
             DisposeGraphics(backgroundGraphics);
             DisposeImage(backgroundBmp);
 
-            DisposeGraphics(radarLevel.graphics);
-            DisposeImage(radarLevel.bmp);
+            DisposeGraphics(radarLevel.graphicsRadar);
+            DisposeImage(radarLevel.bmpRadar);
 
             return newBmp;
         }
@@ -1273,7 +1358,7 @@ namespace JERC
                     var brushSideNew = new BrushSide();
                     foreach (var vertices in brushSide.vertices_plus.ToList())
                     {
-                        brushSideNew.vertices.Add(new Vertices(vertices.x / Sizes.SizeReductionMultiplier, vertices.y / Sizes.SizeReductionMultiplier, vertices.z));
+                        brushSideNew.vertices.Add(new Vertices(vertices.x / Sizes.SizeReductionMultiplier, vertices.y / Sizes.SizeReductionMultiplier, (float)vertices.z));
                         brushSideNew.jercType = jercType;
                     }
 
@@ -1300,7 +1385,7 @@ namespace JERC
                 {
                     var vert = side.vertices_plus[i];
 
-                    brushSide.vertices.Add(new Vertices(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier, vert.z));
+                    brushSide.vertices.Add(new Vertices(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier, (float)vert.z));
                     brushSide.jercType = jercType;
                 }
 
@@ -1324,7 +1409,7 @@ namespace JERC
                     {
                         var vert = side.vertices_plus[i];
 
-                        entityBrushSide.vertices.Add(new Vertices(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier, vert.z));
+                        entityBrushSide.vertices.Add(new Vertices(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier, (float)vert.z));
                     }
 
                     entityBrushSide.entityType = entityType;
@@ -1362,7 +1447,7 @@ namespace JERC
                     {
                         var vert = side.vertices_plus[i];
 
-                        entityBrushSide.vertices.Add(new Vertices(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier, vert.z));
+                        entityBrushSide.vertices.Add(new Vertices(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier, (float)vert.z));
                     }
 
                     if (entityBrushSideListById.ContainsKey(entitySides.Key))
@@ -1502,7 +1587,6 @@ namespace JERC
                         JercTypes.Door => jercConfigValues.doorColour,
                         JercTypes.Ladder => jercConfigValues.ladderColour,
                         JercTypes.Buyzone => Colours.ColourBuyzones(),
-                        JercTypes.Bombsite => Colours.ColourBombsites(),
                         JercTypes.BombsiteA => Colours.ColourBombsites(),
                         JercTypes.BombsiteB => Colours.ColourBombsites(),
                         JercTypes.RescueZone => Colours.ColourRescueZones()
@@ -1510,10 +1594,10 @@ namespace JERC
 
                     verticesOffsetsToUse = verticesOffsetsToUse.Distinct().ToList(); // TODO: doesn't seem to work
 
-                    verticesOffsetsToUse.Add(new VerticesToDraw(new Point((int)verticesOffset.x, (int)verticesOffset.y), (int)verticesOffset.z, colour));
+                    verticesOffsetsToUse.Add(new VerticesToDraw(new Vertices((int)verticesOffset.x, (int)verticesOffset.y, (int)verticesOffset.z), colour));
                 }
 
-                brushesToDraw.Add(new ObjectToDraw(verticesOffsetsToUse, (int)verticesOffsetsToUse.Select(x => x.zAxis).Average(x => x), brushSide.jercType));
+                brushesToDraw.Add(new ObjectToDraw(verticesOffsetsToUse, brushSide.jercType));
             }
 
             return brushesToDraw;
@@ -1560,18 +1644,18 @@ namespace JERC
                             EntityTypes.JercBox => brushEntityBrushSide.rendercolor,
                         };
 
-                        verticesOffsetsToUse.Add(new VerticesToDraw(new Point((int)verticesOffset.x, (int)verticesOffset.y), (int)verticesOffset.z, colour));
+                        verticesOffsetsToUse.Add(new VerticesToDraw(new Vertices((int)verticesOffset.x, (int)verticesOffset.y, (int)verticesOffset.z), colour));
                     }
 
                     verticesOffsetsToUse = verticesOffsetsToUse.Distinct().ToList(); // TODO: doesn't seem to work
 
                     if (brushEntityBrushSide.entityType == EntityTypes.JercBox)
                     {
-                        brushEntitiesToDraw.Add(new ObjectToDraw(verticesOffsetsToUse, (int)verticesOffsetsToUse.Select(x => x.zAxis).Average(x => x), brushEntityBrushSide.entityType, brushEntityBrushSide.rendercolor, brushEntityBrushSide.colourStroke, brushEntityBrushSide.strokeWidth));
+                        brushEntitiesToDraw.Add(new ObjectToDraw(verticesOffsetsToUse, brushEntityBrushSide.entityType, brushEntityBrushSide.rendercolor, brushEntityBrushSide.colourStroke, brushEntityBrushSide.strokeWidth));
                     }
                     else
                     {
-                        brushEntitiesToDraw.Add(new ObjectToDraw(verticesOffsetsToUse, (int)verticesOffsetsToUse.Select(x => x.zAxis).Average(x => x), brushEntityBrushSide.entityType));
+                        brushEntitiesToDraw.Add(new ObjectToDraw(verticesOffsetsToUse, brushEntityBrushSide.entityType));
                     }
                 }
             }
@@ -1592,7 +1676,7 @@ namespace JERC
         }
 
 
-        private static void DrawFilledPolygonGradient(Graphics graphics, ObjectToDraw objectToDraw, bool drawAroundEdge)
+        private static void DrawFilledPolygonGradient(Graphics graphics, ObjectToDraw objectToDraw, bool drawAroundEdge, LevelHeight levelHeightOverride = null)
         {
             // Make the points for a polygon.
             var vertices = objectToDraw.verticesToDraw.Select(x => x.vertices).ToList();
@@ -1605,40 +1689,102 @@ namespace JERC
                 return;
 
             // check there are more than 1 value on each axis
-            if (vertices.Select(x => x.X).Distinct().Count() < 2 || vertices.Select(x => x.Y).Distinct().Count() < 2)
+            if (vertices.Select(x => x.x).Distinct().Count() < 2 || vertices.Select(x => x.y).Distinct().Count() < 2)
                 return;
 
             // draw polygon
-            var verticesArray = vertices.ToArray();
+            var verticesArray = vertices.Select(x => new Point((int)x.x, (int)x.y)).ToArray();
 
             using (PathGradientBrush pathBrush = new PathGradientBrush(verticesArray))
             {
-                var colours = new List<Color>();
-                for (int i = 0; i < verticesArray.Length; i++)
+                var colourUsing = Color.White;
+
+                if (levelHeightOverride == null) // being drawn for the normal radar levels
                 {
-                    colours.Add(objectToDraw.verticesToDraw[i].colour);
-                }
+                    var colours = new List<Color>();
+                    for (int i = 0; i < verticesArray.Length; i++)
+                    {
+                        colours.Add(objectToDraw.verticesToDraw[i].colour);
+                    }
 
-                // get average colour for center
-                int averageColourA = 0, averageColourR = 0, averageColourG = 0, averageColourB = 0;
-                foreach (var colour in colours)
+                    // get average colour for center
+                    int averageColourA = 0, averageColourR = 0, averageColourG = 0, averageColourB = 0;
+                    foreach (var colour in colours)
+                    {
+                        averageColourA += colour.A;
+                        averageColourR += colour.R;
+                        averageColourG += colour.G;
+                        averageColourB += colour.B;
+                    }
+
+                    averageColourA /= colours.Count();
+                    averageColourR /= colours.Count();
+                    averageColourG /= colours.Count();
+                    averageColourB /= colours.Count();
+
+                    var averageColour = Color.FromArgb(averageColourA, averageColourR, averageColourG, averageColourB);
+
+                    colourUsing = averageColour;
+                    pathBrush.SurroundColors = colours.ToArray();
+                }
+                else if ((objectToDraw.entityType != null && objectToDraw.entityType != EntityTypes.None) || (objectToDraw.jercType != null && objectToDraw.jercType != JercTypes.None)) // being drawn for the raw masks
                 {
-                    averageColourA += colour.A;
-                    averageColourR += colour.R;
-                    averageColourG += colour.G;
-                    averageColourB += colour.B;
+                    if (objectToDraw.entityType != null && objectToDraw.entityType != EntityTypes.None) // being drawn for the raw masks
+                    {
+                        switch (objectToDraw.entityType)
+                        {
+                            case EntityTypes.Buyzone:
+                                colourUsing = Colours.ColourBuyzonesStroke();
+                                break;
+                            case EntityTypes.Bombsite:
+                                colourUsing = Colours.ColourBombsitesStroke();
+                                break;
+                            case EntityTypes.RescueZone:
+                                colourUsing = Colours.ColourRescueZonesStroke();
+                                break;
+                            case EntityTypes.JercBox:
+                            default:
+                                colourUsing = Colours.ColourError;
+                                break;
+                        }
+                    }
+                    else // being drawn for the raw masks
+                    {
+                        switch (objectToDraw.jercType)
+                        {
+                            case JercTypes.Buyzone:
+                                colourUsing = Colours.ColourBuyzonesStroke();
+                                break;
+                            case JercTypes.BombsiteA:
+                            case JercTypes.BombsiteB:
+                                colourUsing = Colours.ColourBombsitesStroke();
+                                break;
+                            case JercTypes.RescueZone:
+                                colourUsing = Colours.ColourRescueZonesStroke();
+                                break;
+                            default:
+                                colourUsing = Colours.ColourError;
+                                break;
+                        }
+                    }
+
+                    var colours = new List<Color>();
+                    for (int i = 0; i < verticesArray.Length; i++)
+                    {
+                        colours.Add(colourUsing);
+                    }
+
+                    pathBrush.SurroundColors = colours.ToArray();
                 }
-
-                averageColourA /= colours.Count();
-                averageColourR /= colours.Count();
-                averageColourG /= colours.Count();
-                averageColourB /= colours.Count();
-
-                var averageColour = Color.FromArgb(averageColourA, averageColourR, averageColourG, averageColourB);
+                else
+                {
+                    var heightAboveMin = vertices.Min(x => x.z) - levelHeightOverride.zMinForTxt;
+                    var percentageAboveMin = (float)((Math.Ceiling(Convert.ToDouble(heightAboveMin)) / (levelHeightOverride.zMaxForRadar - levelHeightOverride.zMinForRadar)));
+                    colourUsing = Colours.GetGreyscaleGradient((int)percentageAboveMin * 255);
+                }
 
                 // Define the center and surround colors.
-                pathBrush.CenterColor = averageColour;
-                pathBrush.SurroundColors = colours.ToArray();
+                pathBrush.CenterColor = colourUsing;
 
                 // Fill the hexagon
                 graphics.FillPolygon(pathBrush, verticesArray);
@@ -1652,14 +1798,21 @@ namespace JERC
                         var verticesToDraw1 = verticesToDrawList[i];
                         var verticesToDraw2 = (i == verticesToDrawList.Count() - 1) ? verticesToDrawList[0] : verticesToDrawList[i + 1];
 
-                        if (verticesToDraw1.vertices == verticesToDraw2.vertices)
+                        if (verticesToDraw1.vertices == verticesToDraw2.vertices ||
+                            (verticesToDraw1.vertices.x == verticesToDraw2.vertices.x && verticesToDraw1.vertices.y == verticesToDraw2.vertices.y)
+                        )
+                        {
                             continue;
+                        }
 
-                        using (LinearGradientBrush linearBrush = new LinearGradientBrush(verticesToDraw1.vertices, verticesToDraw2.vertices, verticesToDraw1.colour, verticesToDraw2.colour))
+                        var pointToDraw1 = new Point((int)verticesToDraw1.vertices.x, (int)verticesToDraw1.vertices.y);
+                        var pointToDraw2 = new Point((int)verticesToDraw2.vertices.x, (int)verticesToDraw2.vertices.y);
+
+                        using (LinearGradientBrush linearBrush = new LinearGradientBrush(pointToDraw1, pointToDraw2, verticesToDraw1.colour, verticesToDraw2.colour))
                         {
                             Pen pen = new Pen(linearBrush);
 
-                            graphics.DrawLine(pen, verticesToDraw1.vertices, verticesToDraw2.vertices);
+                            graphics.DrawLine(pen, pointToDraw1, pointToDraw2);
 
                             pen?.Dispose();
                         }
@@ -1699,7 +1852,7 @@ namespace JERC
         }*/
 
 
-        private static void SaveImage(string filepath, Bitmap bmp)
+        private static void SaveImage(string filepath, Bitmap bmp, bool forcePngOnly = false)
         {
             var canSave = false;
 
@@ -1721,10 +1874,10 @@ namespace JERC
             // only create the image if the file is not locked
             if (canSave)
             {
-                if (jercConfigValues.exportDds)
+                if (jercConfigValues.exportDds && !forcePngOnly)
                     bmp.Save(filepath + ".dds");
 
-                if (jercConfigValues.exportPng)
+                if (jercConfigValues.exportPng || forcePngOnly)
                     bmp.Save(filepath + ".png", ImageFormat.Png);
             }
         }

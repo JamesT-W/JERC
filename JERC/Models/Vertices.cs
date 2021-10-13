@@ -10,7 +10,7 @@ namespace JERC.Models
     {
         public float x;
         public float y;
-        public float z;
+        public float? z;
 
         public Vertices(string vertices)
         {
@@ -21,7 +21,9 @@ namespace JERC.Models
 
             float.TryParse(verticesSplit[0], Globalization.Style, Globalization.Culture, out x);
             float.TryParse(verticesSplit[1], Globalization.Style, Globalization.Culture, out y);
-            float.TryParse(verticesSplit[2], Globalization.Style, Globalization.Culture, out z);
+            float.TryParse(verticesSplit[2], Globalization.Style, Globalization.Culture, out float zTemp);
+
+            z = zTemp;
         }
 
         public Vertices(float x, float y, float z)
@@ -40,7 +42,7 @@ namespace JERC.Models
 
         public bool Equals(Vertices other)
         {
-            if (x == other.x && y == other.y && z == other.z)
+            if (x == other.x && y == other.y && (z == null || z == other.z))
                 return true;
 
             return false;

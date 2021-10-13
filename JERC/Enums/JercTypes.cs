@@ -17,12 +17,11 @@ namespace JERC.Enums
         Ladder = 64,
         Ignore = 128,
         Buyzone = 256,
-        Bombsite = 512,
-        BombsiteA = 1024,
-        BombsiteB = 2048,
-        RescueZone = 4096,
-        Hostage = 8192,
-        TSpawn = 16384,
-        CTSpawn = 32768
+        BombsiteA = 512,
+        BombsiteB = 1024,
+        RescueZone = 2048,
+        Hostage = 4096,
+        TSpawn = 8192,
+        CTSpawn = 16384
     }
 }

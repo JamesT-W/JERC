@@ -295,7 +295,7 @@ namespace JERC.Models
         {
             var allDisplayedBrushSides = GetAllDisplayedBrushSides();
 
-            return allDisplayedBrushSides.SelectMany(x => x.vertices_plus.Select(x => x.z)).Min();
+            return allDisplayedBrushSides.SelectMany(x => x.vertices_plus.Where(y => y.z != null).Select(y => (float)y.z)).Min();
         }
 
 
@@ -303,7 +303,7 @@ namespace JERC.Models
         {
             var allDisplayedBrushSides = GetAllDisplayedBrushSides();
 
-            return allDisplayedBrushSides.SelectMany(x => x.vertices_plus.Select(x => x.z)).Max();
+            return allDisplayedBrushSides.SelectMany(x => x.vertices_plus.Where(y => y.z != null).Select(y => (float)y.z)).Max();
         }
 
 

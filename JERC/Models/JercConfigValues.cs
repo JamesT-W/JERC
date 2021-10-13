@@ -10,6 +10,7 @@ namespace JERC.Models
 {
     public class JercConfigValues
     {
+        public bool outputRawMasks;
         public string alternateOutputPath;
         public bool onlyOutputToAlternatePath;
         public bool exportRadarAsSeparateLevels;
@@ -46,6 +47,7 @@ namespace JERC.Models
         public JercConfigValues(Dictionary<string, string> jercEntitySettingsValues, int jercDividerCount)
         {
             // jerc_config
+            outputRawMasks = jercEntitySettingsValues.ContainsKey("outputRawMasks") && jercEntitySettingsValues["outputRawMasks"] == "1";
 
             alternateOutputPath = string.IsNullOrWhiteSpace(jercEntitySettingsValues["alternateOutputPath"]) ? null : jercEntitySettingsValues["alternateOutputPath"];
             if (!string.IsNullOrWhiteSpace(alternateOutputPath) && (alternateOutputPath.LastOrDefault() != '\\' || alternateOutputPath.LastOrDefault() != '/'))

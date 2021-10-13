@@ -12,6 +12,8 @@ namespace JERC.Constants
     {
         public static Color ColourError => Color.DarkRed;
 
+        public static Color GetGreyscaleGradient(int value) => Color.FromArgb(255, ClampGradientValue(value), ClampGradientValue(value), ClampGradientValue(value));
+
         public static Color ColourRemove() => Color.Transparent;
         public static Color ColourBrush(Color rgbLow, Color rgbHigh, float percentageAboveMin, int? alphaOverride = null) =>
             Color.FromArgb(alphaOverride == null ? 255 : (int)alphaOverride,
