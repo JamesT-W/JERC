@@ -964,7 +964,19 @@ namespace JERC
                         JercTypes.Buyzone => Colours.ColourBuyzonesStroke(),
                         JercTypes.BombsiteA => Colours.ColourBombsitesStroke(),
                         JercTypes.BombsiteB => Colours.ColourBombsitesStroke(),
-                        JercTypes.RescueZone => Colours.ColourRescueZonesStroke()
+                        JercTypes.RescueZone => Colours.ColourRescueZonesStroke(),
+                        JercTypes.None => throw new NotImplementedException(),
+                        JercTypes.Remove => throw new NotImplementedException(),
+                        JercTypes.Path => throw new NotImplementedException(),
+                        JercTypes.Cover => throw new NotImplementedException(),
+                        JercTypes.Overlap => throw new NotImplementedException(),
+                        JercTypes.Door => throw new NotImplementedException(),
+                        JercTypes.Ladder => throw new NotImplementedException(),
+                        JercTypes.Ignore => throw new NotImplementedException(),
+                        JercTypes.Hostage => throw new NotImplementedException(),
+                        JercTypes.TSpawn => throw new NotImplementedException(),
+                        JercTypes.CTSpawn => throw new NotImplementedException(),
+                        _ => throw new NotImplementedException()
                     };
 
                     DrawStroke(graphics, brushToRender, Colours.ColourBrushesStroke(colourStroke));
@@ -1624,7 +1636,14 @@ namespace JERC
                         JercTypes.Buyzone => Colours.ColourBuyzones(),
                         JercTypes.BombsiteA => Colours.ColourBombsites(),
                         JercTypes.BombsiteB => Colours.ColourBombsites(),
-                        JercTypes.RescueZone => Colours.ColourRescueZones()
+                        JercTypes.RescueZone => Colours.ColourRescueZones(),
+                        JercTypes.None => throw new NotImplementedException(),
+                        JercTypes.Remove => throw new NotImplementedException(),
+                        JercTypes.Ignore => throw new NotImplementedException(),
+                        JercTypes.Hostage => throw new NotImplementedException(),
+                        JercTypes.TSpawn => throw new NotImplementedException(),
+                        JercTypes.CTSpawn => throw new NotImplementedException(),
+                        _ => throw new NotImplementedException()
                     };
 
                     verticesOffsetsToUse = verticesOffsetsToUse.Distinct().ToList(); // TODO: doesn't seem to work
@@ -1677,6 +1696,8 @@ namespace JERC
                             EntityTypes.Bombsite => Colours.ColourBombsites(),
                             EntityTypes.RescueZone => Colours.ColourRescueZones(),
                             EntityTypes.JercBox => brushEntityBrushSide.rendercolor,
+                            EntityTypes.None => throw new NotImplementedException(),
+                            _ => throw new NotImplementedException(),
                         };
 
                         verticesOffsetsToUse.Add(new VerticesToDraw(new Vertices((int)verticesOffset.x, (int)verticesOffset.y, (int)verticesOffset.z), colour));
