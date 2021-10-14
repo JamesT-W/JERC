@@ -1229,13 +1229,13 @@ namespace JERC
 
             if (!jercConfigValues.onlyOutputToAlternatePath)
             {
-                var outputImageFilepath = string.Concat(outputFilepathPrefix, radarLevelString, "_", rawMaskType, "_radar_mask");
+                var outputImageFilepath = string.Concat(outputFilepathPrefix, radarLevelString, "_radar_", rawMaskType, "_mask");
                 SaveImage(outputImageFilepath, bmpRawMask, true);
             }
 
             if (!string.IsNullOrWhiteSpace(jercConfigValues.alternateOutputPath) && Directory.Exists(jercConfigValues.alternateOutputPath))
             {
-                var outputImageFilepath = string.Concat(jercConfigValues.alternateOutputPath, mapName, radarLevelString, "_", rawMaskType, "_radar_mask");
+                var outputImageFilepath = string.Concat(jercConfigValues.alternateOutputPath, mapName, radarLevelString, "_radar_", rawMaskType, "_mask");
                 SaveImage(outputImageFilepath, bmpRawMask, true);
             }
         }
