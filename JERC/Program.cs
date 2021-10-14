@@ -476,7 +476,6 @@ namespace JERC
             // jerc_config
             var jercConfig = jercEntities.FirstOrDefault(x => x.Body.Any(y => y.Name == "classname" && y.Value == Classnames.JercConfig)).Body;
 
-            jercEntitySettingsValues.Add("outputRawMasks", jercConfig.FirstOrDefault(x => x.Name == "outputRawMasks")?.Value);
             jercEntitySettingsValues.Add("alternateOutputPath", jercConfig.FirstOrDefault(x => x.Name == "alternateOutputPath")?.Value ?? string.Empty);
             jercEntitySettingsValues.Add("onlyOutputToAlternatePath", jercConfig.FirstOrDefault(x => x.Name == "onlyOutputToAlternatePath")?.Value);
             jercEntitySettingsValues.Add("exportRadarAsSeparateLevels", jercConfig.FirstOrDefault(x => x.Name == "exportRadarAsSeparateLevels")?.Value);
@@ -507,6 +506,7 @@ namespace JERC
             jercEntitySettingsValues.Add("exportTxt", jercConfig.FirstOrDefault(x => x.Name == "exportTxt")?.Value);
             jercEntitySettingsValues.Add("exportDds", jercConfig.FirstOrDefault(x => x.Name == "exportDds")?.Value);
             jercEntitySettingsValues.Add("exportPng", jercConfig.FirstOrDefault(x => x.Name == "exportPng")?.Value);
+            jercEntitySettingsValues.Add("exportRawMasks", jercConfig.FirstOrDefault(x => x.Name == "exportRawMasks")?.Value);
             jercEntitySettingsValues.Add("exportBackgroundLevelsImage", jercConfig.FirstOrDefault(x => x.Name == "exportBackgroundLevelsImage")?.Value);
 
 
@@ -764,7 +764,7 @@ namespace JERC
             }
 
             // save overview levels raw masks
-            if (jercConfigValues.outputRawMasks)
+            if (jercConfigValues.exportRawMasks)
             {
                 foreach (var radarLevel in radarLevelsToSaveList)
                 {
@@ -912,7 +912,7 @@ namespace JERC
             }
 
             // raw masks
-            if (jercConfigValues.outputRawMasks)
+            if (jercConfigValues.exportRawMasks)
             {
                 // path
                 using (Graphics graphicsRawMask = Graphics.FromImage(bmpRawMaskByNameDictionary["path"]))
@@ -978,7 +978,7 @@ namespace JERC
             }
 
             // raw masks
-            if (jercConfigValues.outputRawMasks)
+            if (jercConfigValues.exportRawMasks)
             {
                 var brushEntitySides = allObjectiveAndBuyzoneBrushes.OrderBy(x => x.zAxisAverage).Where(x => new List<JercTypes>() { JercTypes.Buyzone, JercTypes.BombsiteA, JercTypes.BombsiteB, JercTypes.RescueZone }.Any(y => y == x.jercType));
 
@@ -1010,7 +1010,7 @@ namespace JERC
             }
 
             // raw masks
-            if (jercConfigValues.outputRawMasks)
+            if (jercConfigValues.exportRawMasks)
             {
                 var entitySides = entitySidesToDraw.Where(x => x.entityType != EntityTypes.None);
 

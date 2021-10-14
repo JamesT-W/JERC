@@ -10,7 +10,6 @@ namespace JERC.Models
 {
     public class JercConfigValues
     {
-        public bool outputRawMasks;
         public string alternateOutputPath;
         public bool onlyOutputToAlternatePath;
         public bool exportRadarAsSeparateLevels;
@@ -41,14 +40,13 @@ namespace JERC.Models
         public bool exportTxt;
         public bool exportDds;
         public bool exportPng;
+        public bool exportRawMasks;
         public bool exportBackgroundLevelsImage;
 
 
         public JercConfigValues(Dictionary<string, string> jercEntitySettingsValues, int jercDividerCount)
         {
             // jerc_config
-            outputRawMasks = jercEntitySettingsValues.ContainsKey("outputRawMasks") && jercEntitySettingsValues["outputRawMasks"] == "1";
-
             alternateOutputPath = string.IsNullOrWhiteSpace(jercEntitySettingsValues["alternateOutputPath"]) ? null : jercEntitySettingsValues["alternateOutputPath"];
             if (!string.IsNullOrWhiteSpace(alternateOutputPath) && (alternateOutputPath.LastOrDefault() != '\\' || alternateOutputPath.LastOrDefault() != '/'))
                 alternateOutputPath += '/';
@@ -94,6 +92,7 @@ namespace JERC.Models
             exportTxt = jercEntitySettingsValues.ContainsKey("exportTxt") && jercEntitySettingsValues["exportTxt"] == "1";
             exportDds = jercEntitySettingsValues.ContainsKey("exportDds") && jercEntitySettingsValues["exportDds"] == "1";
             exportPng = jercEntitySettingsValues.ContainsKey("exportPng") && jercEntitySettingsValues["exportPng"] == "1";
+            exportRawMasks = jercEntitySettingsValues.ContainsKey("exportRawMasks") && jercEntitySettingsValues["exportRawMasks"] == "1";
             exportBackgroundLevelsImage = jercEntitySettingsValues.ContainsKey("exportBackgroundLevelsImage") && jercEntitySettingsValues["exportBackgroundLevelsImage"] == "1";
 
 
