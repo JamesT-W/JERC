@@ -880,37 +880,72 @@ namespace JERC
             AddRemoveRegion(bmp, graphics, brushRemoveList);
             AddRemoveRegion(bmp, graphics, displacementRemoveList);
 
+
+            // brush stuff
+            var pathsOrdered = brushesToDrawPath.Concat(displacementsToDrawPath).OrderBy(x => x.zAxisAverage);
+            var overlapsOrdered = brushesToDrawOverlap.Concat(displacementsToDrawOverlap).OrderBy(x => x.zAxisAverage);
+            var coversOrdered = brushesToDrawCover.Concat(displacementsToDrawCover).OrderBy(x => x.zAxisAverage);
+            var doorsOrdered = brushesToDrawDoor.Concat(displacementsToDrawDoor).OrderBy(x => x.zAxisAverage);
+            var laddersOrdered = brushesToDrawLadder.Concat(displacementsToDrawLadder).OrderBy(x => x.zAxisAverage);
+
+            var coversAndOverlapsOrdered = overlapsOrdered.Concat(coversOrdered).OrderBy(x => x.zAxisAverage);
+
             // path and overlap brush stuff (for stroke)
             if (jercConfigValues.strokeAroundLayoutMaterials)
             {
-                foreach (var brushToRender in brushesToDrawPath.Concat(displacementsToDrawPath).Concat(brushesToDrawOverlap).Concat(displacementsToDrawOverlap).OrderBy(x => x.zAxisAverage))
+                foreach (var brushToRender in pathsOrdered.Concat(overlapsOrdered).OrderBy(x => x.zAxisAverage))
                 {
                     DrawStroke(graphics, brushToRender, Colours.ColourBrushesStroke(jercConfigValues.strokeColour));
                 }
             }
 
             // path brush stuff
-            foreach (var brushToRender in brushesToDrawPath.Concat(displacementsToDrawPath).OrderBy(x => x.zAxisAverage))
+            foreach (var brushToRender in pathsOrdered)
             {
                 DrawFilledPolygonGradient(graphics, brushToRender, true);
             }
 
-            // cover and overlap brush stuff
-            foreach (var brushToRender in brushesToDrawOverlap.Concat(displacementsToDrawOverlap).Concat(brushesToDrawCover).Concat(displacementsToDrawCover).OrderBy(x => x.zAxisAverage))
+            // cover and overlap, door, ladder brush stuff
+            foreach (var brushToRender in coversAndOverlapsOrdered.Concat(doorsOrdered).Concat(laddersOrdered))
             {
                 DrawFilledPolygonGradient(graphics, brushToRender, false);
             }
 
-            // door stuff
-            foreach (var brushToRender in brushesToDrawDoor.Concat(displacementsToDrawDoor).OrderBy(x => x.zAxisAverage))
+            // raw masks
+            if (jercConfigValues.outputRawMasks)
             {
-                DrawFilledPolygonGradient(graphics, brushToRender, false);
-            }
+                // path
+                using (Graphics graphicsRawMask = Graphics.FromImage(bmpRawMaskByNameDictionary["path"]))
+                {
+                    foreach (var brushEntitySide in pathsOrdered)
+                    {
+                        DrawFilledPolygonGradient(graphicsRawMask, brushEntitySide, false, levelHeight);
+                    }
 
-            // ladder stuff
-            foreach (var brushToRender in brushesToDrawLadder.Concat(displacementsToDrawLadder).OrderBy(x => x.zAxisAverage))
-            {
-                DrawFilledPolygonGradient(graphics, brushToRender, false);
+                    graphicsRawMask.Save();
+                }
+
+                // overlap
+                using (Graphics graphicsRawMask = Graphics.FromImage(bmpRawMaskByNameDictionary["overlap"]))
+                {
+                    foreach (var brushEntitySide in overlapsOrdered)
+                    {
+                        DrawFilledPolygonGradient(graphicsRawMask, brushEntitySide, false, levelHeight);
+                    }
+
+                    graphicsRawMask.Save();
+                }
+
+                // cover
+                using (Graphics graphicsRawMask = Graphics.FromImage(bmpRawMaskByNameDictionary["cover"]))
+                {
+                    foreach (var brushEntitySide in coversOrdered)
+                    {
+                        DrawFilledPolygonGradient(graphicsRawMask, brushEntitySide, false, levelHeight);
+                    }
+
+                    graphicsRawMask.Save();
+                }
             }
 
             // brush entity texture stuff (in game)
@@ -951,7 +986,7 @@ namespace JERC
                 {
                     foreach (var brushEntitySide in brushEntitySides)
                     {
-                        DrawFilledPolygonGradient(graphicsRawMask, brushEntitySide, true, levelHeight);
+                        DrawFilledPolygonGradient(graphicsRawMask, brushEntitySide, false, levelHeight);
                     }
 
                     graphicsRawMask.Save();
@@ -983,7 +1018,7 @@ namespace JERC
                 {
                     foreach (var entitySide in entitySides)
                     {
-                        DrawFilledPolygonGradient(graphicsRawMask, entitySide, true, levelHeight);
+                        DrawFilledPolygonGradient(graphicsRawMask, entitySide, false, levelHeight);
                     }
 
                     graphicsRawMask.Save();
@@ -1727,60 +1762,95 @@ namespace JERC
                     colourUsing = averageColour;
                     pathBrush.SurroundColors = colours.ToArray();
                 }
-                else if ((objectToDraw.entityType != null && objectToDraw.entityType != EntityTypes.None) || (objectToDraw.jercType != null && objectToDraw.jercType != JercTypes.None)) // being drawn for the raw masks
-                {
-                    if (objectToDraw.entityType != null && objectToDraw.entityType != EntityTypes.None) // being drawn for the raw masks
-                    {
-                        switch (objectToDraw.entityType)
-                        {
-                            case EntityTypes.Buyzone:
-                                colourUsing = Colours.ColourBuyzonesStroke();
-                                break;
-                            case EntityTypes.Bombsite:
-                                colourUsing = Colours.ColourBombsitesStroke();
-                                break;
-                            case EntityTypes.RescueZone:
-                                colourUsing = Colours.ColourRescueZonesStroke();
-                                break;
-                            case EntityTypes.JercBox:
-                            default:
-                                colourUsing = Colours.ColourError;
-                                break;
-                        }
-                    }
-                    else // being drawn for the raw masks
-                    {
-                        switch (objectToDraw.jercType)
-                        {
-                            case JercTypes.Buyzone:
-                                colourUsing = Colours.ColourBuyzonesStroke();
-                                break;
-                            case JercTypes.BombsiteA:
-                            case JercTypes.BombsiteB:
-                                colourUsing = Colours.ColourBombsitesStroke();
-                                break;
-                            case JercTypes.RescueZone:
-                                colourUsing = Colours.ColourRescueZonesStroke();
-                                break;
-                            default:
-                                colourUsing = Colours.ColourError;
-                                break;
-                        }
-                    }
-
-                    var colours = new List<Color>();
-                    for (int i = 0; i < verticesArray.Length; i++)
-                    {
-                        colours.Add(colourUsing);
-                    }
-
-                    pathBrush.SurroundColors = colours.ToArray();
-                }
                 else
                 {
-                    var heightAboveMin = vertices.Min(x => x.z) - levelHeightOverride.zMinForTxt;
-                    var percentageAboveMin = (float)((Math.Ceiling(Convert.ToDouble(heightAboveMin)) / (levelHeightOverride.zMaxForRadar - levelHeightOverride.zMinForRadar)));
-                    colourUsing = Colours.GetGreyscaleGradient((int)percentageAboveMin * 255);
+                    if ((objectToDraw.entityType != null && objectToDraw.entityType != EntityTypes.None) || (objectToDraw.jercType != null && objectToDraw.jercType != JercTypes.None)) // being drawn for the raw masks
+                    {
+                        if (objectToDraw.entityType != null && objectToDraw.entityType != EntityTypes.None) // being drawn for the raw masks
+                        {
+                            switch (objectToDraw.entityType)
+                            {
+                                case EntityTypes.Buyzone:
+                                    colourUsing = Colours.ColourBuyzonesStroke();
+                                    break;
+                                case EntityTypes.Bombsite:
+                                    colourUsing = Colours.ColourBombsitesStroke();
+                                    break;
+                                case EntityTypes.RescueZone:
+                                    colourUsing = Colours.ColourRescueZonesStroke();
+                                    break;
+                                case EntityTypes.JercBox:
+                                default:
+                                    colourUsing = Colours.ColourError;
+                                    break;
+                            }
+                        }
+                        else // being drawn for the raw masks
+                        {
+                            switch (objectToDraw.jercType)
+                            {
+                                case JercTypes.Path:
+                                case JercTypes.Cover:
+                                case JercTypes.Overlap:
+                                    //var heightAboveMin = vertices.Min(x => x.z) - levelHeightOverride.zMinForRadarGradient;
+                                    var heightAboveMin = vertices.Average(x => x.z) - levelHeightOverride.zMinForRadarGradient;
+                                    var percentageAboveMin = (float)((Math.Ceiling(Convert.ToDouble(heightAboveMin)) / (levelHeightOverride.zMaxForRadarGradient - levelHeightOverride.zMinForRadarGradient)));
+                                    colourUsing = Colours.GetGreyscaleGradient(percentageAboveMin * 255);
+                                    break;
+                                case JercTypes.Buyzone:
+                                    colourUsing = Colours.ColourBuyzonesStroke();
+                                    break;
+                                case JercTypes.BombsiteA:
+                                case JercTypes.BombsiteB:
+                                    colourUsing = Colours.ColourBombsitesStroke();
+                                    break;
+                                case JercTypes.RescueZone:
+                                    colourUsing = Colours.ColourRescueZonesStroke();
+                                    break;
+                                default:
+                                    colourUsing = Colours.ColourError;
+                                    break;
+                            }
+                        }
+
+                        var colours = new List<Color>();
+                        for (int i = 0; i < verticesArray.Length; i++)
+                        {
+                            colours.Add(colourUsing);
+                        }
+
+                        pathBrush.SurroundColors = colours.ToArray();
+                    }
+                    else // is this ever called ?
+                    {
+                        var heightAboveMin = vertices.Min(x => x.z) - levelHeightOverride.zMinForRadarGradient;
+                        var percentageAboveMin = (float)((Math.Ceiling(Convert.ToDouble(heightAboveMin)) / (levelHeightOverride.zMaxForRadarGradient - levelHeightOverride.zMinForRadarGradient)));
+                        colourUsing = Colours.GetGreyscaleGradient(percentageAboveMin * 255);
+                    }
+
+                    // surrounding vertices colours
+                    if (objectToDraw.jercType != null && (objectToDraw.jercType == JercTypes.Path || objectToDraw.jercType == JercTypes.Cover || objectToDraw.jercType == JercTypes.Overlap))
+                    {
+                        var colours = new List<Color>();
+                        for (int i = 0; i < verticesArray.Length; i++)
+                        {
+                            var heightAboveMin = objectToDraw.verticesToDraw[i].vertices.z - levelHeightOverride.zMinForRadarGradient;
+                            var percentageAboveMin = (float)((Math.Ceiling(Convert.ToDouble(heightAboveMin)) / (levelHeightOverride.zMaxForRadarGradient - levelHeightOverride.zMinForRadarGradient)));
+                            colours.Add(Colours.GetGreyscaleGradient(percentageAboveMin * 255));
+                        }
+
+                        pathBrush.SurroundColors = colours.ToArray();
+                    }
+                    else
+                    {
+                        var colours = new List<Color>();
+                        for (int i = 0; i < verticesArray.Length; i++)
+                        {
+                            colours.Add(colourUsing);
+                        }
+
+                        pathBrush.SurroundColors = colours.ToArray();
+                    }
                 }
 
                 // Define the center and surround colors.
