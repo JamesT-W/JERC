@@ -43,6 +43,8 @@
 
 	ladderColour(color255) : "Ladder Colour" : "145 0 145" : "Colour of ladder world brushes"
 
+	dangerColour(color255) : "Danger Colour" : "127 0 0" : "Colour of danger world brushes"
+
 	strokeWidth(integer) : "Stroke Width (int)" : 10 : "Width of stroke to use"
 
 	strokeColour(color255) : "Stroke Colour" : "255 255 255" : "Colour of the stroke"

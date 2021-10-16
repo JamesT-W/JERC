@@ -18,6 +18,7 @@ namespace JERC.Constants
         public static readonly string FuncDoor = "func_door";
         public static readonly string FuncDoorRotating = "func_door_rotating";
         public static readonly string FuncLadder = "func_ladder";
+        public static readonly string TriggerHurt = "trigger_hurt";
 
         public static readonly string JercBox = "jerc_box";
 

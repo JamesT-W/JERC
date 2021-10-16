@@ -360,6 +360,7 @@ namespace JERC
             {
                 brushesLadder.AddRange(GetBrushesByTextureName(allWorldBrushesInVisgroup, ladderTextureName));
             }
+            var brushesDanger = GetBrushesByTextureName(allWorldBrushesInVisgroup, TextureNames.DangerTextureName);
 
             var brushesBuyzone = GetBrushesByTextureName(allWorldBrushesInVisgroup, TextureNames.BuyzoneTextureName);
             var brushesBombsiteA = GetBrushesByTextureName(allWorldBrushesInVisgroup, TextureNames.BombsiteATextureName);
@@ -380,6 +381,7 @@ namespace JERC
             {
                 displacementsLadder.AddRange(GetDisplacementsByTextureName(allWorldBrushesInVisgroup, ladderTextureName));
             }
+            var displacementsDanger = GetDisplacementsByTextureName(allWorldBrushesInVisgroup, TextureNames.DangerTextureName);
 
             var displacementsBuyzone = GetDisplacementsByTextureName(allWorldBrushesInVisgroup, TextureNames.BuyzoneTextureName);
             var displacementsBombsiteA = GetDisplacementsByTextureName(allWorldBrushesInVisgroup, TextureNames.BombsiteATextureName);
@@ -405,6 +407,7 @@ namespace JERC
             var funcDoorBrushEntities = GetEntitiesByClassname(allEntities, Classnames.FuncDoor, true);
             var funcDoorBrushRotatingEntities = GetEntitiesByClassname(allEntities, Classnames.FuncDoorRotating, true);
             var funcLadderBrushEntities = GetEntitiesByClassname(allEntities, Classnames.FuncLadder, true);
+            var triggerHurtBrushEntities = GetEntitiesByClassname(allEntities, Classnames.TriggerHurt, true);
 
             var allBrushesBrushEntities = buyzoneBrushEntities
                 .Concat(bombsiteBrushEntities)
@@ -413,27 +416,30 @@ namespace JERC
                 .Concat(funcDetailBrushEntities)
                 .Concat(funcDoorBrushEntities)
                 .Concat(funcDoorBrushRotatingEntities)
-                .Concat(funcLadderBrushEntities);
+                .Concat(funcLadderBrushEntities)
+                .Concat(triggerHurtBrushEntities);
 
-            var brushesRemoveBrushEntities = GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLadders(allBrushesBrushEntities, TextureNames.RemoveTextureName);
-            var brushesPathBrushEntities = GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLadders(allBrushesBrushEntities, TextureNames.PathTextureName);
-            var brushesCoverBrushEntities = GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLadders(allBrushesBrushEntities, TextureNames.CoverTextureName);
-            var brushesOverlapBrushEntities = GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLadders(allBrushesBrushEntities, TextureNames.OverlapTextureName);
-            var brushesDoorBrushEntities = GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLadders(allBrushesBrushEntities, TextureNames.DoorTextureName)
+            var brushesRemoveBrushEntities = GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLaddersAndDangers(allBrushesBrushEntities, TextureNames.RemoveTextureName);
+            var brushesPathBrushEntities = GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLaddersAndDangers(allBrushesBrushEntities, TextureNames.PathTextureName);
+            var brushesCoverBrushEntities = GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLaddersAndDangers(allBrushesBrushEntities, TextureNames.CoverTextureName);
+            var brushesOverlapBrushEntities = GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLaddersAndDangers(allBrushesBrushEntities, TextureNames.OverlapTextureName);
+            var brushesDoorBrushEntities = GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLaddersAndDangers(allBrushesBrushEntities, TextureNames.DoorTextureName)
                 .Concat(GetBrushEntityBrushesByClassname(allBrushesBrushEntities, Classnames.FuncDoor))
                 .Concat(GetBrushEntityBrushesByClassname(allBrushesBrushEntities, Classnames.FuncDoorRotating));
             var brushesLadderBrushEntities = GetBrushEntityBrushesByClassname(allBrushesBrushEntities, Classnames.FuncLadder).ToList();
             foreach (var ladderTextureName in TextureNames.LadderTextureNames)
             {
-                brushesLadderBrushEntities.AddRange(GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLadders(allBrushesBrushEntities, ladderTextureName));
+                brushesLadderBrushEntities.AddRange(GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLaddersAndDangers(allBrushesBrushEntities, ladderTextureName));
             }
-            var brushesBuyzoneBrushEntities = GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLadders(allBrushesBrushEntities, TextureNames.BuyzoneTextureName);
-            var brushesBombsiteABrushEntities = GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLadders(allBrushesBrushEntities, TextureNames.BombsiteATextureName);
-            var brushesBombsiteBBrushEntities = GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLadders(allBrushesBrushEntities, TextureNames.BombsiteBTextureName);
-            var brushesRescueZoneBrushEntities = GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLadders(allBrushesBrushEntities, TextureNames.RescueZoneTextureName);
-            var brushesHostageBrushEntities = GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLadders(allBrushesBrushEntities, TextureNames.HostageTextureName);
-            var brushesTSpawnBrushEntities = GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLadders(allBrushesBrushEntities, TextureNames.TSpawnTextureName);
-            var brushesCTSpawnBrushEntities = GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLadders(allBrushesBrushEntities, TextureNames.CTSpawnTextureName);
+            var brushesDangerBrushEntities = GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLaddersAndDangers(allBrushesBrushEntities, TextureNames.DangerTextureName)
+                .Concat(GetBrushEntityBrushesByClassname(allBrushesBrushEntities, Classnames.TriggerHurt));
+            var brushesBuyzoneBrushEntities = GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLaddersAndDangers(allBrushesBrushEntities, TextureNames.BuyzoneTextureName);
+            var brushesBombsiteABrushEntities = GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLaddersAndDangers(allBrushesBrushEntities, TextureNames.BombsiteATextureName);
+            var brushesBombsiteBBrushEntities = GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLaddersAndDangers(allBrushesBrushEntities, TextureNames.BombsiteBTextureName);
+            var brushesRescueZoneBrushEntities = GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLaddersAndDangers(allBrushesBrushEntities, TextureNames.RescueZoneTextureName);
+            var brushesHostageBrushEntities = GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLaddersAndDangers(allBrushesBrushEntities, TextureNames.HostageTextureName);
+            var brushesTSpawnBrushEntities = GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLaddersAndDangers(allBrushesBrushEntities, TextureNames.TSpawnTextureName);
+            var brushesCTSpawnBrushEntities = GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLaddersAndDangers(allBrushesBrushEntities, TextureNames.CTSpawnTextureName);
 
 
             // brush entities (JERC)
@@ -456,12 +462,12 @@ namespace JERC
             Logger.LogNewLine();
 
             return new VmfRequiredData(
-                brushesRemove, brushesPath, brushesCover, brushesOverlap, brushesDoor, brushesLadder,
+                brushesRemove, brushesPath, brushesCover, brushesOverlap, brushesDoor, brushesLadder, brushesDanger,
                 brushesBuyzone, brushesBombsiteA, brushesBombsiteB, brushesRescueZone, brushesHostage, brushesTSpawn, brushesCTSpawn,
-                displacementsRemove, displacementsPath, displacementsCover, displacementsOverlap, displacementsDoor, displacementsLadder,
+                displacementsRemove, displacementsPath, displacementsCover, displacementsOverlap, displacementsDoor, displacementsLadder, displacementsDanger,
                 displacementsBuyzone, displacementsBombsiteA, displacementsBombsiteB, displacementsRescueZone, displacementsHostage, displacementsTSpawn, displacementsCTSpawn,
                 buyzoneBrushEntities, bombsiteBrushEntities, rescueZoneBrushEntities, hostageEntities, ctSpawnEntities, tSpawnEntities,
-                brushesRemoveBrushEntities, brushesPathBrushEntities, brushesCoverBrushEntities, brushesOverlapBrushEntities, brushesDoorBrushEntities, brushesLadderBrushEntities,
+                brushesRemoveBrushEntities, brushesPathBrushEntities, brushesCoverBrushEntities, brushesOverlapBrushEntities, brushesDoorBrushEntities, brushesLadderBrushEntities, brushesDangerBrushEntities,
                 brushesBuyzoneBrushEntities, brushesBombsiteABrushEntities, brushesBombsiteBBrushEntities, brushesRescueZoneBrushEntities, brushesHostageBrushEntities, brushesTSpawnBrushEntities, brushesCTSpawnBrushEntities,
                 jercBoxBrushEntities,
                 jercConfigEntities, jercDividerEntities, jercFloorEntities, jercCeilingEntities
@@ -491,6 +497,7 @@ namespace JERC
             jercEntitySettingsValues.Add("coverColourLow", jercConfig.FirstOrDefault(x => x.Name == "coverColourLow")?.Value);
             jercEntitySettingsValues.Add("doorColour", jercConfig.FirstOrDefault(x => x.Name == "doorColour")?.Value);
             jercEntitySettingsValues.Add("ladderColour", jercConfig.FirstOrDefault(x => x.Name == "ladderColour")?.Value);
+            jercEntitySettingsValues.Add("dangerColour", jercConfig.FirstOrDefault(x => x.Name == "dangerColour")?.Value);
             jercEntitySettingsValues.Add("strokeWidth", jercConfig.FirstOrDefault(x => x.Name == "strokeWidth")?.Value);
             jercEntitySettingsValues.Add("strokeColour", jercConfig.FirstOrDefault(x => x.Name == "strokeColour")?.Value);
             jercEntitySettingsValues.Add("strokeAroundLayoutMaterials", jercConfig.FirstOrDefault(x => x.Name == "strokeAroundLayoutMaterials")?.Value);
@@ -544,12 +551,12 @@ namespace JERC
         }
 
 
-        private static IEnumerable<IVNode> GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLadders(IEnumerable<IVNode> allBrushEntities, string textureName)
+        private static IEnumerable<IVNode> GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLaddersAndDangers(IEnumerable<IVNode> allBrushEntities, string textureName)
         {
             return (from x in allBrushEntities
                     from y in x.Body
                     where y.Name == "classname"
-                    where y.Value.ToLower() != Classnames.FuncDoor && y.Value.ToLower() != Classnames.FuncDoorRotating && y.Value.ToLower() != Classnames.FuncLadder
+                    where y.Value.ToLower() != Classnames.FuncDoor && y.Value.ToLower() != Classnames.FuncDoorRotating && y.Value.ToLower() != Classnames.FuncLadder && y.Value.ToLower() != Classnames.TriggerHurt
                     from z in x.Body
                     where z.Name == "solid"
                     from a in z.Body
@@ -608,11 +615,13 @@ namespace JERC
                 .Concat(vmfRequiredData.brushesSidesOverlap)
                 .Concat(vmfRequiredData.brushesSidesDoor)
                 .Concat(vmfRequiredData.brushesSidesLadder)
+                .Concat(vmfRequiredData.brushesSidesDanger)
                 .Concat(vmfRequiredData.displacementsSidesPath)
                 .Concat(vmfRequiredData.displacementsSidesCover)
                 .Concat(vmfRequiredData.displacementsSidesOverlap)
                 .Concat(vmfRequiredData.displacementsSidesDoor)
-                .Concat(vmfRequiredData.displacementsSidesLadder);
+                .Concat(vmfRequiredData.displacementsSidesLadder)
+                .Concat(vmfRequiredData.displacementsSidesDanger);
             //var allWorldBrushes = vmfRequiredData.brushesSidesRemove.Concat(vmfRequiredData.displacementsSidesRemove).Concat(allWorldBrushesAndDisplacementsExceptRemove);
 
             if (allWorldBrushesAndDisplacementsExceptRemove == null || allWorldBrushesAndDisplacementsExceptRemove.Count() == 0)
@@ -822,6 +831,9 @@ namespace JERC
             var brushLadderList = GetBrushVolumeListWithinLevelHeight(levelHeight, vmfRequiredData.brushesLadder, JercTypes.Ladder);
             var displacementLadderList = GetBrushVolumeListWithinLevelHeight(levelHeight, vmfRequiredData.displacementsLadder, JercTypes.Ladder);
 
+            var brushDangerList = GetBrushVolumeListWithinLevelHeight(levelHeight, vmfRequiredData.brushesDanger, JercTypes.Danger);
+            var displacementDangerList = GetBrushVolumeListWithinLevelHeight(levelHeight, vmfRequiredData.displacementsDanger, JercTypes.Danger);
+
             var brushBuyzoneList = GetBrushVolumeListWithinLevelHeight(levelHeight, vmfRequiredData.brushesBuyzone, JercTypes.Buyzone);
             var displacementBuyzoneList = GetBrushVolumeListWithinLevelHeight(levelHeight, vmfRequiredData.displacementsBuyzone, JercTypes.Buyzone);
 
@@ -857,6 +869,9 @@ namespace JERC
             var brushesToDrawLadder = GetBrushesToDraw(boundingBox, brushLadderList.SelectMany(x => x.brushSides).ToList());
             var displacementsToDrawLadder = GetBrushesToDraw(boundingBox, displacementLadderList.SelectMany(x => x.brushSides).ToList());
 
+            var brushesToDrawDanger = GetBrushesToDraw(boundingBox, brushDangerList.SelectMany(x => x.brushSides).ToList());
+            var displacementsToDrawDanger = GetBrushesToDraw(boundingBox, displacementDangerList.SelectMany(x => x.brushSides).ToList());
+
             var brushesToDrawBuyzone = GetBrushesToDraw(boundingBox, brushBuyzoneList.SelectMany(x => x.brushSides).ToList());
             var displacementsToDrawBuyzone = GetBrushesToDraw(boundingBox, displacementBuyzoneList.SelectMany(x => x.brushSides).ToList());
 
@@ -887,6 +902,7 @@ namespace JERC
             var coversOrdered = brushesToDrawCover.Concat(displacementsToDrawCover).OrderBy(x => x.zAxisAverage);
             var doorsOrdered = brushesToDrawDoor.Concat(displacementsToDrawDoor).OrderBy(x => x.zAxisAverage);
             var laddersOrdered = brushesToDrawLadder.Concat(displacementsToDrawLadder).OrderBy(x => x.zAxisAverage);
+            var dangersOrdered = brushesToDrawDanger.Concat(displacementsToDrawDanger).OrderBy(x => x.zAxisAverage);
 
             var coversAndOverlapsOrdered = overlapsOrdered.Concat(coversOrdered).OrderBy(x => x.zAxisAverage);
 
@@ -905,8 +921,8 @@ namespace JERC
                 DrawFilledPolygonGradient(graphics, brushToRender, true);
             }
 
-            // cover and overlap, door, ladder brush stuff
-            foreach (var brushToRender in coversAndOverlapsOrdered.Concat(doorsOrdered).Concat(laddersOrdered))
+            // cover and overlap, door, ladder, danger brush stuff
+            foreach (var brushToRender in coversAndOverlapsOrdered.Concat(doorsOrdered).Concat(laddersOrdered).Concat(dangersOrdered))
             {
                 DrawFilledPolygonGradient(graphics, brushToRender, false);
             }
@@ -972,6 +988,7 @@ namespace JERC
                         JercTypes.Overlap => throw new NotImplementedException(),
                         JercTypes.Door => throw new NotImplementedException(),
                         JercTypes.Ladder => throw new NotImplementedException(),
+                        JercTypes.Danger => throw new NotImplementedException(),
                         JercTypes.Ignore => throw new NotImplementedException(),
                         JercTypes.Hostage => throw new NotImplementedException(),
                         JercTypes.TSpawn => throw new NotImplementedException(),
@@ -1633,6 +1650,7 @@ namespace JERC
                         JercTypes.Overlap => Colours.ColourBrush(jercConfigValues.overlapColourLow, jercConfigValues.overlapColourHigh, percentageAboveMin, jercConfigValues.overlapAlpha),
                         JercTypes.Door => jercConfigValues.doorColour,
                         JercTypes.Ladder => jercConfigValues.ladderColour,
+                        JercTypes.Danger => jercConfigValues.dangerColour,
                         JercTypes.Buyzone => Colours.ColourBuyzones(),
                         JercTypes.BombsiteA => Colours.ColourBombsites(),
                         JercTypes.BombsiteB => Colours.ColourBombsites(),

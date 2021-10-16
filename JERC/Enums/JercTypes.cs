@@ -15,13 +15,14 @@ namespace JERC.Enums
         Overlap = 16,
         Door = 32,
         Ladder = 64,
-        Ignore = 128,
-        Buyzone = 256,
-        BombsiteA = 512,
-        BombsiteB = 1024,
-        RescueZone = 2048,
-        Hostage = 4096,
-        TSpawn = 8192,
-        CTSpawn = 16384
+        Danger = 128,
+        Ignore = 256,
+        Buyzone = 512,
+        BombsiteA = 1024,
+        BombsiteB = 2048,
+        RescueZone = 4096,
+        Hostage = 8192,
+        TSpawn = 16384,
+        CTSpawn = 32768
     }
 }
