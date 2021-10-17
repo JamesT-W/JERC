@@ -27,6 +27,8 @@
 
 	overlapAlpha(integer) : "Overlap Alpha (int)" : 150 : "The alpha value for overlap brush sides (0-255)"
 
+	dangerAlpha(integer) : "Danger Alpha (int)" : 100 : "The alpha value for danger brush sides (0-255)"
+
 	pathColourHigh(color255) : "Path Colour High" : "178 113 65" : "Colour of path world brushes at the highest point"
 
 	pathColourLow(color255) : "Path Colour Low" : "39 56 79" : "Colour of path world brushes at the lowest point"
