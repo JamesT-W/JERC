@@ -856,34 +856,34 @@ namespace JERC
 
             // get all brushes and displacements to draw (brushes)
             var brushesToDrawPath = GetBrushesToDraw(boundingBox, brushPathSideList);
-            var displacementsToDrawPath = GetBrushesToDraw(boundingBox, displacementPathSideList);
+            var displacementsToDrawPath = GetDisplacementsToDraw(boundingBox, displacementPathSideList);
 
             var brushesToDrawOverlap = GetBrushesToDraw(boundingBox, brushOverlapSideList);
-            var displacementsToDrawOverlap = GetBrushesToDraw(boundingBox, displacementOverlapSideList);
+            var displacementsToDrawOverlap = GetDisplacementsToDraw(boundingBox, displacementOverlapSideList);
 
             var brushesToDrawCover = GetBrushesToDraw(boundingBox, brushCoverList.SelectMany(x => x.brushSides).ToList());
-            var displacementsToDrawCover = GetBrushesToDraw(boundingBox, displacementCoverList.SelectMany(x => x.brushSides).ToList());
+            var displacementsToDrawCover = GetDisplacementsToDraw(boundingBox, displacementCoverList.SelectMany(x => x.brushSides).ToList());
 
             var brushesToDrawDoor = GetBrushesToDraw(boundingBox, brushDoorList.SelectMany(x => x.brushSides).ToList());
-            var displacementsToDrawDoor = GetBrushesToDraw(boundingBox, displacementDoorList.SelectMany(x => x.brushSides).ToList());
+            var displacementsToDrawDoor = GetDisplacementsToDraw(boundingBox, displacementDoorList.SelectMany(x => x.brushSides).ToList());
 
             var brushesToDrawLadder = GetBrushesToDraw(boundingBox, brushLadderList.SelectMany(x => x.brushSides).ToList());
-            var displacementsToDrawLadder = GetBrushesToDraw(boundingBox, displacementLadderList.SelectMany(x => x.brushSides).ToList());
+            var displacementsToDrawLadder = GetDisplacementsToDraw(boundingBox, displacementLadderList.SelectMany(x => x.brushSides).ToList());
 
             var brushesToDrawDanger = GetBrushesToDraw(boundingBox, brushDangerList.SelectMany(x => x.brushSides).ToList());
-            var displacementsToDrawDanger = GetBrushesToDraw(boundingBox, displacementDangerList.SelectMany(x => x.brushSides).ToList());
+            var displacementsToDrawDanger = GetDisplacementsToDraw(boundingBox, displacementDangerList.SelectMany(x => x.brushSides).ToList());
 
             var brushesToDrawBuyzone = GetBrushesToDraw(boundingBox, brushBuyzoneList.SelectMany(x => x.brushSides).ToList());
-            var displacementsToDrawBuyzone = GetBrushesToDraw(boundingBox, displacementBuyzoneList.SelectMany(x => x.brushSides).ToList());
+            var displacementsToDrawBuyzone = GetDisplacementsToDraw(boundingBox, displacementBuyzoneList.SelectMany(x => x.brushSides).ToList());
 
             var brushesToDrawBombsiteA = GetBrushesToDraw(boundingBox, brushBombsiteAList.SelectMany(x => x.brushSides).ToList());
-            var displacementsToDrawBombsiteA = GetBrushesToDraw(boundingBox, displacementBombsiteAList.SelectMany(x => x.brushSides).ToList());
+            var displacementsToDrawBombsiteA = GetDisplacementsToDraw(boundingBox, displacementBombsiteAList.SelectMany(x => x.brushSides).ToList());
 
             var brushesToDrawBombsiteB = GetBrushesToDraw(boundingBox, brushBombsiteBList.SelectMany(x => x.brushSides).ToList());
-            var displacementsToDrawBombsiteB = GetBrushesToDraw(boundingBox, displacementBombsiteBList.SelectMany(x => x.brushSides).ToList());
+            var displacementsToDrawBombsiteB = GetDisplacementsToDraw(boundingBox, displacementBombsiteBList.SelectMany(x => x.brushSides).ToList());
 
             var brushesToDrawRescueZone = GetBrushesToDraw(boundingBox, brushRescueZoneList.SelectMany(x => x.brushSides).ToList());
-            var displacementsToDrawRescueZone = GetBrushesToDraw(boundingBox, displacementRescueZoneList.SelectMany(x => x.brushSides).ToList());
+            var displacementsToDrawRescueZone = GetDisplacementsToDraw(boundingBox, displacementRescueZoneList.SelectMany(x => x.brushSides).ToList());
 
             // get all entity sides to draw
             var entityBrushSideListById = GetEntityBrushSideListWithinLevelHeight(levelHeight);
@@ -1427,6 +1427,12 @@ namespace JERC
                         brushSideNew.jercType = jercType;
                     }
 
+                    // add displacement stuff if the brush is a displacement
+                    if (brushSide.isDisplacement)
+                    {
+                        brushSideNew.displacementStuff = new DisplacementStuff(brushSide.dispinfo, brushSideNew.vertices); //// brushSide.vertices_plus ??
+                    }
+
                     brushNew.brushSides.Add(brushSideNew);
                 }
 
@@ -1445,16 +1451,22 @@ namespace JERC
 
             foreach (var side in sideList)
             {
-                var brushSide = new BrushSide();
+                var brushSideNew = new BrushSide();
                 for (int i = 0; i < side.vertices_plus.Count(); i++)
                 {
                     var vert = side.vertices_plus[i];
 
-                    brushSide.vertices.Add(new Vertices(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier, (float)vert.z));
-                    brushSide.jercType = jercType;
+                    brushSideNew.vertices.Add(new Vertices(vert.x / Sizes.SizeReductionMultiplier, vert.y / Sizes.SizeReductionMultiplier, (float)vert.z));
+                    brushSideNew.jercType = jercType;
                 }
 
-                brushSideList.Add(brushSide);
+                // add displacement stuff if the brush is a displacement
+                if (side.isDisplacement)
+                {
+                    brushSideNew.displacementStuff = new DisplacementStuff(side.dispinfo, brushSideNew.vertices); //// brushSide.vertices_plus ??
+                }
+
+                brushSideList.Add(brushSideNew);
             }
 
             return brushSideList;
@@ -1670,7 +1682,79 @@ namespace JERC
                     verticesOffsetsToUse.Add(new VerticesToDraw(new Vertices((int)verticesOffset.x, (int)verticesOffset.y, (int)verticesOffset.z), colour));
                 }
 
-                brushesToDraw.Add(new ObjectToDraw(verticesOffsetsToUse, brushSide.jercType));
+                brushesToDraw.Add(new ObjectToDraw(verticesOffsetsToUse, false, brushSide.jercType));
+            }
+
+            return brushesToDraw;
+        }
+
+
+        private static List<ObjectToDraw> GetDisplacementsToDraw(BoundingBox boundingBox, List<BrushSide> brushSidesList)
+        {
+            var brushesToDraw = new List<ObjectToDraw>();
+
+            foreach (var brushSide in brushSidesList.Where(x => x.displacementStuff != null))
+            {
+                for (int x = 0; x < brushSide.displacementStuff.numOfRows - 1; x++)
+                {
+                    for (int y = 0; y < brushSide.displacementStuff.numOfRows - 1; y++)
+                    {
+                        var verticesOffsetsToUse = new List<VerticesToDraw>();
+
+                        foreach (var vertices in brushSide.displacementStuff.GetSquareVerticesPositions(x, y))
+                        {
+                            var heightAboveMin = vertices.z - boundingBox.minZGradient;
+
+                            float percentageAboveMin = 0;
+                            if (heightAboveMin == 0)
+                            {
+                                if (boundingBox.minZGradient == boundingBox.maxZGradient)
+                                {
+                                    percentageAboveMin = 1.00f;
+                                }
+                                else
+                                {
+                                    percentageAboveMin = 0.01f;
+                                }
+                            }
+                            else
+                            {
+                                percentageAboveMin = (float)((Math.Ceiling(Convert.ToDouble(heightAboveMin)) / (boundingBox.maxZGradient - boundingBox.minZGradient)));
+                            }
+
+                            // corrects the verts by taking into account the movement from space in world to the space in the image (which starts at (0,0))
+                            var verticesOffset = GetCorrectedVerticesPositionInWorld(vertices);
+
+                            Color colour = brushSide.jercType switch
+                            {
+                                //JercTypes.Remove => Colours.ColourRemove(percentageAboveMin),
+                                JercTypes.Path => Colours.ColourBrush(jercConfigValues.pathColourLow, jercConfigValues.pathColourHigh, percentageAboveMin),
+                                JercTypes.Cover => Colours.ColourBrush(jercConfigValues.coverColourLow, jercConfigValues.coverColourHigh, percentageAboveMin),
+                                JercTypes.Overlap => Colours.ColourBrush(jercConfigValues.overlapColourLow, jercConfigValues.overlapColourHigh, percentageAboveMin, jercConfigValues.overlapAlpha),
+                                JercTypes.Door => jercConfigValues.doorColour,
+                                JercTypes.Ladder => jercConfigValues.ladderColour,
+                                JercTypes.Danger => Colours.ColourDanger(jercConfigValues.dangerColour, jercConfigValues.dangerAlpha),
+                                JercTypes.Buyzone => Colours.ColourBuyzones(),
+                                JercTypes.BombsiteA => Colours.ColourBombsites(),
+                                JercTypes.BombsiteB => Colours.ColourBombsites(),
+                                JercTypes.RescueZone => Colours.ColourRescueZones(),
+                                JercTypes.None => throw new NotImplementedException(),
+                                JercTypes.Remove => throw new NotImplementedException(),
+                                JercTypes.Ignore => throw new NotImplementedException(),
+                                JercTypes.Hostage => throw new NotImplementedException(),
+                                JercTypes.TSpawn => throw new NotImplementedException(),
+                                JercTypes.CTSpawn => throw new NotImplementedException(),
+                                _ => throw new NotImplementedException()
+                            };
+
+                            verticesOffsetsToUse = verticesOffsetsToUse.Distinct().ToList(); // TODO: doesn't seem to work
+
+                            verticesOffsetsToUse.Add(new VerticesToDraw(new Vertices((int)verticesOffset.x, (int)verticesOffset.y, (int)verticesOffset.z), colour));
+                        }
+
+                        brushesToDraw.Add(new ObjectToDraw(verticesOffsetsToUse, true, brushSide.jercType));
+                    }
+                }
             }
 
             return brushesToDraw;
@@ -1726,11 +1810,11 @@ namespace JERC
 
                     if (brushEntityBrushSide.entityType == EntityTypes.JercBox)
                     {
-                        brushEntitiesToDraw.Add(new ObjectToDraw(verticesOffsetsToUse, brushEntityBrushSide.entityType, brushEntityBrushSide.rendercolor, brushEntityBrushSide.colourStroke, brushEntityBrushSide.strokeWidth));
+                        brushEntitiesToDraw.Add(new ObjectToDraw(verticesOffsetsToUse, false, brushEntityBrushSide.entityType, brushEntityBrushSide.rendercolor, brushEntityBrushSide.colourStroke, brushEntityBrushSide.strokeWidth));
                     }
                     else
                     {
-                        brushEntitiesToDraw.Add(new ObjectToDraw(verticesOffsetsToUse, brushEntityBrushSide.entityType));
+                        brushEntitiesToDraw.Add(new ObjectToDraw(verticesOffsetsToUse, false, brushEntityBrushSide.entityType));
                     }
                 }
             }
@@ -1896,10 +1980,10 @@ namespace JERC
                 // Define the center and surround colors.
                 pathBrush.CenterColor = colourUsing;
 
-                // Fill the hexagon
+                // Fill the polygon
                 graphics.FillPolygon(pathBrush, verticesArray);
 
-                // Draw border of the hexagon
+                // Draw border of the polygon
                 if (drawAroundEdge)
                 {
                     var verticesToDrawList = objectToDraw.verticesToDraw;

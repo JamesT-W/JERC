@@ -179,6 +179,25 @@ namespace JERC.Models
             var brushesSidesTSpawnUnordered = brushesTSpawn.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.TSpawnTextureName)).ToList();
             var brushesSidesCTSpawnUnordered = brushesCTSpawn.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.CTSpawnTextureName)).ToList();*/
 
+            // remove all of a brush's sides when there is a displacement side on the brush
+            brushesSidesRemoveUnordered.RemoveAll(x => brushesRemove.FirstOrDefault(y => y.id == x.brushId).side.Any(y => y.isDisplacement));
+            brushesSidesPathUnordered.RemoveAll(x => brushesPath.FirstOrDefault(y => y.id == x.brushId).side.Any(y => y.isDisplacement));
+            brushesSidesCoverUnordered.RemoveAll(x => brushesCover.FirstOrDefault(y => y.id == x.brushId).side.Any(y => y.isDisplacement));
+            brushesSidesOverlapUnordered.RemoveAll(x => brushesOverlap.FirstOrDefault(y => y.id == x.brushId).side.Any(y => y.isDisplacement));
+            brushesSidesDoorUnordered.RemoveAll(x => brushesDoor.FirstOrDefault(y => y.id == x.brushId).side.Any(y => y.isDisplacement));
+            brushesSidesLadderUnordered.RemoveAll(x => brushesLadder.FirstOrDefault(y => y.id == x.brushId).side.Any(y => y.isDisplacement));
+            brushesSidesDangerUnordered.RemoveAll(x => brushesDanger.FirstOrDefault(y => y.id == x.brushId).side.Any(y => y.isDisplacement));
+
+            /*brushesSidesBuyzoneUnordered.RemoveAll(x => brushesBuyzone.FirstOrDefault(y => y.id == x.brushId).side.Any(y => y.isDisplacement));
+            brushesSidesBombsiteAUnordered.RemoveAll(x => brushesBombsiteA.FirstOrDefault(y => y.id == x.brushId).side.Any(y => y.isDisplacement));
+            brushesSidesBombsiteBUnordered.RemoveAll(x => brushesBombsiteB.FirstOrDefault(y => y.id == x.brushId).side.Any(y => y.isDisplacement));
+            brushesSidesRescueZoneUnordered.RemoveAll(x => brushesRescueZone.FirstOrDefault(y => y.id == x.brushId).side.Any(y => y.isDisplacement));
+
+            brushesSidesHostageUnordered.RemoveAll(x => brushesHostage.FirstOrDefault(y => y.id == x.brushId).side.Any(y => y.isDisplacement));
+            brushesSidesTSpawnUnordered.RemoveAll(x => brushesTSpawn.FirstOrDefault(y => y.id == x.brushId).side.Any(y => y.isDisplacement));
+            brushesSidesCTSpawnUnordered.RemoveAll(x => brushesCTSpawn.FirstOrDefault(y => y.id == x.brushId).side.Any(y => y.isDisplacement));*/
+            //
+
             brushesSidesRemove = OrderListOfSidesByVerticesMin(brushesSidesRemoveUnordered);
             brushesSidesPath = OrderListOfSidesByVerticesMin(brushesSidesPathUnordered);
             brushesSidesCover = OrderListOfSidesByVerticesMin(brushesSidesCoverUnordered);
@@ -229,6 +248,25 @@ namespace JERC.Models
             var displacementsSidesHostageUnordered = displacementsHostage.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.HostageTextureName)).ToList();
             var displacementsSidesTSpawnUnordered = displacementsTSpawn.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.TSpawnTextureName)).ToList();
             var displacementsSidesCTSpawnUnordered = displacementsCTSpawn.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.CTSpawnTextureName)).ToList();*/
+
+            // remove all non displacement sides on the brush
+            displacementsSidesRemoveUnordered.RemoveAll(x => !x.isDisplacement);
+            displacementsSidesPathUnordered.RemoveAll(x => !x.isDisplacement);
+            displacementsSidesCoverUnordered.RemoveAll(x => !x.isDisplacement);
+            displacementsSidesOverlapUnordered.RemoveAll(x => !x.isDisplacement);
+            displacementsSidesDoorUnordered.RemoveAll(x => !x.isDisplacement);
+            displacementsSidesLadderUnordered.RemoveAll(x => !x.isDisplacement);
+            displacementsSidesDangerUnordered.RemoveAll(x => !x.isDisplacement);
+
+            /*displacementsSidesBuyzoneUnordered.RemoveAll(x => !x.isDisplacement);
+            displacementsSidesBombsiteAUnordered.RemoveAll(x => !x.isDisplacement);
+            displacementsSidesBombsiteBUnordered.RemoveAll(x => !x.isDisplacement);
+            displacementsSidesRescueZoneUnordered.RemoveAll(x => !x.isDisplacement);
+
+            displacementsSidesHostageUnordered.RemoveAll(x => !x.isDisplacement);
+            displacementsSidesTSpawnUnordered.RemoveAll(x => !x.isDisplacement);
+            displacementsSidesCTSpawnUnordered.RemoveAll(x => !x.isDisplacement);*/
+            //
 
             displacementsSidesRemove = OrderListOfSidesByVerticesMin(displacementsSidesRemoveUnordered);
             displacementsSidesPath = OrderListOfSidesByVerticesMin(displacementsSidesPathUnordered);

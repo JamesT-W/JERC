@@ -22,20 +22,22 @@ namespace JERC.Models
         public List<IVNode> triangle_tags;
         public List<IVNode> allowed_verts;
 
-        public DispInfo(IVNode brush)
+
+        public DispInfo(IVNode dispInfo)
         {
-            power = int.Parse(brush.Body.FirstOrDefault(x => x.Name == "power")?.Value);
-            startPosition = brush.Body.FirstOrDefault(x => x.Name == "startPosition")?.Value;
-            flags = int.Parse(brush.Body.FirstOrDefault(x => x.Name == "flags")?.Value);
-            elevation = float.Parse(brush.Body.FirstOrDefault(x => x.Name == "elevation")?.Value);
-            subdiv = float.Parse(brush.Body.FirstOrDefault(x => x.Name == "subdiv")?.Value);
-            normals = brush.Body.Where(x => x.Name == "normals")?.ToList();
-            distances = brush.Body.Where(x => x.Name == "distances")?.ToList();
-            offsets = brush.Body.Where(x => x.Name == "offsets")?.ToList();
-            offset_normals = brush.Body.Where(x => x.Name == "offset_normals")?.ToList();
-            alphas = brush.Body.Where(x => x.Name == "alphas")?.ToList();
-            triangle_tags = brush.Body.Where(x => x.Name == "triangle_tags")?.ToList();
-            allowed_verts = brush.Body.Where(x => x.Name == "allowed_verts")?.ToList();
+            power = int.Parse(dispInfo.Body.FirstOrDefault(x => x.Name == "power")?.Value);
+            startPosition = dispInfo.Body.FirstOrDefault(x => x.Name == "startPosition")?.Value;
+            flags = int.Parse(dispInfo.Body.FirstOrDefault(x => x.Name == "flags")?.Value);
+            elevation = float.Parse(dispInfo.Body.FirstOrDefault(x => x.Name == "elevation")?.Value);
+            subdiv = float.Parse(dispInfo.Body.FirstOrDefault(x => x.Name == "subdiv")?.Value);
+
+            normals = dispInfo.Body.Where(x => x.Name == "normals")?.ToList();
+            distances = dispInfo.Body.Where(x => x.Name == "distances")?.ToList();
+            offsets = dispInfo.Body.Where(x => x.Name == "offsets")?.ToList();
+            offset_normals = dispInfo.Body.Where(x => x.Name == "offset_normals")?.ToList();
+            alphas = dispInfo.Body.Where(x => x.Name == "alphas")?.ToList();
+            triangle_tags = dispInfo.Body.Where(x => x.Name == "triangle_tags")?.ToList();
+            allowed_verts = dispInfo.Body.Where(x => x.Name == "allowed_verts")?.ToList();
         }
     }
 }

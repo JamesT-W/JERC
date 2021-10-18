@@ -9,6 +9,7 @@ namespace JERC.Models
 {
     public class Side
     {
+        public int brushId;
         public int id;
         public string plane;
         public List<Vertices> vertices_plus;
@@ -19,8 +20,10 @@ namespace JERC.Models
         public int smoothing_groups;
         public DispInfo dispinfo;
 
-        public Side(IVNode side)
+
+        public Side(IVNode side, int brushId)
         {
+            this.brushId = brushId;
             id = int.Parse(side.Body.FirstOrDefault(x => x.Name == "id")?.Value);
             plane = side.Body.FirstOrDefault(x => x.Name == "plane")?.Value;
             vertices_plus = side.Body.FirstOrDefault(x => x.Name == "vertices_plus")?.Body.Select(x => new Vertices(x.Value)).ToList();
@@ -30,9 +33,18 @@ namespace JERC.Models
             rotation = int.Parse(side.Body.FirstOrDefault(x => x.Name == "rotation")?.Value, Globalization.Style, Globalization.Culture);
             smoothing_groups = int.Parse(side.Body.FirstOrDefault(x => x.Name == "smoothing_groups")?.Value);
 
-            var displacementsStuff = side.Body.FirstOrDefault(x => x.Name == "dispinfo");
-            if (displacementsStuff != null)
-                dispinfo = new DispInfo(displacementsStuff);
+            var dispinfoIVNode = side.Body.FirstOrDefault(x => x.Name == "dispinfo");
+            if (dispinfoIVNode != null)
+                dispinfo = new DispInfo(dispinfoIVNode);
+        }
+
+
+        public bool isDisplacement
+        {
+            get
+            {
+                return dispinfo != null;
+            }
         }
     }
 }
