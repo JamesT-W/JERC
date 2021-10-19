@@ -1361,19 +1361,21 @@ namespace JERC
 
         private static List<BrushVolume> GetBrushVolumeListWithinLevelHeight(LevelHeight levelHeight, List<Models.Brush> brushList, JercTypes jercType)
         {
-            return GetBrushVolumeList(brushList, jercType).Where(x => !(
-                (x.brushSides.SelectMany(y => y.vertices).All(y => y.z < levelHeight.zMinForRadar) && x.brushSides.SelectMany(y => y.vertices).All(y => y.z < levelHeight.zMaxForRadar)) ||
-                (x.brushSides.SelectMany(y => y.vertices).All(y => y.z >= levelHeight.zMinForRadar) && x.brushSides.SelectMany(y => y.vertices).All(y => y.z >= levelHeight.zMaxForRadar))
-            )).ToList();
+            // may appear on more than 1 level if their brushes span across level dividers or touch edges ?
+            return GetBrushVolumeList(brushList, jercType).Where(x =>
+                x.brushSides.SelectMany(y => y.vertices).All(y => y.z >= levelHeight.zMinForRadar) &&
+                x.brushSides.SelectMany(y => y.vertices).All(y => y.z <= levelHeight.zMaxForRadar)
+            ).ToList();
         }
 
 
         private static List<BrushSide> GetBrushSideListWithinLevelHeight(LevelHeight levelHeight, List<Side> sideList, JercTypes jercType)
         {
-            return GetBrushSideList(sideList, jercType).Where(x => !(
-                (x.vertices.All(y => y.z < levelHeight.zMinForRadar) && x.vertices.All(y => y.z < levelHeight.zMaxForRadar)) ||
-                (x.vertices.All(y => y.z >= levelHeight.zMinForRadar) && x.vertices.All(y => y.z >= levelHeight.zMaxForRadar))
-            )).ToList();
+            // may appear on more than 1 level if their brushes span across level dividers or touch edges ?
+            return GetBrushSideList(sideList, jercType).Where(x =>
+                x.vertices.All(y => y.z >= levelHeight.zMinForRadar) &&
+                x.vertices.All(y => y.z <= levelHeight.zMaxForRadar)
+            ).ToList();
         }
 
 
@@ -1384,8 +1386,11 @@ namespace JERC
 
             foreach (var entityBrushSideById in entityBrushSideListByIdUnfiltered)
             {
-                if (entityBrushSideById.Value.Any(x => !((x.vertices.All(y => y.z < levelHeight.zMinForRadar) && x.vertices.All(y => y.z < levelHeight.zMaxForRadar)) || (x.vertices.All(y => y.z >= levelHeight.zMinForRadar) && x.vertices.All(y => y.z >= levelHeight.zMaxForRadar))))) // would this allow entities to be on more than 1 level if their brushes span across level dividers ??
-                {
+                // may appear on more than 1 level if their brushes span across level dividers or touch edges ?
+                if (entityBrushSideById.Value.Any(x =>
+                    x.vertices.All(y => y.z >= levelHeight.zMinForRadar) &&
+                    x.vertices.All(y => y.z <= levelHeight.zMaxForRadar)
+                )) {
                     entityBrushSideListById.Add(entityBrushSideById.Key, entityBrushSideById.Value);
                 }
             }
@@ -1401,8 +1406,11 @@ namespace JERC
 
             foreach (var brushEntityBrushSideById in brushEntityBrushSideListByIdUnfiltered)
             {
-                if (brushEntityBrushSideById.Value.Any(x => !((x.vertices.All(y => y.z < levelHeight.zMinForRadar) && x.vertices.All(y => y.z < levelHeight.zMaxForRadar)) || (x.vertices.All(y => y.z >= levelHeight.zMinForRadar) && x.vertices.All(y => y.z >= levelHeight.zMaxForRadar))))) // would this allow entities to be on more than 1 level if their brushes span across level dividers ??
-                {
+                // may appear on more than 1 level if their brushes span across level dividers or touch edges ?
+                if (brushEntityBrushSideById.Value.Any(x =>
+                    x.vertices.All(y => y.z >= levelHeight.zMinForRadar) &&
+                    x.vertices.All(y => y.z <= levelHeight.zMaxForRadar)
+                )) {
                     brushEntityBrushSideListById.Add(brushEntityBrushSideById.Key, brushEntityBrushSideById.Value);
                 }
             }
