@@ -24,12 +24,12 @@ namespace JERC.Models
 
         public int numOfRows;
 
-        public float pointPosMinX;
-        public float pointPosMinY;
-        public float pointPosMinZ;
-        public float distanceBetweenPointsX;
-        public float distanceBetweenPointsY;
-        public float distanceBetweenPointsZ;
+        public Vertices vertices0; // bottom left
+        public Vertices vertices1; // bottom right
+        public Vertices vertices2; // top right
+        public Vertices vertices3; // top left
+
+        public Vertices[,] pointsLocations;
 
 
         public DisplacementStuff(DispInfo dispInfo, List<Vertices> brushSideVertices)
@@ -49,13 +49,62 @@ namespace JERC.Models
             // 
             numOfRows = (int)Math.Pow(2, power) + 1;
 
-            ////////// TODO: CURRENTLY ONLY WORKS PROPERLY FOR SQUARE DISPLACEMENT BRUSHES ////////////////
-            pointPosMinX = brushSideVertices.Min(a => a.x);
-            pointPosMinY = brushSideVertices.Min(a => a.y);
-            pointPosMinZ = (float)brushSideVertices.Min(a => a.z);
-            distanceBetweenPointsX = (brushSideVertices.Max(a => a.x) - pointPosMinX) / (numOfRows - 1); // brushSideVertices, numOfRowsDistances
-            distanceBetweenPointsY = (brushSideVertices.Max(a => a.y) - pointPosMinY) / (numOfRows - 1); // brushSideVertices, numOfRowsDistances
-            distanceBetweenPointsZ = (float)(brushSideVertices.Max(a => a.z) - pointPosMinZ) / (numOfRows - 1); // brushSideVertices, numOfRowsDistances
+            var vertices0 = brushSideVertices.OrderBy(a => a.x + a.y).FirstOrDefault();
+            var vertices2 = brushSideVertices.OrderByDescending(a => a.x + a.y).FirstOrDefault();
+            var vertices1 = brushSideVertices.Where(x => x != vertices2).OrderByDescending(a => a.x).ThenBy(a => a.y).FirstOrDefault();
+            var vertices3 = brushSideVertices.Where(x => x != vertices0).OrderBy(a => a.x).ThenByDescending(a => a.y).FirstOrDefault();
+
+            pointsLocations = new Vertices[numOfRows, numOfRows];
+
+            for (int x = 0; x < numOfRows; x++)
+            {
+                for (int y = 0; y < numOfRows; y++)
+                {
+                    if (x == 0 && y == 0)
+                    {
+                        pointsLocations[x, y] = vertices0;
+                        continue;
+                    }
+                    else if (x == (numOfRows-1) && y == 0)
+                    {
+                        pointsLocations[x, y] = vertices1;
+                        continue;
+                    }
+                    else if (x == (numOfRows - 1) && y == (numOfRows - 1))
+                    {
+                        pointsLocations[x, y] = vertices2;
+                        continue;
+                    }
+                    else if (x == 0 && y == (numOfRows - 1))
+                    {
+                        pointsLocations[x, y] = vertices3;
+                        continue;
+                    }
+
+                    var divisionValue = numOfRows - 1;
+
+                    Vertices diff01 = new Vertices(vertices1.x - vertices0.x, vertices1.y - vertices0.y, (float)(vertices1.z - vertices0.z));
+                    Vertices diff12 = new Vertices(vertices2.x - vertices1.x, vertices2.y - vertices1.y, (float)(vertices2.z - vertices1.z));
+                    Vertices diff23 = new Vertices(vertices2.x - vertices3.x, vertices2.y - vertices3.y, (float)(vertices2.z - vertices3.z));
+                    Vertices diff03 = new Vertices(vertices3.x - vertices0.x, vertices3.y - vertices0.y, (float)(vertices3.z - vertices0.z));
+
+                    //var numOfRowsToMinusX = y == numOfRows - 1 ? numOfRows - 1 : numOfRows;
+                    //var numOfRowsToMinusY = x == numOfRows - 1 ? numOfRows - 1 : numOfRows;
+                    var numOfRowsToMinusX = numOfRows;
+                    var numOfRowsToMinusY = numOfRows;
+
+                    var xValue = vertices0.x +
+                        (((((diff01.x / divisionValue * x) * Math.Abs(y - numOfRowsToMinusX)) / numOfRows) + ((diff23.x / divisionValue * x) * y) / numOfRows)) +
+                        (((((diff03.x / divisionValue * y) * Math.Abs(x - numOfRowsToMinusY)) / numOfRows) + ((diff12.x / divisionValue * y) * x) / numOfRows));
+                    var yValue = vertices0.y +
+                        (((((diff03.y / divisionValue * y) * Math.Abs(x - numOfRowsToMinusY)) / numOfRows) + ((diff12.y / divisionValue * y) * x) / numOfRows)) +
+                        (((((diff01.y / divisionValue * x) * Math.Abs(y - numOfRowsToMinusX)) / numOfRows) + ((diff23.y / divisionValue * x) * y) / numOfRows));
+
+                    var zValue = vertices0.z + ((((diff01.z / divisionValue * x) + (diff23.z / divisionValue * x) + (diff03.z / divisionValue * y) + (diff12.z / divisionValue * y))) / 2);
+
+                    pointsLocations[x, y] = new Vertices(xValue, yValue, (float)zValue);
+                }
+            }
 
             // adds default values for each row and vert for normals and distances
             for (int i = 0; i < numOfRows; i++)
@@ -77,7 +126,6 @@ namespace JERC.Models
         }
 
 
-        ////////// TODO: CURRENTLY ONLY WORKS PROPERLY FOR SQUARE DISPLACEMENT BRUSHES ////////////////
         public List<Vertices> GetSquareVerticesPositions(int x, int y)
         {
             var numOfPoints = 4;
@@ -99,17 +147,19 @@ namespace JERC.Models
                         xUsing++;
                         break;
                     case 2:
+                        xUsing++;
                         yUsing++;
                         break;
                     case 3:
-                        xUsing++;
                         yUsing++;
                         break;
                 }
 
-                var xBrush = pointPosMinX + (distanceBetweenPointsX * xUsing);
-                var yBrush = pointPosMinY + (distanceBetweenPointsY * yUsing);
-                var zBrush = pointPosMinZ + (distanceBetweenPointsZ * xUsing) + (distanceBetweenPointsZ * yUsing); //////// is this right ???
+                var verticesUsing = pointsLocations[xUsing, yUsing];
+
+                var xBrush = verticesUsing.x;////////// + (distanceBetweenPointsX * xUsing);
+                var yBrush = verticesUsing.y;/////////// + (distanceBetweenPointsY * yUsing);
+                var zBrush = verticesUsing.z; // + (distanceBetweenPointsZ * xUsing) + (distanceBetweenPointsZ * yUsing); //////// is this right ???
 
                 var xDisp = normals.FirstOrDefault(a => a.rowNum == yUsing).valuesList[xUsing].x * distances.FirstOrDefault(a => a.rowNum == yUsing).valuesList[xUsing];
                 var yDisp = normals.FirstOrDefault(a => a.rowNum == yUsing).valuesList[xUsing].y * distances.FirstOrDefault(a => a.rowNum == yUsing).valuesList[xUsing];
@@ -136,7 +186,7 @@ namespace JERC.Models
                 }
             }
 
-            return new List<Vertices>() { point0, point1, point3, point2 }; // point3 is added before point2 so that a rectangle can be created
+            return new List<Vertices>() { point0, point1, point2, point3 };
         }
     }
 }
