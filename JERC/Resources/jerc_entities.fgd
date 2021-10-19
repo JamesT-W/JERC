@@ -1,7 +1,7 @@
 @PointClass iconsprite("jerc/editor/jerc_config.vmt") = jerc_config : 
 	"JERC - Configure the main functionality."
 [
-	alternateOutputPath(string) report : "Alternate Output Directory" : "" : "DO NOT USE BACKSLACHES. An alternate output directory. Leave blank if you want to output to /csgo/resources/overviews/ only. Eg. C:/Dropbox/JERC/resource/overviews/"
+	alternateOutputPath(string) report : "Alternate Output Directory" : "" : "DO NOT USE BACKSLASHES. An alternate output directory. Leave blank if you want to output to /csgo/resources/overviews/ only. Eg. C:/Dropbox/JERC/resource/overviews/"
 
 	onlyOutputToAlternatePath(choices) : "Only Output to Alternate Path" : 0 =
 	[
