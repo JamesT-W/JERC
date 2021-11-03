@@ -1,31 +1,39 @@
 ﻿using JERC.Constants;
-using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace JERC.Models
 {
     public class GameConfigurationValues
     {
+        public bool isVanillaHammer = false;
+
         public string csgoFolderPath;
         public string binFolderPath;
         public string overviewsFolderPath;
         public string vmfFilepath;
         public string vmfFilepathDirectory;
 
+        private static readonly int maxNumOfDiffArgs = 3;
+        private static readonly int maxNumOfArgs = maxNumOfDiffArgs * 2;
+
 
         public GameConfigurationValues(string[] args)
         {
-            if (args.Length > 4)
+            if (args.Length > maxNumOfArgs)
                 return;
 
             for (int i = 0; i < args.Length; i += 2)
             {
                 switch (args[i].ToLower())
                 {
+                    case "-software":
+                        var software = args[i + 1];
+                        if (software.ToLower() == "hammer")
+                            isVanillaHammer = true;
+                        else if (software.ToLower() == "hammer++" || software.ToLower() == "hammerplusplus")
+                            isVanillaHammer = false;
+                        break;
                     case "-g":
                         csgoFolderPath = args[i + 1];
                         if (string.IsNullOrWhiteSpace(csgoFolderPath))
@@ -49,6 +57,8 @@ namespace JERC.Models
             }
 
             Logger.LogMessage("---- Game Configuration Values ----");
+            Logger.LogMessageKey("Is Vanilla Hammer: ");
+            Logger.LogMessage(isVanillaHammer.ToString());
             Logger.LogMessageKey("csgo Directory: ");
             Logger.LogMessage(csgoFolderPath);
             Logger.LogMessageKey("bin Directory: ");
@@ -63,7 +73,7 @@ namespace JERC.Models
         }
 
 
-        public bool VerifyAllValuesSet()
+        public bool VerifyAllValuesSet() // ignored isVanillaHammer
         {
             if (string.IsNullOrWhiteSpace(csgoFolderPath) ||
                 string.IsNullOrWhiteSpace(binFolderPath) ||
