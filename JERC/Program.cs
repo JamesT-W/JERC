@@ -1,4 +1,4 @@
-﻿using ImageAlterer;
+using ImageAlterer;
 using JERC.Constants;
 using JERC.Enums;
 using JERC.Models;
@@ -658,7 +658,7 @@ namespace JERC
                     var vertices2 = new Vertices(planesVerticesList[i][3] + " " + planesVerticesList[i][4] + " " + planesVerticesList[i][5]); // 3 vertices per plane in vanilla hammer
                     var vertices3 = new Vertices(planesVerticesList[i][6] + " " + planesVerticesList[i][7] + " " + planesVerticesList[i][8]); // 3 vertices per plane in vanilla hammer
 
-                    squarePlaneList.Add(new SquarePlane(vertices1, vertices2, vertices3));
+                    squarePlaneList.Add(new SquarePlane(brush.side.ElementAt(i).brushId, brush.side.ElementAt(i).id, vertices1, vertices2, vertices3));
                 }
 
                 brush.SquarePlaneList = squarePlaneList;

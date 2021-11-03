@@ -8,13 +8,20 @@ namespace JERC.Models
 {
     public class SquarePlane : IEquatable<SquarePlane>
     {
+        public int brushId;
+        public int brushSideId;
+
         public Vertices vertices1;
         public Vertices vertices2;
         public Vertices vertices3;
         public Vertices vertices4;
 
-        public SquarePlane(Vertices vertices1, Vertices vertices2, Vertices vertices3)
+
+        public SquarePlane(int brushId, int brushSideId, Vertices vertices1, Vertices vertices2, Vertices vertices3)
         {
+            this.brushId = brushId;
+            this.brushSideId = brushSideId;
+
             this.vertices1 = vertices1;
             this.vertices2 = vertices2;
             this.vertices3 = vertices3;
