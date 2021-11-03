@@ -27,8 +27,6 @@ namespace JERC
 
         private static readonly string visgroupName = "JERC";
 
-        private static GameConfigurationValues gameConfigurationValues;
-
         private static JercConfigValues jercConfigValues;
 
         private static int visgroupIdMainVmf;
@@ -44,23 +42,23 @@ namespace JERC
 
         static void Main(string[] args)
         {
-            gameConfigurationValues = new GameConfigurationValues(args);
+            GameConfigurationValues.SetArgs(args);
 
-            if (!debugging && (gameConfigurationValues == null || !gameConfigurationValues.VerifyAllValuesSet() || !gameConfigurationValues.VerifyAllDirectoriesAndFilesExist()))
+            if (!debugging && (!GameConfigurationValues.VerifyAllValuesSet() || !GameConfigurationValues.VerifyAllDirectoriesAndFilesExist()))
             {
                 Logger.LogError("Game configuration files missing. Check the compile configuration's parameters.");
                 return;
             }
 
-            if (!debugging && (gameConfigurationValues.binFolderPath.Split(@"\").Reverse().Skip(1).FirstOrDefault() != "bin" || gameConfigurationValues.binFolderPath.Replace("/", @"\").Replace(@"\\", @"\").Contains(@"\csgo\bin")))
+            if (!debugging && (GameConfigurationValues.binFolderPath.Split(@"\").Reverse().Skip(1).FirstOrDefault() != "bin" || GameConfigurationValues.binFolderPath.Replace("/", @"\").Replace(@"\\", @"\").Contains(@"\csgo\bin")))
             {
                 Logger.LogError(@"JERC's folder should be placed in ...\Counter-Strike Global Offensive\bin");
                 return;
             }
 
-            var lines = File.ReadAllLines(gameConfigurationValues.vmfFilepath);
+            var lines = File.ReadAllLines(GameConfigurationValues.vmfFilepath);
 
-            mapName = Path.GetFileNameWithoutExtension(gameConfigurationValues.vmfFilepath);
+            mapName = Path.GetFileNameWithoutExtension(GameConfigurationValues.vmfFilepath);
 
             if (debugging)
             {
@@ -72,8 +70,8 @@ namespace JERC
             }
             else
             {
-                backgroundImagesDirectory = string.Concat(gameConfigurationValues.csgoFolderPath, @"materials\jerc\backgrounds\");
-                outputFilepathPrefix = string.Concat(gameConfigurationValues.overviewsFolderPath, mapName);
+                backgroundImagesDirectory = string.Concat(GameConfigurationValues.csgoFolderPath, @"materials\jerc\backgrounds\");
+                outputFilepathPrefix = string.Concat(GameConfigurationValues.overviewsFolderPath, mapName);
             }
 
             outputImageBackgroundLevelsFilepath = string.Concat(outputFilepathPrefix, "_background_levels.png");
@@ -107,6 +105,12 @@ namespace JERC
                 Logger.LogDebugInfo("Setting alternateOutputPath to empty string");
 
                 jercConfigValues.alternateOutputPath = string.Empty;
+            }
+
+            // calculate vertices_plus for every brush side for vanilla hammer vmfs, as hammer++ adds vertices itself when saving a vmf
+            if (GameConfigurationValues.isVanillaHammer)
+            {
+                CalculateVerticesPlusForAllBrushSides();
             }
 
             Logger.LogNewLine();
@@ -158,7 +162,7 @@ namespace JERC
             // Parse the instance VMFs
             foreach (var instance in funcInstances)
             {
-                var filepath = string.Concat(gameConfigurationValues.vmfFilepathDirectory, @"\", instance.file);
+                var filepath = string.Concat(GameConfigurationValues.vmfFilepathDirectory, @"\", instance.file);
 
                 if (!File.Exists(filepath))
                     continue;
@@ -605,6 +609,59 @@ namespace JERC
                         where y.Name == "classname"
                         where y.Value.ToLower() == classname.ToLower()
                         select x).Distinct();
+            }
+        }
+
+
+        private static void CalculateVerticesPlusForAllBrushSides()
+        {
+            var allBrushesAndDisplacementsExceptIgnore = vmfRequiredData.brushesRemove
+                .Concat(vmfRequiredData.brushesPath)
+                .Concat(vmfRequiredData.brushesCover)
+                .Concat(vmfRequiredData.brushesOverlap)
+                .Concat(vmfRequiredData.brushesDoor)
+                .Concat(vmfRequiredData.brushesLadder)
+                .Concat(vmfRequiredData.brushesDanger)
+                .Concat(vmfRequiredData.brushesBuyzone)
+                .Concat(vmfRequiredData.brushesBombsiteA)
+                .Concat(vmfRequiredData.brushesBombsiteB)
+                .Concat(vmfRequiredData.brushesRescueZone)
+                .Concat(vmfRequiredData.brushesHostage)
+                .Concat(vmfRequiredData.brushesTSpawn)
+                .Concat(vmfRequiredData.brushesCTSpawn)
+                .Concat(vmfRequiredData.displacementsRemove)
+                .Concat(vmfRequiredData.displacementsPath)
+                .Concat(vmfRequiredData.displacementsCover)
+                .Concat(vmfRequiredData.displacementsOverlap)
+                .Concat(vmfRequiredData.displacementsDoor)
+                .Concat(vmfRequiredData.displacementsLadder)
+                .Concat(vmfRequiredData.displacementsDanger)
+                .Concat(vmfRequiredData.displacementsBuyzone)
+                .Concat(vmfRequiredData.displacementsBombsiteA)
+                .Concat(vmfRequiredData.displacementsBombsiteB)
+                .Concat(vmfRequiredData.displacementsRescueZone)
+                .Concat(vmfRequiredData.displacementsHostage)
+                .Concat(vmfRequiredData.displacementsTSpawn)
+                .Concat(vmfRequiredData.displacementsCTSpawn);
+
+            if (allBrushesAndDisplacementsExceptIgnore == null || allBrushesAndDisplacementsExceptIgnore.Count() == 0)
+                return;
+
+            foreach (var brush in allBrushesAndDisplacementsExceptIgnore)
+            {
+                var planesVerticesList = brush.side.Select(x => x.plane.Replace("(", string.Empty).Replace(")", string.Empty).Split(" ").ToArray()).ToList();
+
+                var squarePlaneList = new List<SquarePlane>();
+                for (int i = 0; i < planesVerticesList.Count(); i++)
+                {
+                    var vertices1 = new Vertices(planesVerticesList[i][0] + " " + planesVerticesList[i][1] + " " + planesVerticesList[i][2]); // 3 vertices per plane in vanilla hammer
+                    var vertices2 = new Vertices(planesVerticesList[i][3] + " " + planesVerticesList[i][4] + " " + planesVerticesList[i][5]); // 3 vertices per plane in vanilla hammer
+                    var vertices3 = new Vertices(planesVerticesList[i][6] + " " + planesVerticesList[i][7] + " " + planesVerticesList[i][8]); // 3 vertices per plane in vanilla hammer
+
+                    squarePlaneList.Add(new SquarePlane(vertices1, vertices2, vertices3));
+                }
+
+                brush.SquarePlaneList = squarePlaneList;
             }
         }
 

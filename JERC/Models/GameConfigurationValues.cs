@@ -4,21 +4,21 @@ using System.Linq;
 
 namespace JERC.Models
 {
-    public class GameConfigurationValues
+    public static class GameConfigurationValues
     {
-        public bool isVanillaHammer = false;
+        public static bool isVanillaHammer = false;
 
-        public string csgoFolderPath;
-        public string binFolderPath;
-        public string overviewsFolderPath;
-        public string vmfFilepath;
-        public string vmfFilepathDirectory;
+        public static string csgoFolderPath;
+        public static string binFolderPath;
+        public static string overviewsFolderPath;
+        public static string vmfFilepath;
+        public static string vmfFilepathDirectory;
 
         private static readonly int maxNumOfDiffArgs = 3;
         private static readonly int maxNumOfArgs = maxNumOfDiffArgs * 2;
 
 
-        public GameConfigurationValues(string[] args)
+        public static void SetArgs(string[] args)
         {
             if (args.Length > maxNumOfArgs)
                 return;
@@ -73,7 +73,7 @@ namespace JERC.Models
         }
 
 
-        public bool VerifyAllValuesSet() // ignored isVanillaHammer
+        public static bool VerifyAllValuesSet() // ignored isVanillaHammer
         {
             if (string.IsNullOrWhiteSpace(csgoFolderPath) ||
                 string.IsNullOrWhiteSpace(binFolderPath) ||
@@ -89,7 +89,7 @@ namespace JERC.Models
         }
 
 
-        public bool VerifyAllDirectoriesAndFilesExist()
+        public static bool VerifyAllDirectoriesAndFilesExist()
         {
             if (!Directory.Exists(csgoFolderPath) ||
                 !Directory.Exists(binFolderPath) ||

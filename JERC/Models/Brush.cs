@@ -12,6 +12,8 @@ namespace JERC.Models
         public List<Side> side;
         public Editor editor;
 
+        public List<SquarePlane> SquarePlaneList; // set in CalculateVerticesPlusForAllBrushSides() in Program.cs (only set if using vanilla hammer)
+
 
         public Brush(IVNode brush)
         {
