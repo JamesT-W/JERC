@@ -7,6 +7,7 @@ namespace JERC.Models
 {
     public class VmfRequiredData
     {
+        public List<Brush> brushesIgnore;
         public List<Brush> brushesRemove;
         public List<Brush> brushesPath;
         public List<Brush> brushesCover;
@@ -25,6 +26,7 @@ namespace JERC.Models
         public List<Brush> brushesCTSpawn;
 
 
+        public List<Side> brushesSidesIgnore;
         public List<Side> brushesSidesRemove;
         public List<Side> brushesSidesPath;
         public List<Side> brushesSidesCover;
@@ -43,6 +45,7 @@ namespace JERC.Models
         public List<Side> brushesSidesCTSpawn;*/
 
 
+        public List<Brush> displacementsIgnore;
         public List<Brush> displacementsRemove;
         public List<Brush> displacementsPath;
         public List<Brush> displacementsCover;
@@ -61,6 +64,7 @@ namespace JERC.Models
         public List<Brush> displacementsCTSpawn;
 
 
+        public List<Side> displacementsSidesIgnore;
         public List<Side> displacementsSidesRemove;
         public List<Side> displacementsSidesPath;
         public List<Side> displacementsSidesCover;
@@ -103,18 +107,19 @@ namespace JERC.Models
 
 
         public VmfRequiredData(
-            IEnumerable<IVNode> brushesRemoveIVNodes, IEnumerable<IVNode> brushesPathIVNodes, IEnumerable<IVNode> brushesCoverIVNodes, IEnumerable<IVNode> brushesOverlapIVNodes, IEnumerable<IVNode> brushesDoorIVNodes, IEnumerable<IVNode> brushesLadderIVNodes, IEnumerable<IVNode> brushesDangerIVNodes,
+            IEnumerable<IVNode> brushesIgnoreIVNodes, IEnumerable<IVNode> brushesRemoveIVNodes, IEnumerable<IVNode> brushesPathIVNodes, IEnumerable<IVNode> brushesCoverIVNodes, IEnumerable<IVNode> brushesOverlapIVNodes, IEnumerable<IVNode> brushesDoorIVNodes, IEnumerable<IVNode> brushesLadderIVNodes, IEnumerable<IVNode> brushesDangerIVNodes,
             IEnumerable<IVNode> brushesBuyzoneIVNodes,IEnumerable<IVNode> brushesBombsiteAIVNodes, IEnumerable<IVNode> brushesBombsiteBIVNodes, IEnumerable<IVNode> brushesRescueZoneIVNodes, IEnumerable<IVNode> brushesHostageIVNodes, IEnumerable<IVNode> brushesTSpawnIVNodes, IEnumerable<IVNode> brushesCTSpawnIVNodes,
-            IEnumerable<IVNode> displacementsRemoveIVNodes, IEnumerable<IVNode> displacementsPathIVNodes, IEnumerable<IVNode> displacementsCoverIVNodes, IEnumerable<IVNode> displacementsOverlapIVNodes, IEnumerable<IVNode> displacementsDoorIVNodes, IEnumerable<IVNode> displacementsLadderIVNodes, IEnumerable<IVNode> displacementsDangerIVNodes,
+            IEnumerable<IVNode> displacementsIgnoreIVNodes, IEnumerable<IVNode> displacementsRemoveIVNodes, IEnumerable<IVNode> displacementsPathIVNodes, IEnumerable<IVNode> displacementsCoverIVNodes, IEnumerable<IVNode> displacementsOverlapIVNodes, IEnumerable<IVNode> displacementsDoorIVNodes, IEnumerable<IVNode> displacementsLadderIVNodes, IEnumerable<IVNode> displacementsDangerIVNodes,
             IEnumerable<IVNode> displacementsBuyzoneIVNodes, IEnumerable<IVNode> displacementsBombsiteAIVNodes, IEnumerable<IVNode> displacementsBombsiteBIVNodes, IEnumerable<IVNode> displacementsRescueZoneIVNodes, IEnumerable<IVNode> displacementsHostageIVNodes, IEnumerable<IVNode> displacementsTSpawnIVNodes, IEnumerable<IVNode> displacementsCTSpawnIVNodes,
             IEnumerable<IVNode> buyzoneBrushEntitiesIVNodes, IEnumerable<IVNode> bombsiteBrushEntitiesIVNodes, IEnumerable<IVNode> rescueZoneBrushEntitiesIVNodes, IEnumerable<IVNode> hostageEntitiesIVNodes, IEnumerable<IVNode> ctSpawnEntitiesIVNodes, IEnumerable<IVNode> tSpawnEntitiesIVNodes,
-            IEnumerable<IVNode> brushesRemoveBrushEntitiesIVNodes, IEnumerable<IVNode> brushesPathBrushEntitiesIVNodes, IEnumerable<IVNode> brushesCoverBrushEntitiesIVNodes, IEnumerable<IVNode> brushesOverlapBrushEntitiesIVNodes, IEnumerable<IVNode> brushesDoorBrushEntitiesIVNodes, IEnumerable<IVNode> brushesLadderBrushEntitiesIVNodes, IEnumerable<IVNode> brushesDangerBrushEntitiesIVNodes,
+            IEnumerable<IVNode> brushesIgnoreBrushEntitiesIVNodes, IEnumerable<IVNode> brushesRemoveBrushEntitiesIVNodes, IEnumerable<IVNode> brushesPathBrushEntitiesIVNodes, IEnumerable<IVNode> brushesCoverBrushEntitiesIVNodes, IEnumerable<IVNode> brushesOverlapBrushEntitiesIVNodes, IEnumerable<IVNode> brushesDoorBrushEntitiesIVNodes, IEnumerable<IVNode> brushesLadderBrushEntitiesIVNodes, IEnumerable<IVNode> brushesDangerBrushEntitiesIVNodes,
             IEnumerable<IVNode> brushesBuyzoneBrushEntitiesIVNodes, IEnumerable<IVNode> brushesBombsiteABrushEntitiesIVNodes, IEnumerable<IVNode> brushesBombsiteBBrushEntitiesIVNodes, IEnumerable<IVNode> brushesRescueZoneBrushEntitiesIVNodes, IEnumerable<IVNode> brushesHostageBrushEntitiesIVNodes, IEnumerable<IVNode> brushesTSpawnBrushEntitiesIVNodes, IEnumerable<IVNode> brushesCTSpawnBrushEntitiesIVNodes,
             IEnumerable<IVNode> jercBoxBrushEntitiesIVNodes,
             IEnumerable<IVNode> jercConfigEntitiesIVNodes, IEnumerable<IVNode> jercDividerEntitiesIVNodes, IEnumerable<IVNode> jercFloorEntitiesIVNodes, IEnumerable<IVNode> jercCeilingEntitiesIVNodes
         )
         {
             // world brushes (brush entity brushes are concatinated on)
+            brushesIgnore = brushesIgnoreIVNodes.Any() ? brushesIgnoreIVNodes.Select(x => new Brush(x)).ToList() : new List<Brush>();
             brushesRemove = brushesRemoveIVNodes.Any() ? brushesRemoveIVNodes.Select(x => new Brush(x)).ToList() : new List<Brush>();
             brushesPath = brushesPathIVNodes.Any() ? brushesPathIVNodes.Select(x => new Brush(x)).ToList() : new List<Brush>();
             brushesCover = brushesCoverIVNodes.Any() ? brushesCoverIVNodes.Select(x => new Brush(x)).ToList() : new List<Brush>();
@@ -132,6 +137,8 @@ namespace JERC.Models
             brushesCTSpawn = brushesCTSpawnIVNodes.Any() ? brushesCTSpawnIVNodes.Select(x => new Brush(x)).ToList() : new List<Brush>();
 
             // adds to world brushes from certain brush entities that use the corresponding textures
+            if (brushesIgnoreBrushEntitiesIVNodes.Any())
+                brushesIgnore.AddRange(brushesIgnoreBrushEntitiesIVNodes.Select(x => new Brush(x)).ToList());
             if (brushesRemoveBrushEntitiesIVNodes.Any())
                 brushesRemove.AddRange(brushesRemoveBrushEntitiesIVNodes.Select(x => new Brush(x)).ToList());
             if (brushesPathBrushEntitiesIVNodes.Any())
@@ -162,6 +169,16 @@ namespace JERC.Models
             if (brushesCTSpawnBrushEntitiesIVNodes.Any())
                 brushesCTSpawn.AddRange(brushesCTSpawnBrushEntitiesIVNodes.Select(x => new Brush(x)).ToList());
 
+            // calculate vertices_plus for every brush side for vanilla hammer vmfs, as hammer++ adds vertices itself when saving a vmf
+            if (GameConfigurationValues.isVanillaHammer)
+            {
+                VanillaHammerVmfFixer.CalculateVerticesPlusForAllBrushSides(
+                    brushesIgnore.SelectMany(x => x.side).Concat(brushesRemove.SelectMany(x => x.side)).Concat(brushesPath.SelectMany(x => x.side)).Concat(brushesCover.SelectMany(x => x.side)).Concat(brushesOverlap.SelectMany(x => x.side)).Concat(brushesDoor.SelectMany(x => x.side)).Concat(brushesLadder.SelectMany(x => x.side)).Concat(brushesDanger.SelectMany(x => x.side))
+                    .ToList()
+                );
+            }
+
+            var brushesSidesIgnoreUnordered = brushesIgnore.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.IgnoreTextureName)).ToList();
             var brushesSidesRemoveUnordered = brushesRemove.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.RemoveTextureName)).ToList();
             var brushesSidesPathUnordered = brushesPath.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.PathTextureName)).ToList();
             var brushesSidesCoverUnordered = brushesCover.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.CoverTextureName)).ToList();
@@ -180,6 +197,7 @@ namespace JERC.Models
             var brushesSidesCTSpawnUnordered = brushesCTSpawn.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.CTSpawnTextureName)).ToList();*/
 
             // remove all of a brush's sides when there is a displacement side on the brush
+            brushesSidesIgnoreUnordered.RemoveAll(x => brushesIgnore.FirstOrDefault(y => y.id == x.brushId).side.Any(y => y.isDisplacement));
             brushesSidesRemoveUnordered.RemoveAll(x => brushesRemove.FirstOrDefault(y => y.id == x.brushId).side.Any(y => y.isDisplacement));
             brushesSidesPathUnordered.RemoveAll(x => brushesPath.FirstOrDefault(y => y.id == x.brushId).side.Any(y => y.isDisplacement));
             brushesSidesCoverUnordered.RemoveAll(x => brushesCover.FirstOrDefault(y => y.id == x.brushId).side.Any(y => y.isDisplacement));
@@ -198,6 +216,7 @@ namespace JERC.Models
             brushesSidesCTSpawnUnordered.RemoveAll(x => brushesCTSpawn.FirstOrDefault(y => y.id == x.brushId).side.Any(y => y.isDisplacement));*/
             //
 
+            brushesSidesIgnore = OrderListOfSidesByVerticesMin(brushesSidesIgnoreUnordered, true);
             brushesSidesRemove = OrderListOfSidesByVerticesMin(brushesSidesRemoveUnordered);
             brushesSidesPath = OrderListOfSidesByVerticesMin(brushesSidesPathUnordered);
             brushesSidesCover = OrderListOfSidesByVerticesMin(brushesSidesCoverUnordered);
@@ -216,6 +235,7 @@ namespace JERC.Models
             brushesSidesCTSpawn = OrderListOfSidesByVerticesMin(brushesSidesCTSpawnUnordered);*/
 
             // displacements
+            displacementsIgnore = displacementsIgnoreIVNodes.Any() ? displacementsIgnoreIVNodes.Select(x => new Brush(x)).ToList() : new List<Brush>();
             displacementsRemove = displacementsRemoveIVNodes.Any() ? displacementsRemoveIVNodes.Select(x => new Brush(x)).ToList() : new List<Brush>();
             displacementsPath = displacementsPathIVNodes.Any() ? displacementsPathIVNodes.Select(x => new Brush(x)).ToList() : new List<Brush>();
             displacementsCover = displacementsCoverIVNodes.Any() ? displacementsCoverIVNodes.Select(x => new Brush(x)).ToList() : new List<Brush>();
@@ -232,6 +252,16 @@ namespace JERC.Models
             displacementsTSpawn = displacementsTSpawnIVNodes.Any() ? displacementsTSpawnIVNodes.Select(x => new Brush(x)).ToList() : new List<Brush>();
             displacementsCTSpawn = displacementsCTSpawnIVNodes.Any() ? displacementsCTSpawnIVNodes.Select(x => new Brush(x)).ToList() : new List<Brush>();
 
+            // calculate vertices_plus for every brush side for vanilla hammer vmfs, as hammer++ adds vertices itself when saving a vmf
+            if (GameConfigurationValues.isVanillaHammer)
+            {
+                VanillaHammerVmfFixer.CalculateVerticesPlusForAllBrushSides(
+                    displacementsIgnore.SelectMany(x => x.side).Concat(displacementsRemove.SelectMany(x => x.side)).Concat(displacementsPath.SelectMany(x => x.side)).Concat(displacementsCover.SelectMany(x => x.side)).Concat(displacementsOverlap.SelectMany(x => x.side)).Concat(displacementsDoor.SelectMany(x => x.side)).Concat(displacementsLadder.SelectMany(x => x.side)).Concat(displacementsDanger.SelectMany(x => x.side))
+                    .ToList()
+                );
+            }
+
+            var displacementsSidesIgnoreUnordered = displacementsIgnore.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.IgnoreTextureName)).ToList();
             var displacementsSidesRemoveUnordered = displacementsRemove.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.RemoveTextureName)).ToList();
             var displacementsSidesPathUnordered = displacementsPath.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.PathTextureName)).ToList();
             var displacementsSidesCoverUnordered = displacementsCover.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.CoverTextureName)).ToList();
@@ -250,6 +280,7 @@ namespace JERC.Models
             var displacementsSidesCTSpawnUnordered = displacementsCTSpawn.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.CTSpawnTextureName)).ToList();*/
 
             // remove all non displacement sides on the brush
+            displacementsSidesIgnoreUnordered.RemoveAll(x => !x.isDisplacement);
             displacementsSidesRemoveUnordered.RemoveAll(x => !x.isDisplacement);
             displacementsSidesPathUnordered.RemoveAll(x => !x.isDisplacement);
             displacementsSidesCoverUnordered.RemoveAll(x => !x.isDisplacement);
@@ -268,6 +299,7 @@ namespace JERC.Models
             displacementsSidesCTSpawnUnordered.RemoveAll(x => !x.isDisplacement);*/
             //
 
+            displacementsSidesIgnore = OrderListOfSidesByVerticesMin(displacementsSidesIgnoreUnordered, true);
             displacementsSidesRemove = OrderListOfSidesByVerticesMin(displacementsSidesRemoveUnordered);
             displacementsSidesPath = OrderListOfSidesByVerticesMin(displacementsSidesPathUnordered);
             displacementsSidesCover = OrderListOfSidesByVerticesMin(displacementsSidesCoverUnordered);
@@ -292,6 +324,20 @@ namespace JERC.Models
             hostageEntities = hostageEntitiesIVNodes.Any() ? hostageEntitiesIVNodes.Select(x => new Entity(x)).ToList() : new List<Entity>();
             ctSpawnEntities = ctSpawnEntitiesIVNodes.Any() ? ctSpawnEntitiesIVNodes.Select(x => new Entity(x)).ToList() : new List<Entity>();
             tSpawnEntities = tSpawnEntitiesIVNodes.Any() ? tSpawnEntitiesIVNodes.Select(x => new Entity(x)).ToList() : new List<Entity>();
+
+            // calculate vertices_plus for every brush side for vanilla hammer vmfs, as hammer++ adds vertices itself when saving a vmf
+            if (GameConfigurationValues.isVanillaHammer)
+            {
+                VanillaHammerVmfFixer.CalculateVerticesPlusForAllBrushSides(
+                    buyzoneBrushEntities.SelectMany(x => x.brushes.SelectMany(y => y.side))
+                        .Concat(bombsiteBrushEntities.SelectMany(x => x.brushes.SelectMany(y => y.side)))
+                        .Concat(rescueZoneBrushEntities.SelectMany(x => x.brushes.SelectMany(y => y.side)))
+                        .Concat(hostageEntities.SelectMany(x => x.brushes.SelectMany(y => y.side)))
+                        .Concat(ctSpawnEntities.SelectMany(x => x.brushes.SelectMany(y => y.side)))
+                        .Concat(tSpawnEntities.SelectMany(x => x.brushes.SelectMany(y => y.side)))
+                    .ToList()
+                );
+            }
 
             foreach (var entity in buyzoneBrushEntities)
             {
@@ -325,10 +371,15 @@ namespace JERC.Models
 
         // Orders by descending, then uses distinct to ensure that it gets the MAX value first for each side and ignores the rest.
         // Then, it reverses, so it is ascending (MIN value first)
-        private static List<Side> OrderListOfSidesByVerticesMin(List<Side> sides)
+        private static List<Side> OrderListOfSidesByVerticesMin(List<Side> sides, bool calculateVerticesPlus = false)
         {
             if (sides == null || !sides.Any())
                 return sides;
+
+            if (GameConfigurationValues.isVanillaHammer && calculateVerticesPlus)
+            {
+                VanillaHammerVmfFixer.CalculateVerticesPlusForAllBrushSides(sides);
+            }
 
             var sidesNew = (from x in sides
                             from y in x?.vertices_plus

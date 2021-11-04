@@ -1,4 +1,4 @@
-using ImageAlterer;
+﻿using ImageAlterer;
 using JERC.Constants;
 using JERC.Enums;
 using JERC.Models;
@@ -105,12 +105,6 @@ namespace JERC
                 Logger.LogDebugInfo("Setting alternateOutputPath to empty string");
 
                 jercConfigValues.alternateOutputPath = string.Empty;
-            }
-
-            // calculate vertices_plus for every brush side for vanilla hammer vmfs, as hammer++ adds vertices itself when saving a vmf
-            if (GameConfigurationValues.isVanillaHammer)
-            {
-                CalculateVerticesPlusForAllBrushSides();
             }
 
             Logger.LogNewLine();
@@ -354,6 +348,7 @@ namespace JERC
                                             select x;
 
             // brushes
+            var brushesIgnore = GetBrushesByTextureName(allWorldBrushesInVisgroup, TextureNames.IgnoreTextureName);
             var brushesRemove = GetBrushesByTextureName(allWorldBrushesInVisgroup, TextureNames.RemoveTextureName);
             var brushesPath = GetBrushesByTextureName(allWorldBrushesInVisgroup, TextureNames.PathTextureName);
             var brushesCover = GetBrushesByTextureName(allWorldBrushesInVisgroup, TextureNames.CoverTextureName);
@@ -375,6 +370,7 @@ namespace JERC
             var brushesCTSpawn = GetBrushesByTextureName(allWorldBrushesInVisgroup, TextureNames.CTSpawnTextureName);
 
             // displacements
+            var displacementsIgnore = GetDisplacementsByTextureName(allWorldBrushesInVisgroup, TextureNames.IgnoreTextureName);
             var displacementsRemove = GetDisplacementsByTextureName(allWorldBrushesInVisgroup, TextureNames.RemoveTextureName);
             var displacementsPath = GetDisplacementsByTextureName(allWorldBrushesInVisgroup, TextureNames.PathTextureName);
             var displacementsCover = GetDisplacementsByTextureName(allWorldBrushesInVisgroup, TextureNames.CoverTextureName);
@@ -423,6 +419,7 @@ namespace JERC
                 .Concat(funcLadderBrushEntities)
                 .Concat(triggerHurtBrushEntities);
 
+            var brushesIgnoreBrushEntities = GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLaddersAndDangers(allBrushesBrushEntities, TextureNames.IgnoreTextureName);
             var brushesRemoveBrushEntities = GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLaddersAndDangers(allBrushesBrushEntities, TextureNames.RemoveTextureName);
             var brushesPathBrushEntities = GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLaddersAndDangers(allBrushesBrushEntities, TextureNames.PathTextureName);
             var brushesCoverBrushEntities = GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLaddersAndDangers(allBrushesBrushEntities, TextureNames.CoverTextureName);
@@ -466,12 +463,12 @@ namespace JERC
             Logger.LogNewLine();
 
             return new VmfRequiredData(
-                brushesRemove, brushesPath, brushesCover, brushesOverlap, brushesDoor, brushesLadder, brushesDanger,
+                brushesIgnore, brushesRemove, brushesPath, brushesCover, brushesOverlap, brushesDoor, brushesLadder, brushesDanger,
                 brushesBuyzone, brushesBombsiteA, brushesBombsiteB, brushesRescueZone, brushesHostage, brushesTSpawn, brushesCTSpawn,
-                displacementsRemove, displacementsPath, displacementsCover, displacementsOverlap, displacementsDoor, displacementsLadder, displacementsDanger,
+                displacementsIgnore, displacementsRemove, displacementsPath, displacementsCover, displacementsOverlap, displacementsDoor, displacementsLadder, displacementsDanger,
                 displacementsBuyzone, displacementsBombsiteA, displacementsBombsiteB, displacementsRescueZone, displacementsHostage, displacementsTSpawn, displacementsCTSpawn,
                 buyzoneBrushEntities, bombsiteBrushEntities, rescueZoneBrushEntities, hostageEntities, ctSpawnEntities, tSpawnEntities,
-                brushesRemoveBrushEntities, brushesPathBrushEntities, brushesCoverBrushEntities, brushesOverlapBrushEntities, brushesDoorBrushEntities, brushesLadderBrushEntities, brushesDangerBrushEntities,
+                brushesIgnoreBrushEntities, brushesRemoveBrushEntities, brushesPathBrushEntities, brushesCoverBrushEntities, brushesOverlapBrushEntities, brushesDoorBrushEntities, brushesLadderBrushEntities, brushesDangerBrushEntities,
                 brushesBuyzoneBrushEntities, brushesBombsiteABrushEntities, brushesBombsiteBBrushEntities, brushesRescueZoneBrushEntities, brushesHostageBrushEntities, brushesTSpawnBrushEntities, brushesCTSpawnBrushEntities,
                 jercBoxBrushEntities,
                 jercConfigEntities, jercDividerEntities, jercFloorEntities, jercCeilingEntities
@@ -609,59 +606,6 @@ namespace JERC
                         where y.Name == "classname"
                         where y.Value.ToLower() == classname.ToLower()
                         select x).Distinct();
-            }
-        }
-
-
-        private static void CalculateVerticesPlusForAllBrushSides()
-        {
-            var allBrushesAndDisplacementsExceptIgnore = vmfRequiredData.brushesRemove
-                .Concat(vmfRequiredData.brushesPath)
-                .Concat(vmfRequiredData.brushesCover)
-                .Concat(vmfRequiredData.brushesOverlap)
-                .Concat(vmfRequiredData.brushesDoor)
-                .Concat(vmfRequiredData.brushesLadder)
-                .Concat(vmfRequiredData.brushesDanger)
-                .Concat(vmfRequiredData.brushesBuyzone)
-                .Concat(vmfRequiredData.brushesBombsiteA)
-                .Concat(vmfRequiredData.brushesBombsiteB)
-                .Concat(vmfRequiredData.brushesRescueZone)
-                .Concat(vmfRequiredData.brushesHostage)
-                .Concat(vmfRequiredData.brushesTSpawn)
-                .Concat(vmfRequiredData.brushesCTSpawn)
-                .Concat(vmfRequiredData.displacementsRemove)
-                .Concat(vmfRequiredData.displacementsPath)
-                .Concat(vmfRequiredData.displacementsCover)
-                .Concat(vmfRequiredData.displacementsOverlap)
-                .Concat(vmfRequiredData.displacementsDoor)
-                .Concat(vmfRequiredData.displacementsLadder)
-                .Concat(vmfRequiredData.displacementsDanger)
-                .Concat(vmfRequiredData.displacementsBuyzone)
-                .Concat(vmfRequiredData.displacementsBombsiteA)
-                .Concat(vmfRequiredData.displacementsBombsiteB)
-                .Concat(vmfRequiredData.displacementsRescueZone)
-                .Concat(vmfRequiredData.displacementsHostage)
-                .Concat(vmfRequiredData.displacementsTSpawn)
-                .Concat(vmfRequiredData.displacementsCTSpawn);
-
-            if (allBrushesAndDisplacementsExceptIgnore == null || allBrushesAndDisplacementsExceptIgnore.Count() == 0)
-                return;
-
-            foreach (var brush in allBrushesAndDisplacementsExceptIgnore)
-            {
-                var planesVerticesList = brush.side.Select(x => x.plane.Replace("(", string.Empty).Replace(")", string.Empty).Split(" ").ToArray()).ToList();
-
-                var squarePlaneList = new List<SquarePlane>();
-                for (int i = 0; i < planesVerticesList.Count(); i++)
-                {
-                    var vertices1 = new Vertices(planesVerticesList[i][0] + " " + planesVerticesList[i][1] + " " + planesVerticesList[i][2]); // 3 vertices per plane in vanilla hammer
-                    var vertices2 = new Vertices(planesVerticesList[i][3] + " " + planesVerticesList[i][4] + " " + planesVerticesList[i][5]); // 3 vertices per plane in vanilla hammer
-                    var vertices3 = new Vertices(planesVerticesList[i][6] + " " + planesVerticesList[i][7] + " " + planesVerticesList[i][8]); // 3 vertices per plane in vanilla hammer
-
-                    squarePlaneList.Add(new SquarePlane(brush.side.ElementAt(i).brushId, brush.side.ElementAt(i).id, vertices1, vertices2, vertices3));
-                }
-
-                brush.SquarePlaneList = squarePlaneList;
             }
         }
 
@@ -1485,6 +1429,12 @@ namespace JERC
                 var brushNew = new BrushVolume();
                 foreach (var brushSide in brush.side.ToList())
                 {
+                    // calculate vertices_plus for every brush side for vanilla hammer vmfs, as hammer++ adds vertices itself when saving a vmf
+                    if (GameConfigurationValues.isVanillaHammer)
+                    {
+                        VanillaHammerVmfFixer.CalculateVerticesPlusForAllBrushSides(brush.side);
+                    }
+
                     var brushSideNew = new BrushSide();
                     foreach (var vertices in brushSide.vertices_plus.ToList())
                     {
