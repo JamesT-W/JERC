@@ -16,7 +16,7 @@ namespace JERC.Models
         public string material;
         public string uaxis;
         public string vaxis;
-        public int rotation;
+        public float rotation;
         public int smoothing_groups;
         public DispInfo dispinfo;
 
@@ -30,7 +30,7 @@ namespace JERC.Models
             material = side.Body.FirstOrDefault(x => x.Name == "material")?.Value;
             uaxis = side.Body.FirstOrDefault(x => x.Name == "uaxis")?.Value;
             vaxis = side.Body.FirstOrDefault(x => x.Name == "vaxis")?.Value;
-            rotation = int.Parse(side.Body.FirstOrDefault(x => x.Name == "rotation")?.Value, Globalization.Style, Globalization.Culture);
+            rotation = float.Parse(side.Body.FirstOrDefault(x => x.Name == "rotation")?.Value, Globalization.Style, Globalization.Culture);
             smoothing_groups = int.Parse(side.Body.FirstOrDefault(x => x.Name == "smoothing_groups")?.Value);
 
             var dispinfoIVNode = side.Body.FirstOrDefault(x => x.Name == "dispinfo");
