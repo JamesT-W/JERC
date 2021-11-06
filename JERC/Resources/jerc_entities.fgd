@@ -63,13 +63,13 @@
 		1: "Yes"
 	]
 
-	strokeAroundEntities(choices) : "Stroke Around Entities" : 1 : "Currently, if there are more than one brush in an entity, it will not combine them, so they will keep their individual borders" =
+	strokeAroundEntities(choices) : "Stroke Around Entities" : 1 : "Currently, if there is more than one brush in an entity, it will not combine them, so they will keep their individual borders" =
 	[
 		0: "No"
 		1: "Yes"
 	]
 
-	strokeAroundBrushEntities(choices) : "Stroke Around Brush Entities" : 1 : "Currently, if there are more than one brush in an entity, it will not combine them, so they will keep their individual borders" =
+	strokeAroundBrushEntities(choices) : "Stroke Around Brush Entities" : 1 : "Currently, if there is more than one brush in an entity, it will not combine them, so they will keep their individual borders" =
 	[
 		0: "No"
 		1: "Yes"
