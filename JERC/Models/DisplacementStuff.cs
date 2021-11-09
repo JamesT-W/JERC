@@ -32,7 +32,7 @@ namespace JERC.Models
         public Vertices[,] pointsLocations;
 
 
-        public DisplacementStuff(DispInfo dispInfo, List<Vertices> brushSideVertices)
+        public DisplacementStuff(ConfigurationValues configurationValues, DispInfo dispInfo, List<Vertices> brushSideVertices)
         {
             power = dispInfo.power;
             startPosition = dispInfo.startPosition;
@@ -109,7 +109,7 @@ namespace JERC.Models
             // adds default values for each row and vert for normals and distances
             for (int i = 0; i < numOfRows; i++)
             {
-                var displacementSideNormalsRow = new DisplacementSideNormalsRow(i, dispInfo.normals.FirstOrDefault().Body.FirstOrDefault(x => x.Name == ("row" + i)));
+                var displacementSideNormalsRow = new DisplacementSideNormalsRow(configurationValues, i, dispInfo.normals.FirstOrDefault().Body.FirstOrDefault(x => x.Name == ("row" + i)));
                 var displacementSideDistancesRow = new DisplacementSideDistancesRow(i, dispInfo.distances.FirstOrDefault().Body.FirstOrDefault(x => x.Name == ("row" + i)));
 
                 // add default values if null

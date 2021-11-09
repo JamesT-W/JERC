@@ -15,6 +15,7 @@ namespace JERC.Models
         public bool onlyOutputToAlternatePath;
         public bool exportRadarAsSeparateLevels;
         public bool useSeparateGradientEachLevel;
+        public bool ignoreDisplacementXYChanges;
         public string backgroundFilename;
         public float radarSizeMultiplier;
         public int overlapAlpha;
@@ -62,6 +63,7 @@ namespace JERC.Models
             onlyOutputToAlternatePath = jercEntitySettingsValues.ContainsKey("onlyOutputToAlternatePath") && jercEntitySettingsValues["onlyOutputToAlternatePath"] == "1";
             exportRadarAsSeparateLevels = jercEntitySettingsValues.ContainsKey("exportRadarAsSeparateLevels") && jercEntitySettingsValues["exportRadarAsSeparateLevels"] == "1";
             useSeparateGradientEachLevel = jercEntitySettingsValues.ContainsKey("useSeparateGradientEachLevel") && jercEntitySettingsValues["useSeparateGradientEachLevel"] == "1";
+            ignoreDisplacementXYChanges = jercEntitySettingsValues.ContainsKey("ignoreDisplacementXYChanges") && jercEntitySettingsValues["ignoreDisplacementXYChanges"] == "1";
             backgroundFilename = string.IsNullOrWhiteSpace(jercEntitySettingsValues["backgroundFilename"]) ? null : jercEntitySettingsValues["backgroundFilename"];
 
             radarSizeMultiplier = jercEntitySettingsValues.ContainsKey("radarSizeMultiplier") && jercEntitySettingsValues["radarSizeMultiplier"] != null ? float.Parse(jercEntitySettingsValues["radarSizeMultiplier"], Globalization.Style, Globalization.Culture) : 0.95f;

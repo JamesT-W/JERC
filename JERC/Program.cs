@@ -591,6 +591,7 @@ namespace JERC
             jercEntitySettingsValues.Add("onlyOutputToAlternatePath", jercConfig.FirstOrDefault(x => x.Name == "onlyOutputToAlternatePath")?.Value);
             jercEntitySettingsValues.Add("exportRadarAsSeparateLevels", jercConfig.FirstOrDefault(x => x.Name == "exportRadarAsSeparateLevels")?.Value);
             jercEntitySettingsValues.Add("useSeparateGradientEachLevel", jercConfig.FirstOrDefault(x => x.Name == "useSeparateGradientEachLevel")?.Value);
+            jercEntitySettingsValues.Add("ignoreDisplacementXYChanges", jercConfig.FirstOrDefault(x => x.Name == "ignoreDisplacementXYChanges")?.Value);
             jercEntitySettingsValues.Add("backgroundFilename", jercConfig.FirstOrDefault(x => x.Name == "backgroundFilename")?.Value ?? string.Empty);
             jercEntitySettingsValues.Add("radarSizeMultiplier", jercConfig.FirstOrDefault(x => x.Name == "radarSizeMultiplier")?.Value);
             jercEntitySettingsValues.Add("overlapAlpha", jercConfig.FirstOrDefault(x => x.Name == "overlapAlpha")?.Value);
@@ -1653,7 +1654,7 @@ namespace JERC
                     // add displacement stuff if the brush is a displacement
                     if (brushSide.isDisplacement)
                     {
-                        brushSideNew.displacementStuff = new DisplacementStuff(brushSide.dispinfo, brushSideNew.vertices); //// brushSide.vertices_plus ??
+                        brushSideNew.displacementStuff = new DisplacementStuff(configurationValues, brushSide.dispinfo, brushSideNew.vertices); //// brushSide.vertices_plus ??
                     }
 
                     brushNew.brushSides.Add(brushSideNew);
@@ -1687,7 +1688,7 @@ namespace JERC
                 // add displacement stuff if the brush is a displacement
                 if (side.isDisplacement)
                 {
-                    brushSideNew.displacementStuff = new DisplacementStuff(side.dispinfo, brushSideNew.vertices); //// brushSide.vertices_plus ??
+                    brushSideNew.displacementStuff = new DisplacementStuff(configurationValues, side.dispinfo, brushSideNew.vertices); //// brushSide.vertices_plus ??
                 }
 
                 brushSideList.Add(brushSideNew);

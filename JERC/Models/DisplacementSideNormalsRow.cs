@@ -18,7 +18,7 @@ namespace JERC.Models
                 valuesList.Add(new Vertices(0, 0, 0));
         }
 
-        public DisplacementSideNormalsRow(int rowNum, IVNode valuesIVNode)
+        public DisplacementSideNormalsRow(ConfigurationValues configurationValues, int rowNum, IVNode valuesIVNode)
         {
             this.rowNum = rowNum;
 
@@ -38,9 +38,9 @@ namespace JERC.Models
                 var parsedCorrectlyZ = float.TryParse(valuesSplit[i+2], Globalization.Style, Globalization.Culture, out float z);
 
                 // if any don't parse correctly, just set to 0, even though that might be way off
-                if (!parsedCorrectlyX)
+                if (!parsedCorrectlyX || configurationValues.ignoreDisplacementXYChanges)
                     x = 0;
-                if (!parsedCorrectlyY)
+                if (!parsedCorrectlyY || configurationValues.ignoreDisplacementXYChanges)
                     y = 0;
                 if (!parsedCorrectlyZ)
                     z = 0;
