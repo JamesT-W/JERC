@@ -24,21 +24,21 @@ namespace JERC.Constants
 
         public static void LogWarning(string message)
         {
-            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.ForegroundColor = ConsoleColor.DarkYellow;
             Console.WriteLine(message);
         }
 
 
         public static void LogImportantWarning(string message)
         {
-            Console.ForegroundColor = ConsoleColor.DarkYellow;
+            Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine(message);
         }
 
 
         public static void LogError(string message)
         {
-            Console.ForegroundColor = ConsoleColor.Red;
+            Console.ForegroundColor = ConsoleColor.DarkRed;
             Console.WriteLine(message);
         }
 
