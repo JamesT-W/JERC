@@ -109,9 +109,9 @@ namespace JERC.Models
             // jerc_disp_rotation
             if (jercDispRotationEntityProvided)
             {
-                var dispRotationIds90 = string.IsNullOrWhiteSpace(jercEntitySettingsValues["displacementRotationIds90"]) ? new List<string>() : jercEntitySettingsValues["displacementRotationIds90"].Split(",").ToList();
-                var dispRotationIds180 = string.IsNullOrWhiteSpace(jercEntitySettingsValues["displacementRotationIds180"]) ? new List<string>() : jercEntitySettingsValues["displacementRotationIds180"].Split(",").ToList();
-                var dispRotationIds270 = string.IsNullOrWhiteSpace(jercEntitySettingsValues["displacementRotationIds270"]) ? new List<string>() : jercEntitySettingsValues["displacementRotationIds270"].Split(",").ToList();
+                var dispRotationIds90 = string.IsNullOrWhiteSpace(jercEntitySettingsValues["displacementRotationIds90"]) ? new List<string>() : jercEntitySettingsValues["displacementRotationIds90"].Split(",").Distinct().ToList();
+                var dispRotationIds180 = string.IsNullOrWhiteSpace(jercEntitySettingsValues["displacementRotationIds180"]) ? new List<string>() : jercEntitySettingsValues["displacementRotationIds180"].Split(",").Distinct().ToList();
+                var dispRotationIds270 = string.IsNullOrWhiteSpace(jercEntitySettingsValues["displacementRotationIds270"]) ? new List<string>() : jercEntitySettingsValues["displacementRotationIds270"].Split(",").Distinct().ToList();
 
                 foreach (var brushIdString in dispRotationIds90)
                 {
