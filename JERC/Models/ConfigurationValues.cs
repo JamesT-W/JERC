@@ -8,8 +8,9 @@ using System.Threading.Tasks;
 
 namespace JERC.Models
 {
-    public class JercConfigValues
+    public class ConfigurationValues
     {
+        // jerc_config
         public string alternateOutputPath;
         public bool onlyOutputToAlternatePath;
         public bool exportRadarAsSeparateLevels;
@@ -45,8 +46,13 @@ namespace JERC.Models
         public bool exportRawMasks;
         public bool exportBackgroundLevelsImage;
 
+        // jerc_disp_rotation
+        public List<int> displacementRotationIds90 = new();
+        public List<int> displacementRotationIds180 = new();
+        public List<int> displacementRotationIds270 = new();
 
-        public JercConfigValues(Dictionary<string, string> jercEntitySettingsValues, int jercDividerCount)
+
+        public ConfigurationValues(Dictionary<string, string> jercEntitySettingsValues, int jercDividerCount, bool jercDispRotationEntityProvided)
         {
             // jerc_config
             alternateOutputPath = string.IsNullOrWhiteSpace(jercEntitySettingsValues["alternateOutputPath"]) ? null : jercEntitySettingsValues["alternateOutputPath"];
@@ -100,9 +106,37 @@ namespace JERC.Models
             exportBackgroundLevelsImage = jercEntitySettingsValues.ContainsKey("exportBackgroundLevelsImage") && jercEntitySettingsValues["exportBackgroundLevelsImage"] == "1";
 
 
-            // 
+            // jerc_disp_rotation
+            if (jercDispRotationEntityProvided)
+            {
+                var dispRotationIds90 = string.IsNullOrWhiteSpace(jercEntitySettingsValues["displacementRotationIds90"]) ? new List<string>() : jercEntitySettingsValues["displacementRotationIds90"].Split(",").ToList();
+                var dispRotationIds180 = string.IsNullOrWhiteSpace(jercEntitySettingsValues["displacementRotationIds180"]) ? new List<string>() : jercEntitySettingsValues["displacementRotationIds180"].Split(",").ToList();
+                var dispRotationIds270 = string.IsNullOrWhiteSpace(jercEntitySettingsValues["displacementRotationIds270"]) ? new List<string>() : jercEntitySettingsValues["displacementRotationIds270"].Split(",").ToList();
 
+                foreach (var brushIdString in dispRotationIds90)
+                {
+                    if (int.TryParse(brushIdString, Globalization.Style, Globalization.Culture, out int brushId))
+                        displacementRotationIds90.Add(brushId);
+                    else
+                        Logger.LogImportantWarning($"Could not rotate displacement 90 degrees clockwise due to parsing error. Brush ID: {brushIdString}");
+                }
 
+                foreach (var brushIdString in dispRotationIds180)
+                {
+                    if (int.TryParse(brushIdString, Globalization.Style, Globalization.Culture, out int brushId))
+                        displacementRotationIds180.Add(brushId);
+                    else
+                        Logger.LogImportantWarning($"Could not rotate displacement 180 degrees due to parsing error. Brush ID: {brushIdString}");
+                }
+
+                foreach (var brushIdString in dispRotationIds270)
+                {
+                    if (int.TryParse(brushIdString, Globalization.Style, Globalization.Culture, out int brushId))
+                        displacementRotationIds270.Add(brushId);
+                    else
+                        Logger.LogImportantWarning($"Could not rotate displacement 90 degrees anti-clockwise due to parsing error. Brush ID: {brushIdString}");
+                }
+            }
         }
 
 

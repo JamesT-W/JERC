@@ -104,6 +104,7 @@ namespace JERC.Models
         public List<Entity> jercDividerEntities;
         public List<Entity> jercFloorEntities;
         public List<Entity> jercCeilingEntities;
+        public List<Entity> jercDispRotationEntities;
 
 
         public VmfRequiredData(
@@ -115,7 +116,7 @@ namespace JERC.Models
             IEnumerable<IVNode> brushesIgnoreBrushEntitiesIVNodes, IEnumerable<IVNode> brushesRemoveBrushEntitiesIVNodes, IEnumerable<IVNode> brushesPathBrushEntitiesIVNodes, IEnumerable<IVNode> brushesCoverBrushEntitiesIVNodes, IEnumerable<IVNode> brushesOverlapBrushEntitiesIVNodes, IEnumerable<IVNode> brushesDoorBrushEntitiesIVNodes, IEnumerable<IVNode> brushesLadderBrushEntitiesIVNodes, IEnumerable<IVNode> brushesDangerBrushEntitiesIVNodes,
             IEnumerable<IVNode> brushesBuyzoneBrushEntitiesIVNodes, IEnumerable<IVNode> brushesBombsiteABrushEntitiesIVNodes, IEnumerable<IVNode> brushesBombsiteBBrushEntitiesIVNodes, IEnumerable<IVNode> brushesRescueZoneBrushEntitiesIVNodes, IEnumerable<IVNode> brushesHostageBrushEntitiesIVNodes, IEnumerable<IVNode> brushesTSpawnBrushEntitiesIVNodes, IEnumerable<IVNode> brushesCTSpawnBrushEntitiesIVNodes,
             IEnumerable<IVNode> jercBoxBrushEntitiesIVNodes,
-            IEnumerable<IVNode> jercConfigEntitiesIVNodes, IEnumerable<IVNode> jercDividerEntitiesIVNodes, IEnumerable<IVNode> jercFloorEntitiesIVNodes, IEnumerable<IVNode> jercCeilingEntitiesIVNodes
+            IEnumerable<IVNode> jercConfigEntitiesIVNodes, IEnumerable<IVNode> jercDividerEntitiesIVNodes, IEnumerable<IVNode> jercFloorEntitiesIVNodes, IEnumerable<IVNode> jercCeilingEntitiesIVNodes, IEnumerable<IVNode> jercDispRotationEntitiesIVNodes
         )
         {
             // world brushes (brush entity brushes are concatinated on)
@@ -234,6 +235,7 @@ namespace JERC.Models
             brushesSidesTSpawn = OrderListOfSidesByVerticesMin(brushesSidesTSpawnUnordered);
             brushesSidesCTSpawn = OrderListOfSidesByVerticesMin(brushesSidesCTSpawnUnordered);*/
 
+
             // displacements
             displacementsIgnore = displacementsIgnoreIVNodes.Any() ? displacementsIgnoreIVNodes.Select(x => new Brush(x)).ToList() : new List<Brush>();
             displacementsRemove = displacementsRemoveIVNodes.Any() ? displacementsRemoveIVNodes.Select(x => new Brush(x)).ToList() : new List<Brush>();
@@ -317,6 +319,7 @@ namespace JERC.Models
             displacementsSidesTSpawn = OrderListOfSidesByVerticesMin(displacementsSidesTSpawnUnordered);
             displacementsSidesCTSpawn = OrderListOfSidesByVerticesMin(displacementsSidesCTSpawnUnordered);*/
 
+
             // entities
             buyzoneBrushEntities = buyzoneBrushEntitiesIVNodes.Any() ? buyzoneBrushEntitiesIVNodes.Select(x => new Entity(x)).ToList() : new List<Entity>();
             bombsiteBrushEntities = bombsiteBrushEntitiesIVNodes.Any() ? bombsiteBrushEntitiesIVNodes.Select(x => new Entity(x)).ToList() : new List<Entity>();
@@ -352,6 +355,7 @@ namespace JERC.Models
                 entitiesSidesByEntityRescueZoneId.Add(entity.id, entity.brushes.SelectMany(x => x.side).ToList());
             }
 
+
             // brush entities (JERC)
             jercBoxBrushEntities = jercBoxBrushEntitiesIVNodes.Any() ? jercBoxBrushEntitiesIVNodes.Select(x => new Entity(x)).ToList() : new List<Entity>();
 
@@ -361,11 +365,13 @@ namespace JERC.Models
                 jercBoxByEntityJercBoxId.Add(entity.id, new JercBox(entity));
             }
 
+
             // entities (JERC)
             jercConfigEntities = jercConfigEntitiesIVNodes.Any() ? jercConfigEntitiesIVNodes.Select(x => new Entity(x)).ToList() : new List<Entity>();
             jercDividerEntities = jercDividerEntitiesIVNodes.Any() ? jercDividerEntitiesIVNodes.Select(x => new Entity(x)).OrderBy(x => new Vertices(x.origin).z).ToList() : new List<Entity>(); // order by lowest height first
             jercFloorEntities = jercFloorEntitiesIVNodes.Any() ? jercFloorEntitiesIVNodes.Select(x => new Entity(x)).OrderBy(x => new Vertices(x.origin).z).ToList() : new List<Entity>(); // order by lowest height first
             jercCeilingEntities = jercCeilingEntitiesIVNodes.Any() ? jercCeilingEntitiesIVNodes.Select(x => new Entity(x)).OrderBy(x => new Vertices(x.origin).z).ToList() : new List<Entity>(); // order by lowest height first
+            jercDispRotationEntities = jercDispRotationEntitiesIVNodes.Any() ? jercDispRotationEntitiesIVNodes.Select(x => new Entity(x)).OrderBy(x => new Vertices(x.origin).z).ToList() : new List<Entity>();
         }
 
 
@@ -408,7 +414,16 @@ namespace JERC.Models
         }
 
 
-        private List<Brush> GetAllDisplayedBrushes()
+        // brushes
+        public List<Brush> GetAllDisplayedBrushes()
+        {
+            return GetAllDisplayedBrushesBrush()
+                .Concat(GetAllDisplayedBrushesDisplacement())
+                .Concat(GetAllDisplayedBrushesEntity())
+                .ToList();
+        }
+
+        public List<Brush> GetAllDisplayedBrushesBrush()
         {
             return brushesPath
                 .Concat(brushesCover)
@@ -420,7 +435,12 @@ namespace JERC.Models
                 .Concat(brushesBombsiteA)
                 .Concat(brushesBombsiteB)
                 .Concat(brushesRescueZone)
-                .Concat(displacementsPath)
+                .ToList();
+        }
+
+        public List<Brush> GetAllDisplayedBrushesDisplacement()
+        {
+            return displacementsPath
                 .Concat(displacementsCover)
                 .Concat(displacementsOverlap)
                 .Concat(displacementsDoor)
@@ -430,15 +450,30 @@ namespace JERC.Models
                 .Concat(displacementsBombsiteA)
                 .Concat(displacementsBombsiteB)
                 .Concat(displacementsRescueZone)
-                .Concat(bombsiteBrushEntities.SelectMany(x => x.brushes))
+                .ToList();
+        }
+
+        public List<Brush> GetAllDisplayedBrushesEntity()
+        {
+            return bombsiteBrushEntities.SelectMany(x => x.brushes)
                 .Concat(buyzoneBrushEntities.SelectMany(x => x.brushes))
                 .Concat(rescueZoneBrushEntities.SelectMany(x => x.brushes))
                 .Concat(jercBoxBrushEntities.SelectMany(x => x.brushes))
                 .ToList();
         }
+        //
 
 
-        private List<Side> GetAllDisplayedBrushSides()
+        // brush sides
+        public List<Side> GetAllDisplayedBrushSides()
+        {
+            return GetAllDisplayedBrushSidesBrush()
+                .Concat(GetAllDisplayedBrushSidesDisplacement())
+                .Concat(GetAllDisplayedBrushSidesEntity())
+                .ToList();
+        }
+
+        public List<Side> GetAllDisplayedBrushSidesBrush()
         {
             return brushesSidesPath
                 .Concat(brushesSidesCover)
@@ -446,17 +481,28 @@ namespace JERC.Models
                 .Concat(brushesSidesDoor)
                 .Concat(brushesSidesLadder)
                 .Concat(brushesSidesDanger)
-                .Concat(displacementsSidesPath)
+                .ToList();
+        }
+
+        public List<Side> GetAllDisplayedBrushSidesDisplacement()
+        {
+            return displacementsSidesPath
                 .Concat(displacementsSidesCover)
                 .Concat(displacementsSidesOverlap)
                 .Concat(displacementsSidesDoor)
                 .Concat(displacementsSidesLadder)
                 .Concat(displacementsSidesDanger)
-                .Concat(entitiesSidesByEntityBuyzoneId.SelectMany(x => x.Value))
+                .ToList();
+        }
+
+        public List<Side> GetAllDisplayedBrushSidesEntity()
+        {
+            return entitiesSidesByEntityBuyzoneId.SelectMany(x => x.Value)
                 .Concat(entitiesSidesByEntityBombsiteId.SelectMany(x => x.Value))
                 .Concat(entitiesSidesByEntityRescueZoneId.SelectMany(x => x.Value))
                 .Concat(entitiesSidesByEntityJercBoxId.SelectMany(x => x.Value))
                 .ToList();
         }
+        //
     }
 }

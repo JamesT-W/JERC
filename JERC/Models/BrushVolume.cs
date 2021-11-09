@@ -9,9 +9,13 @@ namespace JERC.Models
 {
     public class BrushVolume
     {
+        public int brushId;
         public List<BrushSide> brushSides = new List<BrushSide>();
         public JercTypes jercType;
 
-        public BrushVolume() {}
+        public BrushVolume(int brushId)
+        {
+            this.brushId = brushId;
+        }
     }
 }

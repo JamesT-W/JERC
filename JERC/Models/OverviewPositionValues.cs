@@ -41,18 +41,18 @@ namespace JERC.Models
         public float posY;
         public float scale;
 
-        public OverviewPositionValues(JercConfigValues jercConfigValues, float brushVerticesPosMinX, float brushVerticesPosMaxX, float brushVerticesPosMinY, float brushVerticesPosMaxY, float scale)
+        public OverviewPositionValues(ConfigurationValues configurationValues, float brushVerticesPosMinX, float brushVerticesPosMaxX, float brushVerticesPosMinY, float brushVerticesPosMaxY, float scale)
         {
             this.brushVerticesPosMinX = brushVerticesPosMinX;
             this.brushVerticesPosMaxX = brushVerticesPosMaxX;
             this.brushVerticesPosMinY = brushVerticesPosMinY;
             this.brushVerticesPosMaxY = brushVerticesPosMaxY;
 
-            var widthBeforeMultiplier = (int)(Math.Ceiling(brushVerticesPosMaxX - brushVerticesPosMinX) + (jercConfigValues.strokeWidth * 2)); // adds the stroke width mutliplier value as a padding at left and right
-            var heightBeforeMultiplier = (int)(Math.Ceiling(brushVerticesPosMaxY - brushVerticesPosMinY) + (jercConfigValues.strokeWidth * 2)); // adds the stroke width mutliplier value as a padding at top and bottom
+            var widthBeforeMultiplier = (int)(Math.Ceiling(brushVerticesPosMaxX - brushVerticesPosMinX) + (configurationValues.strokeWidth * 2)); // adds the stroke width mutliplier value as a padding at left and right
+            var heightBeforeMultiplier = (int)(Math.Ceiling(brushVerticesPosMaxY - brushVerticesPosMinY) + (configurationValues.strokeWidth * 2)); // adds the stroke width mutliplier value as a padding at top and bottom
 
-            width = (int)(widthBeforeMultiplier / jercConfigValues.radarSizeMultiplier);
-            height = (int)(heightBeforeMultiplier / jercConfigValues.radarSizeMultiplier);
+            width = (int)(widthBeforeMultiplier / configurationValues.radarSizeMultiplier);
+            height = (int)(heightBeforeMultiplier / configurationValues.radarSizeMultiplier);
 
             radarSizeMultiplierChangeAmountWidth = widthBeforeMultiplier - width;
             radarSizeMultiplierChangeAmountHeight = heightBeforeMultiplier - height;
@@ -65,8 +65,8 @@ namespace JERC.Models
             paddingPercentageX = (float)paddingSizeX / (float)outputResolution;
             paddingPercentageY = (float)paddingSizeY / (float)outputResolution;
 
-            brushVerticesOffsetX = (int)(width < height ? ((height - width) / 2) + jercConfigValues.strokeWidth - (radarSizeMultiplierChangeAmountWidth / 2) : 0 + jercConfigValues.strokeWidth - (radarSizeMultiplierChangeAmountWidth / 2));
-            brushVerticesOffsetY = (int)(height < width ? ((width - height) / 2) + jercConfigValues.strokeWidth - (radarSizeMultiplierChangeAmountHeight / 2) : 0 + jercConfigValues.strokeWidth - (radarSizeMultiplierChangeAmountHeight / 2));
+            brushVerticesOffsetX = (int)(width < height ? ((height - width) / 2) + configurationValues.strokeWidth - (radarSizeMultiplierChangeAmountWidth / 2) : 0 + configurationValues.strokeWidth - (radarSizeMultiplierChangeAmountWidth / 2));
+            brushVerticesOffsetY = (int)(height < width ? ((width - height) / 2) + configurationValues.strokeWidth - (radarSizeMultiplierChangeAmountHeight / 2) : 0 + configurationValues.strokeWidth - (radarSizeMultiplierChangeAmountHeight / 2));
 
             //offsetPercentageX = (brushVerticesOffsetX / width);
             //offsetPercentageY = (brushVerticesOffsetY / height);

@@ -26,5 +26,6 @@ namespace JERC.Constants
         public static readonly string JercDivider = "jerc_divider";
         public static readonly string JercFloor = "jerc_floor";
         public static readonly string JercCeiling = "jerc_ceiling";
+        public static readonly string JercDispRotation = "jerc_disp_rotation";
     }
 }

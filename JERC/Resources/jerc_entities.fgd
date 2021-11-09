@@ -144,6 +144,17 @@
 ]
 
 
+@PointClass iconsprite("jerc/editor/jerc_disp_rotation.vmt") = jerc_disp_rotation : 
+	"JERC - Rotates displacements that are shown incorrectly (this is caused by cutting a displacement)."
+[
+	displacementRotationIds90(string) : "Displacement Rotation IDs 90 CW" : "" : "List of displacement brush IDs to rotate 90 degrees clockwise (comma separated)"
+
+	displacementRotationIds180(string) : "Displacement Rotation IDs 180" : "" : "List of displacement brush IDs to rotate 180 degrees (comma separated)"
+
+	displacementRotationIds270(string) : "Displacement Rotation IDs 90 ACW" : "" : "List of displacement brush IDs to rotate 90 degrees anti-clockwise (comma separated)"
+]
+
+
 @SolidClass base(Origin, PaintableBrush) = jerc_box : 
 	"JERC - A brush that can specify showing a unique colour when displated in a radar." 
 [
@@ -172,6 +183,7 @@
         "jerc_divider"
         "jerc_floor"
         "jerc_ceiling"
+        "jerc_disp_rotation"
 
         "jerc_box"
     ]

@@ -99,7 +99,7 @@ namespace JERC.Models
         }
 
 
-        public List<string> GetInExportableFormat(JercConfigValues jercConfigValues, List<LevelHeight> levelHeights, string mapName)
+        public List<string> GetInExportableFormat(ConfigurationValues configurationValues, List<LevelHeight> levelHeights, string mapName)
         {
             var lines = new List<string>()
             {
@@ -173,7 +173,7 @@ namespace JERC.Models
                 });
             }
 
-            if (jercConfigValues.exportRadarAsSeparateLevels && levelHeights != null && levelHeights.Count() > 1)
+            if (configurationValues.exportRadarAsSeparateLevels && levelHeights != null && levelHeights.Count() > 1)
             {
                 lines.AddRange(new List<string>()
                 {
