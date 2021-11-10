@@ -1239,6 +1239,22 @@ namespace JERC
                 DrawFilledPolygonGradient(graphics, brushEntitySideToRender, true);
             }
 
+            // raw masks
+            if (configurationValues.exportRawMasks)
+            {
+                var entitySides = brushEntitySidesToDraw.Where(x => x.entityType == EntityTypes.JercBox);
+
+                using (Graphics graphicsRawMask = Graphics.FromImage(bmpRawMaskByNameDictionary["jerc_box"]))
+                {
+                    foreach (var entitySide in entitySides)
+                    {
+                        DrawFilledPolygonGradient(graphicsRawMask, entitySide, false, levelHeight);
+                    }
+
+                    graphicsRawMask.Save();
+                }
+            }
+
             // stroke
             if (configurationValues.strokeAroundBrushEntities)
             {
@@ -1276,6 +1292,7 @@ namespace JERC
                 { "ladder", new Bitmap(overviewPositionValues.outputResolution, overviewPositionValues.outputResolution) },
                 { "danger", new Bitmap(overviewPositionValues.outputResolution, overviewPositionValues.outputResolution) },
                 { "buyzones_and_objectives", new Bitmap(overviewPositionValues.outputResolution, overviewPositionValues.outputResolution) },
+                { "jerc_box", new Bitmap(overviewPositionValues.outputResolution, overviewPositionValues.outputResolution) },
             };
         }
 
@@ -2241,6 +2258,9 @@ namespace JERC
                                     colourUsing = Colours.ColourRescueZonesStroke();
                                     break;
                                 case EntityTypes.JercBox:
+                                    //colourUsing = GetGreyscaleColourByHeight((float)vertices.Average(x => x.z), levelHeightOverride);
+                                    colourUsing = (Color)objectToDraw.colour;
+                                    break;
                                 default:
                                     colourUsing = Colours.ColourError;
                                     break;
@@ -2256,10 +2276,7 @@ namespace JERC
                                 case JercTypes.Door:
                                 case JercTypes.Ladder:
                                 case JercTypes.Danger:
-                                    //var heightAboveMin = vertices.Min(x => x.z) - levelHeightOverride.zMinForRadarGradient;
-                                    var heightAboveMin = vertices.Average(x => x.z) - levelHeightOverride.zMinForRadarGradient;
-                                    var percentageAboveMin = (float)((Math.Ceiling(Convert.ToDouble(heightAboveMin)) / (levelHeightOverride.zMaxForRadarGradient - levelHeightOverride.zMinForRadarGradient)));
-                                    colourUsing = Colours.GetGreyscaleGradient(percentageAboveMin * 255);
+                                    colourUsing = GetGreyscaleColourByHeight((float)vertices.Average(x => x.z), levelHeightOverride);
                                     break;
                                 case JercTypes.Buyzone:
                                     colourUsing = Colours.ColourBuyzonesStroke();
@@ -2287,9 +2304,7 @@ namespace JERC
                     }
                     else // is this ever called ?
                     {
-                        var heightAboveMin = vertices.Min(x => x.z) - levelHeightOverride.zMinForRadarGradient;
-                        var percentageAboveMin = (float)((Math.Ceiling(Convert.ToDouble(heightAboveMin)) / (levelHeightOverride.zMaxForRadarGradient - levelHeightOverride.zMinForRadarGradient)));
-                        colourUsing = Colours.GetGreyscaleGradient(percentageAboveMin * 255);
+                        colourUsing = GetGreyscaleColourByHeight((float)vertices.Min(a => a.z), levelHeightOverride);
                     }
 
                     // surrounding vertices colours
@@ -2298,9 +2313,7 @@ namespace JERC
                         var colours = new List<Color>();
                         for (int i = 0; i < verticesArray.Length; i++)
                         {
-                            var heightAboveMin = objectToDraw.verticesToDraw[i].vertices.z - levelHeightOverride.zMinForRadarGradient;
-                            var percentageAboveMin = (float)((Math.Ceiling(Convert.ToDouble(heightAboveMin)) / (levelHeightOverride.zMaxForRadarGradient - levelHeightOverride.zMinForRadarGradient)));
-                            colours.Add(Colours.GetGreyscaleGradient(percentageAboveMin * 255));
+                            colours.Add(GetGreyscaleColourByHeight((float)objectToDraw.verticesToDraw[i].vertices.z, levelHeightOverride));
                         }
 
                         pathBrush.SurroundColors = colours.ToArray();
@@ -2353,6 +2366,15 @@ namespace JERC
                     }
                 }
             }
+        }
+
+
+        private static Color GetGreyscaleColourByHeight(float zValue, LevelHeight levelHeight)
+        {
+            //var heightAboveMin = vertices.Min(x => x.z) - levelHeight.zMinForRadarGradient;
+            var heightAboveMin = zValue - levelHeight.zMinForRadarGradient;
+            var percentageAboveMin = (float)((Math.Ceiling(Convert.ToDouble(heightAboveMin)) / (levelHeight.zMaxForRadarGradient - levelHeight.zMinForRadarGradient)));
+            return Colours.GetGreyscaleGradient(percentageAboveMin * 255);
         }
 
 
