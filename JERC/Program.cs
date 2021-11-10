@@ -936,70 +936,71 @@ namespace JERC
             graphics.SetClip(Rectangle.FromLTRB(0, 0, overviewPositionValues.outputResolution, overviewPositionValues.outputResolution));
 
             // get all brush sides and displacement sides to draw (brush volumes)
-            var brushRemoveListById = GetBrushVolumeListWithinLevelHeight(levelHeight, vmfRequiredData.brushesRemove, JercTypes.Remove);
-            var displacementRemoveListById = GetBrushVolumeListWithinLevelHeight(levelHeight, vmfRequiredData.displacementsRemove, JercTypes.Remove);
+            var brushRemoveList = GetBrushVolumeListWithinLevelHeight(levelHeight, vmfRequiredData.brushesRemove, JercTypes.Remove);
+            var displacementRemoveList = GetBrushVolumeListWithinLevelHeight(levelHeight, vmfRequiredData.displacementsRemove, JercTypes.Remove);
 
-            var brushCoverListById = GetBrushVolumeListWithinLevelHeight(levelHeight, vmfRequiredData.brushesCover, JercTypes.Cover);
-            var displacementCoverListById = GetBrushVolumeListWithinLevelHeight(levelHeight, vmfRequiredData.displacementsCover, JercTypes.Cover);
+            var brushCoverList = GetBrushVolumeListWithinLevelHeight(levelHeight, vmfRequiredData.brushesCover, JercTypes.Cover);
+            var displacementCoverList = GetBrushVolumeListWithinLevelHeight(levelHeight, vmfRequiredData.displacementsCover, JercTypes.Cover);
 
-            var brushDoorListById = GetBrushVolumeListWithinLevelHeight(levelHeight, vmfRequiredData.brushesDoor, JercTypes.Door);
-            var displacementDoorListById = GetBrushVolumeListWithinLevelHeight(levelHeight, vmfRequiredData.displacementsDoor, JercTypes.Door);
+            var brushDoorList = GetBrushVolumeListWithinLevelHeight(levelHeight, vmfRequiredData.brushesDoor, JercTypes.Door);
+            var displacementDoorList = GetBrushVolumeListWithinLevelHeight(levelHeight, vmfRequiredData.displacementsDoor, JercTypes.Door);
 
-            var brushLadderListById = GetBrushVolumeListWithinLevelHeight(levelHeight, vmfRequiredData.brushesLadder, JercTypes.Ladder);
-            var displacementLadderListById = GetBrushVolumeListWithinLevelHeight(levelHeight, vmfRequiredData.displacementsLadder, JercTypes.Ladder);
+            var brushLadderList = GetBrushVolumeListWithinLevelHeight(levelHeight, vmfRequiredData.brushesLadder, JercTypes.Ladder);
+            var displacementLadderList = GetBrushVolumeListWithinLevelHeight(levelHeight, vmfRequiredData.displacementsLadder, JercTypes.Ladder);
 
-            var brushDangerListById = GetBrushVolumeListWithinLevelHeight(levelHeight, vmfRequiredData.brushesDanger, JercTypes.Danger);
-            var displacementDangerListById = GetBrushVolumeListWithinLevelHeight(levelHeight, vmfRequiredData.displacementsDanger, JercTypes.Danger);
+            var brushDangerList = GetBrushVolumeListWithinLevelHeight(levelHeight, vmfRequiredData.brushesDanger, JercTypes.Danger);
+            var displacementDangerList = GetBrushVolumeListWithinLevelHeight(levelHeight, vmfRequiredData.displacementsDanger, JercTypes.Danger);
 
-            var brushBuyzoneListById = GetBrushVolumeListWithinLevelHeight(levelHeight, vmfRequiredData.brushesBuyzone, JercTypes.Buyzone);
-            var displacementBuyzoneListById = GetBrushVolumeListWithinLevelHeight(levelHeight, vmfRequiredData.displacementsBuyzone, JercTypes.Buyzone);
+            var brushBuyzoneList = GetBrushVolumeListWithinLevelHeight(levelHeight, vmfRequiredData.brushesBuyzone, JercTypes.Buyzone);
+            var displacementBuyzoneList = GetBrushVolumeListWithinLevelHeight(levelHeight, vmfRequiredData.displacementsBuyzone, JercTypes.Buyzone);
 
-            var brushBombsiteAListById = GetBrushVolumeListWithinLevelHeight(levelHeight, vmfRequiredData.brushesBombsiteA, JercTypes.BombsiteA);
-            var displacementBombsiteAListById = GetBrushVolumeListWithinLevelHeight(levelHeight, vmfRequiredData.displacementsBombsiteA, JercTypes.BombsiteA);
+            var brushBombsiteAList = GetBrushVolumeListWithinLevelHeight(levelHeight, vmfRequiredData.brushesBombsiteA, JercTypes.BombsiteA);
+            var displacementBombsiteAList = GetBrushVolumeListWithinLevelHeight(levelHeight, vmfRequiredData.displacementsBombsiteA, JercTypes.BombsiteA);
 
-            var brushBombsiteBListByIdById = GetBrushVolumeListWithinLevelHeight(levelHeight, vmfRequiredData.brushesBombsiteB, JercTypes.BombsiteB);
-            var displacementBombsiteBListById = GetBrushVolumeListWithinLevelHeight(levelHeight, vmfRequiredData.displacementsBombsiteB, JercTypes.BombsiteB);
+            var brushBombsiteBList = GetBrushVolumeListWithinLevelHeight(levelHeight, vmfRequiredData.brushesBombsiteB, JercTypes.BombsiteB);
+            var displacementBombsiteBList = GetBrushVolumeListWithinLevelHeight(levelHeight, vmfRequiredData.displacementsBombsiteB, JercTypes.BombsiteB);
 
-            var brushRescueZoneListById = GetBrushVolumeListWithinLevelHeight(levelHeight, vmfRequiredData.brushesRescueZone, JercTypes.RescueZone);
-            var displacementRescueZoneListById = GetBrushVolumeListWithinLevelHeight(levelHeight, vmfRequiredData.displacementsRescueZone, JercTypes.RescueZone);
+            var brushRescueZoneList = GetBrushVolumeListWithinLevelHeight(levelHeight, vmfRequiredData.brushesRescueZone, JercTypes.RescueZone);
+            var displacementRescueZoneList = GetBrushVolumeListWithinLevelHeight(levelHeight, vmfRequiredData.displacementsRescueZone, JercTypes.RescueZone);
 
             // get all brush sides and displacement sides to draw (brush sides)
             var brushPathSideListById = GetBrushSideListWithinLevelHeight(levelHeight, vmfRequiredData.brushesPath, JercTypes.Path);
             var displacementPathSideListById = GetBrushSideListWithinLevelHeight(levelHeight, vmfRequiredData.displacementsPath, JercTypes.Path);
 
-            var brushOverlapSideList = GetBrushSideListWithinLevelHeight(levelHeight, vmfRequiredData.brushesOverlap, JercTypes.Overlap);
-            var displacementOverlapSideList = GetBrushSideListWithinLevelHeight(levelHeight, vmfRequiredData.displacementsOverlap, JercTypes.Overlap);
+            var brushOverlapSideListById = GetBrushSideListWithinLevelHeight(levelHeight, vmfRequiredData.brushesOverlap, JercTypes.Overlap);
+            var displacementOverlapSideListById = GetBrushSideListWithinLevelHeight(levelHeight, vmfRequiredData.displacementsOverlap, JercTypes.Overlap);
 
             // get all brushes and displacements to draw (brushes)
-            var brushesToDrawPathById = GetBrushesToDraw(boundingBox, brushPathSideListById);
-            var displacementsToDrawPathById = GetDisplacementsToDraw(boundingBox, vmfRequiredData.displacementsPath, displacementPathSideListById);
+            var brushesToDrawPath = GetBrushesToDraw(boundingBox, brushPathSideListById);
+            var displacementsToDrawPath = GetDisplacementsToDraw(boundingBox, vmfRequiredData.displacementsPath, displacementPathSideListById);
 
-            var brushesToDrawOverlapById = GetBrushesToDraw(boundingBox, brushOverlapSideList);
-            var displacementsToDrawOverlapById = GetDisplacementsToDraw(boundingBox, vmfRequiredData.displacementsOverlap, displacementOverlapSideList);
+            var brushesToDrawOverlap = GetBrushesToDraw(boundingBox, brushOverlapSideListById);
+            var displacementsToDrawOverlap = GetDisplacementsToDraw(boundingBox, vmfRequiredData.displacementsOverlap, displacementOverlapSideListById);
 
-            var brushesToDrawCoverById = GetBrushesToDraw(boundingBox, brushCoverListById);
-            var displacementsToDrawCoverById = GetDisplacementsToDraw(boundingBox, vmfRequiredData.brushesCover, displacementCoverListById);
 
-            var brushesToDrawDoorById = GetBrushesToDraw(boundingBox, brushDoorListById);
-            var displacementsToDrawDoorById = GetDisplacementsToDraw(boundingBox, vmfRequiredData.brushesDoor, displacementDoorListById);
+            var brushesToDrawCover = GetBrushesToDraw(boundingBox, brushCoverList);
+            var displacementsToDrawCover = GetDisplacementsToDraw(boundingBox, vmfRequiredData.displacementsCover, displacementCoverList);
 
-            var brushesToDrawLadderById = GetBrushesToDraw(boundingBox, brushLadderListById);
-            var displacementsToDrawLadderById = GetDisplacementsToDraw(boundingBox, vmfRequiredData.brushesLadder, displacementLadderListById);
+            var brushesToDrawDoor = GetBrushesToDraw(boundingBox, brushDoorList);
+            var displacementsToDrawDoor = GetDisplacementsToDraw(boundingBox, vmfRequiredData.displacementsDoor, displacementDoorList);
 
-            var brushesToDrawDangerById = GetBrushesToDraw(boundingBox, brushDangerListById);
-            var displacementsToDrawDangerById = GetDisplacementsToDraw(boundingBox, vmfRequiredData.brushesDanger, displacementDangerListById);
+            var brushesToDrawLadder = GetBrushesToDraw(boundingBox, brushLadderList);
+            var displacementsToDrawLadder = GetDisplacementsToDraw(boundingBox, vmfRequiredData.displacementsLadder, displacementLadderList);
 
-            var brushesToDrawBuyzoneById = GetBrushesToDraw(boundingBox, brushBuyzoneListById);
-            var displacementsToDrawBuyzoneById = GetDisplacementsToDraw(boundingBox, vmfRequiredData.brushesBuyzone, displacementBuyzoneListById);
+            var brushesToDrawDanger = GetBrushesToDraw(boundingBox, brushDangerList);
+            var displacementsToDrawDanger = GetDisplacementsToDraw(boundingBox, vmfRequiredData.displacementsDanger, displacementDangerList);
 
-            var brushesToDrawBombsiteAById = GetBrushesToDraw(boundingBox, brushBombsiteAListById);
-            var displacementsToDrawBombsiteAById = GetDisplacementsToDraw(boundingBox, vmfRequiredData.brushesBombsiteA, displacementBombsiteAListById);
+            var brushesToDrawBuyzone = GetBrushesToDraw(boundingBox, brushBuyzoneList);
+            var displacementsToDrawBuyzone = GetDisplacementsToDraw(boundingBox, vmfRequiredData.displacementsBuyzone, displacementBuyzoneList);
 
-            var brushesToDrawBombsiteBById = GetBrushesToDraw(boundingBox, brushBombsiteBListByIdById);
-            var displacementsToDrawBombsiteBById = GetDisplacementsToDraw(boundingBox, vmfRequiredData.brushesBombsiteB, displacementBombsiteBListById);
+            var brushesToDrawBombsiteA = GetBrushesToDraw(boundingBox, brushBombsiteAList);
+            var displacementsToDrawBombsiteA = GetDisplacementsToDraw(boundingBox, vmfRequiredData.displacementsBombsiteA, displacementBombsiteAList);
 
-            var brushesToDrawRescueZoneById = GetBrushesToDraw(boundingBox, brushRescueZoneListById);
-            var displacementsToDrawRescueZoneById = GetDisplacementsToDraw(boundingBox, vmfRequiredData.brushesRescueZone, displacementRescueZoneListById);
+            var brushesToDrawBombsiteB = GetBrushesToDraw(boundingBox, brushBombsiteBList);
+            var displacementsToDrawBombsiteB = GetDisplacementsToDraw(boundingBox, vmfRequiredData.displacementsBombsiteB, displacementBombsiteBList);
+
+            var brushesToDrawRescueZone = GetBrushesToDraw(boundingBox, brushRescueZoneList);
+            var displacementsToDrawRescueZone = GetDisplacementsToDraw(boundingBox, vmfRequiredData.displacementsRescueZone, displacementRescueZoneList);
 
             // get all entity sides to draw
             var entityBrushSideListById = GetEntityBrushSideListWithinLevelHeight(levelHeight);
@@ -1009,17 +1010,17 @@ namespace JERC
 
 
             // add remove stuff first to set to graphics' clip
-            AddRemoveRegion(bmp, graphics, brushRemoveListById.SelectMany(x => x.Value).ToList());
-            AddRemoveRegion(bmp, graphics, displacementRemoveListById.SelectMany(x => x.Value).ToList());
+            AddRemoveRegion(bmp, graphics, brushRemoveList);
+            AddRemoveRegion(bmp, graphics, displacementRemoveList);
 
 
             // brush stuff
-            var pathsOrdered = brushesToDrawPathById.Concat(displacementsToDrawPathById).OrderBy(x => x.zAxisAverage);
-            var overlapsOrdered = brushesToDrawOverlapById.Concat(displacementsToDrawOverlapById).OrderBy(x => x.zAxisAverage);
-            var coversOrdered = brushesToDrawCoverById.Concat(displacementsToDrawCoverById).OrderBy(x => x.zAxisAverage);
-            var doorsOrdered = brushesToDrawDoorById.Concat(displacementsToDrawDoorById).OrderBy(x => x.zAxisAverage);
-            var laddersOrdered = brushesToDrawLadderById.Concat(displacementsToDrawLadderById).OrderBy(x => x.zAxisAverage);
-            var dangersOrdered = brushesToDrawDangerById.Concat(displacementsToDrawDangerById).OrderBy(x => x.zAxisAverage);
+            var pathsOrdered = brushesToDrawPath.Concat(displacementsToDrawPath).OrderBy(x => x.zAxisAverage);
+            var overlapsOrdered = brushesToDrawOverlap.Concat(displacementsToDrawOverlap).OrderBy(x => x.zAxisAverage);
+            var coversOrdered = brushesToDrawCover.Concat(displacementsToDrawCover).OrderBy(x => x.zAxisAverage);
+            var doorsOrdered = brushesToDrawDoor.Concat(displacementsToDrawDoor).OrderBy(x => x.zAxisAverage);
+            var laddersOrdered = brushesToDrawLadder.Concat(displacementsToDrawLadder).OrderBy(x => x.zAxisAverage);
+            var dangersOrdered = brushesToDrawDanger.Concat(displacementsToDrawDanger).OrderBy(x => x.zAxisAverage);
 
             var coversAndOverlapsOrdered = overlapsOrdered.Concat(coversOrdered).OrderBy(x => x.zAxisAverage);
 
@@ -1082,10 +1083,10 @@ namespace JERC
             }
 
             // brush entity texture stuff (in game)
-            var allObjectiveAndBuyzoneBrushes = brushesToDrawBuyzoneById.Concat(displacementsToDrawBuyzoneById)
-                .Concat(brushesToDrawBombsiteAById).Concat(displacementsToDrawBombsiteAById)
-                .Concat(brushesToDrawBombsiteBById).Concat(displacementsToDrawBombsiteBById)
-                .Concat(brushesToDrawRescueZoneById).Concat(displacementsToDrawRescueZoneById);
+            var allObjectiveAndBuyzoneBrushes = brushesToDrawBuyzone.Concat(displacementsToDrawBuyzone)
+                .Concat(brushesToDrawBombsiteA).Concat(displacementsToDrawBombsiteA)
+                .Concat(brushesToDrawBombsiteB).Concat(displacementsToDrawBombsiteB)
+                .Concat(brushesToDrawRescueZone).Concat(displacementsToDrawRescueZone);
 
             // stroke
             if (configurationValues.strokeAroundBrushEntities)
@@ -1544,25 +1545,24 @@ namespace JERC
         }
 
 
-        private static Dictionary<int, List<BrushVolume>> GetBrushVolumeListWithinLevelHeight(LevelHeight levelHeight, List<Models.Brush> brushList, JercTypes jercType)
+        private static List<BrushVolume> GetBrushVolumeListWithinLevelHeight(LevelHeight levelHeight, List<Models.Brush> brushList, JercTypes jercType)
         {
-            var brushVolumeListById = new Dictionary<int, List<BrushVolume>>();
+            var brushVolumeList = new List<BrushVolume>();
 
             foreach (var brush in brushList)
             {
-                var brushVolumeListByIdUnfiltered = GetBrushVolumeList(brushList, jercType);
+                var brushVolumeUnchecked = GetBrushVolume(brush, jercType);
 
                 // may appear on more than 1 level if their brushes span across level dividers or touch edges ?
-                if (brushVolumeListByIdUnfiltered.Any(x =>
-                    x.brushSides.SelectMany(y => y.vertices).All(y => y.z >= levelHeight.zMinForRadar) &&
-                    x.brushSides.SelectMany(y => y.vertices).All(y => y.z <= levelHeight.zMaxForRadar)
-                ))
+                if (brushVolumeUnchecked.brushSides.SelectMany(a => a.vertices).All(a => a.z >= levelHeight.zMinForRadar) &&
+                    brushVolumeUnchecked.brushSides.SelectMany(a => a.vertices).All(a => a.z <= levelHeight.zMaxForRadar)
+                )
                 {
-                    brushVolumeListById.Add(brush.id, brushVolumeListByIdUnfiltered);
+                    brushVolumeList.Add(brushVolumeUnchecked);
                 }
             }
 
-            return brushVolumeListById;
+            return brushVolumeList;
         }
 
 
@@ -1572,15 +1572,15 @@ namespace JERC
 
             foreach (var brush in brushList)
             {
-                var brushSideListByIdUnfiltered = GetBrushSideList(brush.id, brush.side, jercType);
+                var brushSideListUnfiltered = GetBrushSideList(brush.id, brush.side, jercType);
 
                 // may appear on more than 1 level if their brushes span across level dividers or touch edges ?
-                if (brushSideListByIdUnfiltered.Any(x =>
+                if (brushSideListUnfiltered.Any(x =>
                     x.vertices.All(y => y.z >= levelHeight.zMinForRadar) &&
                     x.vertices.All(y => y.z <= levelHeight.zMaxForRadar)
                 ))
                 {
-                    brushSideListById.Add(brush.id, brushSideListByIdUnfiltered);
+                    brushSideListById.Add(brush.id, brushSideListUnfiltered);
                 }
             }
 
@@ -1591,6 +1591,7 @@ namespace JERC
         private static Dictionary<int, List<EntityBrushSide>> GetEntityBrushSideListWithinLevelHeight(LevelHeight levelHeight)
         {
             var entityBrushSideListById = new Dictionary<int, List<EntityBrushSide>>();
+
             var entityBrushSideListByIdUnfiltered = GetEntityVerticesListById();
 
             foreach (var entityBrushSideById in entityBrushSideListByIdUnfiltered)
@@ -1628,44 +1629,38 @@ namespace JERC
         }
 
 
-        private static List<BrushVolume> GetBrushVolumeList(List<Models.Brush> brushList, JercTypes jercType)
+        private static BrushVolume GetBrushVolume(Models.Brush brush, JercTypes jercType)
         {
-            var brushVolumeList = new List<BrushVolume>();
-            
-            foreach (var brush in brushList)
+            var brushVolume = new BrushVolume(brush.id);
+
+            foreach (var brushSide in brush.side.ToList())
             {
-                var brushNew = new BrushVolume(brush.id);
-                foreach (var brushSide in brush.side.ToList())
+                // calculate vertices_plus for every brush side for vanilla hammer vmfs, as hammer++ adds vertices itself when saving a vmf
+                if (GameConfigurationValues.isVanillaHammer)
                 {
-                    // calculate vertices_plus for every brush side for vanilla hammer vmfs, as hammer++ adds vertices itself when saving a vmf
-                    if (GameConfigurationValues.isVanillaHammer)
-                    {
-                        VanillaHammerVmfFixer.CalculateVerticesPlusForAllBrushSides(brush.side);
-                    }
-
-                    var brushSideNew = new BrushSide(brush.id);
-                    foreach (var vertices in brushSide.vertices_plus.ToList())
-                    {
-                        brushSideNew.vertices.Add(new Vertices(vertices.x / Sizes.SizeReductionMultiplier, vertices.y / Sizes.SizeReductionMultiplier, (float)vertices.z));
-                    }
-
-                    brushSideNew.jercType = jercType;
-
-                    // add displacement stuff if the brush is a displacement
-                    if (brushSide.isDisplacement)
-                    {
-                        brushSideNew.displacementStuff = new DisplacementStuff(configurationValues, brushSide.dispinfo, brushSideNew.vertices); //// brushSide.vertices_plus ??
-                    }
-
-                    brushNew.brushSides.Add(brushSideNew);
+                    VanillaHammerVmfFixer.CalculateVerticesPlusForAllBrushSides(brush.side);
                 }
 
-                brushNew.jercType = jercType;
+                var brushSideNew = new BrushSide(brush.id);
+                foreach (var vertices in brushSide.vertices_plus.ToList())
+                {
+                    brushSideNew.vertices.Add(new Vertices(vertices.x / Sizes.SizeReductionMultiplier, vertices.y / Sizes.SizeReductionMultiplier, (float)vertices.z));
+                }
 
-                brushVolumeList.Add(brushNew);
+                brushSideNew.jercType = jercType;
+
+                // add displacement stuff if the brush is a displacement
+                if (brushSide.isDisplacement)
+                {
+                    brushSideNew.displacementStuff = new DisplacementStuff(configurationValues, brushSide.dispinfo, brushSideNew.vertices); //// brushSide.vertices_plus ??
+                }
+
+                brushVolume.brushSides.Add(brushSideNew);
             }
 
-            return brushVolumeList;
+            brushVolume.jercType = jercType;
+
+            return brushVolume;
         }
 
 
@@ -1850,16 +1845,14 @@ namespace JERC
         }
 
 
-        private static List<ObjectToDraw> GetBrushesToDraw(BoundingBox boundingBox, Dictionary<int, List<BrushVolume>> brushVolumesListById)
+        private static List<ObjectToDraw> GetBrushesToDraw(BoundingBox boundingBox, List<BrushVolume> brushVolumesList)
         {
             var brushesToDrawList = new List<ObjectToDraw>();
 
-            foreach (var brushVolumeById in brushVolumesListById)
+            foreach (var brushVolume in brushVolumesList)
             {
-                var brushSides = brushVolumeById.Value.SelectMany(x => x.brushSides).ToList();
-
                 var brushSidesListById = new Dictionary<int, List<BrushSide>>();
-                brushSidesListById.Add(brushVolumeById.Key, brushSides);
+                brushSidesListById.Add(brushVolume.brushId, brushVolume.brushSides);
 
                 var brushesToDraw = GetBrushesToDraw(boundingBox, brushSidesListById);
 
@@ -1948,16 +1941,14 @@ namespace JERC
         }
 
 
-        private static List<ObjectToDraw> GetDisplacementsToDraw(BoundingBox boundingBox, List<Models.Brush> displacementsInJercType, Dictionary<int, List<BrushVolume>> brushVolumesListById)
+        private static List<ObjectToDraw> GetDisplacementsToDraw(BoundingBox boundingBox, List<Models.Brush> displacementsInJercType, List<BrushVolume> brushVolumesList)
         {
             var brushesToDrawList = new List<ObjectToDraw>();
 
-            foreach (var brushVolumeById in brushVolumesListById)
+            foreach (var brushVolume in brushVolumesList)
             {
-                var brushSides = brushVolumeById.Value.SelectMany(x => x.brushSides).ToList();
-
                 var brushSidesListById = new Dictionary<int, List<BrushSide>>();
-                brushSidesListById.Add(brushVolumeById.Key, brushSides);
+                brushSidesListById.Add(brushVolume.brushId, brushVolume.brushSides);
 
                 var brushesToDraw = GetDisplacementsToDraw(boundingBox, displacementsInJercType, brushSidesListById);
 
