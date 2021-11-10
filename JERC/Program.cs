@@ -1080,6 +1080,39 @@ namespace JERC
 
                     graphicsRawMask.Save();
                 }
+
+                // door
+                using (Graphics graphicsRawMask = Graphics.FromImage(bmpRawMaskByNameDictionary["door"]))
+                {
+                    foreach (var brushEntitySide in doorsOrdered)
+                    {
+                        DrawFilledPolygonGradient(graphicsRawMask, brushEntitySide, false, levelHeight);
+                    }
+
+                    graphicsRawMask.Save();
+                }
+
+                // ladder
+                using (Graphics graphicsRawMask = Graphics.FromImage(bmpRawMaskByNameDictionary["ladder"]))
+                {
+                    foreach (var brushEntitySide in laddersOrdered)
+                    {
+                        DrawFilledPolygonGradient(graphicsRawMask, brushEntitySide, false, levelHeight);
+                    }
+
+                    graphicsRawMask.Save();
+                }
+
+                // danger
+                using (Graphics graphicsRawMask = Graphics.FromImage(bmpRawMaskByNameDictionary["danger"]))
+                {
+                    foreach (var brushEntitySide in dangersOrdered)
+                    {
+                        DrawFilledPolygonGradient(graphicsRawMask, brushEntitySide, false, levelHeight);
+                    }
+
+                    graphicsRawMask.Save();
+                }
             }
 
             // brush entity texture stuff (in game)
@@ -1239,6 +1272,9 @@ namespace JERC
                 { "path", new Bitmap(overviewPositionValues.outputResolution, overviewPositionValues.outputResolution) },
                 { "cover", new Bitmap(overviewPositionValues.outputResolution, overviewPositionValues.outputResolution) },
                 { "overlap", new Bitmap(overviewPositionValues.outputResolution, overviewPositionValues.outputResolution) },
+                { "door", new Bitmap(overviewPositionValues.outputResolution, overviewPositionValues.outputResolution) },
+                { "ladder", new Bitmap(overviewPositionValues.outputResolution, overviewPositionValues.outputResolution) },
+                { "danger", new Bitmap(overviewPositionValues.outputResolution, overviewPositionValues.outputResolution) },
                 { "buyzones_and_objectives", new Bitmap(overviewPositionValues.outputResolution, overviewPositionValues.outputResolution) },
             };
         }
@@ -2217,6 +2253,9 @@ namespace JERC
                                 case JercTypes.Path:
                                 case JercTypes.Cover:
                                 case JercTypes.Overlap:
+                                case JercTypes.Door:
+                                case JercTypes.Ladder:
+                                case JercTypes.Danger:
                                     //var heightAboveMin = vertices.Min(x => x.z) - levelHeightOverride.zMinForRadarGradient;
                                     var heightAboveMin = vertices.Average(x => x.z) - levelHeightOverride.zMinForRadarGradient;
                                     var percentageAboveMin = (float)((Math.Ceiling(Convert.ToDouble(heightAboveMin)) / (levelHeightOverride.zMaxForRadarGradient - levelHeightOverride.zMinForRadarGradient)));
