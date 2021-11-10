@@ -194,7 +194,7 @@ namespace JERC
                     if (originIVNode != null)
                         MoveAndRotateVerticesInInstance(instance, originIVNode);
 
-                    var allBrushSidesInEntity = entity.Body.Where(x => x.Name == "solid").SelectMany(x => x.Body.Where(y => y.Name == "side").Select(y => y.Body)).ToList();
+                    var allBrushSidesInEntity = entity.Body.Where(x => x.Name == "solid" && x.Body != null)?.SelectMany(x => x.Body.Where(y => y.Name == "side" && y.Body != null)?.Select(y => y.Body))?.ToList();
                     MoveAndRotateAllBrushSidesInInstance(instance, allBrushSidesInEntity);
                 }
 
