@@ -453,8 +453,11 @@ namespace JERC
             // instances contents
             if (instanceEntityIdsByVmf != null && instanceEntityIdsByVmf.Any())
             {
-                foreach (var instance in instanceEntityIdsByVmf.Keys)
+                foreach (var instanceEntityIdByVmf in instanceEntityIdsByVmf)
                 {
+                    var instanceEntityId = instanceEntityIdByVmf.Value;
+                    var instance = instanceEntityIdByVmf.Key;
+
                     allWorldBrushes = allWorldBrushes.Concat(instance.World.Body.Where(x => x.Name == "solid"));
                     allEntities = allEntities.Concat(instance.Body.Where(x => x.Name == "entity"));
                 }
