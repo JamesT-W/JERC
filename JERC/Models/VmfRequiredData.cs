@@ -364,8 +364,31 @@ namespace JERC.Models
 
             foreach (var entity in jercBoxBrushEntities)
             {
-                entitiesSidesByEntityJercBoxId.Add(entity.id, entity.brushes.SelectMany(x => x.side).ToList());
-                jercBoxByEntityJercBoxId.Add(entity.id, new JercBox(entity));
+                /////////////////////////////////////////////////////////// TODO: This is a dreadful way to handle different instaces containing the same IDs. They should be handled sepearately somehow, NOT added together
+                if (entitiesSidesByEntityJercBoxId.ContainsKey(entity.id))
+                {
+                    entitiesSidesByEntityJercBoxId[entity.id].AddRange(entity.brushes.SelectMany(x => x.side).ToList());
+
+                    var newKeyTrying = entity.id + 1000;
+                    var foundUnusedId = false;
+                    while (!foundUnusedId)
+                    {
+                        if (!jercBoxByEntityJercBoxId.ContainsKey(newKeyTrying))
+                        {
+                            jercBoxByEntityJercBoxId.Add(newKeyTrying, new JercBox(entity)); /////////////////////////////////////////////////////////// The ID changes, so it will be different in jercBoxByEntityJercBoxId than in entitiesSidesByEntityJercBoxId
+                            foundUnusedId = true;
+                        }
+                        else
+                        {
+                            newKeyTrying++;
+                        }
+                    }
+                }
+                else
+                {
+                    entitiesSidesByEntityJercBoxId.Add(entity.id, entity.brushes.SelectMany(x => x.side).ToList());
+                    jercBoxByEntityJercBoxId.Add(entity.id, new JercBox(entity));
+                }
             }
 
 
