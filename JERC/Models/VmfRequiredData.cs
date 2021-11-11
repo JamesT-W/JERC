@@ -119,6 +119,9 @@ namespace JERC.Models
             IEnumerable<IVNode> jercConfigEntitiesIVNodes, IEnumerable<IVNode> jercDividerEntitiesIVNodes, IEnumerable<IVNode> jercFloorEntitiesIVNodes, IEnumerable<IVNode> jercCeilingEntitiesIVNodes, IEnumerable<IVNode> jercDispRotationEntitiesIVNodes
         )
         {
+            Logger.LogNewLine();
+            Logger.LogMessage("Sorting the data...");
+
             // world brushes (brush entity brushes are concatinated on)
             brushesIgnore = brushesIgnoreIVNodes.Any() ? brushesIgnoreIVNodes.Select(x => new Brush(x)).ToList() : new List<Brush>();
             brushesRemove = brushesRemoveIVNodes.Any() ? brushesRemoveIVNodes.Select(x => new Brush(x)).ToList() : new List<Brush>();
@@ -372,6 +375,9 @@ namespace JERC.Models
             jercFloorEntities = jercFloorEntitiesIVNodes.Any() ? jercFloorEntitiesIVNodes.Select(x => new Entity(x)).OrderBy(x => new Vertices(x.origin).z).ToList() : new List<Entity>(); // order by lowest height first
             jercCeilingEntities = jercCeilingEntitiesIVNodes.Any() ? jercCeilingEntitiesIVNodes.Select(x => new Entity(x)).OrderBy(x => new Vertices(x.origin).z).ToList() : new List<Entity>(); // order by lowest height first
             jercDispRotationEntities = jercDispRotationEntitiesIVNodes.Any() ? jercDispRotationEntitiesIVNodes.Select(x => new Entity(x)).OrderBy(x => new Vertices(x.origin).z).ToList() : new List<Entity>();
+
+
+            Logger.LogMessage("Finished sorting the data");
         }
 
 

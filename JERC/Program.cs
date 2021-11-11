@@ -444,7 +444,7 @@ namespace JERC
         private static VmfRequiredData GetVmfRequiredData()
         {
             Logger.LogNewLine();
-            Logger.LogMessage("Getting required data from the vmf and instances");
+            Logger.LogMessage("Getting required data from the vmf and instances...");
 
             // main vmf contents
             var allWorldBrushes = vmf.World.Body.Where(x => x.Name == "solid");
@@ -590,7 +590,6 @@ namespace JERC
             configurationValues = new ConfigurationValues(GetSettingsValuesFromJercEntities(allJercEntities), jercDividerEntities.Count(), jercDispRotationEntities.Any());
 
             Logger.LogMessage("Retrieved data from the vmf and instances");
-            Logger.LogNewLine();
 
             return new VmfRequiredData(
                 brushesIgnore, brushesRemove, brushesPath, brushesCover, brushesOverlap, brushesDoor, brushesLadder, brushesDanger,
