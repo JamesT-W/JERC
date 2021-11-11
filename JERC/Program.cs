@@ -175,14 +175,20 @@ namespace JERC
                 var filepath = string.Concat(GameConfigurationValues.vmfFilepathDirectory, @"\", instance.file);
 
                 if (!File.Exists(filepath))
+                {
+                    Logger.LogImportantWarning("Instance filepath does not exist, skipping: " + filepath);
                     continue;
+                }
 
                 var lines = File.ReadAllLines(filepath);
 
                 var newVmf = new VMF(lines);
 
                 if (newVmf == null)
+                {
+                    Logger.LogImportantWarning("Instance vmf data was null, skipping. Entity ID: " + instance.id);
                     continue;
+                }
 
                 // correct origins and angles
                 foreach (var entity in newVmf.Body.Where(x => x.Name == "entity"))
@@ -205,6 +211,23 @@ namespace JERC
             }
 
             Logger.LogMessage(string.Concat(instanceEntityIdsByVmf.Count(), " instance", instanceEntityIdsByVmf.Count() == 1 ? string.Empty : "s", " successfully parsed."));
+
+            var numOfInstancesUnsuccessfullyParsed = instanceEntities.Count() - instanceEntityIdsByVmf.Count();
+            if (numOfInstancesUnsuccessfullyParsed < 0)
+            {
+                Logger.LogError("Parsed more instances successfully than there are instance entities ?");
+            }
+            else if (numOfInstancesUnsuccessfullyParsed > 0)
+            {
+                var unsuccessfulInstanceEntityIds = funcInstances.Where(x => (instanceEntityIdsByVmf.Values.All(y => y != x.id))).ToList();
+
+                Logger.LogImportantWarning(string.Concat(numOfInstancesUnsuccessfullyParsed, " instance", numOfInstancesUnsuccessfullyParsed == 1 ? string.Empty : "s", " unsuccessfully parsed:"));
+
+                foreach (var funcInstance in unsuccessfulInstanceEntityIds)
+                {
+                    Logger.LogImportantWarning(string.Concat("Entity ID: ", funcInstance.id));
+                }
+            }
         }
 
 
