@@ -383,6 +383,8 @@ namespace JERC.Models
                             newKeyTrying++;
                         }
                     }
+
+                    entity.id = newKeyTrying;
                 }
                 else
                 {
