@@ -169,6 +169,8 @@
 		1 : "Remove on fire" : 1
 	]
 
+	orderNum(integer) : "Order Num (int)" : 4 : "0 = First, 1 = Between Path And Overlap Brushes/Displacements, 2 = After JERC Brushes/Displacements, 3 = After JERC Brushes For Entities (eg. Bombsite A Material), 4 = After Brush Entities (eg. func_buyzone)"
+
 	rendercolor(color255) : "Colour (R G B)" : "255 255 255"
 
 	colourAlpha(integer) : "Colour Alpha (int)" : 255 : "The alpha value of the JERC box (0-255)"

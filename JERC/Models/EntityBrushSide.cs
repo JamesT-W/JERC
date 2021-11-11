@@ -12,6 +12,7 @@ namespace JERC.Models
     {
         public List<Vertices> vertices = new List<Vertices>();
         public EntityTypes entityType;
+        public int orderNum;
         public Color rendercolor;
         public Color colourStroke;
         public int strokeWidth;

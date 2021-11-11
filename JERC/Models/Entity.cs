@@ -21,6 +21,7 @@ namespace JERC.Models
         public List<Brush> brushes;
 
         // jerc_box
+        public string orderNum;
         public string rendercolor;
         public string colourAlpha;
         public string colourStroke;
@@ -43,6 +44,7 @@ namespace JERC.Models
             brushes = entity.Body.Any(x => x.Name == "solid") ? entity.Body.Where(x => x.Name == "solid").Select(x => new Brush(x)).ToList() : null;
 
             // jerc_box
+            orderNum = entity.Body.FirstOrDefault(x => x.Name == "orderNum")?.Value;
             rendercolor = entity.Body.FirstOrDefault(x => x.Name == "rendercolor")?.Value;
             colourAlpha = entity.Body.FirstOrDefault(x => x.Name == "colourAlpha")?.Value;
             colourStroke = entity.Body.FirstOrDefault(x => x.Name == "colourStroke")?.Value;

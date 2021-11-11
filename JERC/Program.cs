@@ -1,4 +1,4 @@
-using ImageAlterer;
+﻿using ImageAlterer;
 using JERC.Constants;
 using JERC.Enums;
 using JERC.Models;
@@ -1027,6 +1027,11 @@ namespace JERC
             var brushesToDrawRescueZone = GetBrushesToDraw(boundingBox, brushRescueZoneList);
             var displacementsToDrawRescueZone = GetDisplacementsToDraw(boundingBox, vmfRequiredData.displacementsRescueZone, displacementRescueZoneList);
 
+
+            var allBrushesToDraw = new AllBrushesToDraw(brushesToDrawPath, brushesToDrawOverlap, brushesToDrawCover, brushesToDrawDoor, brushesToDrawLadder, brushesToDrawDanger, brushesToDrawBuyzone, brushesToDrawBombsiteA, brushesToDrawBombsiteB, brushesToDrawRescueZone);
+            var allDisplacementsToDraw = new AllDisplacementsToDraw(displacementsToDrawPath, displacementsToDrawOverlap, displacementsToDrawCover, displacementsToDrawDoor, displacementsToDrawLadder, displacementsToDrawDanger, displacementsToDrawBuyzone, displacementsToDrawBombsiteA, displacementsToDrawBombsiteB, displacementsToDrawRescueZone);
+
+
             // get all entity sides to draw
             var entityBrushSideListById = GetEntityBrushSideListWithinLevelHeight(levelHeight);
 
@@ -1039,13 +1044,32 @@ namespace JERC
             AddRemoveRegion(bmp, graphics, displacementRemoveList);
 
 
-            // brush stuff
-            var pathsOrdered = brushesToDrawPath.Concat(displacementsToDrawPath).OrderBy(x => x.zAxisAverage);
-            var overlapsOrdered = brushesToDrawOverlap.Concat(displacementsToDrawOverlap).OrderBy(x => x.zAxisAverage);
-            var coversOrdered = brushesToDrawCover.Concat(displacementsToDrawCover).OrderBy(x => x.zAxisAverage);
-            var doorsOrdered = brushesToDrawDoor.Concat(displacementsToDrawDoor).OrderBy(x => x.zAxisAverage);
-            var laddersOrdered = brushesToDrawLadder.Concat(displacementsToDrawLadder).OrderBy(x => x.zAxisAverage);
-            var dangersOrdered = brushesToDrawDanger.Concat(displacementsToDrawDanger).OrderBy(x => x.zAxisAverage);
+            // draw everything
+            DrawJercBrushEntities(graphics, levelHeight, bmpRawMaskByNameDictionary, brushEntityBrushSideListById, JercBoxOrderNums.First);
+            DrawBrushes(graphics, levelHeight, bmpRawMaskByNameDictionary, allBrushesToDraw, allDisplacementsToDraw, brushEntityBrushSideListById);
+            DrawJercBrushEntities(graphics, levelHeight, bmpRawMaskByNameDictionary, brushEntityBrushSideListById, JercBoxOrderNums.AfterJERCBrushesAndDisplacements);
+            DrawBrushesTexturedEntities(graphics, levelHeight, bmpRawMaskByNameDictionary, allBrushesToDraw, allDisplacementsToDraw);
+            DrawJercBrushEntities(graphics, levelHeight, bmpRawMaskByNameDictionary, brushEntityBrushSideListById, JercBoxOrderNums.AfterJERCBrushesForEntities);
+            DrawBrushEntities(graphics, levelHeight, bmpRawMaskByNameDictionary, entityBrushSideListById);
+            DrawJercBrushEntities(graphics, levelHeight, bmpRawMaskByNameDictionary, brushEntityBrushSideListById, JercBoxOrderNums.AfterBrushEntities);
+
+
+            graphics.Save();
+
+            Logger.LogMessage(string.Concat("Generating radar level ", levelHeight.levelNum, " complete"));
+
+            return new RadarLevel(bmp, levelHeight, bmpRawMaskByNameDictionary);
+        }
+
+
+        private static void DrawBrushes(Graphics graphics, LevelHeight levelHeight, Dictionary<string, Bitmap> bmpRawMaskByNameDictionary, AllBrushesToDraw allBrushesToDraw, AllDisplacementsToDraw allDisplacementsToDraw, Dictionary<int, List<EntityBrushSide>> brushEntityBrushSideListById)
+        {
+            var pathsOrdered = allBrushesToDraw.brushesToDrawPath.Concat(allDisplacementsToDraw.displacementsToDrawPath).OrderBy(x => x.zAxisAverage);
+            var overlapsOrdered = allBrushesToDraw.brushesToDrawOverlap.Concat(allDisplacementsToDraw.displacementsToDrawOverlap).OrderBy(x => x.zAxisAverage);
+            var coversOrdered = allBrushesToDraw.brushesToDrawCover.Concat(allDisplacementsToDraw.displacementsToDrawCover).OrderBy(x => x.zAxisAverage);
+            var doorsOrdered = allBrushesToDraw.brushesToDrawDoor.Concat(allDisplacementsToDraw.displacementsToDrawDoor).OrderBy(x => x.zAxisAverage);
+            var laddersOrdered = allBrushesToDraw.brushesToDrawLadder.Concat(allDisplacementsToDraw.displacementsToDrawLadder).OrderBy(x => x.zAxisAverage);
+            var dangersOrdered = allBrushesToDraw.brushesToDrawDanger.Concat(allDisplacementsToDraw.displacementsToDrawDanger).OrderBy(x => x.zAxisAverage);
 
             var coversAndOverlapsAndDangersOrdered = overlapsOrdered.Concat(coversOrdered).Concat(dangersOrdered).OrderBy(x => x.zAxisAverage);
 
@@ -1063,6 +1087,9 @@ namespace JERC
             {
                 DrawFilledPolygonGradient(graphics, brushToRender, true);
             }
+
+            // draw jerc_box brush entities that have the corresponding orderNum set
+            DrawJercBrushEntities(graphics, levelHeight, bmpRawMaskByNameDictionary, brushEntityBrushSideListById, JercBoxOrderNums.BetweenPathAndOverlapBrushes);
 
             // cover and overlap, door, ladder, danger brush stuff
             foreach (var brushToRender in coversAndOverlapsAndDangersOrdered.Concat(doorsOrdered).Concat(laddersOrdered))
@@ -1139,12 +1166,15 @@ namespace JERC
                     graphicsRawMask.Save();
                 }
             }
+        }
 
-            // brush entity texture stuff (in game)
-            var allObjectiveAndBuyzoneBrushes = brushesToDrawBuyzone.Concat(displacementsToDrawBuyzone)
-                .Concat(brushesToDrawBombsiteA).Concat(displacementsToDrawBombsiteA)
-                .Concat(brushesToDrawBombsiteB).Concat(displacementsToDrawBombsiteB)
-                .Concat(brushesToDrawRescueZone).Concat(displacementsToDrawRescueZone);
+
+        private static void DrawBrushesTexturedEntities(Graphics graphics, LevelHeight levelHeight, Dictionary<string, Bitmap> bmpRawMaskByNameDictionary, AllBrushesToDraw allBrushesToDraw, AllDisplacementsToDraw allDisplacementsToDraw)
+        {
+            var allObjectiveAndBuyzoneBrushes = allBrushesToDraw.brushesToDrawBuyzone.Concat(allDisplacementsToDraw.displacementsToDrawBuyzone)
+                .Concat(allBrushesToDraw.brushesToDrawBombsiteA).Concat(allDisplacementsToDraw.displacementsToDrawBombsiteA)
+                .Concat(allBrushesToDraw.brushesToDrawBombsiteB).Concat(allDisplacementsToDraw.displacementsToDrawBombsiteB)
+                .Concat(allBrushesToDraw.brushesToDrawRescueZone).Concat(allDisplacementsToDraw.displacementsToDrawRescueZone);
 
             // stroke
             if (configurationValues.strokeAroundBrushEntities)
@@ -1197,16 +1227,16 @@ namespace JERC
                     graphicsRawMask.Save();
                 }
             }
+        }
 
 
-
+        private static void DrawBrushEntities(Graphics graphics, LevelHeight levelHeight, Dictionary<string, Bitmap> bmpRawMaskByNameDictionary, Dictionary<int, List<EntityBrushSide>> entityBrushSideListById)
+        {
             // reset the clip so that entity brushes can render anywhere
             ////graphics.ResetClip();
 
 
-
-            // brush entities next
-            var entitySidesToDraw = GetBrushEntitiesToDraw(overviewPositionValues, entityBrushSideListById);
+            var entitySidesToDraw = GetBrushEntitiesToDraw(overviewPositionValues, entityBrushSideListById, JercBoxOrderNums.None); // does not give a jercBoxOrderNum value since jerc_box entities are drawn in DrawJercBrushEntities(), not here
 
             // normal
             foreach (var entitySideToRender in entitySidesToDraw)
@@ -1253,10 +1283,12 @@ namespace JERC
                     DrawStroke(graphics, entitySideToRender, colourStroke);
                 }
             }
+        }
 
 
-            // brush entities (JERC)
-            var brushEntitySidesToDraw = GetBrushEntitiesToDraw(overviewPositionValues, brushEntityBrushSideListById);
+        private static void DrawJercBrushEntities(Graphics graphics, LevelHeight levelHeight, Dictionary<string, Bitmap> bmpRawMaskByNameDictionary, Dictionary<int, List<EntityBrushSide>> brushEntityBrushSideListById, JercBoxOrderNums jercBoxOrderNum)
+        {
+            var brushEntitySidesToDraw = GetBrushEntitiesToDraw(overviewPositionValues, brushEntityBrushSideListById, jercBoxOrderNum);
 
             // normal
             foreach (var brushEntitySideToRender in brushEntitySidesToDraw)
@@ -1297,12 +1329,6 @@ namespace JERC
                     DrawStroke(graphics, brushEntitySideToRender, colour, brushEntitySideToRender.strokeWidth);
                 }
             }
-
-            graphics.Save();
-
-            Logger.LogMessage(string.Concat("Generating radar level ", levelHeight.levelNum, " complete"));
-
-            return new RadarLevel(bmp, levelHeight, bmpRawMaskByNameDictionary);
         }
 
 
@@ -1829,6 +1855,7 @@ namespace JERC
                     var entityBrushSide = new EntityBrushSide
                     {
                         entityType = entityType,
+                        orderNum = vmfRequiredData.jercBoxByEntityJercBoxId[entitySides.Key].orderNum,
                         rendercolor = vmfRequiredData.jercBoxByEntityJercBoxId[entitySides.Key].rendercolor,
                         colourStroke = vmfRequiredData.jercBoxByEntityJercBoxId[entitySides.Key].colourStroke,
                         strokeWidth = vmfRequiredData.jercBoxByEntityJercBoxId[entitySides.Key].strokeWidth,
@@ -2139,7 +2166,7 @@ namespace JERC
         }
 
 
-        private static List<ObjectToDraw> GetBrushEntitiesToDraw(OverviewPositionValues overviewPositionValues, Dictionary<int, List<EntityBrushSide>> brushEntityBrushSideListById)
+        private static List<ObjectToDraw> GetBrushEntitiesToDraw(OverviewPositionValues overviewPositionValues, Dictionary<int, List<EntityBrushSide>> brushEntityBrushSideListById, JercBoxOrderNums jercBoxOrderNum)
         {
             var brushEntitiesToDraw = new List<ObjectToDraw>();
 
@@ -2197,7 +2224,10 @@ namespace JERC
                     // finish
                     if (brushEntityBrushSide.entityType == EntityTypes.JercBox)
                     {
-                        brushEntitiesToDraw.Add(new ObjectToDraw(configurationValues, brushEntityBrushSideListById.Keys.ElementAt(i), brushSideCenterOffset, verticesOffsetsToUse, false, brushEntityBrushSide.entityType, brushEntityBrushSide.rendercolor, brushEntityBrushSide.colourStroke, brushEntityBrushSide.strokeWidth));
+                        if (brushEntityBrushSide.orderNum == (int)jercBoxOrderNum) // ignore any that are being drawn at a different order num
+                        {
+                            brushEntitiesToDraw.Add(new ObjectToDraw(configurationValues, brushEntityBrushSideListById.Keys.ElementAt(i), brushSideCenterOffset, verticesOffsetsToUse, false, brushEntityBrushSide.entityType, brushEntityBrushSide.rendercolor, brushEntityBrushSide.colourStroke, brushEntityBrushSide.strokeWidth));
+                        }
                     }
                     else
                     {

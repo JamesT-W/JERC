@@ -8,6 +8,7 @@ namespace JERC.Models
         public Entity entity;
 
         public int id;
+        public int orderNum;
         public Color rendercolor;
         public Color colourStroke;
         public int strokeWidth;
@@ -17,6 +18,11 @@ namespace JERC.Models
             this.entity = entity;
 
             id = entity.id;
+
+            entity.orderNum ??= "4";
+            entity.orderNum = (int.Parse(entity.orderNum, Globalization.Style, Globalization.Culture) < JercBoxValues.MinJercBoxOrderNumValue) ? JercBoxValues.MinJercBoxOrderNumValue.ToString() : entity.orderNum;
+            entity.orderNum = (int.Parse(entity.orderNum, Globalization.Style, Globalization.Culture) > JercBoxValues.MaxJercBoxOrderNumValue) ? JercBoxValues.MaxJercBoxOrderNumValue.ToString() : entity.orderNum;
+            orderNum = int.Parse(entity.orderNum, Globalization.Style, Globalization.Culture);
 
             entity.rendercolor ??= "255 0 0";
             entity.colourAlpha ??= "255";
@@ -31,6 +37,8 @@ namespace JERC.Models
 
             entity.colourStroke ??= "255 0 0";
             entity.colourStrokeAlpha ??= "255";
+            entity.colourStrokeAlpha = (int.Parse(entity.colourStrokeAlpha, Globalization.Style, Globalization.Culture) < JercBoxValues.MinJercBoxColourStrokeAlphaValue) ? JercBoxValues.MinJercBoxColourStrokeAlphaValue.ToString() : entity.colourStrokeAlpha;
+            entity.colourStrokeAlpha = (int.Parse(entity.colourStrokeAlpha, Globalization.Style, Globalization.Culture) > JercBoxValues.MaxJercBoxColourStrokeAlphaValue) ? JercBoxValues.MaxJercBoxColourStrokeAlphaValue.ToString() : entity.colourStrokeAlpha;
 
             var colourStrokeSplit = entity.colourStroke.Split(" ");
             colourStroke = Color.FromArgb(
@@ -41,7 +49,6 @@ namespace JERC.Models
             );
 
             entity.strokeWidth ??= "10";
-
             strokeWidth = int.Parse(entity.strokeWidth, Globalization.Style, Globalization.Culture);
         }
     }
