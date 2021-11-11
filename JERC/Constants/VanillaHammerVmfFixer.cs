@@ -19,6 +19,11 @@ namespace JERC.Constants
             if (brushesSides == null || brushesSides.Count() == 0)
                 return;
 
+            brushesSides.RemoveAll(x => x.vertices_plus != null && x.vertices_plus.Any());
+
+            if (brushesSides == null || brushesSides.Count() == 0)
+                return;
+
             //
             var positionsToRemove = new List<int>();
             var brushSideIdsFound = new List<int>();
