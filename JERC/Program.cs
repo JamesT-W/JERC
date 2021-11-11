@@ -2397,13 +2397,21 @@ namespace JERC
                         var pointToDraw1 = new Point((int)verticesToDraw1.vertices.x, (int)verticesToDraw1.vertices.y);
                         var pointToDraw2 = new Point((int)verticesToDraw2.vertices.x, (int)verticesToDraw2.vertices.y);
 
-                        using (LinearGradientBrush linearBrush = new LinearGradientBrush(pointToDraw1, pointToDraw2, verticesToDraw1.colour, verticesToDraw2.colour))
+                        try
                         {
-                            Pen pen = new Pen(linearBrush);
+                            using (LinearGradientBrush linearBrush = new LinearGradientBrush(pointToDraw1, pointToDraw2, verticesToDraw1.colour, verticesToDraw2.colour))
+                            {
+                                Pen pen = new Pen(linearBrush);
 
-                            graphics.DrawLine(pen, pointToDraw1, pointToDraw2);
+                                graphics.DrawLine(pen, pointToDraw1, pointToDraw2);
 
-                            pen?.Dispose();
+                                pen?.Dispose();
+                            }
+                        }
+                        catch (OutOfMemoryException e)
+                        {
+                            Logger.LogError($"Out of memory. You most likely have something in the JERC visgroup that is not inside the boundary of your Path brushes/displacements. Skipping. Brush ID: {objectToDraw.brushId}");
+                            return;
                         }
                     }
                 }
