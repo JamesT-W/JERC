@@ -73,7 +73,7 @@ namespace JERC.Models
         }
 
 
-        public static bool VerifyAllValuesSet() // ignored isVanillaHammer
+        public static bool VerifyAllValuesSet() // ignores isVanillaHammer
         {
             if (string.IsNullOrWhiteSpace(csgoFolderPath) ||
                 string.IsNullOrWhiteSpace(binFolderPath) ||
