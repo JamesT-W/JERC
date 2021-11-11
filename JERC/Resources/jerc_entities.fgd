@@ -173,9 +173,9 @@
 
 	colourAlpha(integer) : "Colour Alpha (int)" : 255 : "The alpha value of the JERC box (0-255)"
 
-	colourStroke(color255) : "Colour (R G B)" : "221 138 0"
+	colourStroke(color255) : "Stroke Colour (R G B)" : "221 138 0"
 
-	colourStrokeAlpha(integer) : "Colour Stroke Alpha (int)" : 255 : "The alpha value of the JERC box stroke (0-255)"
+	colourStrokeAlpha(integer) : "Stroke Colour Alpha (int)" : 255 : "The alpha value of the JERC box stroke (0-255)"
 
 	strokeWidth(integer) : "Stroke Width (int)" : 10 : "Width of stroke to use"
 ]
