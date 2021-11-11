@@ -1,4 +1,4 @@
-﻿using ImageAlterer;
+using ImageAlterer;
 using JERC.Constants;
 using JERC.Enums;
 using JERC.Models;
@@ -172,7 +172,7 @@ namespace JERC
             // Parse the instance VMFs
             foreach (var instance in funcInstances)
             {
-                var filepath = string.Concat(GameConfigurationValues.vmfFilepathDirectory, @"\", instance.file);
+                var filepath = string.Concat(GameConfigurationValues.vmfFilepathDirectory, instance.file);
 
                 if (!File.Exists(filepath))
                 {

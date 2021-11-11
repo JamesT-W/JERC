@@ -49,7 +49,7 @@ namespace JERC.Models
                             return;
                         if (!vmfFilepath.Contains(".vmf"))
                             vmfFilepath += ".vmf";
-                        vmfFilepathDirectory = Path.GetDirectoryName(vmfFilepath);
+                        vmfFilepathDirectory = Path.GetDirectoryName(vmfFilepath) + @"\";
                         break;
                     default:
                         return;
