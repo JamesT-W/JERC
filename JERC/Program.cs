@@ -1601,8 +1601,7 @@ namespace JERC
 
         private static Dictionary<int, List<EntityBrushSide>> GetBrushEntityVerticesListById()
         {
-            /* use this code if another new JERC brush entity is added in future */
-
+            /**** use this code if another new JERC brush entity is added in future ****/
 
             /*
             var brushEntityBrushSideListById = new Dictionary<int, List<EntityBrushSide>>();
@@ -1613,7 +1612,11 @@ namespace JERC
             {
                 foreach (var list in brushEntityJercBoxVerticesListById)
                 {
-                    brushEntityBrushSideListById.Add(list.Key, list.Value);
+                    /////////////////////////////////////////////////////////// TODO: This is a dreadful way to handle different instaces containing the same IDs. They should be handled sepearately somehow, NOT added together
+                    if (brushEntityBrushSideListById.ContainsKey(list.Key))
+                        brushEntityBrushSideListById[list.Key].AddRange(list.Value);
+                    else
+                        brushEntityBrushSideListById.Add(list.Key, list.Value);
                 }
             }
 
@@ -1659,7 +1662,11 @@ namespace JERC
                     x.vertices.All(y => y.z <= levelHeight.zMaxForRadar)
                 ))
                 {
-                    brushSideListById.Add(brush.id, brushSideListUnfiltered);
+                    /////////////////////////////////////////////////////////// TODO: This is a dreadful way to handle different instaces containing the same IDs. They should be handled sepearately somehow, NOT added together
+                    if (brushSideListById.ContainsKey(brush.id))
+                        brushSideListById[brush.id].AddRange(brushSideListUnfiltered);
+                    else
+                        brushSideListById.Add(brush.id, brushSideListUnfiltered);
                 }
             }
 
@@ -1679,8 +1686,13 @@ namespace JERC
                 if (entityBrushSideById.Value.Any(x =>
                     x.vertices.All(y => y.z >= levelHeight.zMinForRadar) &&
                     x.vertices.All(y => y.z <= levelHeight.zMaxForRadar)
-                )) {
-                    entityBrushSideListById.Add(entityBrushSideById.Key, entityBrushSideById.Value);
+                ))
+                {
+                    /////////////////////////////////////////////////////////// TODO: This is a dreadful way to handle different instaces containing the same IDs. They should be handled sepearately somehow, NOT added together
+                    if (entityBrushSideListById.ContainsKey(entityBrushSideById.Key))
+                        entityBrushSideListById[entityBrushSideById.Key].AddRange(entityBrushSideById.Value);
+                    else
+                        entityBrushSideListById.Add(entityBrushSideById.Key, entityBrushSideById.Value);
                 }
             }
 
@@ -1699,8 +1711,13 @@ namespace JERC
                 if (brushEntityBrushSideById.Value.Any(x =>
                     x.vertices.All(y => y.z >= levelHeight.zMinForRadar) &&
                     x.vertices.All(y => y.z <= levelHeight.zMaxForRadar)
-                )) {
-                    brushEntityBrushSideListById.Add(brushEntityBrushSideById.Key, brushEntityBrushSideById.Value);
+                ))
+                {
+                    /////////////////////////////////////////////////////////// TODO: This is a dreadful way to handle different instaces containing the same IDs. They should be handled sepearately somehow, NOT added together
+                    if (brushEntityBrushSideListById.ContainsKey(brushEntityBrushSideById.Key))
+                        brushEntityBrushSideListById[brushEntityBrushSideById.Key].AddRange(brushEntityBrushSideById.Value);
+                    else
+                        brushEntityBrushSideListById.Add(brushEntityBrushSideById.Key, brushEntityBrushSideById.Value);
                 }
             }
 
