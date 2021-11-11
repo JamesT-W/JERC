@@ -22,7 +22,11 @@ namespace JERC.Models
             id = int.Parse(entity.Body.FirstOrDefault(x => x.Name == "id")?.Value);
             classname = entity.Body.FirstOrDefault(x => x.Name == "classname")?.Value;
             angles = entity.Body.Where(x => x.Name == "angles")?.Select(x => new Angle(x.Value)).FirstOrDefault();
+
             file = entity.Body.FirstOrDefault(x => x.Name == "file")?.Value;
+            if (new string(file.TakeLast(4).ToArray()).ToLower() != ".vmf")
+                file += ".vmf";
+
             fixup_style = int.Parse(entity.Body.FirstOrDefault(x => x.Name == "fixup_style")?.Value);
             origin = entity.Body.Where(x => x.Name == "origin")?.Select(x => new Vertices(x.Value)).FirstOrDefault();
             editor = new Editor(entity.Body.FirstOrDefault(x => x.Name == "editor"));
