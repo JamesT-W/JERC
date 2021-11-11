@@ -1047,7 +1047,7 @@ namespace JERC
             var laddersOrdered = brushesToDrawLadder.Concat(displacementsToDrawLadder).OrderBy(x => x.zAxisAverage);
             var dangersOrdered = brushesToDrawDanger.Concat(displacementsToDrawDanger).OrderBy(x => x.zAxisAverage);
 
-            var coversAndOverlapsOrdered = overlapsOrdered.Concat(coversOrdered).OrderBy(x => x.zAxisAverage);
+            var coversAndOverlapsAndDangersOrdered = overlapsOrdered.Concat(coversOrdered).Concat(dangersOrdered).OrderBy(x => x.zAxisAverage);
 
             // path and overlap brush stuff (for stroke)
             if (configurationValues.strokeAroundLayoutMaterials)
@@ -1065,7 +1065,7 @@ namespace JERC
             }
 
             // cover and overlap, door, ladder, danger brush stuff
-            foreach (var brushToRender in coversAndOverlapsOrdered.Concat(doorsOrdered).Concat(laddersOrdered).Concat(dangersOrdered))
+            foreach (var brushToRender in coversAndOverlapsAndDangersOrdered.Concat(doorsOrdered).Concat(laddersOrdered))
             {
                 DrawFilledPolygonGradient(graphics, brushToRender, false);
             }
