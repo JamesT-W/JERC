@@ -19,39 +19,39 @@ namespace JERC.Constants
             if (brushesSides == null || brushesSides.Count() == 0)
                 return;
 
-            brushesSides.RemoveAll(x => x.vertices_plus != null && x.vertices_plus.Any());
+            var brushesSidesNoVertics = brushesSides.Where(x => x.vertices_plus == null || !x.vertices_plus.Any()).ToList();
 
-            if (brushesSides == null || brushesSides.Count() == 0)
+            if (brushesSidesNoVertics == null || brushesSidesNoVertics.Count() == 0)
                 return;
 
             //
             var positionsToRemove = new List<int>();
             var brushSideIdsFound = new List<int>();
 
-            for (int i = brushesSides.Count()-1; i >= 0 ; i--)
+            for (int i = brushesSidesNoVertics.Count()-1; i >= 0 ; i--)
             {
-                if (brushSideIdsFound.Any(x => x == brushesSides[i].id))
+                if (brushSideIdsFound.Any(x => x == brushesSidesNoVertics[i].id))
                     positionsToRemove.Add(i);
                 else
-                    brushSideIdsFound.Add(brushesSides[i].id);
+                    brushSideIdsFound.Add(brushesSidesNoVertics[i].id);
             }
 
             foreach (var index in positionsToRemove)
             {
-                brushesSides.RemoveAt(index);
+                brushesSidesNoVertics.RemoveAt(index);
             }
             //
 
 
-            foreach (var brushSide in brushesSides)
+            foreach (var brushSide in brushesSidesNoVertics)
             {
-                brushSide.vertices_plus = GetBrushSideBoundingBoxFromThreeVertices(brushSide, brushesSides.Where(x => x.brushId == brushSide.brushId).Count());
+                brushSide.vertices_plus = GetBrushSideBoundingBoxFromThreeVertices(brushSide, brushesSidesNoVertics.Where(x => x.brushId == brushSide.brushId).Count());
             }
 
 
-            /*foreach (var brushSide in brushesSides)
+            /*foreach (var brushSide in brushesSidesNoVertics)
             {
-                var brushSideBoundingBox = GetBrushSideBoundingBoxFromThreeVertices(brushSide, brushesSides.Where(x => x.brushId == brushSide.brushId).Count());
+                var brushSideBoundingBox = GetBrushSideBoundingBoxFromThreeVertices(brushSide, brushesSidesNoVertics.Where(x => x.brushId == brushSide.brushId).Count());
 
                 var vertices0 = brushSideBoundingBox.OrderBy(a => a.x + a.y).FirstOrDefault(); // bottom left
                 var vertices2 = brushSideBoundingBox.OrderByDescending(a => a.x + a.y).FirstOrDefault(); // top right
@@ -60,9 +60,9 @@ namespace JERC.Constants
 
                 var foundBrushSideInSameBrush = false;
 
-                for (int i = 0; i < brushesSides.Count(); i++)
+                for (int i = 0; i < brushesSidesNoVertics.Count(); i++)
                 {
-                    var brushSideExcluding = brushesSides[i];
+                    var brushSideExcluding = brushesSidesNoVertics[i];
 
                     if (brushSide.brushId != brushSideExcluding.brushId || brushSide.id == brushSideExcluding.id)
                         continue;
