@@ -26,7 +26,7 @@ namespace JERC.Models
         public DispInfo(IVNode dispInfo)
         {
             power = int.Parse(dispInfo.Body.FirstOrDefault(x => x.Name == "power")?.Value);
-            startPosition = dispInfo.Body.FirstOrDefault(x => x.Name == "startPosition")?.Value;
+            startPosition = dispInfo.Body.FirstOrDefault(x => x.Name == "startposition")?.Value;
             flags = int.Parse(dispInfo.Body.FirstOrDefault(x => x.Name == "flags")?.Value);
             elevation = float.Parse(dispInfo.Body.FirstOrDefault(x => x.Name == "elevation")?.Value);
             subdiv = float.Parse(dispInfo.Body.FirstOrDefault(x => x.Name == "subdiv")?.Value);
