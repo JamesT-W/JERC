@@ -153,11 +153,11 @@
 @PointClass iconsprite("jerc/editor/jerc_disp_rotation.vmt") = jerc_disp_rotation : 
 	"JERC - Rotates displacements that are shown incorrectly (this is caused by cutting a displacement)."
 [
-	displacementRotationIds90(string) : "Displacement Rotation IDs 90 CW" : "" : "List of displacement brush IDs to rotate 90 degrees clockwise (comma separated). If set to more than ~980 characters, the quote will be missing at the end of the line in the vmf, therefore the entity will not show on reload"
+	displacementRotationSideIds90(sidelist) : "Displacement Rotation 90 CW Face IDs" : "" : "List of displacement brush face IDs to rotate 90 degrees clockwise (space separated). **If set to more than ~980 characters, the quote will be missing at the end of the line in the vmf, therefore the entity will not show on reload**"
 
-	displacementRotationIds180(string) : "Displacement Rotation IDs 180" : "" : "List of displacement brush IDs to rotate 180 degrees (comma separated). If set to more than ~980 characters, the quote will be missing at the end of the line in the vmf, therefore the entity will not show on reload"
+	displacementRotationSideIds180(sidelist) : "Displacement Rotation 180 Face IDs" : "" : "List of displacement brush face IDs to rotate 180 degrees (space separated). **If set to more than ~980 characters, the quote will be missing at the end of the line in the vmf, therefore the entity will not show on reload**"
 
-	displacementRotationIds270(string) : "Displacement Rotation IDs 90 ACW" : "" : "List of displacement brush IDs to rotate 90 degrees anti-clockwise (comma separated). If set to more than ~980 characters, the quote will be missing at the end of the line in the vmf, therefore the entity will not show on reload"
+	displacementRotationSideIds270(sidelist) : "Displacement Rotation 90 ACW Face IDs" : "" : "List of displacement brush face IDs to rotate 90 degrees anti-clockwise (space separated). **If set to more than ~980 characters, the quote will be missing at the end of the line in the vmf, therefore the entity will not show on reload**"
 ]
 
 

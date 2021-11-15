@@ -48,9 +48,9 @@ namespace JERC.Models
         public bool exportBackgroundLevelsImage;
 
         // jerc_disp_rotation
-        public List<int> displacementRotationIds90 = new();
-        public List<int> displacementRotationIds180 = new();
-        public List<int> displacementRotationIds270 = new();
+        public List<int> displacementRotationSideIds90 = new();
+        public List<int> displacementRotationSideIds180 = new();
+        public List<int> displacementRotationSideIds270 = new();
 
 
         public ConfigurationValues(Dictionary<string, string> jercEntitySettingsValues, int jercDividerCount, bool jercDispRotationEntityProvided)
@@ -111,32 +111,32 @@ namespace JERC.Models
             // jerc_disp_rotation
             if (jercDispRotationEntityProvided)
             {
-                var dispRotationIds90 = string.IsNullOrWhiteSpace(jercEntitySettingsValues["displacementRotationIds90"]) ? new List<string>() : jercEntitySettingsValues["displacementRotationIds90"].Split(",").Distinct().ToList();
-                var dispRotationIds180 = string.IsNullOrWhiteSpace(jercEntitySettingsValues["displacementRotationIds180"]) ? new List<string>() : jercEntitySettingsValues["displacementRotationIds180"].Split(",").Distinct().ToList();
-                var dispRotationIds270 = string.IsNullOrWhiteSpace(jercEntitySettingsValues["displacementRotationIds270"]) ? new List<string>() : jercEntitySettingsValues["displacementRotationIds270"].Split(",").Distinct().ToList();
+                var dispRotationSideIds90 = string.IsNullOrWhiteSpace(jercEntitySettingsValues["displacementRotationSideIds90"]) ? new List<string>() : jercEntitySettingsValues["displacementRotationSideIds90"].Split(" ").Distinct().ToList();
+                var dispRotationSideIds180 = string.IsNullOrWhiteSpace(jercEntitySettingsValues["displacementRotationSideIds180"]) ? new List<string>() : jercEntitySettingsValues["displacementRotationSideIds180"].Split(" ").Distinct().ToList();
+                var dispRotationSideIds270 = string.IsNullOrWhiteSpace(jercEntitySettingsValues["displacementRotationSideIds270"]) ? new List<string>() : jercEntitySettingsValues["displacementRotationSideIds270"].Split(" ").Distinct().ToList();
 
-                foreach (var brushIdString in dispRotationIds90)
+                foreach (var brushSideIdString in dispRotationSideIds90)
                 {
-                    if (int.TryParse(brushIdString, Globalization.Style, Globalization.Culture, out int brushId))
-                        displacementRotationIds90.Add(brushId);
+                    if (int.TryParse(brushSideIdString, Globalization.Style, Globalization.Culture, out int brushSideId))
+                        displacementRotationSideIds90.Add(brushSideId);
                     else
-                        Logger.LogImportantWarning($"Could not rotate displacement 90 degrees clockwise due to parsing error. Brush ID: {brushIdString}");
+                        Logger.LogImportantWarning($"Could not rotate displacement 90 degrees clockwise due to parsing error. Brush side ID: {brushSideIdString}");
                 }
 
-                foreach (var brushIdString in dispRotationIds180)
+                foreach (var brushSideIdString in dispRotationSideIds180)
                 {
-                    if (int.TryParse(brushIdString, Globalization.Style, Globalization.Culture, out int brushId))
-                        displacementRotationIds180.Add(brushId);
+                    if (int.TryParse(brushSideIdString, Globalization.Style, Globalization.Culture, out int brushSideId))
+                        displacementRotationSideIds180.Add(brushSideId);
                     else
-                        Logger.LogImportantWarning($"Could not rotate displacement 180 degrees due to parsing error. Brush ID: {brushIdString}");
+                        Logger.LogImportantWarning($"Could not rotate displacement 180 degrees due to parsing error. Brush side ID: {brushSideIdString}");
                 }
 
-                foreach (var brushIdString in dispRotationIds270)
+                foreach (var brushSideIdString in dispRotationSideIds270)
                 {
-                    if (int.TryParse(brushIdString, Globalization.Style, Globalization.Culture, out int brushId))
-                        displacementRotationIds270.Add(brushId);
+                    if (int.TryParse(brushSideIdString, Globalization.Style, Globalization.Culture, out int brushSideId))
+                        displacementRotationSideIds270.Add(brushSideId);
                     else
-                        Logger.LogImportantWarning($"Could not rotate displacement 90 degrees anti-clockwise due to parsing error. Brush ID: {brushIdString}");
+                        Logger.LogImportantWarning($"Could not rotate displacement 90 degrees anti-clockwise due to parsing error. Brush side ID: {brushSideIdString}");
                 }
             }
         }

@@ -135,18 +135,18 @@ namespace JERC
 
             Logger.LogNewLine();
 
-            var allDisplayedBrushes = vmfRequiredData.GetAllDisplayedBrushes();
-            foreach (var brushId in configurationValues.displacementRotationIds90.Where(x => !allDisplayedBrushes.Any(y => y.id == x)))
+            var allDisplayedBrushSides = vmfRequiredData.GetAllDisplayedBrushSides();
+            foreach (var brushSideId in configurationValues.displacementRotationSideIds90.Where(x => !allDisplayedBrushSides.Any(y => y.id == x)))
             {
-                Logger.LogImportantWarning($"Could not find brush {brushId} to rotate 90 degrees clockwise");
+                Logger.LogImportantWarning($"Could not find brush side {brushSideId} to rotate 90 degrees clockwise");
             }
-            foreach (var brushId in configurationValues.displacementRotationIds180.Where(x => !allDisplayedBrushes.Any(y => y.id == x)))
+            foreach (var brushSideId in configurationValues.displacementRotationSideIds180.Where(x => !allDisplayedBrushSides.Any(y => y.id == x)))
             {
-                Logger.LogImportantWarning($"Could not find brush {brushId} to rotate 180 degrees");
+                Logger.LogImportantWarning($"Could not find brush side {brushSideId} to rotate 180 degrees");
             }
-            foreach (var brushId in configurationValues.displacementRotationIds270.Where(x => !allDisplayedBrushes.Any(y => y.id == x)))
+            foreach (var brushSideId in configurationValues.displacementRotationSideIds270.Where(x => !allDisplayedBrushSides.Any(y => y.id == x)))
             {
-                Logger.LogImportantWarning($"Could not find brush {brushId} to rotate 90 degrees anti-clockwise");
+                Logger.LogImportantWarning($"Could not find brush side {brushSideId} to rotate 90 degrees anti-clockwise");
             }
         }
 
@@ -654,9 +654,9 @@ namespace JERC
 
             if (jercDispRotation != null)
             {
-                jercEntitySettingsValues.Add("displacementRotationIds90", jercDispRotation.FirstOrDefault(x => x.Name == "displacementRotationIds90")?.Value);
-                jercEntitySettingsValues.Add("displacementRotationIds180", jercDispRotation.FirstOrDefault(x => x.Name == "displacementRotationIds180")?.Value);
-                jercEntitySettingsValues.Add("displacementRotationIds270", jercDispRotation.FirstOrDefault(x => x.Name == "displacementRotationIds270")?.Value);
+                jercEntitySettingsValues.Add("displacementRotationSideIds90", jercDispRotation.FirstOrDefault(x => x.Name == "displacementRotationSideIds90")?.Value);
+                jercEntitySettingsValues.Add("displacementRotationSideIds180", jercDispRotation.FirstOrDefault(x => x.Name == "displacementRotationSideIds180")?.Value);
+                jercEntitySettingsValues.Add("displacementRotationSideIds270", jercDispRotation.FirstOrDefault(x => x.Name == "displacementRotationSideIds270")?.Value);
             }
 
 
@@ -1762,7 +1762,7 @@ namespace JERC
                     VanillaHammerVmfFixer.CalculateVerticesPlusForAllBrushSides(brush.side);
                 }
 
-                var brushSideNew = new BrushSide(brush.id);
+                var brushSideNew = new BrushSide(brushSide.id, brush.id);
                 foreach (var vertices in brushSide.vertices_plus.ToList())
                 {
                     brushSideNew.vertices.Add(new Vertices(vertices.x / Sizes.SizeReductionMultiplier, vertices.y / Sizes.SizeReductionMultiplier, (float)vertices.z));
@@ -1791,7 +1791,7 @@ namespace JERC
 
             foreach (var side in sideList)
             {
-                var brushSideNew = new BrushSide(brushId);
+                var brushSideNew = new BrushSide(side.id, brushId); //// side.brushId
                 for (int i = 0; i < side.vertices_plus.Count(); i++)
                 {
                     var vert = side.vertices_plus[i];
@@ -1822,7 +1822,7 @@ namespace JERC
             {
                 foreach (var side in entitySides.Value)
                 {
-                    var entityBrushSide = new EntityBrushSide();
+                    var entityBrushSide = new EntityBrushSide(side.id, side.brushId);
                     for (int i = 0; i < side.vertices_plus.Count(); i++)
                     {
                         var vert = side.vertices_plus[i];
@@ -1852,7 +1852,7 @@ namespace JERC
             {
                 foreach (var side in entitySides.Value)
                 {
-                    var entityBrushSide = new EntityBrushSide
+                    var entityBrushSide = new EntityBrushSide(side.id, side.brushId)
                     {
                         entityType = entityType,
                         orderNum = vmfRequiredData.jercBoxByEntityJercBoxId[entitySides.Key].orderNum,
@@ -2055,7 +2055,7 @@ namespace JERC
                     var brushSideCenterOffset = GetCorrectedVerticesPositionInWorld(brushSideCenter);
 
                     // finish
-                    brushesToDraw.Add(new ObjectToDraw(configurationValues, brushSidesListById.Keys.ElementAt(i), brushSideCenterOffset, verticesOffsetsToUse, false, brushSide.jercType));
+                    brushesToDraw.Add(new ObjectToDraw(configurationValues, brushSide.id, brushSide.brushId, brushSideCenterOffset, verticesOffsetsToUse, false, brushSide.jercType));
                 }
             }
 
@@ -2156,7 +2156,7 @@ namespace JERC
                             var brushCenterOffset = GetCorrectedVerticesPositionInWorld(brushCenter);
 
                             // finish
-                            brushesToDraw.Add(new ObjectToDraw(configurationValues, brushSidesListById.Keys.ElementAt(i), brushCenterOffset, verticesOffsetsToUse, true, brushSide.jercType));
+                            brushesToDraw.Add(new ObjectToDraw(configurationValues, brushSide.id, brushSide.brushId, brushCenterOffset, verticesOffsetsToUse, true, brushSide.jercType));
                         }
                     }
                 }
@@ -2226,12 +2226,12 @@ namespace JERC
                     {
                         if (brushEntityBrushSide.orderNum == (int)jercBoxOrderNum) // ignore any that are being drawn at a different order num
                         {
-                            brushEntitiesToDraw.Add(new ObjectToDraw(configurationValues, brushEntityBrushSideListById.Keys.ElementAt(i), brushSideCenterOffset, verticesOffsetsToUse, false, brushEntityBrushSide.entityType, brushEntityBrushSide.rendercolor, brushEntityBrushSide.colourStroke, brushEntityBrushSide.strokeWidth));
+                            brushEntitiesToDraw.Add(new ObjectToDraw(configurationValues, brushEntityBrushSide.id, brushEntityBrushSide.brushId, brushSideCenterOffset, verticesOffsetsToUse, false, brushEntityBrushSide.entityType, brushEntityBrushSide.rendercolor, brushEntityBrushSide.colourStroke, brushEntityBrushSide.strokeWidth));
                         }
                     }
                     else
                     {
-                        brushEntitiesToDraw.Add(new ObjectToDraw(configurationValues, brushEntityBrushSideListById.Keys.ElementAt(i), brushSideCenterOffset, verticesOffsetsToUse, false, brushEntityBrushSide.entityType));
+                        brushEntitiesToDraw.Add(new ObjectToDraw(configurationValues, brushEntityBrushSide.id, brushEntityBrushSide.brushId, brushSideCenterOffset, verticesOffsetsToUse, false, brushEntityBrushSide.entityType));
                     }
                 }
             }

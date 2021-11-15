@@ -10,6 +10,8 @@ namespace JERC.Models
 {
     public class EntityBrushSide
     {
+        public int id;
+        public int brushId;
         public List<Vertices> vertices = new List<Vertices>();
         public EntityTypes entityType;
         public int orderNum;
@@ -18,6 +20,11 @@ namespace JERC.Models
         public int strokeWidth;
         public string material;
 
-        public EntityBrushSide() {}
+
+        public EntityBrushSide(int id, int brushId)
+        {
+            this.id = id;
+            this.brushId = brushId;
+        }
     }
 }

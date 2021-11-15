@@ -12,6 +12,7 @@ namespace JERC.Models
     {
         public ConfigurationValues configurationValues;
 
+        public int brushSideId;
         public int brushId;
         public Vertices center;
         public List<VerticesToDraw> verticesToDraw;
@@ -29,25 +30,25 @@ namespace JERC.Models
         public bool? needsRotating270;
 
 
-        public ObjectToDraw(ConfigurationValues configurationValues, int brushId, Vertices center, List<VerticesToDraw> verticesToDraw, bool isDisplacement, JercTypes jercType)
+        public ObjectToDraw(ConfigurationValues configurationValues, int brushSideId, int brushId, Vertices center, List<VerticesToDraw> verticesToDraw, bool isDisplacement, JercTypes jercType)
         {
-            SetMainValues(configurationValues, brushId, center, verticesToDraw, isDisplacement);
+            SetMainValues(configurationValues, brushSideId, brushId, center, verticesToDraw, isDisplacement);
 
             this.jercType = jercType;
         }
 
 
-        public ObjectToDraw(ConfigurationValues configurationValues, int brushId, Vertices center, List<VerticesToDraw> verticesToDraw, bool isDisplacement, EntityTypes entityType)
+        public ObjectToDraw(ConfigurationValues configurationValues, int brushSideId, int brushId, Vertices center, List<VerticesToDraw> verticesToDraw, bool isDisplacement, EntityTypes entityType)
         {
-            SetMainValues(configurationValues, brushId, center, verticesToDraw, isDisplacement);
+            SetMainValues(configurationValues, brushSideId, brushId, center, verticesToDraw, isDisplacement);
 
             this.entityType = entityType;
         }
 
 
-        public ObjectToDraw(ConfigurationValues configurationValues, int brushId, Vertices center, List<VerticesToDraw> verticesToDraw, bool isDisplacement, EntityTypes entityType, Color colour, Color colourStroke, int strokeWidth)
+        public ObjectToDraw(ConfigurationValues configurationValues, int brushSideId, int brushId, Vertices center, List<VerticesToDraw> verticesToDraw, bool isDisplacement, EntityTypes entityType, Color colour, Color colourStroke, int strokeWidth)
         {
-            SetMainValues(configurationValues, brushId, center, verticesToDraw, isDisplacement);
+            SetMainValues(configurationValues, brushSideId, brushId, center, verticesToDraw, isDisplacement);
 
             this.entityType = entityType;
 
@@ -59,6 +60,7 @@ namespace JERC.Models
 
         public static ObjectToDraw Clone(ObjectToDraw objectToDraw)
         {
+            var brushSideIdNew = objectToDraw.brushSideId;
             var brushIdNew = objectToDraw.brushId;
             var centerNew = objectToDraw.center;
             var verticesToDrawNew = new List<VerticesToDraw>();
@@ -82,21 +84,22 @@ namespace JERC.Models
             */
 
             if (jercTypeNew != null)
-                return new ObjectToDraw(objectToDraw.configurationValues, brushIdNew, centerNew, verticesToDrawNew, isDisplacementNew, (JercTypes)jercTypeNew);
+                return new ObjectToDraw(objectToDraw.configurationValues, brushSideIdNew, brushIdNew, centerNew, verticesToDrawNew, isDisplacementNew, (JercTypes)jercTypeNew);
             else if (entityTypeNew != null)
                 if (colourNew == null || colourStrokeNew == null || strokeWidthNew == null)
-                    return new ObjectToDraw(objectToDraw.configurationValues, brushIdNew, centerNew, verticesToDrawNew, isDisplacementNew, (EntityTypes)entityTypeNew);
+                    return new ObjectToDraw(objectToDraw.configurationValues, brushSideIdNew, brushIdNew, centerNew, verticesToDrawNew, isDisplacementNew, (EntityTypes)entityTypeNew);
                 else
-                    return new ObjectToDraw(objectToDraw.configurationValues, brushIdNew, centerNew, verticesToDrawNew, isDisplacementNew, (EntityTypes)entityTypeNew, (Color)colourNew, (Color)colourStrokeNew, (int)strokeWidthNew);
+                    return new ObjectToDraw(objectToDraw.configurationValues, brushSideIdNew, brushIdNew, centerNew, verticesToDrawNew, isDisplacementNew, (EntityTypes)entityTypeNew, (Color)colourNew, (Color)colourStrokeNew, (int)strokeWidthNew);
             else
                 return null;
         }
 
 
-        private void SetMainValues(ConfigurationValues configurationValues, int brushId, Vertices center, List<VerticesToDraw> verticesToDraw, bool isDisplacement)
+        private void SetMainValues(ConfigurationValues configurationValues, int brushSideId, int brushId, Vertices center, List<VerticesToDraw> verticesToDraw, bool isDisplacement)
         {
             this.configurationValues = configurationValues;
 
+            this.brushSideId = brushSideId;
             this.brushId = brushId;
             this.center = center;
             this.verticesToDraw = verticesToDraw;
@@ -111,7 +114,7 @@ namespace JERC.Models
 
         private bool GetNeedsRotating90()
         {
-            if (isDisplacement && configurationValues.displacementRotationIds90.Any(x => x == brushId))
+            if (isDisplacement && configurationValues.displacementRotationSideIds90.Any(x => x == brushSideId))
                 return true;
 
             return false;
@@ -120,7 +123,7 @@ namespace JERC.Models
 
         private bool GetNeedsRotating180()
         {
-            if (isDisplacement && configurationValues.displacementRotationIds180.Any(x => x == brushId))
+            if (isDisplacement && configurationValues.displacementRotationSideIds180.Any(x => x == brushSideId))
                 return true;
 
             return false;
@@ -129,7 +132,7 @@ namespace JERC.Models
 
         private bool GetNeedsRotating270()
         {
-            if (isDisplacement && configurationValues.displacementRotationIds270.Any(x => x == brushId))
+            if (isDisplacement && configurationValues.displacementRotationSideIds270.Any(x => x == brushSideId))
                 return true;
 
             return false;

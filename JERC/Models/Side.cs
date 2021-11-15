@@ -9,8 +9,8 @@ namespace JERC.Models
 {
     public class Side
     {
-        public int brushId;
         public int id;
+        public int brushId;
         public string plane;
         public List<Vertices> vertices_plus;
         public string material;
@@ -23,8 +23,8 @@ namespace JERC.Models
 
         public Side(IVNode side, int brushId)
         {
-            this.brushId = brushId;
             id = int.Parse(side.Body.FirstOrDefault(x => x.Name == "id")?.Value);
+            this.brushId = brushId;
             plane = side.Body.FirstOrDefault(x => x.Name == "plane")?.Value;
             vertices_plus = side.Body.FirstOrDefault(x => x.Name == "vertices_plus")?.Body.Select(x => new Vertices(x.Value)).ToList();
             material = side.Body.FirstOrDefault(x => x.Name == "material")?.Value;
