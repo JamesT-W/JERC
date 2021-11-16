@@ -191,14 +191,17 @@
 
 @AutoVisGroup = "Entities"
 [
-    "JERC Entities"
+    "JERC Point Entities"
     [
         "jerc_config"
         "jerc_divider"
         "jerc_floor"
         "jerc_ceiling"
         "jerc_disp_rotation"
+    ]
 
+    "JERC Brush Entities"
+    [
         "jerc_box"
     ]
 ]
