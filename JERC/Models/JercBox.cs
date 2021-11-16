@@ -24,7 +24,7 @@ namespace JERC.Models
             entity.orderNum = (int.Parse(entity.orderNum, Globalization.Style, Globalization.Culture) > JercBoxValues.MaxJercBoxOrderNumValue) ? JercBoxValues.MaxJercBoxOrderNumValue.ToString() : entity.orderNum;
             orderNum = int.Parse(entity.orderNum, Globalization.Style, Globalization.Culture);
 
-            entity.rendercolor ??= "255 0 0";
+            entity.rendercolor ??= "255 255 255";
             entity.colourAlpha ??= "255";
 
             var colourSplit = entity.rendercolor.Split(" ");
@@ -35,7 +35,7 @@ namespace JERC.Models
                 int.Parse(colourSplit[2], Globalization.Style, Globalization.Culture)
             );
 
-            entity.colourStroke ??= "255 0 0";
+            entity.colourStroke ??= "0 0 0";
             entity.colourStrokeAlpha ??= "255";
             entity.colourStrokeAlpha = (int.Parse(entity.colourStrokeAlpha, Globalization.Style, Globalization.Culture) < JercBoxValues.MinJercBoxColourStrokeAlphaValue) ? JercBoxValues.MinJercBoxColourStrokeAlphaValue.ToString() : entity.colourStrokeAlpha;
             entity.colourStrokeAlpha = (int.Parse(entity.colourStrokeAlpha, Globalization.Style, Globalization.Culture) > JercBoxValues.MaxJercBoxColourStrokeAlphaValue) ? JercBoxValues.MaxJercBoxColourStrokeAlphaValue.ToString() : entity.colourStrokeAlpha;
