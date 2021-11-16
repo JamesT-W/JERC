@@ -229,7 +229,7 @@ namespace JERC.Models
                 }
                 else
                 {
-                    Logger.LogImportantWarning("Displacement startPosition matches no vertices? Skipping automatic rotation.");
+                    Logger.LogImportantWarning($"Displacement startPosition matches no vertices? Skipping automatic rotation. Start Position: {startPosition}");
                     return new List<Vertices>() { vertices0, vertices1, vertices2, vertices3 };
                 }
             }
