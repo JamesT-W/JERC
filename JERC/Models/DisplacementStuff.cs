@@ -1,4 +1,5 @@
-﻿using System;
+﻿using JERC.Constants;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -32,6 +33,9 @@ namespace JERC.Models
         public Vertices[,] pointsLocations;
 
 
+        private float automaticallyRotatedDegreesClockwise = 0;
+
+
         public DisplacementStuff(ConfigurationValues configurationValues, DispInfo dispInfo, List<Vertices> brushSideVertices)
         {
             power = dispInfo.power;
@@ -53,6 +57,14 @@ namespace JERC.Models
             var vertices2 = brushSideVertices.OrderByDescending(a => a.x + a.y).FirstOrDefault();
             var vertices1 = brushSideVertices.Where(x => x != vertices2).OrderByDescending(a => a.x).ThenBy(a => a.y).FirstOrDefault();
             var vertices3 = brushSideVertices.Where(x => x != vertices0).OrderBy(a => a.x).ThenByDescending(a => a.y).FirstOrDefault();
+
+
+            var newVerticesOrder = RotateDisplacementAutomatically(configurationValues, startPosition, vertices0, vertices1, vertices2, vertices3); // jerc_config - rotateCutDispsAutomatic
+            vertices0 = newVerticesOrder[0];
+            vertices1 = newVerticesOrder[1];
+            vertices2 = newVerticesOrder[2];
+            vertices3 = newVerticesOrder[3];
+
 
             pointsLocations = new Vertices[numOfRows, numOfRows];
 
@@ -122,6 +134,104 @@ namespace JERC.Models
                 // add parsed values
                 normals.Add(displacementSideNormalsRow);
                 distances.Add(displacementSideDistancesRow);
+            }
+
+
+            /*
+            // rotate all values if necessary
+            switch (automaticallyRotatedDegreesClockwise) // set in RotateDisplacementAutomatically()
+            {
+                case 90:
+                    ////////// would need finishing
+                    /*
+                    0 0 0 0 0
+                    0 0 0 0 0
+                    0 0 0 0 0
+                    300 300 300 300 300
+                    300 300 300 300 300
+
+                    becomes
+
+                    0 0 0 300 300
+                    0 0 0 300 300
+                    0 0 0 300 300
+                    0 0 0 300 300
+                    0 0 0 300 300
+                    */
+
+                    /*
+                    break;
+                case 180:
+                    normals.Reverse();
+                    distances.Reverse();
+                    offsets.Reverse();
+                    offset_normals.Reverse();
+                    alphas.Reverse();
+                    triangle_tags.Reverse();
+                    allowed_verts.Reverse();
+                    break;
+                case 270:
+                    */
+                    ////////// would need finishing
+                    /*
+                    0 0 0 0 0
+                    0 0 0 0 0
+                    0 0 0 0 0
+                    300 300 300 300 300
+                    300 300 300 300 300
+
+                    becomes
+
+                    300 300 0 0 0
+                    300 300 0 0 0
+                    300 300 0 0 0
+                    300 300 0 0 0
+                    300 300 0 0 0
+                    */
+
+                    /*
+                    break;
+            }
+            */
+        }
+
+
+        private List<Vertices> RotateDisplacementAutomatically(ConfigurationValues configurationValues, string startPosition, Vertices vertices0, Vertices vertices1, Vertices vertices2, Vertices vertices3)
+        {
+            if (!configurationValues.rotateCutDispsAutomatic)
+            {
+                return new List<Vertices>() { vertices0, vertices1, vertices2, vertices3 };
+            }
+            else
+            {
+                var startPosString = startPosition.Replace("[", string.Empty).Replace("]", string.Empty);
+                var startPosVertices = new Vertices(startPosString);
+
+                if (startPosVertices.Equals(vertices0))
+                {
+                    automaticallyRotatedDegreesClockwise = 0;
+                    return new List<Vertices>() { vertices0, vertices1, vertices2, vertices3 };
+                }
+                else if (startPosVertices.Equals(vertices1))
+                {
+                    automaticallyRotatedDegreesClockwise = 270;
+                    return new List<Vertices>() { vertices1, vertices2, vertices3, vertices0 };
+                }
+                else if (startPosVertices.Equals(vertices2))
+                {
+                    automaticallyRotatedDegreesClockwise = 180;
+                    return new List<Vertices>() { vertices2, vertices3, vertices0, vertices1 };
+                }
+                else if (startPosVertices.Equals(vertices3))
+                {
+                    automaticallyRotatedDegreesClockwise = 90;
+                    return new List<Vertices>() { vertices3, vertices0, vertices1, vertices2 };
+                }
+                else
+                {
+                    Logger.LogImportantWarning("Displacement startPosition matches no vertices? Skipping automatic rotation.");
+                    return new List<Vertices>() { vertices0, vertices1, vertices2, vertices3 };
+                }
             }
         }
 

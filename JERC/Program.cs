@@ -238,11 +238,27 @@ namespace JERC
                 // brush id is not changed
                 // rotation is not changed
 
+                // start position
+                var startPosition = brushSide.Where(x => x.Name == "dispinfo").Select(x => x.Body.Where(y => y.Name == "startposition").FirstOrDefault()).FirstOrDefault();
+                if (startPosition != null && !string.IsNullOrWhiteSpace(startPosition.Value))
+                {
+                    MoveAndRotateStartPositionInInstance(instance, brushSide.Where(x => x.Name == "dispinfo").Select(x => x.Body.Where(y => y.Name == "startposition").FirstOrDefault()).FirstOrDefault());
+                }
+
+                // vertices
                 foreach (var verticesPlusIVNode in brushSide.Where(x => x.Name == "vertices_plus").SelectMany(x => x.Body))
                 {
                     MoveAndRotateVerticesInInstance(instance, verticesPlusIVNode);
                 }
             }
+        }
+
+
+        private static void MoveAndRotateStartPositionInInstance(FuncInstance instance, IVNode ivNode)
+        {
+            ivNode.Value = MergeVerticesToString(instance.origin, ivNode.Value.Replace("[", string.Empty).Replace("]", string.Empty)); // removes the offset that being in an instances causes
+            ivNode.Value = GetRotatedVerticesNewPositionAsString(new Vertices(ivNode.Value), instance.origin, instance.angles.yaw); // removes the rotation that being in an instances causes
+            ivNode.Value = "[" + ivNode.Value + "]";
         }
 
 
@@ -617,6 +633,7 @@ namespace JERC
             jercEntitySettingsValues.Add("exportRadarAsSeparateLevels", jercConfig.FirstOrDefault(x => x.Name == "exportRadarAsSeparateLevels")?.Value);
             jercEntitySettingsValues.Add("useSeparateGradientEachLevel", jercConfig.FirstOrDefault(x => x.Name == "useSeparateGradientEachLevel")?.Value);
             jercEntitySettingsValues.Add("ignoreDisplacementXYChanges", jercConfig.FirstOrDefault(x => x.Name == "ignoreDisplacementXYChanges")?.Value);
+            jercEntitySettingsValues.Add("rotateCutDispsAutomatic", jercConfig.FirstOrDefault(x => x.Name == "rotateCutDispsAutomatic")?.Value);
             jercEntitySettingsValues.Add("backgroundFilename", jercConfig.FirstOrDefault(x => x.Name == "backgroundFilename")?.Value ?? string.Empty);
             jercEntitySettingsValues.Add("radarSizeMultiplier", jercConfig.FirstOrDefault(x => x.Name == "radarSizeMultiplier")?.Value);
             jercEntitySettingsValues.Add("overlapAlpha", jercConfig.FirstOrDefault(x => x.Name == "overlapAlpha")?.Value);
@@ -1417,7 +1434,7 @@ namespace JERC
 
         private static void DrawStroke(Graphics graphics, ObjectToDraw objectToDraw, Color colourStroke, int? strokeWidthOverride = null)
         {
-            RotateObjectBeforeDrawingIfSpecified(objectToDraw);
+            RotateObjectBeforeDrawingIfSpecified(objectToDraw); // jerc_disp_rotation
 
             var strokeSolidBrush = new SolidBrush(Color.Transparent);
             var strokePen = new Pen(colourStroke);
@@ -2261,7 +2278,7 @@ namespace JERC
 
         private static void DrawFilledPolygonGradient(Graphics graphics, ObjectToDraw objectToDraw, bool drawAroundEdge, LevelHeight levelHeightOverride = null)
         {
-            RotateObjectBeforeDrawingIfSpecified(objectToDraw);
+            RotateObjectBeforeDrawingIfSpecified(objectToDraw); // jerc_disp_rotation
 
             // Make the points for a polygon.
             var vertices = objectToDraw.verticesToDraw.Select(x => x.vertices).ToList();

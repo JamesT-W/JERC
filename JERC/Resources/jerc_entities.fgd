@@ -27,6 +27,12 @@
 		1: "Yes"
 	]
 
+	rotateCutDispsAutomatic(choices) : "Rotate Cut Displacements Automatically" : 1 : "Automatically rotates displacements that have been sliced and are rotated incorrectly on overviews due to using the cutting tool. This should remove the need of a jerc_disp_rotation entity" =
+	[
+		0: "No"
+		1: "Yes"
+	]
+
 	backgroundFilename(string) : "Background Image Filename" : "default" : "For custom images, place them inside the following folder: .../Counter-Strike Global Offensive/csgo/materials/JERC/backgrounds/"
 
 	radarSizeMultiplier(float) : "Radar Size Multiplier (float)" : "0.95" : "A multiplier for altering the size of the level in the radar"
