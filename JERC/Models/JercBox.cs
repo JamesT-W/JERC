@@ -26,6 +26,8 @@ namespace JERC.Models
 
             entity.rendercolor ??= "255 255 255";
             entity.colourAlpha ??= "255";
+            entity.colourAlpha = (int.Parse(entity.colourAlpha, Globalization.Style, Globalization.Culture) < JercBoxValues.MinJercBoxColourAlphaValue) ? JercBoxValues.MinJercBoxColourAlphaValue.ToString() : entity.colourAlpha;
+            entity.colourAlpha = (int.Parse(entity.colourAlpha, Globalization.Style, Globalization.Culture) > JercBoxValues.MaxJercBoxColourAlphaValue) ? JercBoxValues.MaxJercBoxColourAlphaValue.ToString() : entity.colourAlpha;
 
             var colourSplit = entity.rendercolor.Split(" ");
             rendercolor = Color.FromArgb(
