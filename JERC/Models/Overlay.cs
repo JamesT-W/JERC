@@ -100,7 +100,13 @@ namespace JERC.Models
             }
             else
             {
-                rendercolor = configurationValues.overlaysColour;
+                var configOverlaysColour = configurationValues.overlaysColour;
+                rendercolor = Color.FromArgb(
+                    int.Parse(entity.colourAlpha, Globalization.Style, Globalization.Culture),
+                    configOverlaysColour.R,
+                    configOverlaysColour.G,
+                    configOverlaysColour.B
+                );
             }
 
             entity.colourStroke ??= "0 0 0";
