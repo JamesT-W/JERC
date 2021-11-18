@@ -229,6 +229,7 @@
         "jerc_floor"
         "jerc_ceiling"
         "jerc_disp_rotation"
+        "jerc_info_overlay"
     ]
 
     "JERC Brush Entities"
