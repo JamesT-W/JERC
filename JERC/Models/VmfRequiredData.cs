@@ -90,14 +90,19 @@ namespace JERC.Models
         public List<Entity> ctSpawnEntities;
         public List<Entity> tSpawnEntities;
 
+        public List<Entity> infoOverlayEntities;
+        public List<Entity> jercInfoOverlayEntities;
+
         public List<Entity> jercBoxBrushEntities;
 
         public Dictionary<int, List<Side>> entitiesSidesByEntityBuyzoneId = new Dictionary<int, List<Side>>();
         public Dictionary<int, List<Side>> entitiesSidesByEntityBombsiteId = new Dictionary<int, List<Side>>();
         public Dictionary<int, List<Side>> entitiesSidesByEntityRescueZoneId = new Dictionary<int, List<Side>>();
+        public Dictionary<int, List<Side>> entitiesSidesByEntityOverlayId = new Dictionary<int, List<Side>>();
 
         public Dictionary<int, List<Side>> entitiesSidesByEntityJercBoxId = new Dictionary<int, List<Side>>();
 
+        public Dictionary<int, Overlay> overlayByEntityOverlayId = new Dictionary<int, Overlay>();
         public Dictionary<int, JercBox> jercBoxByEntityJercBoxId = new Dictionary<int, JercBox>();
 
         public List<Entity> jercConfigEntities;
@@ -108,14 +113,17 @@ namespace JERC.Models
 
 
         public VmfRequiredData(
+            ConfigurationValues configurationValues,
             IEnumerable<IVNode> brushesIgnoreIVNodes, IEnumerable<IVNode> brushesRemoveIVNodes, IEnumerable<IVNode> brushesPathIVNodes, IEnumerable<IVNode> brushesCoverIVNodes, IEnumerable<IVNode> brushesOverlapIVNodes, IEnumerable<IVNode> brushesDoorIVNodes, IEnumerable<IVNode> brushesLadderIVNodes, IEnumerable<IVNode> brushesDangerIVNodes,
             IEnumerable<IVNode> brushesBuyzoneIVNodes,IEnumerable<IVNode> brushesBombsiteAIVNodes, IEnumerable<IVNode> brushesBombsiteBIVNodes, IEnumerable<IVNode> brushesRescueZoneIVNodes, IEnumerable<IVNode> brushesHostageIVNodes, IEnumerable<IVNode> brushesTSpawnIVNodes, IEnumerable<IVNode> brushesCTSpawnIVNodes,
             IEnumerable<IVNode> displacementsIgnoreIVNodes, IEnumerable<IVNode> displacementsRemoveIVNodes, IEnumerable<IVNode> displacementsPathIVNodes, IEnumerable<IVNode> displacementsCoverIVNodes, IEnumerable<IVNode> displacementsOverlapIVNodes, IEnumerable<IVNode> displacementsDoorIVNodes, IEnumerable<IVNode> displacementsLadderIVNodes, IEnumerable<IVNode> displacementsDangerIVNodes,
             IEnumerable<IVNode> displacementsBuyzoneIVNodes, IEnumerable<IVNode> displacementsBombsiteAIVNodes, IEnumerable<IVNode> displacementsBombsiteBIVNodes, IEnumerable<IVNode> displacementsRescueZoneIVNodes, IEnumerable<IVNode> displacementsHostageIVNodes, IEnumerable<IVNode> displacementsTSpawnIVNodes, IEnumerable<IVNode> displacementsCTSpawnIVNodes,
-            IEnumerable<IVNode> buyzoneBrushEntitiesIVNodes, IEnumerable<IVNode> bombsiteBrushEntitiesIVNodes, IEnumerable<IVNode> rescueZoneBrushEntitiesIVNodes, IEnumerable<IVNode> hostageEntitiesIVNodes, IEnumerable<IVNode> ctSpawnEntitiesIVNodes, IEnumerable<IVNode> tSpawnEntitiesIVNodes,
+            IEnumerable<IVNode> buyzoneBrushEntitiesIVNodes, IEnumerable<IVNode> bombsiteBrushEntitiesIVNodes, IEnumerable<IVNode> rescueZoneBrushEntitiesIVNodes,
             IEnumerable<IVNode> brushesIgnoreBrushEntitiesIVNodes, IEnumerable<IVNode> brushesRemoveBrushEntitiesIVNodes, IEnumerable<IVNode> brushesPathBrushEntitiesIVNodes, IEnumerable<IVNode> brushesCoverBrushEntitiesIVNodes, IEnumerable<IVNode> brushesOverlapBrushEntitiesIVNodes, IEnumerable<IVNode> brushesDoorBrushEntitiesIVNodes, IEnumerable<IVNode> brushesLadderBrushEntitiesIVNodes, IEnumerable<IVNode> brushesDangerBrushEntitiesIVNodes,
             IEnumerable<IVNode> brushesBuyzoneBrushEntitiesIVNodes, IEnumerable<IVNode> brushesBombsiteABrushEntitiesIVNodes, IEnumerable<IVNode> brushesBombsiteBBrushEntitiesIVNodes, IEnumerable<IVNode> brushesRescueZoneBrushEntitiesIVNodes, IEnumerable<IVNode> brushesHostageBrushEntitiesIVNodes, IEnumerable<IVNode> brushesTSpawnBrushEntitiesIVNodes, IEnumerable<IVNode> brushesCTSpawnBrushEntitiesIVNodes,
             IEnumerable<IVNode> jercBoxBrushEntitiesIVNodes,
+            IEnumerable<IVNode> hostageEntitiesIVNodes, IEnumerable<IVNode> ctSpawnEntitiesIVNodes, IEnumerable<IVNode> tSpawnEntitiesIVNodes,
+            IEnumerable<IVNode> infoOverlayEntitiesIVNodes, IEnumerable<IVNode> jercInfoOverlayEntitiesIVNodes,
             IEnumerable<IVNode> jercConfigEntitiesIVNodes, IEnumerable<IVNode> jercDividerEntitiesIVNodes, IEnumerable<IVNode> jercFloorEntitiesIVNodes, IEnumerable<IVNode> jercCeilingEntitiesIVNodes, IEnumerable<IVNode> jercDispRotationEntitiesIVNodes
         )
         {
@@ -331,6 +339,41 @@ namespace JERC.Models
             ctSpawnEntities = ctSpawnEntitiesIVNodes.Any() ? ctSpawnEntitiesIVNodes.Select(x => new Entity(x)).ToList() : new List<Entity>();
             tSpawnEntities = tSpawnEntitiesIVNodes.Any() ? tSpawnEntitiesIVNodes.Select(x => new Entity(x)).ToList() : new List<Entity>();
 
+            infoOverlayEntities = infoOverlayEntitiesIVNodes.Any() ? infoOverlayEntitiesIVNodes.Select(x => new Entity(x, true)).ToList() : new List<Entity>();
+            jercInfoOverlayEntities = jercInfoOverlayEntitiesIVNodes.Any() ? jercInfoOverlayEntitiesIVNodes.Select(x => new Entity(x, true)).ToList() : new List<Entity>();
+
+            foreach (var entity in infoOverlayEntities.Concat(jercInfoOverlayEntities))
+            {
+                /////////////////////////////////////////////////////////// TODO: This is a dreadful way to handle different instaces containing the same IDs. They should be handled sepearately somehow, NOT added together
+                if (entitiesSidesByEntityOverlayId.ContainsKey(entity.id))
+                {
+                    entitiesSidesByEntityOverlayId[entity.id].AddRange(entity.brushes.SelectMany(x => x.side).ToList());
+
+                    var newKeyTrying = entity.id + 1000;
+                    var foundUnusedId = false;
+                    while (!foundUnusedId)
+                    {
+                        if (!overlayByEntityOverlayId.ContainsKey(newKeyTrying))
+                        {
+                            overlayByEntityOverlayId.Add(newKeyTrying, new Overlay(configurationValues, entity)); /////////////////////////////////////////////////////////// The ID changes, so it will be different in overlayByEntityOverlayId than in entitiesSidesByEntityOverlayId
+                            foundUnusedId = true;
+                        }
+                        else
+                        {
+                            newKeyTrying++;
+                        }
+                    }
+
+                    entity.id = newKeyTrying;
+                }
+                else
+                {
+                    entitiesSidesByEntityOverlayId.Add(entity.id, entity.brushes.SelectMany(x => x.side).ToList());
+                    overlayByEntityOverlayId.Add(entity.id, new Overlay(configurationValues, entity));
+                }
+            }
+
+
             // calculate vertices_plus for every brush side for vanilla hammer vmfs, as hammer++ adds vertices itself when saving a vmf
             if (GameConfigurationValues.isVanillaHammer)
             {
@@ -531,6 +574,7 @@ namespace JERC.Models
             return entitiesSidesByEntityBuyzoneId.SelectMany(x => x.Value)
                 .Concat(entitiesSidesByEntityBombsiteId.SelectMany(x => x.Value))
                 .Concat(entitiesSidesByEntityRescueZoneId.SelectMany(x => x.Value))
+                .Concat(entitiesSidesByEntityOverlayId.SelectMany(x => x.Value))
                 .Concat(entitiesSidesByEntityJercBoxId.SelectMany(x => x.Value))
                 .ToList();
         }

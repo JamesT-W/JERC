@@ -16,6 +16,7 @@ namespace JERC.Constants
 
         public static readonly string IgnoreTextureName = "jerc/ignore";
 
+        public static readonly string OverlayTextureName = "jerc/jerc_overlays";
         public static readonly string JercBoxTextureName = "jerc/jerc_box";
 
         public static readonly string BuyzoneTextureName = "jerc/buyzone";

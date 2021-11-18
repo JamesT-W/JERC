@@ -59,6 +59,8 @@
 
 	dangerColour(color255) : "Danger Colour" : "127 0 0" : "Colour of danger world brushes"
 
+	overlaysColour(color255) : "Overlays Colour" : "0 100 100" : "Colour of info_overlay and jerc_info_overlay (unless overridden) entities"
+
 	strokeWidth(integer) : "Stroke Width (int)" : 10 : "Width of stroke to use"
 
 	strokeColour(color255) : "Stroke Colour" : "255 255 255" : "Colour of the stroke"
@@ -167,6 +169,27 @@
 ]
 
 
+@PointClass base(info_overlay) size(-1 -1 0, 1 1 1) iconsprite("jerc/editor/jerc_info_overlay.vmt") sphere(fademindist) sphere(fademaxdist) overlay() = jerc_info_overlay : 
+	"JERC - An info_overlay with the ability to set a colour for this overlay instead of using the jerc_config's overlay colour."
+[
+	orderNum(integer) : "Order Num (int)" : 2 : "0 = First, 1 = Between Path And Overlap Brushes/Displacements, 2 = After JERC Brushes/Displacements"
+
+	overrideColour(choices) : "Override Colour" : 1 : "Uses the colour set on this entity instead of the jerc_config's overlay colour value" =
+	[
+		0: "No"
+		1: "Yes"
+	]
+
+	rendercolor(color255) : "Colour (R G B)" : "0 100 100"
+
+	colourAlpha(integer) : "Colour Alpha (int)" : 255 : "The alpha value of the overlay (0-255)"
+
+	colourStroke(color255) : "Stroke Colour (R G B)" : "0 0 0"
+
+	colourStrokeAlpha(integer) : "Stroke Colour Alpha (int)" : 255 : "The alpha value of the overlay stroke (0-255)"
+]
+
+
 @SolidClass base(Origin, PaintableBrush) = jerc_box : 
 	"JERC - A brush that can specify showing a unique colour when displated in a radar." 
 [
@@ -175,7 +198,7 @@
 		1 : "Remove on fire" : 1
 	]
 
-	orderNum(integer) : "Order Num (int)" : 4 : "0 = First, 1 = Between Path And Overlap Brushes/Displacements, 2 = After JERC Brushes/Displacements, 3 = After JERC Brushes For Entities (eg. Bombsite A Material), 4 = After Brush Entities (eg. func_buyzone)"
+	orderNum(integer) : "Order Num (int)" : 4 : "0 = First, 1 = Between Path And Overlap Brushes/Displacements, 2 = After JERC Brushes/Displacements, 3 = After Brush Entities (eg. func_buyzone), 4 = After JERC Brushes For Entities (eg. Bombsite A Material)"
 
 	rendercolor(color255) : "Colour (R G B)" : "255 255 255"
 

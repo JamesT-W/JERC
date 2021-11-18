@@ -15,6 +15,9 @@ namespace JERC.Models
 
         public Angle(string angle)
         {
+            if (string.IsNullOrWhiteSpace(angle))
+                return;
+
             var angleSplit = angle.Split(" ");
 
             if (angleSplit.Count() != 3)

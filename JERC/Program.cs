@@ -87,6 +87,41 @@ namespace JERC
             Logger.LogNewLine();
             Logger.LogMessage("VMF parsed sucessfully");
 
+
+            // correct origins and angles
+            foreach (var entity in vmf.Body.Where(x => x.Name == "entity"))
+            {
+                // overlays (before the fake brush is created, the vertices need rotating)
+                if (entity.Body.FirstOrDefault(x => x.Name == "classname")?.Value == "info_overlay" || entity.Body.FirstOrDefault(x => x.Name == "classname")?.Value == "jerc_info_overlay")
+                {
+                    var originIVNode = entity.Body.FirstOrDefault(x => x.Name == "origin");
+                    var anglesIVNode = entity.Body.FirstOrDefault(x => x.Name == "angles");
+
+                    var uv0 = entity.Body.FirstOrDefault(x => x.Name == "uv0");
+                    var uv1 = entity.Body.FirstOrDefault(x => x.Name == "uv1");
+                    var uv2 = entity.Body.FirstOrDefault(x => x.Name == "uv2");
+                    var uv3 = entity.Body.FirstOrDefault(x => x.Name == "uv3");
+
+                    if (uv0 != null && uv1 != null && uv2 != null && uv3 != null)
+                    {
+                        var allVerticesOffsetsInOverlay = new List<IVNode>() { uv0, uv1, uv2, uv3 };
+                        for (int i = 0; i < allVerticesOffsetsInOverlay.Count(); i++) // allVerticesOffsetsInOverlay.Count() should be 4
+                        {
+                            var overlayVerticesOffset = allVerticesOffsetsInOverlay[i];
+
+                            var origin = new Vertices(originIVNode.Value);
+                            var angles = anglesIVNode?.Value == null ? new Angle(0, 0, 0) : new Angle(anglesIVNode.Value);
+
+                            var verticesString = MergeTwoVerticesAsString(originIVNode.Value, overlayVerticesOffset.Value); // removes the offset
+                            verticesString = GetRotatedVerticesNewPositionAsString(new Vertices(verticesString), origin, angles.yaw); // removes the rotation
+
+                            AddSingleJimVertices(entity, i, verticesString);
+                        }
+                    }
+                }
+            }
+
+
             SortInstances(vmf);
 
             SetVisgroupIdMainVmf();
@@ -196,12 +231,32 @@ namespace JERC
                     // entity id is not changed
                     // brush rotation is not changed
 
+                    string originalOriginValue = null;
+
                     var originIVNode = entity.Body.FirstOrDefault(x => x.Name == "origin");
                     if (originIVNode != null)
+                    {
+                        originalOriginValue = originIVNode.Value;
                         MoveAndRotateVerticesInInstance(instance, originIVNode);
+                    }
 
                     var allBrushSidesInEntity = entity.Body.Where(x => x.Name == "solid" && x.Body != null)?.SelectMany(x => x.Body.Where(y => y.Name == "side" && y.Body != null)?.Select(y => y.Body))?.ToList();
                     MoveAndRotateAllBrushSidesInInstance(instance, allBrushSidesInEntity);
+
+                    // overlays (before the fake brush is created, the vertices need rotating)
+                    if (!string.IsNullOrWhiteSpace(originalOriginValue) && (entity.Body.FirstOrDefault(x => x.Name == "classname")?.Value == "info_overlay" || entity.Body.FirstOrDefault(x => x.Name == "classname")?.Value == "jerc_info_overlay"))
+                    {
+                        var uv0 = entity.Body.FirstOrDefault(x => x.Name == "uv0");
+                        var uv1 = entity.Body.FirstOrDefault(x => x.Name == "uv1");
+                        var uv2 = entity.Body.FirstOrDefault(x => x.Name == "uv2");
+                        var uv3 = entity.Body.FirstOrDefault(x => x.Name == "uv3");
+
+                        if (uv0 != null && uv1 != null && uv2 != null && uv3 != null)
+                        {
+                            var allVerticesOffsetsInOverlay = new List<IVNode>() { uv0, uv1, uv2, uv3 };
+                            RotateOverlayVerticesInInstanceAndSetJimVertices(instance, entity, allVerticesOffsetsInOverlay, originalOriginValue);
+                        }
+                    }
                 }
 
                 var allWorldBrushSides = newVmf.World.Body.Where(x => x.Name == "solid").SelectMany(x => x.Body.Where(y => y.Name == "side").Select(y => y.Body)).ToList();
@@ -266,6 +321,26 @@ namespace JERC
         {
             ivNode.Value = MergeVerticesToString(instance.origin, ivNode.Value); // removes the offset that being in an instances causes
             ivNode.Value = GetRotatedVerticesNewPositionAsString(new Vertices(ivNode.Value), instance.origin, instance.angles.yaw); // removes the rotation that being in an instances causes
+        }
+
+
+        private static void RotateOverlayVerticesInInstanceAndSetJimVertices(FuncInstance instance, IVNode entity, List<IVNode> allVerticesOffsetsInOverlay, string originalOriginValue)
+        {
+            for (int i = 0; i < allVerticesOffsetsInOverlay.Count(); i++) // allVerticesOffsetsInOverlay.Count() should be 4
+            {
+                var overlayVerticesOffset = allVerticesOffsetsInOverlay[i];
+
+                var verticesString = MergeTwoVerticesAsString(MergeVerticesToString(instance.origin, overlayVerticesOffset.Value), originalOriginValue); // removes the offset that being in an instances causes
+                verticesString = GetRotatedVerticesNewPositionAsString(new Vertices(verticesString), instance.origin, instance.angles.yaw); // removes the rotation that being in an instances causes
+
+                AddSingleJimVertices(entity, i, verticesString);
+            }
+        }
+
+
+        private static void AddSingleJimVertices(IVNode entity, int verticesIndex, string verticesString)
+        {
+            entity.Body.Add(new VProperty($"jim_vertices{verticesIndex}", verticesString));
         }
 
 
@@ -344,6 +419,19 @@ namespace JERC
             var xNew = vertices.x + verticesNew.x;
             var yNew = vertices.y + verticesNew.y;
             var zNew = vertices.z + verticesNew.z;
+
+            return string.Concat(xNew, " ", yNew, " ", zNew);
+        }
+
+
+        public static string MergeTwoVerticesAsString(string verticesString1, string verticesString2)
+        {
+            var vertices1New = GetVerticesFromString(verticesString1);
+            var vertices2New = GetVerticesFromString(verticesString2);
+
+            var xNew = vertices1New.x + vertices2New.x;
+            var yNew = vertices1New.y + vertices2New.y;
+            var zNew = vertices1New.z + vertices2New.z;
 
             return string.Concat(xNew, " ", yNew, " ", zNew);
         }
@@ -489,6 +577,7 @@ namespace JERC
                                                 visgroupIdsByInstanceEntityIds.Values.Any(a => a == int.Parse(z.Value, Globalization.Style, Globalization.Culture))
                                             select x;
 
+
             // brushes
             var brushesIgnore = GetBrushesByTextureName(allWorldBrushesInVisgroup, TextureNames.IgnoreTextureName);
             var brushesRemove = GetBrushesByTextureName(allWorldBrushesInVisgroup, TextureNames.RemoveTextureName);
@@ -510,6 +599,7 @@ namespace JERC
             var brushesHostage = GetBrushesByTextureName(allWorldBrushesInVisgroup, TextureNames.HostageTextureName);
             var brushesTSpawn = GetBrushesByTextureName(allWorldBrushesInVisgroup, TextureNames.TSpawnTextureName);
             var brushesCTSpawn = GetBrushesByTextureName(allWorldBrushesInVisgroup, TextureNames.CTSpawnTextureName);
+
 
             // displacements
             var displacementsIgnore = GetDisplacementsByTextureName(allWorldBrushesInVisgroup, TextureNames.IgnoreTextureName);
@@ -533,17 +623,12 @@ namespace JERC
             var displacementsTSpawn = GetDisplacementsByTextureName(allWorldBrushesInVisgroup, TextureNames.TSpawnTextureName);
             var displacementsCTSpawn = GetDisplacementsByTextureName(allWorldBrushesInVisgroup, TextureNames.CTSpawnTextureName);
 
-            // brush entities (in game)
+
+            // brush entities
             var buyzoneBrushEntities = GetEntitiesByClassname(allEntities, Classnames.Buyzone, true);
             var bombsiteBrushEntities = GetEntitiesByClassname(allEntities, Classnames.Bombsite, true);
             var rescueZoneBrushEntities = GetEntitiesByClassname(allEntities, Classnames.RescueZone, true);
 
-            // entities (in game)
-            var hostageEntities = GetEntitiesByClassname(allEntities, Classnames.Hostage, true);
-            var tSpawnEntities = GetEntitiesByClassname(allEntities, Classnames.TSpawn, true);
-            var ctSpawnEntities = GetEntitiesByClassname(allEntities, Classnames.CTSpawn, true);
-
-            // brush entities (JERC)
             var funcBrushBrushEntities = GetEntitiesByClassname(allEntities, Classnames.FuncBrush, true);
             var funcDetailBrushEntities = GetEntitiesByClassname(allEntities, Classnames.FuncDetail, true);
             var funcDoorBrushEntities = GetEntitiesByClassname(allEntities, Classnames.FuncDoor, true);
@@ -588,7 +673,17 @@ namespace JERC
             // brush entities (JERC)
             var jercBoxBrushEntities = GetEntitiesByClassname(allEntities, Classnames.JercBox, true);
 
-            // entities (JERC)
+
+            // point entities
+            var hostageEntities = GetEntitiesByClassname(allEntities, Classnames.Hostage, true);
+            var tSpawnEntities = GetEntitiesByClassname(allEntities, Classnames.TSpawn, true);
+            var ctSpawnEntities = GetEntitiesByClassname(allEntities, Classnames.CTSpawn, true);
+
+            var infoOverlayEntities = GetEntitiesByClassname(allEntities, Classnames.InfoOverlay, true);
+            var jercInfoOverlayEntities = GetEntitiesByClassname(allEntities, Classnames.JercInfoOverlay, true);
+
+
+            // point entities (JERC)
             var jercConfigEntities = GetEntitiesByClassname(allEntities, Classnames.JercConfig, false);
             var jercDividerEntities = GetEntitiesByClassname(allEntities, Classnames.JercDivider, false);
             var jercFloorEntities = GetEntitiesByClassname(allEntities, Classnames.JercFloor, false);
@@ -608,14 +703,17 @@ namespace JERC
             Logger.LogMessage("Retrieved data from the vmf and instances");
 
             return new VmfRequiredData(
+                configurationValues,
                 brushesIgnore, brushesRemove, brushesPath, brushesCover, brushesOverlap, brushesDoor, brushesLadder, brushesDanger,
                 brushesBuyzone, brushesBombsiteA, brushesBombsiteB, brushesRescueZone, brushesHostage, brushesTSpawn, brushesCTSpawn,
                 displacementsIgnore, displacementsRemove, displacementsPath, displacementsCover, displacementsOverlap, displacementsDoor, displacementsLadder, displacementsDanger,
                 displacementsBuyzone, displacementsBombsiteA, displacementsBombsiteB, displacementsRescueZone, displacementsHostage, displacementsTSpawn, displacementsCTSpawn,
-                buyzoneBrushEntities, bombsiteBrushEntities, rescueZoneBrushEntities, hostageEntities, ctSpawnEntities, tSpawnEntities,
+                buyzoneBrushEntities, bombsiteBrushEntities, rescueZoneBrushEntities,
                 brushesIgnoreBrushEntities, brushesRemoveBrushEntities, brushesPathBrushEntities, brushesCoverBrushEntities, brushesOverlapBrushEntities, brushesDoorBrushEntities, brushesLadderBrushEntities, brushesDangerBrushEntities,
                 brushesBuyzoneBrushEntities, brushesBombsiteABrushEntities, brushesBombsiteBBrushEntities, brushesRescueZoneBrushEntities, brushesHostageBrushEntities, brushesTSpawnBrushEntities, brushesCTSpawnBrushEntities,
                 jercBoxBrushEntities,
+                hostageEntities, ctSpawnEntities, tSpawnEntities,
+                infoOverlayEntities, jercInfoOverlayEntities,
                 jercConfigEntities, jercDividerEntities, jercFloorEntities, jercCeilingEntities, jercDispRotationEntities
             );
         }
@@ -647,6 +745,7 @@ namespace JERC
             jercEntitySettingsValues.Add("doorColour", jercConfig.FirstOrDefault(x => x.Name == "doorColour")?.Value);
             jercEntitySettingsValues.Add("ladderColour", jercConfig.FirstOrDefault(x => x.Name == "ladderColour")?.Value);
             jercEntitySettingsValues.Add("dangerColour", jercConfig.FirstOrDefault(x => x.Name == "dangerColour")?.Value);
+            jercEntitySettingsValues.Add("overlaysColour", jercConfig.FirstOrDefault(x => x.Name == "overlaysColour")?.Value);
             jercEntitySettingsValues.Add("strokeWidth", jercConfig.FirstOrDefault(x => x.Name == "strokeWidth")?.Value);
             jercEntitySettingsValues.Add("strokeColour", jercConfig.FirstOrDefault(x => x.Name == "strokeColour")?.Value);
             jercEntitySettingsValues.Add("strokeAroundLayoutMaterials", jercConfig.FirstOrDefault(x => x.Name == "strokeAroundLayoutMaterials")?.Value);
@@ -1062,13 +1161,15 @@ namespace JERC
 
 
             // draw everything
-            DrawJercBrushEntities(graphics, levelHeight, bmpRawMaskByNameDictionary, brushEntityBrushSideListById, JercBoxOrderNums.First);
-            DrawBrushes(graphics, levelHeight, bmpRawMaskByNameDictionary, allBrushesToDraw, allDisplacementsToDraw, brushEntityBrushSideListById);
-            DrawJercBrushEntities(graphics, levelHeight, bmpRawMaskByNameDictionary, brushEntityBrushSideListById, JercBoxOrderNums.AfterJERCBrushesAndDisplacements);
-            DrawBrushesTexturedEntities(graphics, levelHeight, bmpRawMaskByNameDictionary, allBrushesToDraw, allDisplacementsToDraw);
-            DrawJercBrushEntities(graphics, levelHeight, bmpRawMaskByNameDictionary, brushEntityBrushSideListById, JercBoxOrderNums.AfterJERCBrushesForEntities);
-            DrawBrushEntities(graphics, levelHeight, bmpRawMaskByNameDictionary, entityBrushSideListById);
-            DrawJercBrushEntities(graphics, levelHeight, bmpRawMaskByNameDictionary, brushEntityBrushSideListById, JercBoxOrderNums.AfterBrushEntities);
+            DrawJercBrushOrPointEntities(graphics, levelHeight, bmpRawMaskByNameDictionary, brushEntityBrushSideListById, OverlayOrderNums.None, JercBoxOrderNums.First); // jerc_box
+            DrawJercBrushOrPointEntities(graphics, levelHeight, bmpRawMaskByNameDictionary, entityBrushSideListById, OverlayOrderNums.First, JercBoxOrderNums.None); // overlays
+            DrawBrushes(graphics, levelHeight, bmpRawMaskByNameDictionary, allBrushesToDraw, allDisplacementsToDraw, brushEntityBrushSideListById, entityBrushSideListById); // brushes and displacements (and jerc_box & overlays)
+            DrawJercBrushOrPointEntities(graphics, levelHeight, bmpRawMaskByNameDictionary, brushEntityBrushSideListById, OverlayOrderNums.None, JercBoxOrderNums.AfterJERCBrushesAndDisplacements); // jerc_box
+            DrawJercBrushOrPointEntities(graphics, levelHeight, bmpRawMaskByNameDictionary, entityBrushSideListById, OverlayOrderNums.AfterJERCBrushesAndDisplacements, JercBoxOrderNums.None); // overlays
+            DrawBrushEntities(graphics, levelHeight, bmpRawMaskByNameDictionary, entityBrushSideListById); // brush entity (eg. func_buyzone)
+            DrawJercBrushOrPointEntities(graphics, levelHeight, bmpRawMaskByNameDictionary, brushEntityBrushSideListById, OverlayOrderNums.None, JercBoxOrderNums.AfterBrushEntities); // jerc_box
+            DrawBrushesTexturedEntities(graphics, levelHeight, bmpRawMaskByNameDictionary, allBrushesToDraw, allDisplacementsToDraw); // jerc brushes for entities (eg. Bombsite A Material)
+            DrawJercBrushOrPointEntities(graphics, levelHeight, bmpRawMaskByNameDictionary, brushEntityBrushSideListById, OverlayOrderNums.None, JercBoxOrderNums.AfterJERCBrushesForEntities); // jerc_box
 
 
             graphics.Save();
@@ -1079,7 +1180,7 @@ namespace JERC
         }
 
 
-        private static void DrawBrushes(Graphics graphics, LevelHeight levelHeight, Dictionary<string, Bitmap> bmpRawMaskByNameDictionary, AllBrushesToDraw allBrushesToDraw, AllDisplacementsToDraw allDisplacementsToDraw, Dictionary<int, List<EntityBrushSide>> brushEntityBrushSideListById)
+        private static void DrawBrushes(Graphics graphics, LevelHeight levelHeight, Dictionary<string, Bitmap> bmpRawMaskByNameDictionary, AllBrushesToDraw allBrushesToDraw, AllDisplacementsToDraw allDisplacementsToDraw, Dictionary<int, List<EntityBrushSide>> brushEntityBrushSideListById, Dictionary<int, List<EntityBrushSide>> entityBrushSideListById)
         {
             var pathsOrdered = allBrushesToDraw.brushesToDrawPath.Concat(allDisplacementsToDraw.displacementsToDrawPath).OrderBy(x => x.zAxisAverage);
             var overlapsOrdered = allBrushesToDraw.brushesToDrawOverlap.Concat(allDisplacementsToDraw.displacementsToDrawOverlap).OrderBy(x => x.zAxisAverage);
@@ -1106,7 +1207,8 @@ namespace JERC
             }
 
             // draw jerc_box brush entities that have the corresponding orderNum set
-            DrawJercBrushEntities(graphics, levelHeight, bmpRawMaskByNameDictionary, brushEntityBrushSideListById, JercBoxOrderNums.BetweenPathAndOverlapBrushes);
+            DrawJercBrushOrPointEntities(graphics, levelHeight, bmpRawMaskByNameDictionary, brushEntityBrushSideListById, OverlayOrderNums.None, JercBoxOrderNums.BetweenPathAndOverlapBrushes); // jerc_box
+            DrawJercBrushOrPointEntities(graphics, levelHeight, bmpRawMaskByNameDictionary, entityBrushSideListById, OverlayOrderNums.BetweenPathAndOverlapBrushes, JercBoxOrderNums.None); // overlays
 
             // cover and overlap, door, ladder, danger brush stuff
             foreach (var brushToRender in coversAndOverlapsAndDangersOrdered.Concat(doorsOrdered).Concat(laddersOrdered))
@@ -1253,7 +1355,7 @@ namespace JERC
             ////graphics.ResetClip();
 
 
-            var entitySidesToDraw = GetBrushEntitiesToDraw(overviewPositionValues, entityBrushSideListById, JercBoxOrderNums.None); // does not give a jercBoxOrderNum value since jerc_box entities are drawn in DrawJercBrushEntities(), not here
+            var entitySidesToDraw = GetBrushEntitiesToDraw(overviewPositionValues, entityBrushSideListById, OverlayOrderNums.None, JercBoxOrderNums.None); // does not give an overlayOrderNum or a jercBoxOrderNum value since overlay and jerc_box entities are drawn in DrawJercBrushOrPointEntities(), not here
 
             // normal
             foreach (var entitySideToRender in entitySidesToDraw)
@@ -1264,11 +1366,11 @@ namespace JERC
             // raw masks
             if (configurationValues.exportRawMasks)
             {
-                var entitySides = entitySidesToDraw.Where(x => x.entityType != EntityTypes.None);
+                var entitySidesBuyzonesAndObjectives = entitySidesToDraw.Where(x => x.entityType == EntityTypes.Buyzone || x.entityType == EntityTypes.Bombsite || x.entityType == EntityTypes.RescueZone);
 
                 using (Graphics graphicsRawMask = Graphics.FromImage(bmpRawMaskByNameDictionary["buyzones_and_objectives"]))
                 {
-                    foreach (var entitySide in entitySides)
+                    foreach (var entitySide in entitySidesBuyzonesAndObjectives)
                     {
                         DrawFilledPolygonGradient(graphicsRawMask, entitySide, false, levelHeight);
                     }
@@ -1303,9 +1405,9 @@ namespace JERC
         }
 
 
-        private static void DrawJercBrushEntities(Graphics graphics, LevelHeight levelHeight, Dictionary<string, Bitmap> bmpRawMaskByNameDictionary, Dictionary<int, List<EntityBrushSide>> brushEntityBrushSideListById, JercBoxOrderNums jercBoxOrderNum)
+        private static void DrawJercBrushOrPointEntities(Graphics graphics, LevelHeight levelHeight, Dictionary<string, Bitmap> bmpRawMaskByNameDictionary, Dictionary<int, List<EntityBrushSide>> brushSideListById, OverlayOrderNums overlayOrderNum, JercBoxOrderNums jercBoxOrderNum)
         {
-            var brushEntitySidesToDraw = GetBrushEntitiesToDraw(overviewPositionValues, brushEntityBrushSideListById, jercBoxOrderNum);
+            var brushEntitySidesToDraw = GetBrushEntitiesToDraw(overviewPositionValues, brushSideListById, overlayOrderNum, jercBoxOrderNum);
 
             // normal
             foreach (var brushEntitySideToRender in brushEntitySidesToDraw)
@@ -1316,11 +1418,22 @@ namespace JERC
             // raw masks
             if (configurationValues.exportRawMasks)
             {
-                var entitySides = brushEntitySidesToDraw.Where(x => x.entityType == EntityTypes.JercBox);
+                var entitySidesOverlays = brushEntitySidesToDraw.Where(x => x.entityType == EntityTypes.Overlays);
+                var entitySidesJercBox = brushEntitySidesToDraw.Where(x => x.entityType == EntityTypes.JercBox);
+
+                using (Graphics graphicsRawMask = Graphics.FromImage(bmpRawMaskByNameDictionary["overlays"]))
+                {
+                    foreach (var entitySide in entitySidesOverlays)
+                    {
+                        DrawFilledPolygonGradient(graphicsRawMask, entitySide, false, levelHeight);
+                    }
+
+                    graphicsRawMask.Save();
+                }
 
                 using (Graphics graphicsRawMask = Graphics.FromImage(bmpRawMaskByNameDictionary["jerc_box"]))
                 {
-                    foreach (var entitySide in entitySides)
+                    foreach (var entitySide in entitySidesJercBox)
                     {
                         DrawFilledPolygonGradient(graphicsRawMask, entitySide, false, levelHeight);
                     }
@@ -1339,6 +1452,7 @@ namespace JERC
                     switch (brushEntitySideToRender.entityType)
                     {
                         case EntityTypes.JercBox:
+                        case EntityTypes.Overlays:
                             colour = (Color)brushEntitySideToRender.colourStroke;
                             break;
                     }
@@ -1360,6 +1474,7 @@ namespace JERC
                 { "ladder", new Bitmap(overviewPositionValues.outputResolution, overviewPositionValues.outputResolution) },
                 { "danger", new Bitmap(overviewPositionValues.outputResolution, overviewPositionValues.outputResolution) },
                 { "buyzones_and_objectives", new Bitmap(overviewPositionValues.outputResolution, overviewPositionValues.outputResolution) },
+                { "overlays", new Bitmap(overviewPositionValues.outputResolution, overviewPositionValues.outputResolution) },
                 { "jerc_box", new Bitmap(overviewPositionValues.outputResolution, overviewPositionValues.outputResolution) },
             };
         }
@@ -1614,6 +1729,7 @@ namespace JERC
             var entityBuyzoneVerticesListById = GetEntityBrushSideList(vmfRequiredData.entitiesSidesByEntityBuyzoneId, EntityTypes.Buyzone);
             var entityBombsiteVerticesListById = GetEntityBrushSideList(vmfRequiredData.entitiesSidesByEntityBombsiteId, EntityTypes.Bombsite);
             var entityRescueZoneVerticesListById = GetEntityBrushSideList(vmfRequiredData.entitiesSidesByEntityRescueZoneId, EntityTypes.RescueZone);
+            var entityOverlayVerticesListById = GetEntityBrushSideList(vmfRequiredData.entitiesSidesByEntityOverlayId, EntityTypes.Overlays);
 
             if (entityBuyzoneVerticesListById != null && entityBuyzoneVerticesListById.Any())
             {
@@ -1632,6 +1748,13 @@ namespace JERC
             if (entityRescueZoneVerticesListById != null && entityRescueZoneVerticesListById.Any())
             {
                 foreach (var list in entityRescueZoneVerticesListById)
+                {
+                    entityBrushSideListById.Add(list.Key, list.Value);
+                }
+            }
+            if (entityOverlayVerticesListById != null && entityOverlayVerticesListById.Any())
+            {
+                foreach (var list in entityOverlayVerticesListById)
                 {
                     entityBrushSideListById.Add(list.Key, list.Value);
                 }
@@ -1840,6 +1963,17 @@ namespace JERC
                 foreach (var side in entitySides.Value)
                 {
                     var entityBrushSide = new EntityBrushSide(side.id, side.brushId);
+
+                    if (entityType == EntityTypes.Overlays)
+                    {
+                        entityBrushSide.entityType = entityType;
+                        entityBrushSide.orderNum = vmfRequiredData.overlayByEntityOverlayId[entitySides.Key].orderNum;
+                        entityBrushSide.rendercolor = vmfRequiredData.overlayByEntityOverlayId[entitySides.Key].rendercolor;
+                        entityBrushSide.colourStroke = vmfRequiredData.overlayByEntityOverlayId[entitySides.Key].colourStroke;
+                        entityBrushSide.strokeWidth = vmfRequiredData.overlayByEntityOverlayId[entitySides.Key].strokeWidth;
+                        entityBrushSide.material = side.material;
+                    }
+
                     for (int i = 0; i < side.vertices_plus.Count(); i++)
                     {
                         var vert = side.vertices_plus[i];
@@ -2183,13 +2317,13 @@ namespace JERC
         }
 
 
-        private static List<ObjectToDraw> GetBrushEntitiesToDraw(OverviewPositionValues overviewPositionValues, Dictionary<int, List<EntityBrushSide>> brushEntityBrushSideListById, JercBoxOrderNums jercBoxOrderNum)
+        private static List<ObjectToDraw> GetBrushEntitiesToDraw(OverviewPositionValues overviewPositionValues, Dictionary<int, List<EntityBrushSide>> brushSideListById, OverlayOrderNums overlayOrderNum, JercBoxOrderNums jercBoxOrderNum)
         {
             var brushEntitiesToDraw = new List<ObjectToDraw>();
 
-            for (int i = 0; i < brushEntityBrushSideListById.Values.Count(); i++)
+            for (int i = 0; i < brushSideListById.Values.Count(); i++)
             {
-                var brushEntityBrushSideByBrush = brushEntityBrushSideListById.Values.ElementAt(i);
+                var brushEntityBrushSideByBrush = brushSideListById.Values.ElementAt(i);
 
                 foreach (var brushEntityBrushSide in brushEntityBrushSideByBrush)
                 {
@@ -2222,6 +2356,7 @@ namespace JERC
                             EntityTypes.Buyzone => Colours.ColourBuyzones(),
                             EntityTypes.Bombsite => Colours.ColourBombsites(),
                             EntityTypes.RescueZone => Colours.ColourRescueZones(),
+                            EntityTypes.Overlays => brushEntityBrushSide.rendercolor,
                             EntityTypes.JercBox => brushEntityBrushSide.rendercolor,
                             EntityTypes.None => throw new NotImplementedException(),
                             _ => throw new NotImplementedException(),
@@ -2239,9 +2374,13 @@ namespace JERC
                     var brushSideCenterOffset = GetCorrectedVerticesPositionInWorld(brushSideCenter);
 
                     // finish
-                    if (brushEntityBrushSide.entityType == EntityTypes.JercBox)
+                    if (brushEntityBrushSide.entityType == EntityTypes.Overlays || brushEntityBrushSide.entityType == EntityTypes.JercBox)
                     {
-                        if (brushEntityBrushSide.orderNum == (int)jercBoxOrderNum) // ignore any that are being drawn at a different order num
+                        if (brushEntityBrushSide.orderNum == (int)overlayOrderNum) // ignore any that are being drawn at a different order num
+                        {
+                            brushEntitiesToDraw.Add(new ObjectToDraw(configurationValues, brushEntityBrushSide.id, brushEntityBrushSide.brushId, brushSideCenterOffset, verticesOffsetsToUse, false, brushEntityBrushSide.entityType, brushEntityBrushSide.rendercolor, brushEntityBrushSide.colourStroke, brushEntityBrushSide.strokeWidth));
+                        }
+                        else if (brushEntityBrushSide.orderNum == (int)jercBoxOrderNum) // ignore any that are being drawn at a different order num
                         {
                             brushEntitiesToDraw.Add(new ObjectToDraw(configurationValues, brushEntityBrushSide.id, brushEntityBrushSide.brushId, brushSideCenterOffset, verticesOffsetsToUse, false, brushEntityBrushSide.entityType, brushEntityBrushSide.rendercolor, brushEntityBrushSide.colourStroke, brushEntityBrushSide.strokeWidth));
                         }
@@ -2346,6 +2485,7 @@ namespace JERC
                                 case EntityTypes.RescueZone:
                                     colourUsing = Colours.ColourRescueZonesStroke();
                                     break;
+                                case EntityTypes.Overlays:
                                 case EntityTypes.JercBox:
                                     //colourUsing = GetGreyscaleColourByHeight((float)vertices.Average(x => x.z), levelHeightOverride);
                                     colourUsing = (Color)objectToDraw.colour;

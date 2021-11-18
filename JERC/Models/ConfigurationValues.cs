@@ -30,6 +30,7 @@ namespace JERC.Models
         public Color doorColour;
         public Color ladderColour;
         public Color dangerColour;
+        public Color overlaysColour;
         public int strokeWidth;
         public Color strokeColour;
         public bool strokeAroundLayoutMaterials;
@@ -85,6 +86,7 @@ namespace JERC.Models
             doorColour = jercEntitySettingsValues.ContainsKey("doorColour") && jercEntitySettingsValues["doorColour"] != null ? GetColourStringAsColour(jercEntitySettingsValues["doorColour"]) : Colours.ColourError;
             ladderColour = jercEntitySettingsValues.ContainsKey("ladderColour") && jercEntitySettingsValues["ladderColour"] != null ? GetColourStringAsColour(jercEntitySettingsValues["ladderColour"]) : Colours.ColourError;
             dangerColour = jercEntitySettingsValues.ContainsKey("dangerColour") && jercEntitySettingsValues["dangerColour"] != null ? GetColourStringAsColour(jercEntitySettingsValues["dangerColour"]) : Colours.ColourError;
+            overlaysColour = jercEntitySettingsValues.ContainsKey("overlaysColour") && jercEntitySettingsValues["overlaysColour"] != null ? GetColourStringAsColour(jercEntitySettingsValues["overlaysColour"]) : Colours.ColourError;
             strokeWidth = jercEntitySettingsValues.ContainsKey("strokeWidth") && jercEntitySettingsValues["strokeWidth"] != null ? int.Parse(jercEntitySettingsValues["strokeWidth"]) : 0;
             strokeColour = jercEntitySettingsValues.ContainsKey("strokeColour") && jercEntitySettingsValues["strokeColour"] != null ? GetColourStringAsColour(jercEntitySettingsValues["strokeColour"]) : Colours.ColourError;
             strokeAroundLayoutMaterials = jercEntitySettingsValues.ContainsKey("strokeAroundLayoutMaterials") && jercEntitySettingsValues["strokeAroundLayoutMaterials"] == "1";

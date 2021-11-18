@@ -12,6 +12,7 @@ namespace JERC.Enums
         Buyzone = 2,
         Bombsite = 4,
         RescueZone = 8,
-        JercBox = 16
+        Overlays = 16,
+        JercBox = 32
     }
 }

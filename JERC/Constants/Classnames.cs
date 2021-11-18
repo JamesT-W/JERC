@@ -20,6 +20,9 @@ namespace JERC.Constants
         public static readonly string FuncLadder = "func_ladder";
         public static readonly string TriggerHurt = "trigger_hurt";
 
+        public static readonly string InfoOverlay = "info_overlay";
+        public static readonly string JercInfoOverlay = "jerc_info_overlay";
+
         public static readonly string JercBox = "jerc_box";
 
         public static readonly string JercConfig = "jerc_config";

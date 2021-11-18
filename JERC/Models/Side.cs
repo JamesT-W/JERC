@@ -20,6 +20,10 @@ namespace JERC.Models
         public int smoothing_groups;
         public DispInfo dispinfo;
 
+        public bool fakeBrushSideCreatedFromOverlay;
+
+        public static List<int> allBrushSideIds = new List<int>();
+
 
         public Side(IVNode side, int brushId)
         {
@@ -36,6 +40,34 @@ namespace JERC.Models
             var dispinfoIVNode = side.Body.FirstOrDefault(x => x.Name == "dispinfo");
             if (dispinfoIVNode != null)
                 dispinfo = new DispInfo(dispinfoIVNode);
+
+            allBrushSideIds.Add(id);
+
+            fakeBrushSideCreatedFromOverlay = false;
+        }
+
+
+        // for overlays becoming fake brushes
+        public Side(int brushId, List<Vertices> vertices)
+        {
+            var newIdTrying = int.MaxValue - brushId;
+            while (allBrushSideIds.Any(x => x == newIdTrying))
+            {
+                newIdTrying--;
+
+                if (newIdTrying < 0)
+                {
+                    newIdTrying = int.MaxValue - 1;
+                }
+            }
+            id = newIdTrying;
+
+            this.brushId = brushId;
+            plane = string.Concat(vertices[0].GetPlaneFormatForSingleVertices(), " ", vertices[1].GetPlaneFormatForSingleVertices(), " ", vertices[2].GetPlaneFormatForSingleVertices()); // randomly leave out vertices3
+            vertices_plus = vertices;
+            //// ignore the rest of the variables ////
+
+            fakeBrushSideCreatedFromOverlay = true;
         }
 
 

@@ -1,0 +1,10 @@
+UnlitGeneric
+{
+	$basetexture "jerc/JERC_Overlays"
+
+	//$additive 1
+
+	%keywords "jerc,tool,tools,radar,overview,overlay,overlays,jerc_overlay,jerc_overlays"
+
+	//%compileskip 1
+}
