@@ -31,9 +31,9 @@ namespace JERC.Constants
         public static Color ColourRemoveStroke(Color strokeColour) => strokeColour;
         public static Color ColourBrushesStroke(Color strokeColour) => strokeColour;
 
-        public static Color ColourBuyzones() => Color.FromArgb(50, 25, 255, 25);
-        public static Color ColourBombsites() => Color.FromArgb(50, 255, 25, 25);
-        public static Color ColourRescueZones() => Color.FromArgb(50, 25, 25, 255);
+        public static Color ColourBuyzones() => Color.FromArgb(50, 10, 255, 10);
+        public static Color ColourBombsites() => Color.FromArgb(50, 255, 10, 10);
+        public static Color ColourRescueZones() => Color.FromArgb(50, 10, 10, 255);
 
         public static Color ColourBuyzonesStroke() => Color.FromArgb(255, 0, 255, 0);
         public static Color ColourBombsitesStroke() => Color.FromArgb(255, 255, 0, 0);
