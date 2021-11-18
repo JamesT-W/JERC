@@ -37,6 +37,7 @@ namespace JERC.Models
         public bool strokeAroundRemoveMaterials;
         public bool strokeAroundEntities;
         public bool strokeAroundBrushEntities;
+        public bool strokeAroundOverlays;
         public int defaultLevelNum;
         public bool levelBackgroundEnabled;
         public int levelBackgroundDarkenAlpha;
@@ -93,6 +94,7 @@ namespace JERC.Models
             strokeAroundRemoveMaterials = jercEntitySettingsValues.ContainsKey("strokeAroundRemoveMaterials") && jercEntitySettingsValues["strokeAroundRemoveMaterials"] == "1";
             strokeAroundEntities = jercEntitySettingsValues.ContainsKey("strokeAroundEntities") && jercEntitySettingsValues["strokeAroundEntities"] == "1";
             strokeAroundBrushEntities = jercEntitySettingsValues.ContainsKey("strokeAroundBrushEntities") && jercEntitySettingsValues["strokeAroundBrushEntities"] == "1";
+            strokeAroundOverlays = jercEntitySettingsValues.ContainsKey("strokeAroundOverlays") && jercEntitySettingsValues["strokeAroundOverlays"] == "1";
 
             defaultLevelNum = jercEntitySettingsValues.ContainsKey("defaultLevelNum") && jercEntitySettingsValues["defaultLevelNum"] != null ? int.Parse(jercEntitySettingsValues["defaultLevelNum"]) : 0;
             if (defaultLevelNum < 0)

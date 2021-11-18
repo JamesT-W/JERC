@@ -752,6 +752,7 @@ namespace JERC
             jercEntitySettingsValues.Add("strokeAroundRemoveMaterials", jercConfig.FirstOrDefault(x => x.Name == "strokeAroundRemoveMaterials")?.Value);
             jercEntitySettingsValues.Add("strokeAroundEntities", jercConfig.FirstOrDefault(x => x.Name == "strokeAroundEntities")?.Value);
             jercEntitySettingsValues.Add("strokeAroundBrushEntities", jercConfig.FirstOrDefault(x => x.Name == "strokeAroundBrushEntities")?.Value);
+            jercEntitySettingsValues.Add("strokeAroundOverlays", jercConfig.FirstOrDefault(x => x.Name == "strokeAroundOverlays")?.Value);
             jercEntitySettingsValues.Add("defaultLevelNum", jercConfig.FirstOrDefault(x => x.Name == "defaultLevelNum")?.Value);
             jercEntitySettingsValues.Add("levelBackgroundEnabled", jercConfig.FirstOrDefault(x => x.Name == "levelBackgroundEnabled")?.Value);
             jercEntitySettingsValues.Add("levelBackgroundDarkenAlpha", jercConfig.FirstOrDefault(x => x.Name == "levelBackgroundDarkenAlpha")?.Value);
@@ -1443,7 +1444,9 @@ namespace JERC
             }
 
             // stroke
-            if (configurationValues.strokeAroundBrushEntities)
+            if ((configurationValues.strokeAroundBrushEntities && jercBoxOrderNum != JercBoxOrderNums.None) ||
+                (configurationValues.strokeAroundOverlays && overlayOrderNum != OverlayOrderNums.None)
+            )
             {
                 foreach (var brushEntitySideToRender in brushEntitySidesToDraw)
                 {

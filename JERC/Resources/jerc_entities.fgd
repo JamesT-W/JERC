@@ -89,6 +89,12 @@
 		1: "Yes"
 	]
 
+	strokeAroundOverlays(choices) : "Stroke Around Overlays" : 0 =
+	[
+		0: "No"
+		1: "Yes"
+	]
+
 	defaultLevelNum(integer) : "Default Level Num (int)" : 0 : "The index that the default level is in a multilevel radar. 0 = bottom level, 1 = second from bottom level, ..."
 
 	levelBackgroundEnabled(choices) : "Enable Levels As Backgrounds" : 1 : "Adds all levels as a background for each level when using multiple radar levels" =
