@@ -11,6 +11,11 @@ namespace JERC.Models
         public static string csgoFolderPath;
         public static string binFolderPath;
         public static string overviewsFolderPath;
+        public static string dzTabletFolderPath;
+        public static string dzSpawnselectFolderPath;
+
+        public static string extrasFolderPath;
+
         public static string vmfFilepath;
         public static string vmfFilepathDirectory;
 
@@ -42,6 +47,9 @@ namespace JERC.Models
                             csgoFolderPath += '\\';
                         binFolderPath = Path.Combine(Directory.GetParent(csgoFolderPath).Parent.FullName, @"bin\");
                         overviewsFolderPath = Path.Combine(csgoFolderPath, @"resource\overviews\");
+                        dzTabletFolderPath = Path.Combine(csgoFolderPath, @"materials\models\weapons\v_models\tablet\");
+                        dzSpawnselectFolderPath = Path.Combine(csgoFolderPath, @"materials\panorama\images\survival\spawnselect\");
+                        extrasFolderPath = Path.Combine(csgoFolderPath, @"jerc_extras\");
                         break;
                     case "-vmffilepath":
                         vmfFilepath = args[i + 1];
@@ -65,6 +73,12 @@ namespace JERC.Models
             Logger.LogMessage(binFolderPath);
             Logger.LogMessageKey("overviews Directory: ");
             Logger.LogMessage(overviewsFolderPath);
+            Logger.LogMessageKey("dz tablet Directory: ");
+            Logger.LogMessage(dzTabletFolderPath);
+            Logger.LogMessageKey("dz spawn select Directory: ");
+            Logger.LogMessage(dzSpawnselectFolderPath);
+            Logger.LogMessageKey("jerc extras Directory: ");
+            Logger.LogMessage(extrasFolderPath);
             Logger.LogMessageKey("vmf Filepath: ");
             Logger.LogMessage(vmfFilepath);
             Logger.LogMessageKey("vmf Directory: ");
@@ -78,6 +92,9 @@ namespace JERC.Models
             if (string.IsNullOrWhiteSpace(csgoFolderPath) ||
                 string.IsNullOrWhiteSpace(binFolderPath) ||
                 string.IsNullOrWhiteSpace(overviewsFolderPath) ||
+                string.IsNullOrWhiteSpace(dzTabletFolderPath) ||
+                string.IsNullOrWhiteSpace(dzSpawnselectFolderPath) ||
+                string.IsNullOrWhiteSpace(extrasFolderPath) ||
                 string.IsNullOrWhiteSpace(vmfFilepath) ||
                 string.IsNullOrWhiteSpace(vmfFilepathDirectory)
             )
@@ -94,6 +111,9 @@ namespace JERC.Models
             if (!Directory.Exists(csgoFolderPath) ||
                 !Directory.Exists(binFolderPath) ||
                 !Directory.Exists(overviewsFolderPath) ||
+                !Directory.Exists(dzTabletFolderPath) ||
+                !Directory.Exists(dzSpawnselectFolderPath) ||
+                !Directory.Exists(extrasFolderPath) ||
                 !File.Exists(vmfFilepath) ||
                 !Directory.Exists(vmfFilepathDirectory)
             )
@@ -102,6 +122,27 @@ namespace JERC.Models
             }
 
             return true;
+        }
+
+
+        public static void CreateAnyGameDirectoriesThatDontExist()
+        {
+            CreateDirectoryIfDoesntExist(csgoFolderPath);
+            CreateDirectoryIfDoesntExist(binFolderPath);
+            CreateDirectoryIfDoesntExist(overviewsFolderPath);
+            CreateDirectoryIfDoesntExist(dzTabletFolderPath);
+            CreateDirectoryIfDoesntExist(dzSpawnselectFolderPath);
+            CreateDirectoryIfDoesntExist(extrasFolderPath);
+            CreateDirectoryIfDoesntExist(vmfFilepathDirectory);
+        }
+
+
+        private static void CreateDirectoryIfDoesntExist(string filepath)
+        {
+            if (!Directory.Exists(filepath))
+            {
+                Directory.CreateDirectory(filepath);
+            }
         }
     }
 }

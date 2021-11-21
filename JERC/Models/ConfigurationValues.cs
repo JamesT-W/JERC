@@ -1,4 +1,4 @@
-using JERC.Constants;
+﻿using JERC.Constants;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -11,6 +11,9 @@ namespace JERC.Models
     public class ConfigurationValues
     {
         // jerc_config
+        public ulong workshopId;
+        public int overviewGamemodeType;
+        public int dangerZoneUses;
         public string alternateOutputPath;
         public bool onlyOutputToAlternatePath;
         public bool exportRadarAsSeparateLevels;
@@ -59,6 +62,10 @@ namespace JERC.Models
         public ConfigurationValues(Dictionary<string, string> jercEntitySettingsValues, int jercDividerCount, bool jercDispRotationEntityProvided)
         {
             // jerc_config
+            workshopId = jercEntitySettingsValues.ContainsKey("workshopId") && jercEntitySettingsValues["workshopId"] != null ? ulong.Parse(jercEntitySettingsValues["workshopId"]) : 0;
+            overviewGamemodeType = jercEntitySettingsValues.ContainsKey("overviewGamemodeType") && jercEntitySettingsValues["overviewGamemodeType"] != null ? int.Parse(jercEntitySettingsValues["overviewGamemodeType"]) : 0;
+            dangerZoneUses = jercEntitySettingsValues.ContainsKey("dangerZoneUses") && jercEntitySettingsValues["dangerZoneUses"] != null ? int.Parse(jercEntitySettingsValues["dangerZoneUses"]) : 0;
+
             alternateOutputPath = string.IsNullOrWhiteSpace(jercEntitySettingsValues["alternateOutputPath"]) ? null : jercEntitySettingsValues["alternateOutputPath"];
             if (!string.IsNullOrWhiteSpace(alternateOutputPath) && alternateOutputPath.LastOrDefault() != '\\' && alternateOutputPath.LastOrDefault() != '/')
                 alternateOutputPath += '/';

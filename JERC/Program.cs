@@ -1,4 +1,4 @@
-using ImageAlterer;
+﻿using ImageAlterer;
 using JERC.Constants;
 using JERC.Enums;
 using JERC.Models;
@@ -22,8 +22,15 @@ namespace JERC
         private static readonly ImageProcessorExtender imageProcessorExtender = new ImageProcessorExtender();
 
         private static string backgroundImagesDirectory;
-        private static string outputFilepathPrefix;
+        private static string overviewsOutputFilepathPrefix;
+        private static string dzTabletOutputFilepathPrefix;
+        private static string dzTabletWorkshopOutputFilepathPrefix;
+        private static string dzSpawnselectOutputFilepathPrefix;
+        private static string dzSpawnselectWorkshopOutputFilepathPrefix;
         private static string outputImageBackgroundLevelsFilepath;
+
+        private static string extrasOutputFilepathPrefix;
+        private static string alternateExtrasOutputFilepathPrefix;
 
         private static readonly string visgroupName = "JERC";
 
@@ -44,7 +51,7 @@ namespace JERC
         {
             GameConfigurationValues.SetArgs(args);
 
-            if (!debugging && (!GameConfigurationValues.VerifyAllValuesSet() || !GameConfigurationValues.VerifyAllDirectoriesAndFilesExist()))
+            if (!debugging && !GameConfigurationValues.VerifyAllValuesSet())
             {
                 Logger.LogError("Game configuration filepaths missing. Check the compile configuration's parameters.");
                 return;
@@ -56,27 +63,15 @@ namespace JERC
                 return;
             }
 
-            var lines = File.ReadAllLines(GameConfigurationValues.vmfFilepath);
-
-            mapName = Path.GetFileNameWithoutExtension(GameConfigurationValues.vmfFilepath);
-
-            if (debugging)
+            try
             {
-                Logger.LogDebugInfo("Setting backgroundImagesDirectory to empty string");
-                Logger.LogDebugInfo("Setting outputFilepathPrefix to empty string");
-
-                backgroundImagesDirectory = string.Concat(debuggingJercPath, @"JERC\Resources\materials\jerc\backgrounds\");
-                outputFilepathPrefix = string.Concat(debuggingJercPath, mapName);
+                var lines = File.ReadAllLines(GameConfigurationValues.vmfFilepath);
+                vmf = new VMF(lines);
             }
-            else
+            catch (Exception e)
             {
-                backgroundImagesDirectory = string.Concat(GameConfigurationValues.csgoFolderPath, @"materials\jerc\backgrounds\");
-                outputFilepathPrefix = string.Concat(GameConfigurationValues.overviewsFolderPath, mapName);
+                Logger.LogError("Could not read main vmf, it is potentially locked due to saving, aborting");
             }
-
-            outputImageBackgroundLevelsFilepath = string.Concat(outputFilepathPrefix, "_background_levels.png");
-
-            vmf = new VMF(lines);
 
             if (vmf == null)
             {
@@ -122,18 +117,69 @@ namespace JERC
             }
 
 
-            SortInstances(vmf);
+            var successfullyParsedInstances = SortInstances(vmf);
+            if (!successfullyParsedInstances)
+            {
+                return;
+            }
 
             SetVisgroupIdMainVmf();
             SetVisgroupIdInstancesByEntityId();
 
             vmfRequiredData = GetVmfRequiredData();
 
+            if (!configurationValues.onlyOutputToAlternatePath)
+            {
+                GameConfigurationValues.CreateAnyGameDirectoriesThatDontExist();
+            }
+
+            if (!debugging && !configurationValues.onlyOutputToAlternatePath && !GameConfigurationValues.VerifyAllDirectoriesAndFilesExist())
+            {
+                Logger.LogError("Game configuration directories missing. These directories are created automatically, make sure nothing is being locked.");
+                return;
+            }
+
+
             if (configurationValues.onlyOutputToAlternatePath && string.IsNullOrWhiteSpace(configurationValues.alternateOutputPath))
             {
                 Logger.LogError("Set to only output to alternate path, however no alternate path is provided.");
                 return;
             }
+
+            mapName = Path.GetFileNameWithoutExtension(GameConfigurationValues.vmfFilepath);
+            if (debugging)
+            {
+                Logger.LogDebugInfo("Setting backgroundImagesDirectory to empty string");
+                Logger.LogDebugInfo("Setting overviewsOutputFilepathPrefix to empty string");
+                Logger.LogDebugInfo("Setting dzTabletOutputFilepathPrefix to empty string");
+                Logger.LogDebugInfo("Setting dzTabletWorkshopOutputFilepathPrefix to empty string");
+                Logger.LogDebugInfo("Setting dzSpawnselectOutputFilepathPrefix to empty string");
+                Logger.LogDebugInfo("Setting dzSpawnselectWorkshopOutputFilepathPrefix to empty string");
+
+                backgroundImagesDirectory = string.Concat(debuggingJercPath, @"JERC\Resources\materials\jerc\backgrounds\");
+                overviewsOutputFilepathPrefix = string.Concat(debuggingJercPath, mapName);
+                dzTabletOutputFilepathPrefix = string.Concat(debuggingJercPath, "tablet_radar_", mapName);
+                dzTabletWorkshopOutputFilepathPrefix = string.Concat(debuggingJercPath, @"tablet_radar_workshop\", configurationValues.workshopId, @"\", mapName);
+                dzSpawnselectOutputFilepathPrefix = string.Concat(debuggingJercPath, "map_", mapName);
+                dzSpawnselectWorkshopOutputFilepathPrefix = string.Concat(debuggingJercPath, @"map_workshop\", configurationValues.workshopId, @"\", mapName);
+
+                extrasOutputFilepathPrefix = string.Concat(debuggingJercPath, mapName);
+                alternateExtrasOutputFilepathPrefix = string.Concat(debuggingJercPath, @"jerc_extra\", mapName);
+            }
+            else
+            {
+                backgroundImagesDirectory = string.Concat(GameConfigurationValues.csgoFolderPath, @"materials\jerc\backgrounds\");
+                overviewsOutputFilepathPrefix = string.Concat(GameConfigurationValues.overviewsFolderPath, mapName);
+                dzTabletOutputFilepathPrefix = string.Concat(GameConfigurationValues.dzTabletFolderPath, "tablet_radar_", mapName);
+                dzTabletWorkshopOutputFilepathPrefix = string.Concat(GameConfigurationValues.dzTabletFolderPath, @"tablet_radar_workshop\", configurationValues.workshopId, @"\", mapName);
+                dzSpawnselectOutputFilepathPrefix = string.Concat(GameConfigurationValues.dzSpawnselectFolderPath, "map_", mapName);
+                dzSpawnselectWorkshopOutputFilepathPrefix = string.Concat(GameConfigurationValues.dzSpawnselectFolderPath, @"map_workshop\", configurationValues.workshopId, @"\", mapName);
+
+                extrasOutputFilepathPrefix = string.Concat(GameConfigurationValues.extrasFolderPath, mapName);
+                alternateExtrasOutputFilepathPrefix = string.Concat(configurationValues.alternateOutputPath, @"jerc_extras\", mapName);
+            }
+
+            outputImageBackgroundLevelsFilepath = string.Concat(extrasOutputFilepathPrefix, "_background_levels.png");
 
             if (vmfRequiredData == null)
             {
@@ -192,7 +238,7 @@ namespace JERC
         }
 
 
-        private static void SortInstances(VMF vmf)
+        private static bool SortInstances(VMF vmf)
         {
             var instanceEntities = vmf.Body.Where(x => x.Name == "entity").Where(x => x.Body.Any(y => y.Name == "classname" && y.Value == "func_instance")).ToList();
 
@@ -221,9 +267,17 @@ namespace JERC
                     continue;
                 }
 
-                var lines = File.ReadAllLines(filepath);
+                VMF newVmf = null;
 
-                var newVmf = new VMF(lines);
+                try
+                {
+                    var lines = File.ReadAllLines(filepath);
+                    newVmf = new VMF(lines);
+                }
+                catch (Exception e)
+                {
+                    Logger.LogError($"Could not read instance vmf: {instance.file}, it is potentially locked due to saving, aborting");
+                }
 
                 if (newVmf == null)
                 {
@@ -289,6 +343,8 @@ namespace JERC
                     Logger.LogImportantWarning(string.Concat("Entity ID: ", funcInstance.id));
                 }
             }
+
+            return true;
         }
 
 
@@ -732,6 +788,9 @@ namespace JERC
             // jerc_config
             var jercConfig = jercEntities.FirstOrDefault(x => x.Body.Any(y => y.Name == "classname" && y.Value == Classnames.JercConfig)).Body;
 
+            jercEntitySettingsValues.Add("workshopId", jercConfig.FirstOrDefault(x => x.Name == "workshopId")?.Value);
+            jercEntitySettingsValues.Add("overviewGamemodeType", jercConfig.FirstOrDefault(x => x.Name == "overviewGamemodeType")?.Value);
+            jercEntitySettingsValues.Add("dangerZoneUses", jercConfig.FirstOrDefault(x => x.Name == "dangerZoneUses")?.Value);
             jercEntitySettingsValues.Add("alternateOutputPath", jercConfig.FirstOrDefault(x => x.Name == "alternateOutputPath")?.Value ?? string.Empty);
             jercEntitySettingsValues.Add("onlyOutputToAlternatePath", jercConfig.FirstOrDefault(x => x.Name == "onlyOutputToAlternatePath")?.Value);
             jercEntitySettingsValues.Add("exportRadarAsSeparateLevels", jercConfig.FirstOrDefault(x => x.Name == "exportRadarAsSeparateLevels")?.Value);
@@ -1631,13 +1690,12 @@ namespace JERC
                     imageFactoryBlurred.Save(outputImageBackgroundLevelsFilepath);
                 }
 
-                if (!Directory.Exists(configurationValues.alternateOutputPath))
-                    Directory.CreateDirectory(configurationValues.alternateOutputPath);
+                CreateDirectoryOfFileIfDoesntExist(alternateExtrasOutputFilepathPrefix);
 
-                if (!string.IsNullOrWhiteSpace(configurationValues.alternateOutputPath))
+                if (!string.IsNullOrWhiteSpace(alternateExtrasOutputFilepathPrefix))
                 {
-                    var outputImageBackgroundLevelsFilepath = string.Concat(configurationValues.alternateOutputPath, mapName, "_background_levels.png");
-                    imageFactoryBlurred.Save(outputImageBackgroundLevelsFilepath);
+                    var outputImageFilepath = string.Concat(alternateExtrasOutputFilepathPrefix, "_background_levels.png");
+                    imageFactoryBlurred.Save(outputImageFilepath);
                 }
             }
 
@@ -1660,17 +1718,73 @@ namespace JERC
             {
                 if (!configurationValues.onlyOutputToAlternatePath)
                 {
-                    var outputImageFilepath = string.Concat(outputFilepathPrefix, radarLevelString, "_radar");
-                    SaveImage(outputImageFilepath, radarLevel.bmpRadar);
-                }
+                    if (configurationValues.overviewGamemodeType == 0)
+                    {
+                        var outputImageFilepath = string.Concat(overviewsOutputFilepathPrefix, radarLevelString, "_radar");
+                        SaveImage(outputImageFilepath, radarLevel.bmpRadar);
+                    }
+                    else if (configurationValues.overviewGamemodeType == 1)
+                    {
+                        if (configurationValues.dangerZoneUses == 0 || configurationValues.dangerZoneUses == 1)
+                            SaveImage(dzTabletOutputFilepathPrefix, radarLevel.bmpRadar);
+                        if (configurationValues.dangerZoneUses == 0 || configurationValues.dangerZoneUses == 2)
+                            SaveImage(dzSpawnselectOutputFilepathPrefix, radarLevel.bmpRadar);
 
-                if (!Directory.Exists(configurationValues.alternateOutputPath))
-                    Directory.CreateDirectory(configurationValues.alternateOutputPath);
+                        if (configurationValues.workshopId > 0) // set to 0 by default
+                        {
+                            if (configurationValues.dangerZoneUses == 0 || configurationValues.dangerZoneUses == 1)
+                            {
+                                CreateDirectoryOfFileIfDoesntExist(dzTabletWorkshopOutputFilepathPrefix);
+                                SaveImage(dzTabletWorkshopOutputFilepathPrefix, radarLevel.bmpRadar);
+                            }
+                            if (configurationValues.dangerZoneUses == 0 || configurationValues.dangerZoneUses == 2)
+                            {
+                                CreateDirectoryOfFileIfDoesntExist(dzSpawnselectWorkshopOutputFilepathPrefix);
+                                SaveImage(dzSpawnselectWorkshopOutputFilepathPrefix, radarLevel.bmpRadar);
+                            }
+                        }
+                    }
+                }
 
                 if (!string.IsNullOrWhiteSpace(configurationValues.alternateOutputPath))
                 {
-                    var outputImageFilepath = string.Concat(configurationValues.alternateOutputPath, mapName, radarLevelString, "_radar");
-                    SaveImage(outputImageFilepath, radarLevel.bmpRadar);
+                    if (configurationValues.overviewGamemodeType == 0)
+                    {
+                        var outputImageFilepath = string.Concat(configurationValues.alternateOutputPath, @"resource\overviews\", mapName, radarLevelString, "_radar");
+                        CreateDirectoryOfFileIfDoesntExist(outputImageFilepath);
+                        SaveImage(outputImageFilepath, radarLevel.bmpRadar);
+                    }
+                    else if (configurationValues.overviewGamemodeType == 1)
+                    {
+                        if (configurationValues.dangerZoneUses == 0 || configurationValues.dangerZoneUses == 1)
+                        {
+                            var outputImageFilepath = string.Concat(configurationValues.alternateOutputPath, @"materials\models\weapons\v_models\tablet\tablet_radar_", mapName);
+                            CreateDirectoryOfFileIfDoesntExist(outputImageFilepath);
+                            SaveImage(outputImageFilepath, radarLevel.bmpRadar);
+                        }
+                        if (configurationValues.dangerZoneUses == 0 || configurationValues.dangerZoneUses == 2)
+                        {
+                            var outputImageFilepath = string.Concat(configurationValues.alternateOutputPath, @"materials\panorama\images\survival\spawnselect\map_", mapName);
+                            CreateDirectoryOfFileIfDoesntExist(outputImageFilepath);
+                            SaveImage(outputImageFilepath, radarLevel.bmpRadar);
+                        }
+
+                        if (configurationValues.workshopId > 0) // set to 0 by default
+                        {
+                            if (configurationValues.dangerZoneUses == 0 || configurationValues.dangerZoneUses == 1)
+                            {
+                                var outputImageFilepath = string.Concat(configurationValues.alternateOutputPath, @"materials\models\weapons\v_models\tablet\tablet_radar_workshop\", configurationValues.workshopId, @"\", mapName);
+                                CreateDirectoryOfFileIfDoesntExist(outputImageFilepath);
+                                SaveImage(outputImageFilepath, radarLevel.bmpRadar);
+                            }
+                            if (configurationValues.dangerZoneUses == 0 || configurationValues.dangerZoneUses == 2)
+                            {
+                                var outputImageFilepath = string.Concat(configurationValues.alternateOutputPath, @"materials\panorama\images\survival\spawnselect\map_workshop\", configurationValues.workshopId, @"\", mapName);
+                                CreateDirectoryOfFileIfDoesntExist(outputImageFilepath);
+                                SaveImage(outputImageFilepath, radarLevel.bmpRadar);
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -1684,16 +1798,15 @@ namespace JERC
 
             if (!configurationValues.onlyOutputToAlternatePath)
             {
-                var outputImageFilepath = string.Concat(outputFilepathPrefix, radarLevelString, "_radar_", rawMaskType, "_mask");
+                var outputImageFilepath = string.Concat(extrasOutputFilepathPrefix, radarLevelString, "_radar_", rawMaskType, "_mask");
                 SaveImage(outputImageFilepath, bmpRawMask, true);
             }
 
-            if (!Directory.Exists(configurationValues.alternateOutputPath))
-                Directory.CreateDirectory(configurationValues.alternateOutputPath);
+            CreateDirectoryOfFileIfDoesntExist(alternateExtrasOutputFilepathPrefix);
 
-            if (!string.IsNullOrWhiteSpace(configurationValues.alternateOutputPath))
+            if (!string.IsNullOrWhiteSpace(alternateExtrasOutputFilepathPrefix))
             {
-                var outputImageFilepath = string.Concat(configurationValues.alternateOutputPath, mapName, radarLevelString, "_radar_", rawMaskType, "_mask");
+                var outputImageFilepath = string.Concat(alternateExtrasOutputFilepathPrefix, radarLevelString, "_radar_", rawMaskType, "_mask");
                 SaveImage(outputImageFilepath, bmpRawMask, true);
             }
         }
@@ -2760,6 +2873,17 @@ namespace JERC
         }
 
 
+        private static void CreateDirectoryOfFileIfDoesntExist(string filepath)
+        {
+            var directory = Path.GetDirectoryName(filepath);
+
+            if (!Directory.Exists(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+        }
+
+
         private static void FlipImage(Bitmap bmp)
         {
             bmp.RotateFlip(RotateFlipType.RotateNoneFlipY);
@@ -2768,6 +2892,12 @@ namespace JERC
 
         private static void GenerateTxt(List<LevelHeight> levelHeights)
         {
+            if (configurationValues.overviewGamemodeType == 1)
+            {
+                Logger.LogWarning("Skipped generating txt because the gamemode is set to Danger Zone");
+                return;
+            }
+
             Logger.LogMessage("Generating txt");
 
             var overviewTxt = GetOverviewTxt(overviewPositionValues);
@@ -2776,16 +2906,14 @@ namespace JERC
 
             if (!configurationValues.onlyOutputToAlternatePath)
             {
-                var outputTxtFilepath = string.Concat(outputFilepathPrefix, ".txt");
+                var outputTxtFilepath = string.Concat(overviewsOutputFilepathPrefix, ".txt");
                 SaveOutputTxtFile(outputTxtFilepath, lines);
             }
 
-            if (!Directory.Exists(configurationValues.alternateOutputPath))
-                Directory.CreateDirectory(configurationValues.alternateOutputPath);
-
             if (!string.IsNullOrWhiteSpace(configurationValues.alternateOutputPath))
             {
-                var outputTxtFilepath = string.Concat(configurationValues.alternateOutputPath, mapName, ".txt");
+                var outputTxtFilepath = string.Concat(configurationValues.alternateOutputPath, @"resource\overviews\", mapName, ".txt");
+                CreateDirectoryOfFileIfDoesntExist(outputTxtFilepath);
                 SaveOutputTxtFile(outputTxtFilepath, lines);
             }
 

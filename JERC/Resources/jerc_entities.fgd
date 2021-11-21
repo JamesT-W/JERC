@@ -1,7 +1,22 @@
 @PointClass iconsprite("jerc/editor/jerc_config.vmt") = jerc_config : 
 	"JERC - Configure the main functionality."
 [
-	alternateOutputPath(string) report : "Alternate Output Directory" : "" : "DO NOT USE BACKSLASHES. An alternate output directory. Leave blank if you want to output to /csgo/resources/overviews/ only. Eg. C:/Dropbox/JERC/resource/overviews/"
+	workshopId(string) report : "Workshop ID" : "" : "Used for Danger Zone maps for duplicating the overview (for the tablet) into the correct location for packing"
+
+	overviewGamemodeType(choices) : "Overview Gamemode Type" : 0 : "For export filepath purposes only. Standard = .../resource/overviews/..., Danger Zone = .../materials/models/weapons/v_models/tablet/... & .../materials/panorama/images/survival/spawnselect/..." =
+	[
+		0: "Standard"
+		1: "Danger Zone"
+	]
+
+	dangerZoneUses(choices) : "Danger Zone Uses" : 0 : "Defines which filepaths to export the overview to (only used if Overview Gamemode Type is set to Danger Zone)" =
+	[
+		0: "Both"
+		1: "Tablet"
+		2: "Spawn Select"
+	]
+
+	alternateOutputPath(string) report : "Alternate Output Directory" : "" : "DO NOT USE BACKSLASHES. An alternate base output directory. Leave blank if you want to output to /csgo/ only. Eg. C:/Dropbox/JERC/"
 
 	onlyOutputToAlternatePath(choices) : "Only Output to Alternate Path" : 0 =
 	[
