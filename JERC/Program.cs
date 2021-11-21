@@ -46,7 +46,7 @@ namespace JERC
 
             if (!debugging && (!GameConfigurationValues.VerifyAllValuesSet() || !GameConfigurationValues.VerifyAllDirectoriesAndFilesExist()))
             {
-                Logger.LogError("Game configuration files missing. Check the compile configuration's parameters.");
+                Logger.LogError("Game configuration filepaths missing. Check the compile configuration's parameters.");
                 return;
             }
 
