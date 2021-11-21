@@ -1,4 +1,4 @@
-﻿using ImageAlterer;
+using ImageAlterer;
 using JERC.Constants;
 using JERC.Enums;
 using JERC.Models;
@@ -128,6 +128,12 @@ namespace JERC
             SetVisgroupIdInstancesByEntityId();
 
             vmfRequiredData = GetVmfRequiredData();
+
+            if (configurationValues.onlyOutputToAlternatePath && string.IsNullOrWhiteSpace(configurationValues.alternateOutputPath))
+            {
+                Logger.LogError("Set to only output to alternate path, however no alternate path is provided.");
+                return;
+            }
 
             if (vmfRequiredData == null)
             {
