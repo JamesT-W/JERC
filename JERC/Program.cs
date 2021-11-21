@@ -1625,7 +1625,10 @@ namespace JERC
                     imageFactoryBlurred.Save(outputImageBackgroundLevelsFilepath);
                 }
 
-                if (!string.IsNullOrWhiteSpace(configurationValues.alternateOutputPath) && Directory.Exists(configurationValues.alternateOutputPath))
+                if (!Directory.Exists(configurationValues.alternateOutputPath))
+                    Directory.CreateDirectory(configurationValues.alternateOutputPath);
+
+                if (!string.IsNullOrWhiteSpace(configurationValues.alternateOutputPath))
                 {
                     var outputImageBackgroundLevelsFilepath = string.Concat(configurationValues.alternateOutputPath, mapName, "_background_levels.png");
                     imageFactoryBlurred.Save(outputImageBackgroundLevelsFilepath);
@@ -1655,7 +1658,10 @@ namespace JERC
                     SaveImage(outputImageFilepath, radarLevel.bmpRadar);
                 }
 
-                if (!string.IsNullOrWhiteSpace(configurationValues.alternateOutputPath) && Directory.Exists(configurationValues.alternateOutputPath))
+                if (!Directory.Exists(configurationValues.alternateOutputPath))
+                    Directory.CreateDirectory(configurationValues.alternateOutputPath);
+
+                if (!string.IsNullOrWhiteSpace(configurationValues.alternateOutputPath))
                 {
                     var outputImageFilepath = string.Concat(configurationValues.alternateOutputPath, mapName, radarLevelString, "_radar");
                     SaveImage(outputImageFilepath, radarLevel.bmpRadar);
@@ -1676,7 +1682,10 @@ namespace JERC
                 SaveImage(outputImageFilepath, bmpRawMask, true);
             }
 
-            if (!string.IsNullOrWhiteSpace(configurationValues.alternateOutputPath) && Directory.Exists(configurationValues.alternateOutputPath))
+            if (!Directory.Exists(configurationValues.alternateOutputPath))
+                Directory.CreateDirectory(configurationValues.alternateOutputPath);
+
+            if (!string.IsNullOrWhiteSpace(configurationValues.alternateOutputPath))
             {
                 var outputImageFilepath = string.Concat(configurationValues.alternateOutputPath, mapName, radarLevelString, "_radar_", rawMaskType, "_mask");
                 SaveImage(outputImageFilepath, bmpRawMask, true);
@@ -2765,7 +2774,10 @@ namespace JERC
                 SaveOutputTxtFile(outputTxtFilepath, lines);
             }
 
-            if (!string.IsNullOrWhiteSpace(configurationValues.alternateOutputPath) && Directory.Exists(configurationValues.alternateOutputPath))
+            if (!Directory.Exists(configurationValues.alternateOutputPath))
+                Directory.CreateDirectory(configurationValues.alternateOutputPath);
+
+            if (!string.IsNullOrWhiteSpace(configurationValues.alternateOutputPath))
             {
                 var outputTxtFilepath = string.Concat(configurationValues.alternateOutputPath, mapName, ".txt");
                 SaveOutputTxtFile(outputTxtFilepath, lines);
