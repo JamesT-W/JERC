@@ -1,4 +1,4 @@
-﻿using JERC.Constants;
+using JERC.Constants;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -60,7 +60,7 @@ namespace JERC.Models
         {
             // jerc_config
             alternateOutputPath = string.IsNullOrWhiteSpace(jercEntitySettingsValues["alternateOutputPath"]) ? null : jercEntitySettingsValues["alternateOutputPath"];
-            if (!string.IsNullOrWhiteSpace(alternateOutputPath) && (alternateOutputPath.LastOrDefault() != '\\' || alternateOutputPath.LastOrDefault() != '/'))
+            if (!string.IsNullOrWhiteSpace(alternateOutputPath) && alternateOutputPath.LastOrDefault() != '\\' && alternateOutputPath.LastOrDefault() != '/')
                 alternateOutputPath += '/';
 
             onlyOutputToAlternatePath = jercEntitySettingsValues.ContainsKey("onlyOutputToAlternatePath") && jercEntitySettingsValues["onlyOutputToAlternatePath"] == "1";
