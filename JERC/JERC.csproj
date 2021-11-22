@@ -14,4 +14,8 @@
     <ProjectReference Include="..\VMFParser\VMFParser.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Resources\VTFCmd\" />
+  </ItemGroup>
+
 </Project>

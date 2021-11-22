@@ -4,6 +4,7 @@ using JERC.Enums;
 using JERC.Models;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
@@ -31,6 +32,8 @@ namespace JERC
 
         private static string extrasOutputFilepathPrefix;
         private static string alternateExtrasOutputFilepathPrefix;
+
+        private static string vmfcmdFilepath;
 
         private static readonly string visgroupName = "JERC";
 
@@ -165,6 +168,8 @@ namespace JERC
 
                 extrasOutputFilepathPrefix = string.Concat(debuggingJercPath, mapName);
                 alternateExtrasOutputFilepathPrefix = string.Concat(debuggingJercPath, @"jerc_extra\", mapName);
+
+                vmfcmdFilepath = string.Concat(debuggingJercPath, @"JERC\Resources\VTFCmd\VTFCmd.exe");
             }
             else
             {
@@ -177,6 +182,8 @@ namespace JERC
 
                 extrasOutputFilepathPrefix = string.Concat(GameConfigurationValues.extrasFolderPath, mapName);
                 alternateExtrasOutputFilepathPrefix = string.Concat(configurationValues.alternateOutputPath, @"jerc_extras\", mapName);
+
+                vmfcmdFilepath = string.Concat(GameConfigurationValues.csgoFolderPath, @"Resources\VTFCmd\VTFCmd.exe");
             }
 
             outputImageBackgroundLevelsFilepath = string.Concat(extrasOutputFilepathPrefix, "_background_levels.png");
@@ -1727,21 +1734,21 @@ namespace JERC
                     else if (configurationValues.overviewGamemodeType == 1)
                     {
                         if (configurationValues.dangerZoneUses == 0 || configurationValues.dangerZoneUses == 1)
-                            SaveImage(dzTabletOutputFilepathPrefix, radarLevel.bmpRadar);
+                            SaveImage(dzTabletOutputFilepathPrefix, radarLevel.bmpRadar, dangerZoneSpecificFile: DangerZoneSpecificFiles.TabletImage);
                         if (configurationValues.dangerZoneUses == 0 || configurationValues.dangerZoneUses == 2)
-                            SaveImage(dzSpawnselectOutputFilepathPrefix, radarLevel.bmpRadar);
+                            SaveImage(dzSpawnselectOutputFilepathPrefix, radarLevel.bmpRadar, dangerZoneSpecificFile: DangerZoneSpecificFiles.SpawnselectImage);
 
                         if (configurationValues.workshopId > 0) // set to 0 by default
                         {
                             if (configurationValues.dangerZoneUses == 0 || configurationValues.dangerZoneUses == 1)
                             {
                                 CreateDirectoryOfFileIfDoesntExist(dzTabletWorkshopOutputFilepathPrefix);
-                                SaveImage(dzTabletWorkshopOutputFilepathPrefix, radarLevel.bmpRadar);
+                                SaveImage(dzTabletWorkshopOutputFilepathPrefix, radarLevel.bmpRadar, dangerZoneSpecificFile: DangerZoneSpecificFiles.TabletImage);
                             }
                             if (configurationValues.dangerZoneUses == 0 || configurationValues.dangerZoneUses == 2)
                             {
                                 CreateDirectoryOfFileIfDoesntExist(dzSpawnselectWorkshopOutputFilepathPrefix);
-                                SaveImage(dzSpawnselectWorkshopOutputFilepathPrefix, radarLevel.bmpRadar);
+                                SaveImage(dzSpawnselectWorkshopOutputFilepathPrefix, radarLevel.bmpRadar, dangerZoneSpecificFile: DangerZoneSpecificFiles.SpawnselectImage);
                             }
                         }
                     }
@@ -1761,13 +1768,13 @@ namespace JERC
                         {
                             var outputImageFilepath = string.Concat(configurationValues.alternateOutputPath, @"materials\models\weapons\v_models\tablet\tablet_radar_", mapName);
                             CreateDirectoryOfFileIfDoesntExist(outputImageFilepath);
-                            SaveImage(outputImageFilepath, radarLevel.bmpRadar);
+                            SaveImage(outputImageFilepath, radarLevel.bmpRadar, dangerZoneSpecificFile: DangerZoneSpecificFiles.TabletImage);
                         }
                         if (configurationValues.dangerZoneUses == 0 || configurationValues.dangerZoneUses == 2)
                         {
                             var outputImageFilepath = string.Concat(configurationValues.alternateOutputPath, @"materials\panorama\images\survival\spawnselect\map_", mapName);
                             CreateDirectoryOfFileIfDoesntExist(outputImageFilepath);
-                            SaveImage(outputImageFilepath, radarLevel.bmpRadar);
+                            SaveImage(outputImageFilepath, radarLevel.bmpRadar, dangerZoneSpecificFile: DangerZoneSpecificFiles.SpawnselectImage);
                         }
 
                         if (configurationValues.workshopId > 0) // set to 0 by default
@@ -1776,13 +1783,13 @@ namespace JERC
                             {
                                 var outputImageFilepath = string.Concat(configurationValues.alternateOutputPath, @"materials\models\weapons\v_models\tablet\tablet_radar_workshop\", configurationValues.workshopId, @"\", mapName);
                                 CreateDirectoryOfFileIfDoesntExist(outputImageFilepath);
-                                SaveImage(outputImageFilepath, radarLevel.bmpRadar);
+                                SaveImage(outputImageFilepath, radarLevel.bmpRadar, dangerZoneSpecificFile: DangerZoneSpecificFiles.TabletImage);
                             }
                             if (configurationValues.dangerZoneUses == 0 || configurationValues.dangerZoneUses == 2)
                             {
                                 var outputImageFilepath = string.Concat(configurationValues.alternateOutputPath, @"materials\panorama\images\survival\spawnselect\map_workshop\", configurationValues.workshopId, @"\", mapName);
                                 CreateDirectoryOfFileIfDoesntExist(outputImageFilepath);
-                                SaveImage(outputImageFilepath, radarLevel.bmpRadar);
+                                SaveImage(outputImageFilepath, radarLevel.bmpRadar, dangerZoneSpecificFile: DangerZoneSpecificFiles.SpawnselectImage);
                             }
                         }
                     }
@@ -1800,7 +1807,7 @@ namespace JERC
             if (!configurationValues.onlyOutputToAlternatePath)
             {
                 var outputImageFilepath = string.Concat(extrasOutputFilepathPrefix, radarLevelString, "_radar_", rawMaskType, "_mask");
-                SaveImage(outputImageFilepath, bmpRawMask, true);
+                SaveImage(outputImageFilepath, bmpRawMask, forcePngOnly: true);
             }
 
             CreateDirectoryOfFileIfDoesntExist(alternateExtrasOutputFilepathPrefix);
@@ -1808,7 +1815,7 @@ namespace JERC
             if (!string.IsNullOrWhiteSpace(alternateExtrasOutputFilepathPrefix))
             {
                 var outputImageFilepath = string.Concat(alternateExtrasOutputFilepathPrefix, radarLevelString, "_radar_", rawMaskType, "_mask");
-                SaveImage(outputImageFilepath, bmpRawMask, true);
+                SaveImage(outputImageFilepath, bmpRawMask, forcePngOnly: true);
             }
         }
 
@@ -2777,7 +2784,7 @@ namespace JERC
         }*/
 
 
-        private static void SaveImage(string filepath, Bitmap bmp, bool forcePngOnly = false)
+        private static void SaveImage(string filepath, Bitmap bmp, bool forcePngOnly = false, DangerZoneSpecificFiles dangerZoneSpecificFile = DangerZoneSpecificFiles.None)
         {
             var canSave = false;
 
@@ -2804,6 +2811,9 @@ namespace JERC
             }
 
 
+            var filepathPng = filepath + ".png";
+            var filepathDds = filepath + ".dds";
+
             // add padding around Danger Zone overview
             if (configurationValues.overviewGamemodeType == 1)
             {
@@ -2823,11 +2833,55 @@ namespace JERC
 
                 bmp = new Bitmap(bmpTemp, Sizes.FinalOutputImageResolution, Sizes.FinalOutputImageResolution);
 
-                if (configurationValues.exportDds && !forcePngOnly)
-                    bmp.Save(filepath + ".dds");
+                if (dangerZoneSpecificFile == DangerZoneSpecificFiles.TabletImage)
+                {
+                    bmp.Save(filepathPng, ImageFormat.Png);
 
-                if (configurationValues.exportPng || forcePngOnly)
-                    bmp.Save(filepath + ".png", ImageFormat.Png);
+                    var aa = $"-file \"{filepathPng}\" -output \"{Path.GetDirectoryName(filepathPng)}\"";
+
+                    var vmfcmdFilepath = string.Concat(debuggingJercPath, @"JERC\Resources\VTFCmd\VTFCmd.exe");
+                    if (!File.Exists(vmfcmdFilepath))
+                    {
+                        Logger.LogImportantWarning("VMTCmd.exe not found, exporting Danger Zone tablet image as a png instead of a vtf");
+                    }
+                    else
+                    {
+                        Logger.LogMessage($"Converting {filepathPng} to vtf");
+
+                        ProcessStartInfo startInfo = new ProcessStartInfo();
+                        startInfo.CreateNoWindow = false;
+                        startInfo.UseShellExecute = false;
+                        startInfo.FileName = vmfcmdFilepath;
+                        startInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                        startInfo.Arguments = $"-file \"{filepathPng}\" -output \"{Path.GetDirectoryName(filepathPng)}\"";
+
+                        try
+                        {
+                            Process.Start(startInfo).WaitForExit();
+
+                            Logger.LogMessage($"Successfully converted {filepathPng} to vtf");
+
+                            if (File.Exists(filepathPng) && !configurationValues.exportPng)
+                                File.Delete(filepathPng);
+                        }
+                        catch (Exception e)
+                        {
+                            Logger.LogImportantWarning("Failed to export Danger Zone tablet image as a vtf, exporting as png instead");
+                        }
+                    }
+                }
+                else if (dangerZoneSpecificFile == DangerZoneSpecificFiles.SpawnselectImage)
+                {
+                    bmp.Save(filepathPng, ImageFormat.Png);
+                }
+                else
+                {
+                    if (configurationValues.exportDds && !forcePngOnly)
+                        bmp.Save(filepathDds);
+
+                    if (configurationValues.exportPng || forcePngOnly)
+                        bmp.Save(filepathPng, ImageFormat.Png);
+                }
 
                 // dispose
                 DisposeGraphics(Graphics.FromImage(bmpTemp));
@@ -2836,10 +2890,10 @@ namespace JERC
             else
             {
                 if (configurationValues.exportDds && !forcePngOnly)
-                    bmp.Save(filepath + ".dds");
+                    bmp.Save(filepathDds);
 
                 if (configurationValues.exportPng || forcePngOnly)
-                    bmp.Save(filepath + ".png", ImageFormat.Png);
+                    bmp.Save(filepathPng, ImageFormat.Png);
             }
         }
 
