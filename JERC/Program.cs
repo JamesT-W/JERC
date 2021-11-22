@@ -2816,9 +2816,9 @@ namespace JERC
                     graphicsTemp.SmoothingMode = SmoothingMode.HighSpeed;
                     graphicsTemp.InterpolationMode = InterpolationMode.HighQualityBicubic;
                     graphicsTemp.Clear(Color.Transparent);
-                    int x = (bmpTemp.Width - Sizes.FinalOutputImageResolution) / 2;
-                    int y = (bmpTemp.Height - Sizes.FinalOutputImageResolution) / 2;
-                    graphicsTemp.DrawImage(bmp, x, y);
+                    int xStartPos = (bmpTemp.Width - Sizes.FinalOutputImageResolution) / 2;
+                    int yStartPos = (bmpTemp.Height - Sizes.FinalOutputImageResolution) / 2;
+                    graphicsTemp.DrawImage(bmp, xStartPos, yStartPos);
                 }
 
                 bmp = new Bitmap(bmpTemp, Sizes.FinalOutputImageResolution, Sizes.FinalOutputImageResolution);
