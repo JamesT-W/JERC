@@ -14,8 +14,11 @@ namespace JERC.Models
         public float brushVerticesPosMinY;
         public float brushVerticesPosMaxY;
 
-        public int width;
-        public int height;
+        public int widthWithoutStroke;
+        public int heightWithoutStroke;
+
+        public int widthWithStroke;
+        public int heightWithStroke;
 
         public int paddingSizeX;
         public int paddingSizeY;
@@ -48,25 +51,33 @@ namespace JERC.Models
             this.brushVerticesPosMinY = brushVerticesPosMinY;
             this.brushVerticesPosMaxY = brushVerticesPosMaxY;
 
-            var widthBeforeMultiplier = (int)(Math.Ceiling(brushVerticesPosMaxX - brushVerticesPosMinX) + (configurationValues.strokeWidth * 2)); // adds the stroke width mutliplier value as a padding at left and right
-            var heightBeforeMultiplier = (int)(Math.Ceiling(brushVerticesPosMaxY - brushVerticesPosMinY) + (configurationValues.strokeWidth * 2)); // adds the stroke width mutliplier value as a padding at top and bottom
+            var widthBeforeMultiplier = (int)(Math.Ceiling(brushVerticesPosMaxX - brushVerticesPosMinX));
+            var heightBeforeMultiplier = (int)(Math.Ceiling(brushVerticesPosMaxY - brushVerticesPosMinY));
 
-            width = (int)(widthBeforeMultiplier / configurationValues.radarSizeMultiplier);
-            height = (int)(heightBeforeMultiplier / configurationValues.radarSizeMultiplier);
+            widthWithoutStroke = (int)(widthBeforeMultiplier / configurationValues.radarSizeMultiplier);
+            heightWithoutStroke = (int)(widthBeforeMultiplier / configurationValues.radarSizeMultiplier);
 
-            radarSizeMultiplierChangeAmountWidth = widthBeforeMultiplier - width;
-            radarSizeMultiplierChangeAmountHeight = heightBeforeMultiplier - height;
+            widthWithStroke = (int)((widthBeforeMultiplier + (configurationValues.strokeWidth * 2)) / configurationValues.radarSizeMultiplier); // adds the stroke width mutliplier value as a padding at left and right
+            heightWithStroke = (int)((heightBeforeMultiplier + (configurationValues.strokeWidth * 2)) / configurationValues.radarSizeMultiplier); // adds the stroke width mutliplier value as a padding at top and bottom
 
-            outputResolution = width >= height ? width : height;
+            if (configurationValues.overviewGamemodeType == 1 && (widthWithStroke > DangerZoneValues.DangerZoneOverviewSize || heightWithStroke > DangerZoneValues.DangerZoneOverviewSize))
+            {
+                Logger.LogImportantWarning("Danger Zone maps should not be larger than 20480x20480 units, errors are likely to occur");
+            }
 
-            paddingSizeX = width < height ? height - width : 0;
-            paddingSizeY = height < width ? width - height : 0;
+            radarSizeMultiplierChangeAmountWidth = widthBeforeMultiplier - widthWithStroke;
+            radarSizeMultiplierChangeAmountHeight = heightBeforeMultiplier - heightWithStroke;
+
+            outputResolution = widthWithStroke >= heightWithStroke ? widthWithStroke : heightWithStroke;
+
+            paddingSizeX = widthWithStroke < heightWithStroke ? heightWithStroke - widthWithStroke : 0;
+            paddingSizeY = heightWithStroke < widthWithStroke ? widthWithStroke - heightWithStroke : 0;
 
             paddingPercentageX = (float)paddingSizeX / (float)outputResolution;
             paddingPercentageY = (float)paddingSizeY / (float)outputResolution;
 
-            brushVerticesOffsetX = (int)(width < height ? ((height - width) / 2) + configurationValues.strokeWidth - (radarSizeMultiplierChangeAmountWidth / 2) : 0 + configurationValues.strokeWidth - (radarSizeMultiplierChangeAmountWidth / 2));
-            brushVerticesOffsetY = (int)(height < width ? ((width - height) / 2) + configurationValues.strokeWidth - (radarSizeMultiplierChangeAmountHeight / 2) : 0 + configurationValues.strokeWidth - (radarSizeMultiplierChangeAmountHeight / 2));
+            brushVerticesOffsetX = (int)(widthWithStroke < heightWithStroke ? ((heightWithStroke - widthWithStroke) / 2) + configurationValues.strokeWidth - (radarSizeMultiplierChangeAmountWidth / 2) : 0 + configurationValues.strokeWidth - (radarSizeMultiplierChangeAmountWidth / 2));
+            brushVerticesOffsetY = (int)(heightWithStroke < widthWithStroke ? ((widthWithStroke - heightWithStroke) / 2) + configurationValues.strokeWidth - (radarSizeMultiplierChangeAmountHeight / 2) : 0 + configurationValues.strokeWidth - (radarSizeMultiplierChangeAmountHeight / 2));
 
             //offsetPercentageX = (brushVerticesOffsetX / width);
             //offsetPercentageY = (brushVerticesOffsetY / height);

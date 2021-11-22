@@ -78,10 +78,17 @@ namespace JERC.Models
             backgroundFilename = string.IsNullOrWhiteSpace(jercEntitySettingsValues["backgroundFilename"]) ? null : jercEntitySettingsValues["backgroundFilename"];
 
             radarSizeMultiplier = jercEntitySettingsValues.ContainsKey("radarSizeMultiplier") && jercEntitySettingsValues["radarSizeMultiplier"] != null ? float.Parse(jercEntitySettingsValues["radarSizeMultiplier"], Globalization.Style, Globalization.Culture) : 0.95f;
-            if (radarSizeMultiplier < 0.01)
-                radarSizeMultiplier = 0.01f;
-            else if (radarSizeMultiplier > 1)
+            if (overviewGamemodeType == 0)
+            {
+                if (radarSizeMultiplier < 0.01)
+                    radarSizeMultiplier = 0.01f;
+                else if (radarSizeMultiplier > 1)
+                    radarSizeMultiplier = 1;
+            }
+            else // force 1 in Danger Zone for correct scale on the tablet
+            {
                 radarSizeMultiplier = 1;
+            }
 
             overlapAlpha = jercEntitySettingsValues.ContainsKey("overlapAlpha") && jercEntitySettingsValues["overlapAlpha"] != null ? Math.Clamp(int.Parse(jercEntitySettingsValues["overlapAlpha"]), 0, 255) : 0;
             dangerAlpha = jercEntitySettingsValues.ContainsKey("dangerAlpha") && jercEntitySettingsValues["dangerAlpha"] != null ? Math.Clamp(int.Parse(jercEntitySettingsValues["dangerAlpha"]), 0, 255) : 0;

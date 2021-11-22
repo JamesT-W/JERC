@@ -1139,6 +1139,7 @@ namespace JERC
 
             //graphics.SmoothingMode = SmoothingMode.AntiAlias;
             graphics.SmoothingMode = SmoothingMode.HighSpeed;
+            graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
 
             graphics.SetClip(Rectangle.FromLTRB(0, 0, overviewPositionValues.outputResolution, overviewPositionValues.outputResolution));
 
@@ -2796,7 +2797,43 @@ namespace JERC
             }
 
             // only create the image if the file is not locked
-            if (canSave)
+            if (!canSave)
+            {
+                Logger.LogError($"Could not save to {filepath}, file is most likely locked.");
+                return;
+            }
+
+
+            // add padding around Danger Zone overview
+            if (configurationValues.overviewGamemodeType == 1)
+            {
+                float newBitmapSizeDivider = ((float)overviewPositionValues.widthWithoutStroke + (float)overviewPositionValues.paddingSizeX) / (float)DangerZoneValues.DangerZoneOverviewSize;
+                var newSizeX = (int)(Sizes.FinalOutputImageResolution / newBitmapSizeDivider);
+                var newSizeY = (int)(Sizes.FinalOutputImageResolution / newBitmapSizeDivider);
+                Bitmap bmpTemp = new Bitmap(newSizeX, newSizeY);
+                using (Graphics graphicsTemp = Graphics.FromImage(bmpTemp))
+                {
+                    graphicsTemp.SmoothingMode = SmoothingMode.HighSpeed;
+                    graphicsTemp.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                    graphicsTemp.Clear(Color.Transparent);
+                    int x = (bmpTemp.Width - Sizes.FinalOutputImageResolution) / 2;
+                    int y = (bmpTemp.Height - Sizes.FinalOutputImageResolution) / 2;
+                    graphicsTemp.DrawImage(bmp, x, y);
+                }
+
+                bmp = new Bitmap(bmpTemp, Sizes.FinalOutputImageResolution, Sizes.FinalOutputImageResolution);
+
+                if (configurationValues.exportDds && !forcePngOnly)
+                    bmp.Save(filepath + ".dds");
+
+                if (configurationValues.exportPng || forcePngOnly)
+                    bmp.Save(filepath + ".png", ImageFormat.Png);
+
+                // dispose
+                DisposeGraphics(Graphics.FromImage(bmpTemp));
+                DisposeImage(bmpTemp);
+            }
+            else
             {
                 if (configurationValues.exportDds && !forcePngOnly)
                     bmp.Save(filepath + ".dds");
