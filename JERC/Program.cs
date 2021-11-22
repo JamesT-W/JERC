@@ -183,7 +183,7 @@ namespace JERC
                 extrasOutputFilepathPrefix = string.Concat(GameConfigurationValues.extrasFolderPath, mapName);
                 alternateExtrasOutputFilepathPrefix = string.Concat(configurationValues.alternateOutputPath, @"jerc_extras\", mapName);
 
-                vmfcmdFilepath = string.Concat(GameConfigurationValues.csgoFolderPath, @"Resources\VTFCmd\VTFCmd.exe");
+                vmfcmdFilepath = string.Concat(GameConfigurationValues.binFolderPath, @"JERC\VTFCmd\VTFCmd.exe");
             }
 
             outputImageBackgroundLevelsFilepath = string.Concat(extrasOutputFilepathPrefix, "_background_levels.png");
@@ -2837,9 +2837,6 @@ namespace JERC
                 {
                     bmp.Save(filepathPng, ImageFormat.Png);
 
-                    var aa = $"-file \"{filepathPng}\" -output \"{Path.GetDirectoryName(filepathPng)}\"";
-
-                    var vmfcmdFilepath = string.Concat(debuggingJercPath, @"JERC\Resources\VTFCmd\VTFCmd.exe");
                     if (!File.Exists(vmfcmdFilepath))
                     {
                         Logger.LogImportantWarning("VMTCmd.exe not found, exporting Danger Zone tablet image as a png instead of a vtf");
