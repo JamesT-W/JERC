@@ -126,7 +126,7 @@
 
 	lowerLevelOutputName(string) : "Lower Level Output Name" : "lower" : "The lower level radar name JERC uses for naming"
 
-	exportTxt(choices) : "Export .TXT" : 1 =
+	exportTxt(choices) : "Export .TXT" : 1 : "Overview Gamemode Type set to Standard only" =
 	[
 		0: "No"
 		1: "Yes"
