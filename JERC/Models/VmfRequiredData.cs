@@ -182,7 +182,7 @@ namespace JERC.Models
                 brushesCTSpawn.AddRange(brushesCTSpawnBrushEntitiesIVNodes.Select(x => new Brush(x)).ToList());
 
             // calculate vertices_plus for every brush side for vanilla hammer vmfs, as hammer++ adds vertices itself when saving a vmf
-            if (GameConfigurationValues.isVanillaHammer)
+            if (GameConfigurationValues.isVanillaHammer == true)
             {
                 VanillaHammerVmfFixer.CalculateVerticesPlusForAllBrushSides(
                     brushesIgnore.SelectMany(x => x.side).Concat(brushesRemove.SelectMany(x => x.side)).Concat(brushesPath.SelectMany(x => x.side)).Concat(brushesCover.SelectMany(x => x.side)).Concat(brushesOverlap.SelectMany(x => x.side)).Concat(brushesDoor.SelectMany(x => x.side)).Concat(brushesLadder.SelectMany(x => x.side)).Concat(brushesDanger.SelectMany(x => x.side))
@@ -266,7 +266,7 @@ namespace JERC.Models
             displacementsCTSpawn = displacementsCTSpawnIVNodes.Any() ? displacementsCTSpawnIVNodes.Select(x => new Brush(x)).ToList() : new List<Brush>();
 
             // calculate vertices_plus for every brush side for vanilla hammer vmfs, as hammer++ adds vertices itself when saving a vmf
-            if (GameConfigurationValues.isVanillaHammer)
+            if (GameConfigurationValues.isVanillaHammer == true)
             {
                 VanillaHammerVmfFixer.CalculateVerticesPlusForAllBrushSides(
                     displacementsIgnore.SelectMany(x => x.side).Concat(displacementsRemove.SelectMany(x => x.side)).Concat(displacementsPath.SelectMany(x => x.side)).Concat(displacementsCover.SelectMany(x => x.side)).Concat(displacementsOverlap.SelectMany(x => x.side)).Concat(displacementsDoor.SelectMany(x => x.side)).Concat(displacementsLadder.SelectMany(x => x.side)).Concat(displacementsDanger.SelectMany(x => x.side))
@@ -375,7 +375,7 @@ namespace JERC.Models
 
 
             // calculate vertices_plus for every brush side for vanilla hammer vmfs, as hammer++ adds vertices itself when saving a vmf
-            if (GameConfigurationValues.isVanillaHammer)
+            if (GameConfigurationValues.isVanillaHammer == true)
             {
                 VanillaHammerVmfFixer.CalculateVerticesPlusForAllBrushSides(
                     buyzoneBrushEntities.SelectMany(x => x.brushes.SelectMany(y => y.side))
@@ -456,7 +456,7 @@ namespace JERC.Models
             if (sides == null || !sides.Any())
                 return sides;
 
-            if (GameConfigurationValues.isVanillaHammer && calculateVerticesPlus)
+            if (GameConfigurationValues.isVanillaHammer == true && calculateVerticesPlus)
             {
                 VanillaHammerVmfFixer.CalculateVerticesPlusForAllBrushSides(sides);
             }

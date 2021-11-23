@@ -84,11 +84,32 @@ namespace JERC
 
             Logger.LogNewLine();
             Logger.LogMessage("VMF parsed sucessfully");
+            Logger.LogNewLine();
 
 
             // main vmf contents
             var allWorldBrushes = vmf.World.Body.Where(x => x.Name == "solid");
             var allEntities = vmf.Body.Where(x => x.Name == "entity");
+
+            // if software was not defined, work out which is being used automatically
+            if (GameConfigurationValues.isVanillaHammer == null)
+            {
+                // check world brushes and entity brushes for "vertices_plus" to know if it has been saved with hammer++ or vanilla hammer
+                if (allWorldBrushes.Any(x => x.Body.Where(y => y.Name == "side").Any(y => y.Body.Any(z => z.Name == "vertices_plus"))) ||
+                    allEntities.Any(x => x.Body.Where(y => y.Name == "solid").Any(y => y.Body.Where(z => z.Name == "side").Any(z => z.Body.Any(a => a.Name == "vertices_plus"))))
+                )
+                {
+                    GameConfigurationValues.isVanillaHammer = false;
+                    Logger.LogMessage("VMF saved with Hammer++ (auto)");
+                }
+                else
+                {
+                    GameConfigurationValues.isVanillaHammer = true;
+                    Logger.LogMessage("VMF saved with Vanilla Hammer (auto)");
+                }
+
+                Logger.LogNewLine();
+            }
 
             var jercConfigEntities = GetEntitiesByClassname(allEntities, Classnames.JercConfig, false);
 
@@ -2120,7 +2141,7 @@ namespace JERC
             foreach (var brushSide in brush.side.ToList())
             {
                 // calculate vertices_plus for every brush side for vanilla hammer vmfs, as hammer++ adds vertices itself when saving a vmf
-                if (GameConfigurationValues.isVanillaHammer)
+                if (GameConfigurationValues.isVanillaHammer == true)
                 {
                     VanillaHammerVmfFixer.CalculateVerticesPlusForAllBrushSides(brush.side);
                 }

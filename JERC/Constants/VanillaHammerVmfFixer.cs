@@ -13,7 +13,7 @@ namespace JERC.Constants
     {
         public static void CalculateVerticesPlusForAllBrushSides(List<Side> brushesSides)
         {
-            if (!GameConfigurationValues.isVanillaHammer)
+            if (GameConfigurationValues.isVanillaHammer == false)
                 return;
 
             if (brushesSides == null || brushesSides.Count() == 0)

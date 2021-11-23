@@ -6,7 +6,7 @@ namespace JERC.Models
 {
     public static class GameConfigurationValues
     {
-        public static bool isVanillaHammer = false;
+        public static bool? isVanillaHammer = null;
 
         public static string csgoFolderPath;
         public static string binFolderPath;
@@ -34,7 +34,7 @@ namespace JERC.Models
                 {
                     case "-software":
                         var software = args[i + 1];
-                        if (software.ToLower() == "hammer")
+                        if (software.ToLower() == "hammer" || software.ToLower() == "vanilla")
                             isVanillaHammer = true;
                         else if (software.ToLower() == "hammer++" || software.ToLower() == "hammerplusplus")
                             isVanillaHammer = false;
@@ -65,8 +65,6 @@ namespace JERC.Models
             }
 
             Logger.LogMessage("---- Game Configuration Values ----");
-            Logger.LogMessageKey("Is Vanilla Hammer: ");
-            Logger.LogMessage(isVanillaHammer.ToString());
             Logger.LogMessageKey("csgo Directory: ");
             Logger.LogMessage(csgoFolderPath);
             Logger.LogMessageKey("bin Directory: ");
@@ -84,6 +82,20 @@ namespace JERC.Models
             Logger.LogMessageKey("vmf Directory: ");
             Logger.LogMessage(vmfFilepathDirectory);
             Logger.LogNewLine();
+
+            if (isVanillaHammer != null)
+            {
+                if (isVanillaHammer == true)
+                {
+                    Logger.LogMessage("VMF saved with Vanilla Hammer (provided)");
+                }
+                else
+                {
+                    Logger.LogMessage("VMF saved with Hammer++ (provided)");
+                }
+
+                Logger.LogNewLine();
+            }
         }
 
 
