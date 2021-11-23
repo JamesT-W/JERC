@@ -109,33 +109,12 @@ namespace JERC
             // add hidden stuff if applicable except when instance is hidden
             if (configurationValues.includeEvenWhenHidden)
             {
-                var hiddenIVNodesWorldBrushes = from x in vmf.World.Body
-                                                where x.Name == "hidden"
-                                                from y in x.Body
-                                                where y.Name == "solid"
-                                                select y;
-                vmf.World.Body = vmf.World.Body.Concat(hiddenIVNodesWorldBrushes).ToList();
-
-                // ignores hidden instances
-                var hiddenIVNodesEntities = from x in vmf.Body
-                                            where x.Name == "hidden"
-                                            from y in x.Body
-                                            where y.Name == "entity"
-                                            from z in y.Body
-                                            where z.Name == "classname"
-                                            where z.Value != Classnames.FuncInstance
-                                            select y;
-                for (int i = 0; i < hiddenIVNodesEntities.Count(); i++)
-                {
-                    var hiddenIVNode = hiddenIVNodesEntities.ElementAt(i).Body.FirstOrDefault(x => x.Name == "hidden"); // could there be multiple of these ???
-                    var solidIVNode = hiddenIVNode.Body.FirstOrDefault(x => x.Name == "solid"); // could there be multiple of these ???
-                    hiddenIVNodesEntities.ElementAt(i).Body.Add(solidIVNode);
-                }
-                vmf.Body = vmf.Body.Concat(hiddenIVNodesEntities).ToList();
+                AddHiddenStuffToDifferentLocationInVmf(vmf);
 
                 allWorldBrushes = vmf.World.Body.Where(x => x.Name == "solid");
                 allEntities = vmf.Body.Where(x => x.Name == "entity");
             }
+
 
             // correct entity origins and angles
             CorrectOverlayOriginsAndAngles(vmf.Body.Where(x => x.Name == "entity"));
@@ -354,31 +333,9 @@ namespace JERC
                 // add hidden stuff if applicable except when instance is hidden
                 if (configurationValues.includeEvenWhenHidden)
                 {
-                    var hiddenIVNodesWorldBrushes = from x in newVmf.World.Body
-                                                    where x.Name == "hidden"
-                                                    from y in x.Body
-                                                    where y.Name == "solid"
-                                                    select y;
-                    newVmf.World.Body = newVmf.World.Body.Concat(hiddenIVNodesWorldBrushes).ToList();
-
-                    // ignores hidden instances
-                    var hiddenIVNodesEntities = from x in newVmf.Body
-                                                where x.Name == "hidden"
-                                                from y in x.Body
-                                                where y.Name == "entity"
-                                                from z in y.Body
-                                                where z.Name == "classname"
-                                                where z.Value != Classnames.FuncInstance
-                                                select y;
-                    for (int i = 0; i < hiddenIVNodesEntities.Count(); i++)
-                    {
-                        var hiddenIVNode = hiddenIVNodesEntities.ElementAt(i).Body.FirstOrDefault(x => x.Name == "hidden"); // could there be multiple of these ???
-                        var solidIVNode = hiddenIVNode.Body.FirstOrDefault(x => x.Name == "solid"); // could there be multiple of these ???
-                        hiddenIVNodesEntities.ElementAt(i).Body.Add(solidIVNode);
-                    }
-                    newVmf.Body = newVmf.Body.Concat(hiddenIVNodesEntities).ToList();
+                    AddHiddenStuffToDifferentLocationInVmf(newVmf);
                 }
-
+                
 
                 // correct entity origins and angles
                 foreach (var entity in newVmf.Body.Where(x => x.Name == "entity"))
@@ -440,6 +397,39 @@ namespace JERC
             }
 
             return true;
+        }
+
+
+        private static void AddHiddenStuffToDifferentLocationInVmf(VMF vmf)
+        {
+            var hiddenIVNodesWorldBrushes = from x in vmf.World.Body
+                                            where x.Name == "hidden"
+                                            from y in x.Body
+                                            where y.Name == "solid"
+                                            select y;
+            vmf.World.Body = vmf.World.Body.Concat(hiddenIVNodesWorldBrushes).ToList();
+
+            // ignores hidden instances
+            var hiddenIVNodesEntities = from x in vmf.Body
+                                        where x.Name == "hidden"
+                                        from y in x.Body
+                                        where y.Name == "entity"
+                                        from z in y.Body
+                                        where z.Name == "classname"
+                                        where z.Value != Classnames.FuncInstance
+                                        select y;
+            for (int i = 0; i < hiddenIVNodesEntities.Count(); i++)
+            {
+                var hiddenIVNode = hiddenIVNodesEntities.ElementAt(i).Body.FirstOrDefault(x => x.Name == "hidden"); // could there be multiple of these ???
+                if (hiddenIVNode == null)
+                    continue;
+
+                var solidIVNode = hiddenIVNode.Body.FirstOrDefault(x => x.Name == "solid"); // could there be multiple of these ???
+                if (solidIVNode == null)
+                    continue;
+                hiddenIVNodesEntities.ElementAt(i).Body.Add(solidIVNode);
+            }
+            vmf.Body = vmf.Body.Concat(hiddenIVNodesEntities).ToList();
         }
 
 
