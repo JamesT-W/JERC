@@ -10,7 +10,7 @@ namespace VMFParser
     public abstract class AVBlock
     {
         /// <summary> Contains all sub IVNodes. </summary>
-        public IList<IVNode> Body { get; protected set; }
+        public IList<IVNode> Body { get; set; }
 
         /// <summary> Returns all nodes matching given names. </summary>
         /// <param name="name"> Only get values with this Name. </param>

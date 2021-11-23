@@ -86,38 +86,59 @@ namespace JERC
             Logger.LogMessage("VMF parsed sucessfully");
 
 
-            // correct origins and angles
-            foreach (var entity in vmf.Body.Where(x => x.Name == "entity"))
+            // main vmf contents
+            var allWorldBrushes = vmf.World.Body.Where(x => x.Name == "solid");
+            var allEntities = vmf.Body.Where(x => x.Name == "entity");
+
+            var jercConfigEntities = GetEntitiesByClassname(allEntities, Classnames.JercConfig, false);
+
+            if (jercConfigEntities == null || !jercConfigEntities.Any())
             {
-                // overlays (before the fake brush is created, the vertices need rotating)
-                if (entity.Body.FirstOrDefault(x => x.Name == "classname")?.Value == "info_overlay" || entity.Body.FirstOrDefault(x => x.Name == "classname")?.Value == "jerc_info_overlay")
-                {
-                    var originIVNode = entity.Body.FirstOrDefault(x => x.Name == "origin");
-                    var anglesIVNode = entity.Body.FirstOrDefault(x => x.Name == "angles");
-
-                    var uv0 = entity.Body.FirstOrDefault(x => x.Name == "uv0");
-                    var uv1 = entity.Body.FirstOrDefault(x => x.Name == "uv1");
-                    var uv2 = entity.Body.FirstOrDefault(x => x.Name == "uv2");
-                    var uv3 = entity.Body.FirstOrDefault(x => x.Name == "uv3");
-
-                    if (uv0 != null && uv1 != null && uv2 != null && uv3 != null)
-                    {
-                        var allVerticesOffsetsInOverlay = new List<IVNode>() { uv0, uv1, uv2, uv3 };
-                        for (int i = 0; i < allVerticesOffsetsInOverlay.Count(); i++) // allVerticesOffsetsInOverlay.Count() should be 4
-                        {
-                            var overlayVerticesOffset = allVerticesOffsetsInOverlay[i];
-
-                            var origin = new Vertices(originIVNode.Value);
-                            var angles = anglesIVNode?.Value == null ? new Angle(0, 0, 0) : new Angle(anglesIVNode.Value);
-
-                            var verticesString = MergeTwoVerticesAsString(originIVNode.Value, overlayVerticesOffset.Value); // removes the offset
-                            verticesString = GetRotatedVerticesNewPositionAsString(new Vertices(verticesString), origin, angles.yaw); // removes the rotation
-
-                            AddSingleJimVertices(entity, i, verticesString);
-                        }
-                    }
-                }
+                Logger.LogError("No jerc_config entity found in main vmf, aborting");
+                return;
             }
+
+            if (jercConfigEntities.Count() > 1)
+            {
+                Logger.LogError("More than one jerc_config entity found, aborting");
+                return;
+            }
+
+            configurationValues = new ConfigurationValues(GetSettingsValuesFromJercConfig(jercConfigEntities.First()));
+
+            // add hidden stuff if applicable except when instance is hidden
+            if (configurationValues.includeEvenWhenHidden)
+            {
+                var hiddenIVNodesWorldBrushes = from x in vmf.World.Body
+                                                where x.Name == "hidden"
+                                                from y in x.Body
+                                                where y.Name == "solid"
+                                                select y;
+                vmf.World.Body = vmf.World.Body.Concat(hiddenIVNodesWorldBrushes).ToList();
+
+                // ignores hidden instances
+                var hiddenIVNodesEntities = from x in vmf.Body
+                                            where x.Name == "hidden"
+                                            from y in x.Body
+                                            where y.Name == "entity"
+                                            from z in y.Body
+                                            where z.Name == "classname"
+                                            where z.Value != Classnames.FuncInstance
+                                            select y;
+                for (int i = 0; i < hiddenIVNodesEntities.Count(); i++)
+                {
+                    var hiddenIVNode = hiddenIVNodesEntities.ElementAt(i).Body.FirstOrDefault(x => x.Name == "hidden"); // could there be multiple of these ???
+                    var solidIVNode = hiddenIVNode.Body.FirstOrDefault(x => x.Name == "solid"); // could there be multiple of these ???
+                    hiddenIVNodesEntities.ElementAt(i).Body.Add(solidIVNode);
+                }
+                vmf.Body = vmf.Body.Concat(hiddenIVNodesEntities).ToList();
+
+                allWorldBrushes = vmf.World.Body.Where(x => x.Name == "solid");
+                allEntities = vmf.Body.Where(x => x.Name == "entity");
+            }
+
+            // correct entity origins and angles
+            CorrectOverlayOriginsAndAngles(vmf.Body.Where(x => x.Name == "entity"));
 
 
             var successfullyParsedInstances = SortInstances(vmf);
@@ -129,7 +150,14 @@ namespace JERC
             SetVisgroupIdMainVmf();
             SetVisgroupIdInstancesByEntityId();
 
-            vmfRequiredData = GetVmfRequiredData();
+            vmfRequiredData = GetVmfRequiredData(allWorldBrushes, allEntities, jercConfigEntities);
+
+            if (vmfRequiredData == null)
+            {
+                Logger.LogError("More than one jerc_disp_rotation entity found in main vmf, aborting");
+                return;
+            }
+
 
             if (!configurationValues.onlyOutputToAlternatePath)
             {
@@ -188,12 +216,6 @@ namespace JERC
 
             outputImageBackgroundLevelsFilepath = string.Concat(extrasOutputFilepathPrefix, "_background_levels.png");
 
-            if (vmfRequiredData == null)
-            {
-                Logger.LogError("Either no jerc_config entity found, or more than one jerc_disp_rotation entity found. Aborting!");
-                return;
-            }
-
             if (debugging)
             {
                 Logger.LogDebugInfo("Setting alternateOutputPath to empty string");
@@ -245,9 +267,45 @@ namespace JERC
         }
 
 
+        private static void CorrectOverlayOriginsAndAngles(IEnumerable<IVNode> entityList)
+        {
+            foreach (var entity in entityList)
+            {
+                // overlays (before the fake brush is created, the vertices need rotating)
+                if (entity.Body.FirstOrDefault(x => x.Name == "classname")?.Value == "info_overlay" || entity.Body.FirstOrDefault(x => x.Name == "classname")?.Value == "jerc_info_overlay")
+                {
+                    var originIVNode = entity.Body.FirstOrDefault(x => x.Name == "origin");
+                    var anglesIVNode = entity.Body.FirstOrDefault(x => x.Name == "angles");
+
+                    var uv0 = entity.Body.FirstOrDefault(x => x.Name == "uv0");
+                    var uv1 = entity.Body.FirstOrDefault(x => x.Name == "uv1");
+                    var uv2 = entity.Body.FirstOrDefault(x => x.Name == "uv2");
+                    var uv3 = entity.Body.FirstOrDefault(x => x.Name == "uv3");
+
+                    if (uv0 != null && uv1 != null && uv2 != null && uv3 != null)
+                    {
+                        var allVerticesOffsetsInOverlay = new List<IVNode>() { uv0, uv1, uv2, uv3 };
+                        for (int i = 0; i < allVerticesOffsetsInOverlay.Count(); i++) // allVerticesOffsetsInOverlay.Count() should be 4
+                        {
+                            var overlayVerticesOffset = allVerticesOffsetsInOverlay[i];
+
+                            var origin = new Vertices(originIVNode.Value);
+                            var angles = anglesIVNode?.Value == null ? new Angle(0, 0, 0) : new Angle(anglesIVNode.Value);
+
+                            var verticesString = MergeTwoVerticesAsString(originIVNode.Value, overlayVerticesOffset.Value); // removes the offset
+                            verticesString = GetRotatedVerticesNewPositionAsString(new Vertices(verticesString), origin, angles.yaw); // removes the rotation
+
+                            AddSingleJimVertices(entity, i, verticesString);
+                        }
+                    }
+                }
+            }
+        }
+
+
         private static bool SortInstances(VMF vmf)
         {
-            var instanceEntities = vmf.Body.Where(x => x.Name == "entity").Where(x => x.Body.Any(y => y.Name == "classname" && y.Value == "func_instance")).ToList();
+            var instanceEntities = vmf.Body.Where(x => x.Name == "entity").Where(x => x.Body.Any(y => y.Name == "classname" && y.Value == Classnames.FuncInstance)).ToList();
 
             Logger.LogMessage(string.Concat(instanceEntities.Count(), " instance", instanceEntities.Count() == 1 ? string.Empty : "s", " found"));
 
@@ -292,7 +350,37 @@ namespace JERC
                     continue;
                 }
 
-                // correct origins and angles
+
+                // add hidden stuff if applicable except when instance is hidden
+                if (configurationValues.includeEvenWhenHidden)
+                {
+                    var hiddenIVNodesWorldBrushes = from x in newVmf.World.Body
+                                                    where x.Name == "hidden"
+                                                    from y in x.Body
+                                                    where y.Name == "solid"
+                                                    select y;
+                    newVmf.World.Body = newVmf.World.Body.Concat(hiddenIVNodesWorldBrushes).ToList();
+
+                    // ignores hidden instances
+                    var hiddenIVNodesEntities = from x in newVmf.Body
+                                                where x.Name == "hidden"
+                                                from y in x.Body
+                                                where y.Name == "entity"
+                                                from z in y.Body
+                                                where z.Name == "classname"
+                                                where z.Value != Classnames.FuncInstance
+                                                select y;
+                    for (int i = 0; i < hiddenIVNodesEntities.Count(); i++)
+                    {
+                        var hiddenIVNode = hiddenIVNodesEntities.ElementAt(i).Body.FirstOrDefault(x => x.Name == "hidden"); // could there be multiple of these ???
+                        var solidIVNode = hiddenIVNode.Body.FirstOrDefault(x => x.Name == "solid"); // could there be multiple of these ???
+                        hiddenIVNodesEntities.ElementAt(i).Body.Add(solidIVNode);
+                    }
+                    newVmf.Body = newVmf.Body.Concat(hiddenIVNodesEntities).ToList();
+                }
+
+
+                // correct entity origins and angles
                 foreach (var entity in newVmf.Body.Where(x => x.Name == "entity"))
                 {
                     // entity id is not changed
@@ -614,14 +702,10 @@ namespace JERC
         }
 
 
-        private static VmfRequiredData GetVmfRequiredData()
+        private static VmfRequiredData GetVmfRequiredData(IEnumerable<IVNode> allWorldBrushes, IEnumerable<IVNode> allEntities, IEnumerable<IVNode> jercConfigEntities)
         {
             Logger.LogNewLine();
             Logger.LogMessage("Getting required data from the vmf and instances...");
-
-            // main vmf contents
-            var allWorldBrushes = vmf.World.Body.Where(x => x.Name == "solid");
-            var allEntities = vmf.Body.Where(x => x.Name == "entity");
 
             // instances contents
             if (instanceEntityIdsByVmf != null && instanceEntityIdsByVmf.Any())
@@ -753,21 +837,17 @@ namespace JERC
 
 
             // point entities (JERC)
-            var jercConfigEntities = GetEntitiesByClassname(allEntities, Classnames.JercConfig, false);
             var jercDividerEntities = GetEntitiesByClassname(allEntities, Classnames.JercDivider, false);
             var jercFloorEntities = GetEntitiesByClassname(allEntities, Classnames.JercFloor, false);
             var jercCeilingEntities = GetEntitiesByClassname(allEntities, Classnames.JercCeiling, false);
             var jercDispRotationEntities = GetEntitiesByClassname(allEntities, Classnames.JercDispRotation, false);
 
-            if (jercConfigEntities == null || !jercConfigEntities.Any())
-                return null;
-
             if (jercDispRotationEntities != null && jercDispRotationEntities.Count() > 1)
                 return null;
 
-            var allJercEntities = jercConfigEntities.Concat(jercDividerEntities).Concat(jercFloorEntities).Concat(jercCeilingEntities).Concat(jercDispRotationEntities);
+            var allJercEntitiesExceptJercConfig = jercDividerEntities.Concat(jercFloorEntities).Concat(jercCeilingEntities).Concat(jercDispRotationEntities);
 
-            configurationValues = new ConfigurationValues(GetSettingsValuesFromJercEntities(allJercEntities), jercDividerEntities.Count(), jercDispRotationEntities.Any());
+            configurationValues.SetAllOtherSettingsValues(GetSettingsValuesFromJercEntitiesExceptJercConfig(allJercEntitiesExceptJercConfig), jercDividerEntities.Count(), jercDispRotationEntities.Any());
 
             Logger.LogMessage("Retrieved data from the vmf and instances");
 
@@ -788,18 +868,19 @@ namespace JERC
         }
 
 
-        private static Dictionary<string, string> GetSettingsValuesFromJercEntities(IEnumerable<IVNode> jercEntities)
+        private static Dictionary<string, string> GetSettingsValuesFromJercConfig(IVNode jercConfigEntity)
         {
             var jercEntitySettingsValues = new Dictionary<string, string>();
 
             // jerc_config
-            var jercConfig = jercEntities.FirstOrDefault(x => x.Body.Any(y => y.Name == "classname" && y.Value == Classnames.JercConfig)).Body;
+            var jercConfig = jercConfigEntity.Body;
 
             jercEntitySettingsValues.Add("workshopId", jercConfig.FirstOrDefault(x => x.Name == "workshopId")?.Value);
             jercEntitySettingsValues.Add("overviewGamemodeType", jercConfig.FirstOrDefault(x => x.Name == "overviewGamemodeType")?.Value);
             jercEntitySettingsValues.Add("dangerZoneUses", jercConfig.FirstOrDefault(x => x.Name == "dangerZoneUses")?.Value);
             jercEntitySettingsValues.Add("alternateOutputPath", jercConfig.FirstOrDefault(x => x.Name == "alternateOutputPath")?.Value ?? string.Empty);
             jercEntitySettingsValues.Add("onlyOutputToAlternatePath", jercConfig.FirstOrDefault(x => x.Name == "onlyOutputToAlternatePath")?.Value);
+            jercEntitySettingsValues.Add("includeEvenWhenHidden", jercConfig.FirstOrDefault(x => x.Name == "includeEvenWhenHidden")?.Value);
             jercEntitySettingsValues.Add("exportRadarAsSeparateLevels", jercConfig.FirstOrDefault(x => x.Name == "exportRadarAsSeparateLevels")?.Value);
             jercEntitySettingsValues.Add("useSeparateGradientEachLevel", jercConfig.FirstOrDefault(x => x.Name == "useSeparateGradientEachLevel")?.Value);
             jercEntitySettingsValues.Add("ignoreDisplacementXYChanges", jercConfig.FirstOrDefault(x => x.Name == "ignoreDisplacementXYChanges")?.Value);
@@ -837,6 +918,13 @@ namespace JERC
             jercEntitySettingsValues.Add("exportRawMasks", jercConfig.FirstOrDefault(x => x.Name == "exportRawMasks")?.Value);
             jercEntitySettingsValues.Add("exportBackgroundLevelsImage", jercConfig.FirstOrDefault(x => x.Name == "exportBackgroundLevelsImage")?.Value);
 
+            return jercEntitySettingsValues;
+        }
+
+
+        private static Dictionary<string, string> GetSettingsValuesFromJercEntitiesExceptJercConfig(IEnumerable<IVNode> jercEntities)
+        {
+            var jercEntitySettingsValues = new Dictionary<string, string>();
 
             // jerc_disp_rotation
             var jercDispRotation = jercEntities.FirstOrDefault(x => x.Body.Any(y => y.Name == "classname" && y.Value == Classnames.JercDispRotation))?.Body;
@@ -847,7 +935,6 @@ namespace JERC
                 jercEntitySettingsValues.Add("displacementRotationSideIds180", jercDispRotation.FirstOrDefault(x => x.Name == "displacementRotationSideIds180")?.Value);
                 jercEntitySettingsValues.Add("displacementRotationSideIds270", jercDispRotation.FirstOrDefault(x => x.Name == "displacementRotationSideIds270")?.Value);
             }
-
 
             return jercEntitySettingsValues;
         }

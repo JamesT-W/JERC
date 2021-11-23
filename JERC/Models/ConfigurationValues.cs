@@ -16,6 +16,7 @@ namespace JERC.Models
         public int dangerZoneUses;
         public string alternateOutputPath;
         public bool onlyOutputToAlternatePath;
+        public bool includeEvenWhenHidden;
         public bool exportRadarAsSeparateLevels;
         public bool useSeparateGradientEachLevel;
         public bool ignoreDisplacementXYChanges;
@@ -59,7 +60,7 @@ namespace JERC.Models
         public List<int> displacementRotationSideIds270 = new();
 
 
-        public ConfigurationValues(Dictionary<string, string> jercEntitySettingsValues, int jercDividerCount, bool jercDispRotationEntityProvided)
+        public ConfigurationValues(Dictionary<string, string> jercEntitySettingsValues)
         {
             // jerc_config
             workshopId = jercEntitySettingsValues.ContainsKey("workshopId") && jercEntitySettingsValues["workshopId"] != null ? ulong.Parse(jercEntitySettingsValues["workshopId"]) : 0;
@@ -71,6 +72,7 @@ namespace JERC.Models
                 alternateOutputPath += '/';
 
             onlyOutputToAlternatePath = jercEntitySettingsValues.ContainsKey("onlyOutputToAlternatePath") && jercEntitySettingsValues["onlyOutputToAlternatePath"] == "1";
+            includeEvenWhenHidden = jercEntitySettingsValues.ContainsKey("includeEvenWhenHidden") && jercEntitySettingsValues["includeEvenWhenHidden"] == "1";
             exportRadarAsSeparateLevels = jercEntitySettingsValues.ContainsKey("exportRadarAsSeparateLevels") && jercEntitySettingsValues["exportRadarAsSeparateLevels"] == "1";
             useSeparateGradientEachLevel = jercEntitySettingsValues.ContainsKey("useSeparateGradientEachLevel") && jercEntitySettingsValues["useSeparateGradientEachLevel"] == "1";
             ignoreDisplacementXYChanges = jercEntitySettingsValues.ContainsKey("ignoreDisplacementXYChanges") && jercEntitySettingsValues["ignoreDisplacementXYChanges"] == "1";
@@ -113,8 +115,7 @@ namespace JERC.Models
             defaultLevelNum = jercEntitySettingsValues.ContainsKey("defaultLevelNum") && jercEntitySettingsValues["defaultLevelNum"] != null ? int.Parse(jercEntitySettingsValues["defaultLevelNum"]) : 0;
             if (defaultLevelNum < 0)
                 defaultLevelNum = 0;
-            else if (defaultLevelNum > jercDividerCount)
-                defaultLevelNum = jercDividerCount;
+            //// this may change later in SetAllOtherSettingsValues()
 
             levelBackgroundEnabled = jercEntitySettingsValues.ContainsKey("levelBackgroundEnabled") && jercEntitySettingsValues["levelBackgroundEnabled"] == "1";
             levelBackgroundDarkenAlpha = jercEntitySettingsValues.ContainsKey("levelBackgroundDarkenAlpha") && jercEntitySettingsValues["levelBackgroundDarkenAlpha"] != null ? Math.Clamp(int.Parse(jercEntitySettingsValues["levelBackgroundDarkenAlpha"]), 0, 255) : 0;
@@ -126,7 +127,14 @@ namespace JERC.Models
             exportPng = jercEntitySettingsValues.ContainsKey("exportPng") && jercEntitySettingsValues["exportPng"] == "1";
             exportRawMasks = jercEntitySettingsValues.ContainsKey("exportRawMasks") && jercEntitySettingsValues["exportRawMasks"] == "1";
             exportBackgroundLevelsImage = jercEntitySettingsValues.ContainsKey("exportBackgroundLevelsImage") && jercEntitySettingsValues["exportBackgroundLevelsImage"] == "1";
+        }
 
+
+        public void SetAllOtherSettingsValues(Dictionary<string, string> jercEntitySettingsValues, int jercDividerCount, bool jercDispRotationEntityProvided)
+        {
+            // jerc_config
+            if (defaultLevelNum > jercDividerCount)
+                defaultLevelNum = jercDividerCount;
 
             // jerc_disp_rotation
             if (jercDispRotationEntityProvided)

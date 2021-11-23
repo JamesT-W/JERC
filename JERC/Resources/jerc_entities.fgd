@@ -24,6 +24,12 @@
 		1: "Yes"
 	]
 
+	includeEvenWhenHidden(choices) : "Include Even When Hidden" : 1 : "Includes everything in overviews, even when hidden (except when in a hidden instance). Useful to avoid having to enable/disable the JERC visgroup in all instances constantly" =
+	[
+		0: "No"
+		1: "Yes"
+	]
+
 	exportRadarAsSeparateLevels(choices) : "Export Multilevel Radar" : 1 : "Exports multiple separate radars (if there are any jerc_divider entities)" =
 	[
 		0: "No"
