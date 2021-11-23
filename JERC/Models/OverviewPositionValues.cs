@@ -60,7 +60,7 @@ namespace JERC.Models
             widthWithStroke = (int)((widthBeforeMultiplier + (configurationValues.strokeWidth * 2)) / configurationValues.radarSizeMultiplier); // adds the stroke width mutliplier value as a padding at left and right
             heightWithStroke = (int)((heightBeforeMultiplier + (configurationValues.strokeWidth * 2)) / configurationValues.radarSizeMultiplier); // adds the stroke width mutliplier value as a padding at top and bottom
 
-            if (configurationValues.overviewGamemodeType == 1 && configurationValues.strokeAroundBrushEntities && (widthWithStroke > DangerZoneValues.DangerZoneOverviewSize || heightWithStroke > DangerZoneValues.DangerZoneOverviewSize))
+            if (configurationValues.overviewGamemodeType == 1 && configurationValues.strokeAroundLayoutMaterials && (widthWithStroke > DangerZoneValues.DangerZoneOverviewSize || heightWithStroke > DangerZoneValues.DangerZoneOverviewSize))
             {
                 Logger.LogImportantWarning("Danger Zone maps should not be larger than 20480x20480 units, errors are likely to occur");
             }
