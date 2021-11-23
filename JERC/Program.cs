@@ -420,14 +420,21 @@ namespace JERC
                                         select y;
             for (int i = 0; i < hiddenIVNodesEntities.Count(); i++)
             {
-                var hiddenIVNode = hiddenIVNodesEntities.ElementAt(i).Body.FirstOrDefault(x => x.Name == "hidden"); // could there be multiple of these ???
-                if (hiddenIVNode == null)
+                var hiddenIVNodes = hiddenIVNodesEntities.ElementAt(i).Body.Where(x => x.Name == "hidden"); // could there be multiple of these ???
+                if (hiddenIVNodes == null || !hiddenIVNodes.Any())
                     continue;
 
-                var solidIVNode = hiddenIVNode.Body.FirstOrDefault(x => x.Name == "solid"); // could there be multiple of these ???
-                if (solidIVNode == null)
-                    continue;
-                hiddenIVNodesEntities.ElementAt(i).Body.Add(solidIVNode);
+                for (int j = 0; j < hiddenIVNodes.Count(); j++)
+                {
+                    var solidIVNodes = hiddenIVNodes.ElementAt(j).Body.Where(x => x.Name == "solid"); // could there be multiple of these ???
+                    if (solidIVNodes == null || !solidIVNodes.Any())
+                        continue;
+
+                    for (int k = 0; k < solidIVNodes.Count(); k++)
+                    {
+                        hiddenIVNodesEntities.ElementAt(i).Body.Add(solidIVNodes.ElementAt(k));
+                    }
+                }
             }
             vmf.Body = vmf.Body.Concat(hiddenIVNodesEntities).ToList();
         }
