@@ -727,7 +727,7 @@ namespace JERC
         private static VmfRequiredData GetVmfRequiredData(IEnumerable<IVNode> allWorldBrushes, IEnumerable<IVNode> allEntities, IEnumerable<IVNode> jercConfigEntities)
         {
             Logger.LogNewLine();
-            Logger.LogMessage("Getting required data from the vmf and instances...");
+            Logger.LogMessage("Getting required data from the main vmf and instances...");
 
             // instances contents
             if (instanceEntityIdsByVmf != null && instanceEntityIdsByVmf.Any())
@@ -871,7 +871,7 @@ namespace JERC
 
             configurationValues.SetAllOtherSettingsValues(GetSettingsValuesFromJercEntitiesExceptJercConfig(allJercEntitiesExceptJercConfig), jercDividerEntities.Count(), jercDispRotationEntities.Any());
 
-            Logger.LogMessage("Retrieved data from the vmf and instances");
+            Logger.LogMessage("Finished getting required data from the main vmf and instances");
 
             return new VmfRequiredData(
                 configurationValues,
