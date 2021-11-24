@@ -7,6 +7,7 @@ namespace JERC.Models
     public static class GameConfigurationValues
     {
         public static bool? isVanillaHammer = null;
+        public static bool softwareProvided = false;
 
         public static string csgoFolderPath;
         public static string binFolderPath;
@@ -38,6 +39,7 @@ namespace JERC.Models
                             isVanillaHammer = true;
                         else if (software.ToLower() == "hammer++" || software.ToLower() == "hammerplusplus")
                             isVanillaHammer = false;
+                        softwareProvided = true;
                         break;
                     case "-g":
                         csgoFolderPath = args[i + 1];
