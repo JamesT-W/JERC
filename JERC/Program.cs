@@ -1,4 +1,4 @@
-using ImageAlterer;
+﻿using ImageAlterer;
 using JERC.Constants;
 using JERC.Enums;
 using JERC.Models;
@@ -35,12 +35,10 @@ namespace JERC
 
         private static string vmfcmdFilepath;
 
-        private static readonly string visgroupName = "JERC";
-
         private static ConfigurationValues configurationValues;
 
-        private static int visgroupIdMainVmf;
-        private static readonly Dictionary<int, int> visgroupIdsByInstanceEntityIds = new Dictionary<int, int>();
+        private static VisgroupIdsInVmf visgroupIdsInMainVmf;
+        private static readonly Dictionary<int, VisgroupIdsInVmf> visgroupIdsInInstanceEntityIds = new Dictionary<int, VisgroupIdsInVmf>();
 
         private static string mapName;
 
@@ -111,7 +109,7 @@ namespace JERC
                 Logger.LogNewLine();
             }
 
-            var jercConfigEntities = GetEntitiesByClassname(allEntities, Classnames.JercConfig, false);
+            var jercConfigEntities = GetEntitiesByClassname(allEntities, Classnames.JercConfig);
 
             if (jercConfigEntities == null || !jercConfigEntities.Any())
             {
@@ -151,8 +149,8 @@ namespace JERC
             }
             Logger.LogMessage("Finished parsing instances");
 
-            SetVisgroupIdMainVmf();
-            SetVisgroupIdInstancesByEntityId();
+            SetVisgroupIdsInMainVmf();
+            SetVisgroupIdsInInstancesByEntityId();
 
             vmfRequiredData = GetVmfRequiredData(allWorldBrushes, allEntities, jercConfigEntities);
 
@@ -690,27 +688,45 @@ namespace JERC
         }
 
 
-        private static void SetVisgroupIdMainVmf()
+        private static void SetVisgroupIdsInMainVmf()
         {
-            visgroupIdMainVmf = GetJercVisgroupIdFromVmf(vmf);
+            visgroupIdsInMainVmf = GetJercVisgroupIdsInVmf(vmf, VisgroupNames.Jerc);
         }
 
 
-        private static void SetVisgroupIdInstancesByEntityId()
+        private static void SetVisgroupIdsInInstancesByEntityId()
         {
             if (instanceEntityIdsByVmf != null && instanceEntityIdsByVmf.Any())
             {
                 foreach (var instance in instanceEntityIdsByVmf)
                 {
-                    var id = GetJercVisgroupIdFromVmf(instance.Key);
+                    var id = GetJercVisgroupIdsInVmf(instance.Key, VisgroupNames.Jerc);
 
-                    visgroupIdsByInstanceEntityIds.Add(instance.Value, id);
+                    visgroupIdsInInstanceEntityIds.Add(instance.Value, id);
                 }
             }
         }
 
 
-        private static int GetJercVisgroupIdFromVmf(VMF vmf)
+        private static VisgroupIdsInVmf GetJercVisgroupIdsInVmf(VMF vmf, string visgroupName)
+        {
+            var visgroupIdsInVmf = new VisgroupIdsInVmf()
+            {
+                Jerc = GetJercVisgroupIdInVmf(vmf, VisgroupNames.Jerc),
+                JercRemove = GetJercVisgroupIdInVmf(vmf, VisgroupNames.JercRemove),
+                JercPath = GetJercVisgroupIdInVmf(vmf, VisgroupNames.JercPath),
+                JercCover = GetJercVisgroupIdInVmf(vmf, VisgroupNames.JercCover),
+                JercOverlap = GetJercVisgroupIdInVmf(vmf, VisgroupNames.JercOverlap),
+                JercDoor = GetJercVisgroupIdInVmf(vmf, VisgroupNames.JercDoor),
+                JercLadder = GetJercVisgroupIdInVmf(vmf, VisgroupNames.JercLadder),
+                JercDanger = GetJercVisgroupIdInVmf(vmf, VisgroupNames.JercDanger),
+            };
+
+            return visgroupIdsInVmf;
+        }
+
+
+        private static int GetJercVisgroupIdInVmf(VMF vmf, string visgroupName)
         {
             int.TryParse((from x in vmf.VisGroups.Body
                           from y in x.Body
@@ -743,75 +759,140 @@ namespace JERC
             }
 
             // used for both world brushes and displacements
-            var allWorldBrushesInVisgroup = from x in allWorldBrushes
-                                            from y in x.Body
-                                            where y.Name == "editor"
-                                            from z in y.Body
-                                            where z.Name == "visgroupid"
-                                            where int.Parse(z.Value, Globalization.Style, Globalization.Culture) == visgroupIdMainVmf ||
-                                                visgroupIdsByInstanceEntityIds.Values.Any(a => a == int.Parse(z.Value, Globalization.Style, Globalization.Culture))
-                                            select x;
+            var allWorldBrushesInJercVisgroup = from x in allWorldBrushes
+                                                from y in x.Body
+                                                where y.Name == "editor"
+                                                from z in y.Body
+                                                where z.Name == "visgroupid"
+                                                where int.Parse(z.Value, Globalization.Style, Globalization.Culture) == visgroupIdsInMainVmf.Jerc ||
+                                                    visgroupIdsInInstanceEntityIds.Values.Any(a => a.Jerc == int.Parse(z.Value, Globalization.Style, Globalization.Culture))
+                                                select x;
+
+            // separated visgroups mode
+            var allWorldBrushesInJercRemoveVisgroup = from x in allWorldBrushes
+                                                      from y in x.Body
+                                                      where y.Name == "editor"
+                                                      from z in y.Body
+                                                      where z.Name == "visgroupid"
+                                                      where int.Parse(z.Value, Globalization.Style, Globalization.Culture) == visgroupIdsInMainVmf.JercRemove ||
+                                                          visgroupIdsInInstanceEntityIds.Values.Any(a => a.JercRemove == int.Parse(z.Value, Globalization.Style, Globalization.Culture))
+                                                      select x;
+
+            var allWorldBrushesInJercPathVisgroup = from x in allWorldBrushes
+                                                      from y in x.Body
+                                                      where y.Name == "editor"
+                                                      from z in y.Body
+                                                      where z.Name == "visgroupid"
+                                                      where int.Parse(z.Value, Globalization.Style, Globalization.Culture) == visgroupIdsInMainVmf.JercPath ||
+                                                          visgroupIdsInInstanceEntityIds.Values.Any(a => a.JercPath == int.Parse(z.Value, Globalization.Style, Globalization.Culture))
+                                                      select x;
+
+            var allWorldBrushesInJercCoverVisgroup = from x in allWorldBrushes
+                                                      from y in x.Body
+                                                      where y.Name == "editor"
+                                                      from z in y.Body
+                                                      where z.Name == "visgroupid"
+                                                      where int.Parse(z.Value, Globalization.Style, Globalization.Culture) == visgroupIdsInMainVmf.JercCover ||
+                                                          visgroupIdsInInstanceEntityIds.Values.Any(a => a.JercCover == int.Parse(z.Value, Globalization.Style, Globalization.Culture))
+                                                      select x;
+
+            var allWorldBrushesInJercOverlapVisgroup = from x in allWorldBrushes
+                                                      from y in x.Body
+                                                      where y.Name == "editor"
+                                                      from z in y.Body
+                                                      where z.Name == "visgroupid"
+                                                      where int.Parse(z.Value, Globalization.Style, Globalization.Culture) == visgroupIdsInMainVmf.JercOverlap ||
+                                                          visgroupIdsInInstanceEntityIds.Values.Any(a => a.JercOverlap == int.Parse(z.Value, Globalization.Style, Globalization.Culture))
+                                                      select x;
+
+            var allWorldBrushesInJercDoorVisgroup = from x in allWorldBrushes
+                                                      from y in x.Body
+                                                      where y.Name == "editor"
+                                                      from z in y.Body
+                                                      where z.Name == "visgroupid"
+                                                      where int.Parse(z.Value, Globalization.Style, Globalization.Culture) == visgroupIdsInMainVmf.JercDoor ||
+                                                          visgroupIdsInInstanceEntityIds.Values.Any(a => a.JercDoor == int.Parse(z.Value, Globalization.Style, Globalization.Culture))
+                                                      select x;
+
+            var allWorldBrushesInJercLadderVisgroup = from x in allWorldBrushes
+                                                      from y in x.Body
+                                                      where y.Name == "editor"
+                                                      from z in y.Body
+                                                      where z.Name == "visgroupid"
+                                                      where int.Parse(z.Value, Globalization.Style, Globalization.Culture) == visgroupIdsInMainVmf.JercLadder ||
+                                                          visgroupIdsInInstanceEntityIds.Values.Any(a => a.JercLadder == int.Parse(z.Value, Globalization.Style, Globalization.Culture))
+                                                      select x;
+
+            var allWorldBrushesInJercDangerVisgroup = from x in allWorldBrushes
+                                                      from y in x.Body
+                                                      where y.Name == "editor"
+                                                      from z in y.Body
+                                                      where z.Name == "visgroupid"
+                                                      where int.Parse(z.Value, Globalization.Style, Globalization.Culture) == visgroupIdsInMainVmf.JercDanger ||
+                                                          visgroupIdsInInstanceEntityIds.Values.Any(a => a.JercDanger == int.Parse(z.Value, Globalization.Style, Globalization.Culture))
+                                                      select x;
 
 
             // brushes
-            var brushesIgnore = GetBrushesByTextureName(allWorldBrushesInVisgroup, TextureNames.IgnoreTextureName);
-            var brushesRemove = GetBrushesByTextureName(allWorldBrushesInVisgroup, TextureNames.RemoveTextureName);
-            var brushesPath = GetBrushesByTextureName(allWorldBrushesInVisgroup, TextureNames.PathTextureName);
-            var brushesCover = GetBrushesByTextureName(allWorldBrushesInVisgroup, TextureNames.CoverTextureName);
-            var brushesOverlap = GetBrushesByTextureName(allWorldBrushesInVisgroup, TextureNames.OverlapTextureName);
-            var brushesDoor = GetBrushesByTextureName(allWorldBrushesInVisgroup, TextureNames.DoorTextureName);
+            var brushesIgnore = GetBrushesByTextureName(allWorldBrushesInJercVisgroup, TextureNames.IgnoreTextureName);
+            var brushesRemove = GetBrushesByTextureName(allWorldBrushesInJercVisgroup, TextureNames.RemoveTextureName).Concat(allWorldBrushesInJercRemoveVisgroup); // concats the brushes in separated visgroups mode
+            var brushesPath = GetBrushesByTextureName(allWorldBrushesInJercVisgroup, TextureNames.PathTextureName).Concat(allWorldBrushesInJercPathVisgroup);
+            var brushesCover = GetBrushesByTextureName(allWorldBrushesInJercVisgroup, TextureNames.CoverTextureName).Concat(allWorldBrushesInJercCoverVisgroup);
+            var brushesOverlap = GetBrushesByTextureName(allWorldBrushesInJercVisgroup, TextureNames.OverlapTextureName).Concat(allWorldBrushesInJercOverlapVisgroup);
+            var brushesDoor = GetBrushesByTextureName(allWorldBrushesInJercVisgroup, TextureNames.DoorTextureName).Concat(allWorldBrushesInJercDoorVisgroup);
             var brushesLadder = new List<IVNode>();
             foreach (var ladderTextureName in TextureNames.LadderTextureNames)
             {
-                brushesLadder.AddRange(GetBrushesByTextureName(allWorldBrushesInVisgroup, ladderTextureName));
+                brushesLadder.AddRange(GetBrushesByTextureName(allWorldBrushesInJercVisgroup, ladderTextureName));
             }
-            var brushesDanger = GetBrushesByTextureName(allWorldBrushesInVisgroup, TextureNames.DangerTextureName);
+            brushesLadder.AddRange(allWorldBrushesInJercLadderVisgroup);
+            var brushesDanger = GetBrushesByTextureName(allWorldBrushesInJercVisgroup, TextureNames.DangerTextureName).Concat(allWorldBrushesInJercDangerVisgroup);
 
-            var brushesBuyzone = GetBrushesByTextureName(allWorldBrushesInVisgroup, TextureNames.BuyzoneTextureName);
-            var brushesBombsiteA = GetBrushesByTextureName(allWorldBrushesInVisgroup, TextureNames.BombsiteATextureName);
-            var brushesBombsiteB = GetBrushesByTextureName(allWorldBrushesInVisgroup, TextureNames.BombsiteBTextureName);
-            var brushesRescueZone = GetBrushesByTextureName(allWorldBrushesInVisgroup, TextureNames.RescueZoneTextureName);
-            var brushesHostage = GetBrushesByTextureName(allWorldBrushesInVisgroup, TextureNames.HostageTextureName);
-            var brushesTSpawn = GetBrushesByTextureName(allWorldBrushesInVisgroup, TextureNames.TSpawnTextureName);
-            var brushesCTSpawn = GetBrushesByTextureName(allWorldBrushesInVisgroup, TextureNames.CTSpawnTextureName);
+            var brushesBuyzone = GetBrushesByTextureName(allWorldBrushesInJercVisgroup, TextureNames.BuyzoneTextureName);
+            var brushesBombsiteA = GetBrushesByTextureName(allWorldBrushesInJercVisgroup, TextureNames.BombsiteATextureName);
+            var brushesBombsiteB = GetBrushesByTextureName(allWorldBrushesInJercVisgroup, TextureNames.BombsiteBTextureName);
+            var brushesRescueZone = GetBrushesByTextureName(allWorldBrushesInJercVisgroup, TextureNames.RescueZoneTextureName);
+            var brushesHostage = GetBrushesByTextureName(allWorldBrushesInJercVisgroup, TextureNames.HostageTextureName);
+            var brushesTSpawn = GetBrushesByTextureName(allWorldBrushesInJercVisgroup, TextureNames.TSpawnTextureName);
+            var brushesCTSpawn = GetBrushesByTextureName(allWorldBrushesInJercVisgroup, TextureNames.CTSpawnTextureName);
 
 
             // displacements
-            var displacementsIgnore = GetDisplacementsByTextureName(allWorldBrushesInVisgroup, TextureNames.IgnoreTextureName);
-            var displacementsRemove = GetDisplacementsByTextureName(allWorldBrushesInVisgroup, TextureNames.RemoveTextureName);
-            var displacementsPath = GetDisplacementsByTextureName(allWorldBrushesInVisgroup, TextureNames.PathTextureName);
-            var displacementsCover = GetDisplacementsByTextureName(allWorldBrushesInVisgroup, TextureNames.CoverTextureName);
-            var displacementsOverlap = GetDisplacementsByTextureName(allWorldBrushesInVisgroup, TextureNames.OverlapTextureName);
-            var displacementsDoor = GetDisplacementsByTextureName(allWorldBrushesInVisgroup, TextureNames.DoorTextureName);
+            var displacementsIgnore = GetDisplacementsByTextureName(allWorldBrushesInJercVisgroup, TextureNames.IgnoreTextureName);
+            var displacementsRemove = GetDisplacementsByTextureName(allWorldBrushesInJercVisgroup, TextureNames.RemoveTextureName);
+            var displacementsPath = GetDisplacementsByTextureName(allWorldBrushesInJercVisgroup, TextureNames.PathTextureName);
+            var displacementsCover = GetDisplacementsByTextureName(allWorldBrushesInJercVisgroup, TextureNames.CoverTextureName);
+            var displacementsOverlap = GetDisplacementsByTextureName(allWorldBrushesInJercVisgroup, TextureNames.OverlapTextureName);
+            var displacementsDoor = GetDisplacementsByTextureName(allWorldBrushesInJercVisgroup, TextureNames.DoorTextureName);
             var displacementsLadder = new List<IVNode>();
             foreach (var ladderTextureName in TextureNames.LadderTextureNames)
             {
-                displacementsLadder.AddRange(GetDisplacementsByTextureName(allWorldBrushesInVisgroup, ladderTextureName));
+                displacementsLadder.AddRange(GetDisplacementsByTextureName(allWorldBrushesInJercVisgroup, ladderTextureName));
             }
-            var displacementsDanger = GetDisplacementsByTextureName(allWorldBrushesInVisgroup, TextureNames.DangerTextureName);
+            var displacementsDanger = GetDisplacementsByTextureName(allWorldBrushesInJercVisgroup, TextureNames.DangerTextureName);
 
-            var displacementsBuyzone = GetDisplacementsByTextureName(allWorldBrushesInVisgroup, TextureNames.BuyzoneTextureName);
-            var displacementsBombsiteA = GetDisplacementsByTextureName(allWorldBrushesInVisgroup, TextureNames.BombsiteATextureName);
-            var displacementsBombsiteB = GetDisplacementsByTextureName(allWorldBrushesInVisgroup, TextureNames.BombsiteBTextureName);
-            var displacementsRescueZone = GetDisplacementsByTextureName(allWorldBrushesInVisgroup, TextureNames.RescueZoneTextureName);
-            var displacementsHostage = GetDisplacementsByTextureName(allWorldBrushesInVisgroup, TextureNames.HostageTextureName);
-            var displacementsTSpawn = GetDisplacementsByTextureName(allWorldBrushesInVisgroup, TextureNames.TSpawnTextureName);
-            var displacementsCTSpawn = GetDisplacementsByTextureName(allWorldBrushesInVisgroup, TextureNames.CTSpawnTextureName);
+            var displacementsBuyzone = GetDisplacementsByTextureName(allWorldBrushesInJercVisgroup, TextureNames.BuyzoneTextureName);
+            var displacementsBombsiteA = GetDisplacementsByTextureName(allWorldBrushesInJercVisgroup, TextureNames.BombsiteATextureName);
+            var displacementsBombsiteB = GetDisplacementsByTextureName(allWorldBrushesInJercVisgroup, TextureNames.BombsiteBTextureName);
+            var displacementsRescueZone = GetDisplacementsByTextureName(allWorldBrushesInJercVisgroup, TextureNames.RescueZoneTextureName);
+            var displacementsHostage = GetDisplacementsByTextureName(allWorldBrushesInJercVisgroup, TextureNames.HostageTextureName);
+            var displacementsTSpawn = GetDisplacementsByTextureName(allWorldBrushesInJercVisgroup, TextureNames.TSpawnTextureName);
+            var displacementsCTSpawn = GetDisplacementsByTextureName(allWorldBrushesInJercVisgroup, TextureNames.CTSpawnTextureName);
 
 
             // brush entities
-            var buyzoneBrushEntities = GetEntitiesByClassname(allEntities, Classnames.Buyzone, true);
-            var bombsiteBrushEntities = GetEntitiesByClassname(allEntities, Classnames.Bombsite, true);
-            var rescueZoneBrushEntities = GetEntitiesByClassname(allEntities, Classnames.RescueZone, true);
+            var buyzoneBrushEntities = GetEntitiesByClassnameInJercVisgroup(allEntities, Classnames.Buyzone);
+            var bombsiteBrushEntities = GetEntitiesByClassnameInJercVisgroup(allEntities, Classnames.Bombsite);
+            var rescueZoneBrushEntities = GetEntitiesByClassnameInJercVisgroup(allEntities, Classnames.RescueZone);
 
-            var funcBrushBrushEntities = GetEntitiesByClassname(allEntities, Classnames.FuncBrush, true);
-            var funcDetailBrushEntities = GetEntitiesByClassname(allEntities, Classnames.FuncDetail, true);
-            var funcDoorBrushEntities = GetEntitiesByClassname(allEntities, Classnames.FuncDoor, true);
-            var funcDoorBrushRotatingEntities = GetEntitiesByClassname(allEntities, Classnames.FuncDoorRotating, true);
-            var funcLadderBrushEntities = GetEntitiesByClassname(allEntities, Classnames.FuncLadder, true);
-            var triggerHurtBrushEntities = GetEntitiesByClassname(allEntities, Classnames.TriggerHurt, true);
+            var funcBrushBrushEntities = GetEntitiesByClassnameInJercVisgroup(allEntities, Classnames.FuncBrush);
+            var funcDetailBrushEntities = GetEntitiesByClassnameInJercVisgroup(allEntities, Classnames.FuncDetail);
+            var funcDoorBrushEntities = GetEntitiesByClassnameInJercVisgroup(allEntities, Classnames.FuncDoor);
+            var funcDoorBrushRotatingEntities = GetEntitiesByClassnameInJercVisgroup(allEntities, Classnames.FuncDoorRotating);
+            var funcLadderBrushEntities = GetEntitiesByClassnameInJercVisgroup(allEntities, Classnames.FuncLadder);
+            var triggerHurtBrushEntities = GetEntitiesByClassnameInJercVisgroup(allEntities, Classnames.TriggerHurt);
 
-            var allBrushesBrushEntities = buyzoneBrushEntities
+            var allBrushesBrushEntitiesInJercVisgroup = buyzoneBrushEntities
                 .Concat(bombsiteBrushEntities)
                 .Concat(rescueZoneBrushEntities)
                 .Concat(funcBrushBrushEntities)
@@ -821,48 +902,50 @@ namespace JERC
                 .Concat(funcLadderBrushEntities)
                 .Concat(triggerHurtBrushEntities);
 
-            var brushesIgnoreBrushEntities = GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLaddersAndDangers(allBrushesBrushEntities, TextureNames.IgnoreTextureName);
-            var brushesRemoveBrushEntities = GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLaddersAndDangers(allBrushesBrushEntities, TextureNames.RemoveTextureName);
-            var brushesPathBrushEntities = GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLaddersAndDangers(allBrushesBrushEntities, TextureNames.PathTextureName);
-            var brushesCoverBrushEntities = GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLaddersAndDangers(allBrushesBrushEntities, TextureNames.CoverTextureName);
-            var brushesOverlapBrushEntities = GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLaddersAndDangers(allBrushesBrushEntities, TextureNames.OverlapTextureName);
-            var brushesDoorBrushEntities = GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLaddersAndDangers(allBrushesBrushEntities, TextureNames.DoorTextureName)
-                .Concat(GetBrushEntityBrushesByClassname(allBrushesBrushEntities, Classnames.FuncDoor))
-                .Concat(GetBrushEntityBrushesByClassname(allBrushesBrushEntities, Classnames.FuncDoorRotating));
-            var brushesLadderBrushEntities = GetBrushEntityBrushesByClassname(allBrushesBrushEntities, Classnames.FuncLadder).ToList();
+            var brushesIgnoreBrushEntities = GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLaddersAndTriggerHurts(allBrushesBrushEntitiesInJercVisgroup, TextureNames.IgnoreTextureName);
+            var brushesRemoveBrushEntities = GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLaddersAndTriggerHurts(allBrushesBrushEntitiesInJercVisgroup, TextureNames.RemoveTextureName).Concat(GetBrushEntityBrushes(GetEntitiesByClassnameInAnyJercVisgroup(allEntities, VisgroupNames.JercRemove))); // concats the brush entity brushes in separated visgroups mode
+            var brushesPathBrushEntities = GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLaddersAndTriggerHurts(allBrushesBrushEntitiesInJercVisgroup, TextureNames.PathTextureName).Concat(GetBrushEntityBrushes(GetEntitiesByClassnameInAnyJercVisgroup(allEntities, VisgroupNames.JercPath)));
+            var brushesCoverBrushEntities = GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLaddersAndTriggerHurts(allBrushesBrushEntitiesInJercVisgroup, TextureNames.CoverTextureName).Concat(GetBrushEntityBrushes(GetEntitiesByClassnameInAnyJercVisgroup(allEntities, VisgroupNames.JercCover)));
+            var brushesOverlapBrushEntities = GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLaddersAndTriggerHurts(allBrushesBrushEntitiesInJercVisgroup, TextureNames.OverlapTextureName).Concat(GetBrushEntityBrushes(GetEntitiesByClassnameInAnyJercVisgroup(allEntities, VisgroupNames.JercOverlap)));
+            var brushesDoorBrushEntities = GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLaddersAndTriggerHurts(allBrushesBrushEntitiesInJercVisgroup, TextureNames.DoorTextureName)
+                .Concat(GetBrushEntityBrushesByClassname(allBrushesBrushEntitiesInJercVisgroup, Classnames.FuncDoor))
+                .Concat(GetBrushEntityBrushesByClassname(allBrushesBrushEntitiesInJercVisgroup, Classnames.FuncDoorRotating))
+                .Concat(GetBrushEntityBrushes(GetEntitiesByClassnameInAnyJercVisgroup(allEntities, VisgroupNames.JercDoor)));
+            var brushesLadderBrushEntities = GetBrushEntityBrushesByClassname(allBrushesBrushEntitiesInJercVisgroup, Classnames.FuncLadder).Concat(GetBrushEntityBrushes(GetEntitiesByClassnameInAnyJercVisgroup(allEntities, VisgroupNames.JercLadder))).ToList();
             foreach (var ladderTextureName in TextureNames.LadderTextureNames)
             {
-                brushesLadderBrushEntities.AddRange(GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLaddersAndDangers(allBrushesBrushEntities, ladderTextureName));
+                brushesLadderBrushEntities.AddRange(GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLaddersAndTriggerHurts(allBrushesBrushEntitiesInJercVisgroup, ladderTextureName));
             }
-            var brushesDangerBrushEntities = GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLaddersAndDangers(allBrushesBrushEntities, TextureNames.DangerTextureName)
-                .Concat(GetBrushEntityBrushesByClassname(allBrushesBrushEntities, Classnames.TriggerHurt));
-            var brushesBuyzoneBrushEntities = GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLaddersAndDangers(allBrushesBrushEntities, TextureNames.BuyzoneTextureName);
-            var brushesBombsiteABrushEntities = GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLaddersAndDangers(allBrushesBrushEntities, TextureNames.BombsiteATextureName);
-            var brushesBombsiteBBrushEntities = GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLaddersAndDangers(allBrushesBrushEntities, TextureNames.BombsiteBTextureName);
-            var brushesRescueZoneBrushEntities = GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLaddersAndDangers(allBrushesBrushEntities, TextureNames.RescueZoneTextureName);
-            var brushesHostageBrushEntities = GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLaddersAndDangers(allBrushesBrushEntities, TextureNames.HostageTextureName);
-            var brushesTSpawnBrushEntities = GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLaddersAndDangers(allBrushesBrushEntities, TextureNames.TSpawnTextureName);
-            var brushesCTSpawnBrushEntities = GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLaddersAndDangers(allBrushesBrushEntities, TextureNames.CTSpawnTextureName);
+            var brushesDangerBrushEntities = GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLaddersAndTriggerHurts(allBrushesBrushEntitiesInJercVisgroup, TextureNames.DangerTextureName)
+                .Concat(GetBrushEntityBrushesByClassname(allBrushesBrushEntitiesInJercVisgroup, Classnames.TriggerHurt))
+                .Concat(GetBrushEntityBrushes(GetEntitiesByClassnameInAnyJercVisgroup(allEntities, VisgroupNames.JercDanger)));
+            var brushesBuyzoneBrushEntities = GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLaddersAndTriggerHurts(allBrushesBrushEntitiesInJercVisgroup, TextureNames.BuyzoneTextureName);
+            var brushesBombsiteABrushEntities = GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLaddersAndTriggerHurts(allBrushesBrushEntitiesInJercVisgroup, TextureNames.BombsiteATextureName);
+            var brushesBombsiteBBrushEntities = GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLaddersAndTriggerHurts(allBrushesBrushEntitiesInJercVisgroup, TextureNames.BombsiteBTextureName);
+            var brushesRescueZoneBrushEntities = GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLaddersAndTriggerHurts(allBrushesBrushEntitiesInJercVisgroup, TextureNames.RescueZoneTextureName);
+            var brushesHostageBrushEntities = GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLaddersAndTriggerHurts(allBrushesBrushEntitiesInJercVisgroup, TextureNames.HostageTextureName);
+            var brushesTSpawnBrushEntities = GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLaddersAndTriggerHurts(allBrushesBrushEntitiesInJercVisgroup, TextureNames.TSpawnTextureName);
+            var brushesCTSpawnBrushEntities = GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLaddersAndTriggerHurts(allBrushesBrushEntitiesInJercVisgroup, TextureNames.CTSpawnTextureName);
 
 
             // brush entities (JERC)
-            var jercBoxBrushEntities = GetEntitiesByClassname(allEntities, Classnames.JercBox, true);
+            var jercBoxBrushEntities = GetEntitiesByClassnameInJercVisgroup(allEntities, Classnames.JercBox);
 
 
             // point entities
-            var hostageEntities = GetEntitiesByClassname(allEntities, Classnames.Hostage, true);
-            var tSpawnEntities = GetEntitiesByClassname(allEntities, Classnames.TSpawn, true);
-            var ctSpawnEntities = GetEntitiesByClassname(allEntities, Classnames.CTSpawn, true);
+            var hostageEntities = GetEntitiesByClassnameInJercVisgroup(allEntities, Classnames.Hostage);
+            var tSpawnEntities = GetEntitiesByClassnameInJercVisgroup(allEntities, Classnames.TSpawn);
+            var ctSpawnEntities = GetEntitiesByClassnameInJercVisgroup(allEntities, Classnames.CTSpawn);
 
-            var infoOverlayEntities = GetEntitiesByClassname(allEntities, Classnames.InfoOverlay, true);
-            var jercInfoOverlayEntities = GetEntitiesByClassname(allEntities, Classnames.JercInfoOverlay, true);
+            var infoOverlayEntities = GetEntitiesByClassnameInJercVisgroup(allEntities, Classnames.InfoOverlay);
+            var jercInfoOverlayEntities = GetEntitiesByClassnameInJercVisgroup(allEntities, Classnames.JercInfoOverlay);
 
 
             // point entities (JERC)
-            var jercDividerEntities = GetEntitiesByClassname(allEntities, Classnames.JercDivider, false);
-            var jercFloorEntities = GetEntitiesByClassname(allEntities, Classnames.JercFloor, false);
-            var jercCeilingEntities = GetEntitiesByClassname(allEntities, Classnames.JercCeiling, false);
-            var jercDispRotationEntities = GetEntitiesByClassname(allEntities, Classnames.JercDispRotation, false);
+            var jercDividerEntities = GetEntitiesByClassname(allEntities, Classnames.JercDivider);
+            var jercFloorEntities = GetEntitiesByClassname(allEntities, Classnames.JercFloor);
+            var jercCeilingEntities = GetEntitiesByClassname(allEntities, Classnames.JercCeiling);
+            var jercDispRotationEntities = GetEntitiesByClassname(allEntities, Classnames.JercDispRotation);
 
             if (jercDispRotationEntities != null && jercDispRotationEntities.Count() > 1)
                 return null;
@@ -991,7 +1074,7 @@ namespace JERC
         }
 
 
-        private static IEnumerable<IVNode> GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLaddersAndDangers(IEnumerable<IVNode> allBrushEntities, string textureName)
+        private static IEnumerable<IVNode> GetBrushEntityBrushesByTextureNameIgnoreDoorsAndLaddersAndTriggerHurts(IEnumerable<IVNode> allBrushEntities, string textureName)
         {
             return (from x in allBrushEntities
                     from y in x.Body
@@ -1021,30 +1104,54 @@ namespace JERC
         }
 
 
-        private static IEnumerable<IVNode> GetEntitiesByClassname(IEnumerable<IVNode> allEntities, string classname, bool onlyIncludeIfInVisgroup)
+        private static IEnumerable<IVNode> GetBrushEntityBrushes(IEnumerable<IVNode> allBrushEntities)
         {
-            if (onlyIncludeIfInVisgroup)
-            {
-                return (from x in allEntities
-                        from y in x.Body
-                        where y.Name == "classname"
-                        where y.Value.ToLower() == classname.ToLower()
-                        from z in x.Body
-                        where z.Name == "editor"
-                        from a in z.Body
-                        where a.Name == "visgroupid"
-                        where int.Parse(a.Value, Globalization.Style, Globalization.Culture) == visgroupIdMainVmf ||
-                        visgroupIdsByInstanceEntityIds.Values.Any(b => b == int.Parse(a.Value, Globalization.Style, Globalization.Culture))
-                        select x).Distinct();
-            }
-            else
-            {
-                return (from x in allEntities
-                        from y in x.Body
-                        where y.Name == "classname"
-                        where y.Value.ToLower() == classname.ToLower()
-                        select x).Distinct();
-            }
+            return (from x in allBrushEntities
+                    from y in x.Body
+                    where y.Name == "solid"
+                    select y).Distinct();
+        }
+
+
+        private static IEnumerable<IVNode> GetEntitiesByClassname(IEnumerable<IVNode> allEntities, string classname)
+        {
+            return (from x in allEntities
+                    from y in x.Body
+                    where y.Name == "classname"
+                    where y.Value.ToLower() == classname.ToLower()
+                    select x).Distinct();
+        }
+
+
+        private static IEnumerable<IVNode> GetEntitiesByClassnameInJercVisgroup(IEnumerable<IVNode> allEntities, string classname)
+        {
+            return (from x in allEntities
+                    from y in x.Body
+                    where y.Name == "classname"
+                    where y.Value.ToLower() == classname.ToLower()
+                    from z in x.Body
+                    where z.Name == "editor"
+                    from a in z.Body
+                    where a.Name == "visgroupid"
+                    where int.Parse(a.Value, Globalization.Style, Globalization.Culture) == visgroupIdsInMainVmf.Jerc ||
+                    visgroupIdsInInstanceEntityIds.Values.Any(b => b.Jerc == int.Parse(a.Value, Globalization.Style, Globalization.Culture))
+                    select x).Distinct();
+        }
+
+
+        private static IEnumerable<IVNode> GetEntitiesByClassnameInAnyJercVisgroup(IEnumerable<IVNode> allEntities, string visgroupName)
+        {
+            return (from x in allEntities
+                    from y in x.Body
+                    where y.Name == "classname"
+                    where Classnames.GetAllClassnames().Any(x => x.ToLower() == y.Value.ToLower())
+                    from z in x.Body
+                    where z.Name == "editor"
+                    from a in z.Body
+                    where a.Name == "visgroupid"
+                    where int.Parse(a.Value, Globalization.Style, Globalization.Culture) == visgroupIdsInMainVmf.GetVisgroupId(visgroupName) ||
+                    visgroupIdsInInstanceEntityIds.Values.Any(b => b.GetVisgroupId(visgroupName) == int.Parse(a.Value, Globalization.Style, Globalization.Culture))
+                    select x).Distinct();
         }
 
 

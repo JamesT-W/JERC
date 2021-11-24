@@ -32,5 +32,39 @@ namespace JERC.Constants
         public static readonly string JercDispRotation = "jerc_disp_rotation";
 
         public static readonly string FuncInstance = "func_instance";
+
+
+        public static List<string> GetAllClassnames()
+        {
+            return new List<string>()
+            {
+                Buyzone,
+                Bombsite,
+                RescueZone,
+                Hostage,
+                CTSpawn,
+                TSpawn,
+
+                FuncBrush,
+                FuncDetail,
+                FuncDoor,
+                FuncDoorRotating,
+                FuncLadder,
+                TriggerHurt,
+
+                InfoOverlay,
+                JercInfoOverlay,
+
+                JercBox,
+
+                JercConfig,
+                JercDivider,
+                JercFloor,
+                JercCeiling,
+                JercDispRotation,
+
+                FuncInstance,
+            };
+        }
     }
 }
