@@ -384,6 +384,8 @@ namespace JERC.Models
                         .Concat(hostageEntities.SelectMany(x => x.brushes.SelectMany(y => y.side)))
                         .Concat(ctSpawnEntities.SelectMany(x => x.brushes.SelectMany(y => y.side)))
                         .Concat(tSpawnEntities.SelectMany(x => x.brushes.SelectMany(y => y.side)))
+                        .Concat(infoOverlayEntities.SelectMany(x => x.brushes.SelectMany(y => y.side)))
+                        .Concat(jercInfoOverlayEntities.SelectMany(x => x.brushes.SelectMany(y => y.side)))
                     .ToList()
                 );
             }
@@ -404,6 +406,13 @@ namespace JERC.Models
 
             // brush entities (JERC)
             jercBoxBrushEntities = jercBoxBrushEntitiesIVNodes.Any() ? jercBoxBrushEntitiesIVNodes.Select(x => new Entity(x)).ToList() : new List<Entity>();
+
+
+            // calculate vertices_plus for every brush side for vanilla hammer vmfs, as hammer++ adds vertices itself when saving a vmf
+            if (GameConfigurationValues.isVanillaHammer == true)
+            {
+                VanillaHammerVmfFixer.CalculateVerticesPlusForAllBrushSides(jercBoxBrushEntities.SelectMany(x => x.brushes.SelectMany(y => y.side)).ToList());
+            }
 
             foreach (var entity in jercBoxBrushEntities)
             {
