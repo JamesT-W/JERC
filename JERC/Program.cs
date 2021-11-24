@@ -1,4 +1,4 @@
-﻿using ImageAlterer;
+using ImageAlterer;
 using JERC.Constants;
 using JERC.Enums;
 using JERC.Models;
@@ -138,14 +138,18 @@ namespace JERC
 
 
             // correct entity origins and angles
+            Logger.LogMessage("Correcting overlay origins and angles...");
             CorrectOverlayOriginsAndAngles(vmf.Body.Where(x => x.Name == "entity"));
+            Logger.LogMessage("Finished correcting overlay origins and angles");
 
 
+            Logger.LogMessage("Parsing instances...");
             var successfullyParsedInstances = SortInstances(vmf);
             if (!successfullyParsedInstances)
             {
                 return;
             }
+            Logger.LogMessage("Finished parsing instances");
 
             SetVisgroupIdMainVmf();
             SetVisgroupIdInstancesByEntityId();
