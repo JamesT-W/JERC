@@ -1491,10 +1491,12 @@ namespace JERC
             }
 
             // path brush stuff
+            Logger.LogMessage("Drawing paths...");
             foreach (var brushToRender in pathsOrdered)
             {
                 DrawFilledPolygonGradient(graphics, brushToRender, true);
             }
+            Logger.LogMessage("Finished drawing paths");
 
             // draw jerc_box brush entities that have the corresponding orderNum set
             DrawJercBrushOrPointEntities(graphics, levelHeight, bmpRawMaskByNameDictionary, brushEntityBrushSideListById, OverlayOrderNums.None, JercBoxOrderNums.BetweenPathAndOverlapBrushes); // jerc_box
@@ -2784,7 +2786,7 @@ namespace JERC
             if (vertices.Count() < 3)
                 return;
 
-            // check there are more than 1 value on each axis
+            // check there are more than 1 value on each axis (otherwise they are just side faces)
             if (vertices.Select(x => x.x).Distinct().Count() < 2 || vertices.Select(x => x.y).Distinct().Count() < 2)
                 return;
 
