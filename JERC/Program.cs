@@ -3068,7 +3068,7 @@ namespace JERC
                         startInfo.UseShellExecute = false;
                         startInfo.FileName = vmfcmdFilepath;
                         startInfo.WindowStyle = ProcessWindowStyle.Hidden;
-                        startInfo.Arguments = $"-file \"{filepathPng}\" -output \"{Path.GetDirectoryName(filepathPng)}\"";
+                        startInfo.Arguments = $"-file \"{filepathPng}\" -output \"{Path.GetDirectoryName(filepathPng)}\" -silent";
 
                         try
                         {
