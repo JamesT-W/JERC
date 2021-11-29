@@ -196,7 +196,7 @@
 ]
 
 
-@PointClass base(info_overlay) size(-1 -1 0, 1 1 1) iconsprite("jerc/editor/jerc_info_overlay.vmt") sphere(fademindist) sphere(fademaxdist) overlay() = jerc_info_overlay : 
+@PointClass base(info_overlay) size(-1 -1 0, 1 1 1) iconsprite("jerc/editor/jerc_info_overlay.vmt") studio("models/editor/overlay_helper.mdl") sphere(fademindist) sphere(fademaxdist) overlay() = jerc_info_overlay : 
 	"JERC - An info_overlay with the ability to set a colour for this overlay instead of using the jerc_config's overlay colour."
 [
 	angles(string) : "Pitch Yaw Roll (Y Z X)" : "0 0 0" : "This is the overlay direction. Pitch is rotation around the Y axis, yaw is the rotation around the Z axis, and roll is the rotation around the X axis. (Yaw is used for rotating the overlay in the overview)"
