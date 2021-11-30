@@ -1718,6 +1718,9 @@ namespace JERC
                     foreach (var entitySide in entitySidesOverlays)
                     {
                         DrawFilledPolygonGradient(graphicsRawMask, entitySide, false, levelHeight);
+
+                        if (entitySide.strokeWidth > 0 && entitySide.colourStroke != null && entitySide.colourStroke.HasValue && entitySide.colourStroke.Value.A > 0)
+                            DrawStroke(graphicsRawMask, entitySide, (Color)entitySide.colourStroke, entitySide.strokeWidth);
                     }
 
                     graphicsRawMask.Save();
@@ -1728,6 +1731,9 @@ namespace JERC
                     foreach (var entitySide in entitySidesJercBox)
                     {
                         DrawFilledPolygonGradient(graphicsRawMask, entitySide, false, levelHeight);
+
+                        if (entitySide.strokeWidth > 0 && entitySide.colourStroke != null && entitySide.colourStroke.HasValue && entitySide.colourStroke.Value.A > 0)
+                            DrawStroke(graphicsRawMask, entitySide, (Color)entitySide.colourStroke, entitySide.strokeWidth);
                     }
 
                     graphicsRawMask.Save();
@@ -2974,11 +2980,11 @@ namespace JERC
 
         private static void DrawFilledPolygonObjectBrushes(Graphics graphics, SolidBrush solidBrush, Pen pen, Point[] vertices)
         {
-            graphics.DrawPolygon(pen, vertices);
             graphics.FillPolygon(solidBrush, vertices);
+            graphics.DrawPolygon(pen, vertices);
 
-            pen?.Dispose();
             solidBrush?.Dispose();
+            pen?.Dispose();
         }
 
 
