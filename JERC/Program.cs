@@ -71,7 +71,7 @@ namespace JERC
             }
             catch (Exception e)
             {
-                Logger.LogError("Could not read main vmf, it is potentially locked due to saving, aborting");
+                Logger.LogError("Could not find or read main vmf, check the filepath is correct and if the file is potentially locked due to saving, aborting");
             }
 
             if (vmf == null)
@@ -1245,7 +1245,7 @@ namespace JERC
 
         private static void GenerateRadars(List<LevelHeight> levelHeights)
         {
-            Logger.LogMessage("Generating radars");
+            Logger.LogMessage("Generating radars...");
 
             var radarLevels = new List<RadarLevel>();
 
