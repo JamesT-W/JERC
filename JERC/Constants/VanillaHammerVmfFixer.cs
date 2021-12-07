@@ -19,7 +19,7 @@ namespace JERC.Constants
             if (brushesSides == null || brushesSides.Count() == 0)
                 return;
 
-            // is -software is provided and is vanilla hammer, force all brush sides' vertices to be calculated (even if it is a hammer++ vmf)
+            // if -software is provided and is vanilla hammer, force all brush sides' vertices to be calculated (even if it is a hammer++ vmf)
             var brushesSidesNoVertics = GameConfigurationValues.softwareProvided ? brushesSides : brushesSides.Where(x => x.vertices_plus == null || !x.vertices_plus.Any()).ToList();
 
             if (brushesSidesNoVertics == null || brushesSidesNoVertics.Count() == 0)
