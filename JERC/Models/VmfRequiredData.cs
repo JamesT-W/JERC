@@ -39,7 +39,6 @@ namespace JERC.Models
         public List<Side> brushesSidesBombsiteA;
         public List<Side> brushesSidesBombsiteB;
         public List<Side> brushesSidesRescueZone;
-
         public List<Side> brushesSidesHostage;
         public List<Side> brushesSidesTSpawn;
         public List<Side> brushesSidesCTSpawn;*/
@@ -77,7 +76,6 @@ namespace JERC.Models
         public List<Side> displacementsSidesBombsiteA;
         public List<Side> displacementsSidesBombsiteB;
         public List<Side> displacementsSidesRescueZone;
-
         public List<Side> displacementsSidesHostage;
         public List<Side> displacementsSidesTSpawn;
         public List<Side> displacementsSidesCTSpawn;*/
@@ -188,6 +186,11 @@ namespace JERC.Models
                     brushesIgnore.SelectMany(x => x.side).Concat(brushesRemove.SelectMany(x => x.side)).Concat(brushesPath.SelectMany(x => x.side)).Concat(brushesCover.SelectMany(x => x.side)).Concat(brushesOverlap.SelectMany(x => x.side)).Concat(brushesDoor.SelectMany(x => x.side)).Concat(brushesLadder.SelectMany(x => x.side)).Concat(brushesDanger.SelectMany(x => x.side))
                     .ToList()
                 );
+
+                VanillaHammerVmfFixer.CalculateVerticesPlusForAllBrushSides(
+                    brushesBuyzone.SelectMany(x => x.side).Concat(brushesBombsiteA.SelectMany(x => x.side)).Concat(brushesBombsiteB.SelectMany(x => x.side)).Concat(brushesRescueZone.SelectMany(x => x.side)).Concat(brushesHostage.SelectMany(x => x.side)).Concat(brushesTSpawn.SelectMany(x => x.side)).Concat(brushesCTSpawn.SelectMany(x => x.side))
+                    .ToList()
+                );
             }
 
             var brushesSidesIgnoreUnordered = brushesIgnore.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.IgnoreTextureName)).ToList();
@@ -203,7 +206,6 @@ namespace JERC.Models
             var brushesSidesBombsiteAUnordered = brushesBombsiteA.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.BombsiteATextureName)).ToList();
             var brushesSidesBombsiteBUnordered = brushesBombsiteB.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.BombsiteBTextureName)).ToList();
             var brushesSidesRescueZoneUnordered = brushesRescueZone.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.RescueZoneTextureName)).ToList();
-
             var brushesSidesHostageUnordered = brushesHostage.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.HostageTextureName)).ToList();
             var brushesSidesTSpawnUnordered = brushesTSpawn.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.TSpawnTextureName)).ToList();
             var brushesSidesCTSpawnUnordered = brushesCTSpawn.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.CTSpawnTextureName)).ToList();*/
@@ -222,7 +224,6 @@ namespace JERC.Models
             brushesSidesBombsiteAUnordered.RemoveAll(x => brushesBombsiteA.FirstOrDefault(y => y.id == x.brushId).side.Any(y => y.isDisplacement));
             brushesSidesBombsiteBUnordered.RemoveAll(x => brushesBombsiteB.FirstOrDefault(y => y.id == x.brushId).side.Any(y => y.isDisplacement));
             brushesSidesRescueZoneUnordered.RemoveAll(x => brushesRescueZone.FirstOrDefault(y => y.id == x.brushId).side.Any(y => y.isDisplacement));
-
             brushesSidesHostageUnordered.RemoveAll(x => brushesHostage.FirstOrDefault(y => y.id == x.brushId).side.Any(y => y.isDisplacement));
             brushesSidesTSpawnUnordered.RemoveAll(x => brushesTSpawn.FirstOrDefault(y => y.id == x.brushId).side.Any(y => y.isDisplacement));
             brushesSidesCTSpawnUnordered.RemoveAll(x => brushesCTSpawn.FirstOrDefault(y => y.id == x.brushId).side.Any(y => y.isDisplacement));*/
@@ -241,7 +242,6 @@ namespace JERC.Models
             brushesSidesBombsiteA = OrderListOfSidesByVerticesMin(brushesSidesBombsiteAUnordered);
             brushesSidesBombsiteB = OrderListOfSidesByVerticesMin(brushesSidesBombsiteBUnordered);
             brushesSidesRescueZone = OrderListOfSidesByVerticesMin(brushesSidesRescueZoneUnordered);
-
             brushesSidesHostage = OrderListOfSidesByVerticesMin(brushesSidesHostageUnordered);
             brushesSidesTSpawn = OrderListOfSidesByVerticesMin(brushesSidesTSpawnUnordered);
             brushesSidesCTSpawn = OrderListOfSidesByVerticesMin(brushesSidesCTSpawnUnordered);*/
@@ -272,6 +272,11 @@ namespace JERC.Models
                     displacementsIgnore.SelectMany(x => x.side).Concat(displacementsRemove.SelectMany(x => x.side)).Concat(displacementsPath.SelectMany(x => x.side)).Concat(displacementsCover.SelectMany(x => x.side)).Concat(displacementsOverlap.SelectMany(x => x.side)).Concat(displacementsDoor.SelectMany(x => x.side)).Concat(displacementsLadder.SelectMany(x => x.side)).Concat(displacementsDanger.SelectMany(x => x.side))
                     .ToList()
                 );
+
+                VanillaHammerVmfFixer.CalculateVerticesPlusForAllBrushSides(
+                    displacementsBuyzone.SelectMany(x => x.side).Concat(displacementsBombsiteA.SelectMany(x => x.side)).Concat(displacementsBombsiteB.SelectMany(x => x.side)).Concat(displacementsRescueZone.SelectMany(x => x.side)).Concat(displacementsHostage.SelectMany(x => x.side)).Concat(displacementsTSpawn.SelectMany(x => x.side)).Concat(displacementsCTSpawn.SelectMany(x => x.side))
+                    .ToList()
+                );
             }
 
             var displacementsSidesIgnoreUnordered = displacementsIgnore.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.IgnoreTextureName)).ToList();
@@ -287,7 +292,6 @@ namespace JERC.Models
             var displacementsSidesBombsiteAUnordered = displacementsBombsiteA.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.BombsiteATextureName)).ToList();
             var displacementsSidesBombsiteBUnordered = displacementsBombsiteB.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.BombsiteBTextureName)).ToList();
             var displacementsSidesRescueZoneUnordered = displacementsRescueZone.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.RescueZoneTextureName)).ToList();
-
             var displacementsSidesHostageUnordered = displacementsHostage.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.HostageTextureName)).ToList();
             var displacementsSidesTSpawnUnordered = displacementsTSpawn.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.TSpawnTextureName)).ToList();
             var displacementsSidesCTSpawnUnordered = displacementsCTSpawn.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.CTSpawnTextureName)).ToList();*/
@@ -306,7 +310,6 @@ namespace JERC.Models
             displacementsSidesBombsiteAUnordered.RemoveAll(x => !x.isDisplacement);
             displacementsSidesBombsiteBUnordered.RemoveAll(x => !x.isDisplacement);
             displacementsSidesRescueZoneUnordered.RemoveAll(x => !x.isDisplacement);
-
             displacementsSidesHostageUnordered.RemoveAll(x => !x.isDisplacement);
             displacementsSidesTSpawnUnordered.RemoveAll(x => !x.isDisplacement);
             displacementsSidesCTSpawnUnordered.RemoveAll(x => !x.isDisplacement);*/
@@ -325,7 +328,6 @@ namespace JERC.Models
             displacementsSidesBombsiteA = OrderListOfSidesByVerticesMin(displacementsSidesBombsiteAUnordered);
             displacementsSidesBombsiteB = OrderListOfSidesByVerticesMin(displacementsSidesBombsiteBUnordered);
             displacementsSidesRescueZone = OrderListOfSidesByVerticesMin(displacementsSidesRescueZoneUnordered);
-
             displacementsSidesHostage = OrderListOfSidesByVerticesMin(displacementsSidesHostageUnordered);
             displacementsSidesTSpawn = OrderListOfSidesByVerticesMin(displacementsSidesTSpawnUnordered);
             displacementsSidesCTSpawn = OrderListOfSidesByVerticesMin(displacementsSidesCTSpawnUnordered);*/
