@@ -24,10 +24,20 @@ namespace JERC.Models
 
         public static List<int> allBrushSideIds = new List<int>();
 
+        private static int nextOverrideSideId = 2000000;
+
 
         public Side(IVNode side, int brushId)
         {
             id = int.Parse(side.Body.FirstOrDefault(x => x.Name == "id")?.Value);
+            if (id == 0) // vertices added with ctrl+f in the vertex tool have an id set as '0'
+            {
+                id = nextOverrideSideId; //TODO: bad way to handle setting a random id, as this might already exist
+
+                nextOverrideSideId++;
+            }
+
+
             this.brushId = brushId;
             plane = side.Body.FirstOrDefault(x => x.Name == "plane")?.Value;
             vertices_plus = side.Body.FirstOrDefault(x => x.Name == "vertices_plus")?.Body.Select(x => new Vertices(x.Value)).ToList();
