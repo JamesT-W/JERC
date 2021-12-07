@@ -180,35 +180,37 @@ namespace JERC.Models
                 brushesCTSpawn.AddRange(brushesCTSpawnBrushEntitiesIVNodes.Select(x => new Brush(x)).ToList());
 
             // calculate vertices_plus for every brush side for vanilla hammer vmfs, as hammer++ adds vertices itself when saving a vmf
+            var brushesSidesToAvoidDrawingBrushesSides = new List<Side>();
+
             if (GameConfigurationValues.isVanillaHammer == true)
             {
-                VanillaHammerVmfFixer.CalculateVerticesPlusForAllBrushSides(
-                    brushesIgnore.SelectMany(x => x.side).Concat(brushesRemove.SelectMany(x => x.side)).Concat(brushesPath.SelectMany(x => x.side)).Concat(brushesCover.SelectMany(x => x.side)).Concat(brushesOverlap.SelectMany(x => x.side)).Concat(brushesDoor.SelectMany(x => x.side)).Concat(brushesLadder.SelectMany(x => x.side)).Concat(brushesDanger.SelectMany(x => x.side))
-                    .ToList()
-                );
+                brushesSidesToAvoidDrawingBrushesSides.AddRange(VanillaHammerVmfFixer.CalculateVerticesPlusForAllBrushSides(
+                                                                    brushesIgnore.SelectMany(x => x.side).Concat(brushesRemove.SelectMany(x => x.side)).Concat(brushesPath.SelectMany(x => x.side)).Concat(brushesCover.SelectMany(x => x.side)).Concat(brushesOverlap.SelectMany(x => x.side)).Concat(brushesDoor.SelectMany(x => x.side)).Concat(brushesLadder.SelectMany(x => x.side)).Concat(brushesDanger.SelectMany(x => x.side))
+                                                                    .ToList()
+                ));
 
-                VanillaHammerVmfFixer.CalculateVerticesPlusForAllBrushSides(
-                    brushesBuyzone.SelectMany(x => x.side).Concat(brushesBombsiteA.SelectMany(x => x.side)).Concat(brushesBombsiteB.SelectMany(x => x.side)).Concat(brushesRescueZone.SelectMany(x => x.side)).Concat(brushesHostage.SelectMany(x => x.side)).Concat(brushesTSpawn.SelectMany(x => x.side)).Concat(brushesCTSpawn.SelectMany(x => x.side))
-                    .ToList()
-                );
+                brushesSidesToAvoidDrawingBrushesSides.AddRange(VanillaHammerVmfFixer.CalculateVerticesPlusForAllBrushSides(
+                                                                    brushesBuyzone.SelectMany(x => x.side).Concat(brushesBombsiteA.SelectMany(x => x.side)).Concat(brushesBombsiteB.SelectMany(x => x.side)).Concat(brushesRescueZone.SelectMany(x => x.side)).Concat(brushesHostage.SelectMany(x => x.side)).Concat(brushesTSpawn.SelectMany(x => x.side)).Concat(brushesCTSpawn.SelectMany(x => x.side))
+                                                                    .ToList()
+                ));
             }
 
-            var brushesSidesIgnoreUnordered = brushesIgnore.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.IgnoreTextureName)).ToList();
-            var brushesSidesRemoveUnordered = brushesRemove.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.RemoveTextureName)).ToList();
-            var brushesSidesPathUnordered = brushesPath.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.PathTextureName)).ToList();
-            var brushesSidesCoverUnordered = brushesCover.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.CoverTextureName)).ToList();
-            var brushesSidesOverlapUnordered = brushesOverlap.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.OverlapTextureName)).ToList();
-            var brushesSidesDoorUnordered = brushesDoor.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.DoorTextureName)).ToList();
-            var brushesSidesLadderUnordered = brushesLadder.SelectMany(x => x.side.Where(y => TextureNames.LadderTextureNames.Any(z => z == y.material.ToLower()))).ToList();
-            var brushesSidesDangerUnordered = brushesDanger.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.DangerTextureName)).ToList();
+            var brushesSidesIgnoreUnordered = brushesIgnore.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.IgnoreTextureName)).ToList(); // !brushesSidesToAvoidDrawingBrushesSides.Any(a => a.id == y.id && a.brushId == y.brushId)
+            var brushesSidesRemoveUnordered = brushesRemove.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.RemoveTextureName)).ToList(); // !brushesSidesToAvoidDrawingBrushesSides.Any(a => a.id == y.id && a.brushId == y.brushId)
+            var brushesSidesPathUnordered = brushesPath.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.PathTextureName && !brushesSidesToAvoidDrawingBrushesSides.Any(a => a.id == y.id && a.brushId == y.brushId))).ToList();
+            var brushesSidesCoverUnordered = brushesCover.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.CoverTextureName)).ToList(); // !brushesSidesToAvoidDrawingBrushesSides.Any(a => a.id == y.id && a.brushId == y.brushId)
+            var brushesSidesOverlapUnordered = brushesOverlap.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.OverlapTextureName && !brushesSidesToAvoidDrawingBrushesSides.Any(a => a.id == y.id && a.brushId == y.brushId))).ToList();
+            var brushesSidesDoorUnordered = brushesDoor.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.DoorTextureName)).ToList(); // !brushesSidesToAvoidDrawingBrushesSides.Any(a => a.id == y.id && a.brushId == y.brushId)
+            var brushesSidesLadderUnordered = brushesLadder.SelectMany(x => x.side.Where(y => TextureNames.LadderTextureNames.Any(z => z == y.material.ToLower()))).ToList(); // !brushesSidesToAvoidDrawingBrushesSides.Any(a => a.id == y.id && a.brushId == y.brushId)
+            var brushesSidesDangerUnordered = brushesDanger.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.DangerTextureName)).ToList(); // !brushesSidesToAvoidDrawingBrushesSides.Any(a => a.id == y.id && a.brushId == y.brushId)
 
-            /*var brushesSidesBuyzoneUnordered = brushesBuyzone.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.BuyzoneTextureName)).ToList();
-            var brushesSidesBombsiteAUnordered = brushesBombsiteA.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.BombsiteATextureName)).ToList();
-            var brushesSidesBombsiteBUnordered = brushesBombsiteB.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.BombsiteBTextureName)).ToList();
-            var brushesSidesRescueZoneUnordered = brushesRescueZone.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.RescueZoneTextureName)).ToList();
-            var brushesSidesHostageUnordered = brushesHostage.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.HostageTextureName)).ToList();
-            var brushesSidesTSpawnUnordered = brushesTSpawn.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.TSpawnTextureName)).ToList();
-            var brushesSidesCTSpawnUnordered = brushesCTSpawn.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.CTSpawnTextureName)).ToList();*/
+            /*var brushesSidesBuyzoneUnordered = brushesBuyzone.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.BuyzoneTextureName)).ToList(); // !brushesSidesToAvoidDrawingBrushesSides.Any(a => a.id == y.id && a.brushId == y.brushId)
+            var brushesSidesBombsiteAUnordered = brushesBombsiteA.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.BombsiteATextureName)).ToList(); // !brushesSidesToAvoidDrawingBrushesSides.Any(a => a.id == y.id && a.brushId == y.brushId)
+            var brushesSidesBombsiteBUnordered = brushesBombsiteB.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.BombsiteBTextureName)).ToList(); // !brushesSidesToAvoidDrawingBrushesSides.Any(a => a.id == y.id && a.brushId == y.brushId)
+            var brushesSidesRescueZoneUnordered = brushesRescueZone.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.RescueZoneTextureName)).ToList(); // !brushesSidesToAvoidDrawingBrushesSides.Any(a => a.id == y.id && a.brushId == y.brushId)
+            var brushesSidesHostageUnordered = brushesHostage.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.HostageTextureName)).ToList(); // !brushesSidesToAvoidDrawingBrushesSides.Any(a => a.id == y.id && a.brushId == y.brushId)
+            var brushesSidesTSpawnUnordered = brushesTSpawn.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.TSpawnTextureName)).ToList(); // !brushesSidesToAvoidDrawingBrushesSides.Any(a => a.id == y.id && a.brushId == y.brushId)
+            var brushesSidesCTSpawnUnordered = brushesCTSpawn.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.CTSpawnTextureName)).ToList();*/ // !brushesSidesToAvoidDrawingBrushesSides.Any(a => a.id == y.id && a.brushId == y.brushId)
 
             // remove all of a brush's sides when there is a displacement side on the brush
             brushesSidesIgnoreUnordered.RemoveAll(x => brushesIgnore.FirstOrDefault(y => y.id == x.brushId).side.Any(y => y.isDisplacement));
@@ -266,35 +268,37 @@ namespace JERC.Models
             displacementsCTSpawn = displacementsCTSpawnIVNodes.Any() ? displacementsCTSpawnIVNodes.Select(x => new Brush(x)).ToList() : new List<Brush>();
 
             // calculate vertices_plus for every brush side for vanilla hammer vmfs, as hammer++ adds vertices itself when saving a vmf
+            var brushesSidesToAvoidDrawingDisplacementsSides = new List<Side>();
+
             if (GameConfigurationValues.isVanillaHammer == true)
             {
-                VanillaHammerVmfFixer.CalculateVerticesPlusForAllBrushSides(
-                    displacementsIgnore.SelectMany(x => x.side).Concat(displacementsRemove.SelectMany(x => x.side)).Concat(displacementsPath.SelectMany(x => x.side)).Concat(displacementsCover.SelectMany(x => x.side)).Concat(displacementsOverlap.SelectMany(x => x.side)).Concat(displacementsDoor.SelectMany(x => x.side)).Concat(displacementsLadder.SelectMany(x => x.side)).Concat(displacementsDanger.SelectMany(x => x.side))
-                    .ToList()
-                );
+                brushesSidesToAvoidDrawingDisplacementsSides.AddRange(VanillaHammerVmfFixer.CalculateVerticesPlusForAllBrushSides(
+                                                                        displacementsIgnore.SelectMany(x => x.side).Concat(displacementsRemove.SelectMany(x => x.side)).Concat(displacementsPath.SelectMany(x => x.side)).Concat(displacementsCover.SelectMany(x => x.side)).Concat(displacementsOverlap.SelectMany(x => x.side)).Concat(displacementsDoor.SelectMany(x => x.side)).Concat(displacementsLadder.SelectMany(x => x.side)).Concat(displacementsDanger.SelectMany(x => x.side))
+                                                                        .ToList()
+                ));
 
-                VanillaHammerVmfFixer.CalculateVerticesPlusForAllBrushSides(
-                    displacementsBuyzone.SelectMany(x => x.side).Concat(displacementsBombsiteA.SelectMany(x => x.side)).Concat(displacementsBombsiteB.SelectMany(x => x.side)).Concat(displacementsRescueZone.SelectMany(x => x.side)).Concat(displacementsHostage.SelectMany(x => x.side)).Concat(displacementsTSpawn.SelectMany(x => x.side)).Concat(displacementsCTSpawn.SelectMany(x => x.side))
-                    .ToList()
-                );
+                brushesSidesToAvoidDrawingDisplacementsSides.AddRange(VanillaHammerVmfFixer.CalculateVerticesPlusForAllBrushSides(
+                                                                        displacementsBuyzone.SelectMany(x => x.side).Concat(displacementsBombsiteA.SelectMany(x => x.side)).Concat(displacementsBombsiteB.SelectMany(x => x.side)).Concat(displacementsRescueZone.SelectMany(x => x.side)).Concat(displacementsHostage.SelectMany(x => x.side)).Concat(displacementsTSpawn.SelectMany(x => x.side)).Concat(displacementsCTSpawn.SelectMany(x => x.side))
+                                                                        .ToList()
+                ));
             }
 
-            var displacementsSidesIgnoreUnordered = displacementsIgnore.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.IgnoreTextureName)).ToList();
-            var displacementsSidesRemoveUnordered = displacementsRemove.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.RemoveTextureName)).ToList();
-            var displacementsSidesPathUnordered = displacementsPath.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.PathTextureName)).ToList();
-            var displacementsSidesCoverUnordered = displacementsCover.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.CoverTextureName)).ToList();
-            var displacementsSidesOverlapUnordered = displacementsOverlap.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.OverlapTextureName)).ToList();
-            var displacementsSidesDoorUnordered = displacementsDoor.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.DoorTextureName)).ToList();
-            var displacementsSidesLadderUnordered = displacementsLadder.SelectMany(x => x.side.Where(y => TextureNames.LadderTextureNames.Any(z => z == y.material.ToLower()))).ToList();
-            var displacementsSidesDangerUnordered = displacementsDanger.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.DangerTextureName)).ToList();
+            var displacementsSidesIgnoreUnordered = displacementsIgnore.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.IgnoreTextureName)).ToList(); // && !brushesSidesToAvoidDrawingDisplacementsSides.Any(a => a.id == y.id && a.brushId == y.brushId)
+            var displacementsSidesRemoveUnordered = displacementsRemove.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.RemoveTextureName)).ToList(); // && !brushesSidesToAvoidDrawingDisplacementsSides.Any(a => a.id == y.id && a.brushId == y.brushId)
+            var displacementsSidesPathUnordered = displacementsPath.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.PathTextureName && !brushesSidesToAvoidDrawingDisplacementsSides.Any(a => a.id == y.id && a.brushId == y.brushId))).ToList();
+            var displacementsSidesCoverUnordered = displacementsCover.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.CoverTextureName)).ToList(); // && !brushesSidesToAvoidDrawingDisplacementsSides.Any(a => a.id == y.id && a.brushId == y.brushId)
+            var displacementsSidesOverlapUnordered = displacementsOverlap.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.OverlapTextureName && !brushesSidesToAvoidDrawingDisplacementsSides.Any(a => a.id == y.id && a.brushId == y.brushId))).ToList();
+            var displacementsSidesDoorUnordered = displacementsDoor.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.DoorTextureName)).ToList(); // && !brushesSidesToAvoidDrawingDisplacementsSides.Any(a => a.id == y.id && a.brushId == y.brushId)
+            var displacementsSidesLadderUnordered = displacementsLadder.SelectMany(x => x.side.Where(y => TextureNames.LadderTextureNames.Any(z => z == y.material.ToLower()))).ToList(); // && !brushesSidesToAvoidDrawingDisplacementsSides.Any(a => a.id == y.id && a.brushId == y.brushId)
+            var displacementsSidesDangerUnordered = displacementsDanger.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.DangerTextureName)).ToList(); // && !brushesSidesToAvoidDrawingDisplacementsSides.Any(a => a.id == y.id && a.brushId == y.brushId)
 
-            /*var displacementsSidesBuyzoneUnordered = displacementsBuyzone.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.BuyzoneTextureName)).ToList();
-            var displacementsSidesBombsiteAUnordered = displacementsBombsiteA.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.BombsiteATextureName)).ToList();
-            var displacementsSidesBombsiteBUnordered = displacementsBombsiteB.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.BombsiteBTextureName)).ToList();
-            var displacementsSidesRescueZoneUnordered = displacementsRescueZone.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.RescueZoneTextureName)).ToList();
-            var displacementsSidesHostageUnordered = displacementsHostage.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.HostageTextureName)).ToList();
-            var displacementsSidesTSpawnUnordered = displacementsTSpawn.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.TSpawnTextureName)).ToList();
-            var displacementsSidesCTSpawnUnordered = displacementsCTSpawn.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.CTSpawnTextureName)).ToList();*/
+            /*var displacementsSidesBuyzoneUnordered = displacementsBuyzone.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.BuyzoneTextureName)).ToList(); // && !brushesSidesToAvoidDrawingDisplacementsSides.Any(a => a.id == y.id && a.brushId == y.brushId)
+            var displacementsSidesBombsiteAUnordered = displacementsBombsiteA.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.BombsiteATextureName)).ToList(); // && !brushesSidesToAvoidDrawingDisplacementsSides.Any(a => a.id == y.id && a.brushId == y.brushId)
+            var displacementsSidesBombsiteBUnordered = displacementsBombsiteB.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.BombsiteBTextureName)).ToList(); // && !brushesSidesToAvoidDrawingDisplacementsSides.Any(a => a.id == y.id && a.brushId == y.brushId)
+            var displacementsSidesRescueZoneUnordered = displacementsRescueZone.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.RescueZoneTextureName)).ToList(); // && !brushesSidesToAvoidDrawingDisplacementsSides.Any(a => a.id == y.id && a.brushId == y.brushId)
+            var displacementsSidesHostageUnordered = displacementsHostage.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.HostageTextureName)).ToList(); // && !brushesSidesToAvoidDrawingDisplacementsSides.Any(a => a.id == y.id && a.brushId == y.brushId)
+            var displacementsSidesTSpawnUnordered = displacementsTSpawn.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.TSpawnTextureName)).ToList(); // && !brushesSidesToAvoidDrawingDisplacementsSides.Any(a => a.id == y.id && a.brushId == y.brushId)
+            var displacementsSidesCTSpawnUnordered = displacementsCTSpawn.SelectMany(x => x.side.Where(y => y.material.ToLower() == TextureNames.CTSpawnTextureName)).ToList();*/ // && !brushesSidesToAvoidDrawingDisplacementsSides.Any(a => a.id == y.id && a.brushId == y.brushId)
 
             // remove all non displacement sides on the brush
             displacementsSidesIgnoreUnordered.RemoveAll(x => !x.isDisplacement);
@@ -377,19 +381,23 @@ namespace JERC.Models
 
 
             // calculate vertices_plus for every brush side for vanilla hammer vmfs, as hammer++ adds vertices itself when saving a vmf
+            var brushesSidesToAvoidDrawingBrushEntitiesSides = new List<Side>();
+
             if (GameConfigurationValues.isVanillaHammer == true)
             {
-                VanillaHammerVmfFixer.CalculateVerticesPlusForAllBrushSides(
-                    buyzoneBrushEntities.SelectMany(x => x.brushes.SelectMany(y => y.side))
-                        .Concat(bombsiteBrushEntities.SelectMany(x => x.brushes.SelectMany(y => y.side)))
-                        .Concat(rescueZoneBrushEntities.SelectMany(x => x.brushes.SelectMany(y => y.side)))
-                        .Concat(hostageEntities.SelectMany(x => x.brushes.SelectMany(y => y.side)))
-                        .Concat(ctSpawnEntities.SelectMany(x => x.brushes.SelectMany(y => y.side)))
-                        .Concat(tSpawnEntities.SelectMany(x => x.brushes.SelectMany(y => y.side)))
-                        .Concat(infoOverlayEntities.SelectMany(x => x.brushes.SelectMany(y => y.side)))
-                        .Concat(jercInfoOverlayEntities.SelectMany(x => x.brushes.SelectMany(y => y.side)))
-                    .ToList()
-                );
+                brushesSidesToAvoidDrawingBrushEntitiesSides.AddRange(VanillaHammerVmfFixer.CalculateVerticesPlusForAllBrushSides(
+                                                                        buyzoneBrushEntities.SelectMany(x => x.brushes.SelectMany(y => y.side))
+                                                                            .Concat(bombsiteBrushEntities.SelectMany(x => x.brushes.SelectMany(y => y.side)))
+                                                                            .Concat(rescueZoneBrushEntities.SelectMany(x => x.brushes.SelectMany(y => y.side)))
+                                                                            .Concat(hostageEntities.SelectMany(x => x.brushes.SelectMany(y => y.side)))
+                                                                            .Concat(ctSpawnEntities.SelectMany(x => x.brushes.SelectMany(y => y.side)))
+                                                                            .Concat(tSpawnEntities.SelectMany(x => x.brushes.SelectMany(y => y.side)))
+                                                                            .Concat(infoOverlayEntities.SelectMany(x => x.brushes.SelectMany(y => y.side)))
+                                                                            .Concat(jercInfoOverlayEntities.SelectMany(x => x.brushes.SelectMany(y => y.side)))
+                                                                        .ToList()
+                ));
+
+                /* && !brushesSidesToAvoidDrawingBrushEntitiesSides.Any(a => a.id == y.id && a.brushId == y.brushId) */
             }
 
             foreach (var entity in buyzoneBrushEntities)
@@ -411,9 +419,13 @@ namespace JERC.Models
 
 
             // calculate vertices_plus for every brush side for vanilla hammer vmfs, as hammer++ adds vertices itself when saving a vmf
+            var brushesSidesToAvoidDrawingJERCBrushEntitiesSides = new List<Side>();
+
             if (GameConfigurationValues.isVanillaHammer == true)
             {
-                VanillaHammerVmfFixer.CalculateVerticesPlusForAllBrushSides(jercBoxBrushEntities.SelectMany(x => x.brushes.SelectMany(y => y.side)).ToList());
+                brushesSidesToAvoidDrawingJERCBrushEntitiesSides.AddRange(VanillaHammerVmfFixer.CalculateVerticesPlusForAllBrushSides(jercBoxBrushEntities.SelectMany(x => x.brushes.SelectMany(y => y.side)).ToList()));
+
+                /* && !brushesSidesToAvoidDrawingJERCBrushEntitiesSides.Any(a => a.id == y.id && a.brushId == y.brushId) */
             }
 
             foreach (var entity in jercBoxBrushEntities)
@@ -462,14 +474,19 @@ namespace JERC.Models
 
         // Orders by descending, then uses distinct to ensure that it gets the MAX value first for each side and ignores the rest.
         // Then, it reverses, so it is ascending (MIN value first)
-        private static List<Side> OrderListOfSidesByVerticesMin(List<Side> sides, bool calculateVerticesPlus = false)
+        private List<Side> OrderListOfSidesByVerticesMin(List<Side> sides, bool calculateVerticesPlus = false)
         {
             if (sides == null || !sides.Any())
                 return sides;
 
+
+            var brushesSidesToAvoidDrawingBrushSides = new List<Side>();
+
             if (GameConfigurationValues.isVanillaHammer == true && calculateVerticesPlus)
             {
-                VanillaHammerVmfFixer.CalculateVerticesPlusForAllBrushSides(sides);
+                brushesSidesToAvoidDrawingBrushSides.AddRange(VanillaHammerVmfFixer.CalculateVerticesPlusForAllBrushSides(sides));
+
+                /* && !brushesSidesToAvoidDrawingBrushSides.Any(a => a.id == y.id && a.brushId == y.brushId) */
             }
 
             var sidesNew = (from x in sides

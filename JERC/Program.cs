@@ -2260,9 +2260,13 @@ namespace JERC
             foreach (var brushSide in brush.side.ToList())
             {
                 // calculate vertices_plus for every brush side for vanilla hammer vmfs, as hammer++ adds vertices itself when saving a vmf
+                var brushesSidesToAvoidDrawingBrushSides = new List<Side>();
+
                 if (GameConfigurationValues.isVanillaHammer == true)
                 {
-                    VanillaHammerVmfFixer.CalculateVerticesPlusForAllBrushSides(brush.side);
+                    brushesSidesToAvoidDrawingBrushSides.AddRange(VanillaHammerVmfFixer.CalculateVerticesPlusForAllBrushSides(brush.side));
+
+                    /* && !brushesSidesToAvoidDrawingBrushSides.Any(a => a.id == y.id && a.brushId == y.brushId) */
                 }
 
                 var brushSideNew = new BrushSide(brushSide.id, brush.id);

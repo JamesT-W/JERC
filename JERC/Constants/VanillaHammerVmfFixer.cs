@@ -11,19 +11,22 @@ namespace JERC.Constants
 {
     public static class VanillaHammerVmfFixer
     {
-        public static void CalculateVerticesPlusForAllBrushSides(List<Side> brushesSides)
+        public static List<Side> CalculateVerticesPlusForAllBrushSides(List<Side> brushesSides)
         {
+            List<Side> brushesSidesToAvoidDrawing = new List<Side>();
+
+
             if (GameConfigurationValues.isVanillaHammer == false)
-                return;
+                return new List<Side>();
 
             if (brushesSides == null || brushesSides.Count() == 0)
-                return;
+                return new List<Side>();
 
             // if -software is provided and is vanilla hammer, force all brush sides' vertices to be calculated (even if it is a hammer++ vmf)
             var brushesSidesNoVertics = GameConfigurationValues.softwareProvided ? brushesSides : brushesSides.Where(x => x.vertices_plus == null || !x.vertices_plus.Any()).ToList();
 
             if (brushesSidesNoVertics == null || brushesSidesNoVertics.Count() == 0)
-                return;
+                return new List<Side>();
 
             //
             var positionsToRemove = new List<int>();
@@ -44,13 +47,52 @@ namespace JERC.Constants
             //
 
 
+            // remove all brush sides that do not show from a top down view
+            var brushesSidesNoVerticsViewableTopDown = new List<Side>();
+
+            var foundTwoVerticesDifferingOnlyBeHeight = false;
             foreach (var brushSide in brushesSidesNoVertics)
+            {
+                var allVerticesInPlane = GetAllVerticesInPlane(brushSide.plane);
+
+                for (int i = 0; i < allVerticesInPlane.Count() - 1; i++)
+                {
+                    for (int j = 1; j < allVerticesInPlane.Count(); j++)
+                    {
+                        if (i == j)
+                            continue;
+
+                        if (Math.Ceiling(allVerticesInPlane[i].x) == Math.Ceiling(allVerticesInPlane[j].x) &&
+                            Math.Ceiling(allVerticesInPlane[i].y) == Math.Ceiling(allVerticesInPlane[j].y)
+                        )
+                        {
+                            foundTwoVerticesDifferingOnlyBeHeight = true;
+                        }
+                    }
+                }
+
+                if (foundTwoVerticesDifferingOnlyBeHeight)
+                {
+                    brushesSidesToAvoidDrawing.Add(brushSide);
+                }
+                else
+                {
+                    brushesSidesNoVerticsViewableTopDown.Add(brushSide);
+                }
+            }
+            //
+
+
+            foreach (var brushSide in brushesSidesNoVerticsViewableTopDown)
             {
                 brushSide.vertices_plus = GetBrushSideBoundingBoxFromThreeVertices(brushSide, brushesSidesNoVertics.Where(x => x.brushId == brushSide.brushId).Count());
             }
 
 
-            /*foreach (var brushSide in brushesSidesNoVertics)
+            return brushesSidesToAvoidDrawing;
+
+
+            /*foreach (var brushSide in brushesSidesNoVerticsViewableTopDown)
             {
                 var brushSideBoundingBox = GetBrushSideBoundingBoxFromThreeVertices(brushSide, brushesSidesNoVertics.Where(x => x.brushId == brushSide.brushId).Count());
 
