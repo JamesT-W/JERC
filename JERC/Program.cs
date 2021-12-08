@@ -1,4 +1,4 @@
-using ImageAlterer;
+﻿using ImageAlterer;
 using JERC.Constants;
 using JERC.Enums;
 using JERC.Models;
@@ -2262,7 +2262,7 @@ namespace JERC
                 // calculate vertices_plus for every brush side for vanilla hammer vmfs, as hammer++ adds vertices itself when saving a vmf
                 if (GameConfigurationValues.isVanillaHammer == true)
                 {
-                    VanillaHammerVmfFixer.CalculateVerticesPlusForAllBrushSides(brush.side);
+                    VanillaHammerVmfFixer.CalculateVerticesPlusForAllBrushes(new List<Models.Brush>() { brush });
                 }
 
                 var brushSideNew = new BrushSide(brushSide.id, brush.id);

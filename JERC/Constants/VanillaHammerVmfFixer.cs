@@ -11,140 +11,347 @@ namespace JERC.Constants
 {
     public static class VanillaHammerVmfFixer
     {
-        public static void CalculateVerticesPlusForAllBrushSides(List<Side> brushesSides)
+        public static void CalculateVerticesPlusForAllBrushes(List<Models.Brush> brushes)
         {
             if (GameConfigurationValues.isVanillaHammer == false)
                 return;
 
-            if (brushesSides == null || brushesSides.Count() == 0)
+            if (brushes == null)
                 return;
 
-            // if -software is provided and is vanilla hammer, force all brush sides' vertices to be calculated (even if it is a hammer++ vmf)
-            var brushesSidesNoVertics = GameConfigurationValues.softwareProvided ? brushesSides : brushesSides.Where(x => x.vertices_plus == null || !x.vertices_plus.Any()).ToList();
+            brushes.RemoveAll(x => x.side == null || !x.side.Any());
 
-            if (brushesSidesNoVertics == null || brushesSidesNoVertics.Count() == 0)
+            if (brushes.Select(x => x.side) == null || !brushes.Select(x => x.side).Any())
                 return;
 
-            //
-            var positionsToRemove = new List<int>();
-            var brushSideIdsFound = new List<int>();
 
-            for (int i = brushesSidesNoVertics.Count()-1; i >= 0 ; i--)
+            foreach (var brush in brushes)
             {
-                if (brushSideIdsFound.Any(x => x == brushesSidesNoVertics[i].id))
-                    positionsToRemove.Add(i);
-                else
-                    brushSideIdsFound.Add(brushesSidesNoVertics[i].id);
-            }
+                var brushSides = brush.side;
 
-            foreach (var index in positionsToRemove)
-            {
-                brushesSidesNoVertics.RemoveAt(index);
-            }
-            //
+                // if -software is provided and is vanilla hammer, force all brush sides' vertices to be calculated (even if it is a hammer++ vmf)
+                var brushSidesNoVertics = GameConfigurationValues.softwareProvided ? brushSides : brushSides.Where(x => x.vertices_plus == null || !x.vertices_plus.Any()).ToList();
 
+                if (brushSidesNoVertics == null || brushSidesNoVertics.Count() == 0)
+                    return;
 
-            foreach (var brushSide in brushesSidesNoVertics)
-            {
-                brushSide.vertices_plus = GetBrushSideBoundingBoxFromThreeVertices(brushSide, brushesSidesNoVertics.Where(x => x.brushId == brushSide.brushId).Count());
-            }
+                //
+                var positionsToRemove = new List<int>();
+                var brushSideIdsFound = new List<int>();
 
-
-            /*foreach (var brushSide in brushesSidesNoVertics)
-            {
-                var brushSideBoundingBox = GetBrushSideBoundingBoxFromThreeVertices(brushSide, brushesSidesNoVertics.Where(x => x.brushId == brushSide.brushId).Count());
-
-                var vertices0 = brushSideBoundingBox.OrderBy(a => a.x + a.y).FirstOrDefault(); // bottom left
-                var vertices2 = brushSideBoundingBox.OrderByDescending(a => a.x + a.y).FirstOrDefault(); // top right
-                var vertices1 = brushSideBoundingBox.Where(x => x != vertices2).OrderByDescending(a => a.x).ThenBy(a => a.y).FirstOrDefault(); // bottom right
-                var vertices3 = brushSideBoundingBox.Where(x => x != vertices0).OrderBy(a => a.x).ThenByDescending(a => a.y).FirstOrDefault(); // top left
-
-                var foundBrushSideInSameBrush = false;
-
-                for (int i = 0; i < brushesSidesNoVertics.Count(); i++)
+                for (int i = brushSidesNoVertics.Count() - 1; i >= 0; i--)
                 {
-                    var brushSideExcluding = brushesSidesNoVertics[i];
-
-                    if (brushSide.brushId != brushSideExcluding.brushId || brushSide.id == brushSideExcluding.id)
-                        continue;
-
-                    foundBrushSideInSameBrush = true;
-
-                    switch (i)
-                    {
-                        case 0:
-                            break;
-                        case 1:
-                            break;
-                        case 2:
-                            var brushSideExcludingBoundingBox = GetAllVerticesInPlane(brushSideExcluding.plane);
-
-                            var top = brushSideExcludingBoundingBox.OrderByDescending(a => a.y).ThenByDescending(a => a.x).FirstOrDefault();
-                            var bottom = brushSideExcludingBoundingBox.OrderBy(a => a.y).ThenByDescending(a => a.x).FirstOrDefault();
-
-                            vertices3.x = top.x;
-                            vertices0.x = bottom.x;
-                            break;
-                        case 3:
-                            brushSideExcludingBoundingBox = GetAllVerticesInPlane(brushSideExcluding.plane);
-
-                            top = brushSideExcludingBoundingBox.OrderByDescending(a => a.y).ThenBy(a => a.x).FirstOrDefault();
-                            bottom = brushSideExcludingBoundingBox.OrderBy(a => a.y).ThenBy(a => a.x).FirstOrDefault();
-
-                            vertices2.x = top.x;
-                            vertices1.x = bottom.x;
-                            break;
-                        case 4:
-                            brushSideExcludingBoundingBox = GetAllVerticesInPlane(brushSideExcluding.plane);
-
-                            var left = brushSideExcludingBoundingBox.OrderBy(a => a.x).ThenByDescending(a => a.y).FirstOrDefault();
-                            var right = brushSideExcludingBoundingBox.OrderByDescending(a => a.x).ThenByDescending(a => a.y).FirstOrDefault();
-
-                            vertices3.y = left.y;
-                            vertices2.y = right.y;
-                            break;
-                        case 5:
-                            brushSideExcludingBoundingBox = GetAllVerticesInPlane(brushSideExcluding.plane);
-
-                            left = brushSideExcludingBoundingBox.OrderBy(a => a.x).ThenBy(a => a.y).FirstOrDefault();
-                            right = brushSideExcludingBoundingBox.OrderByDescending(a => a.x).ThenBy(a => a.y).FirstOrDefault();
-
-                            vertices0.y = left.y;
-                            vertices1.y = right.y;
-                            break;
-                        default:
-                            break;
-                    }
-
-
-                    var allVertices = new List<Vertices>() { vertices0, vertices1, vertices2, vertices3 };
-
-                    var verticesOrdered0 = allVertices.OrderBy(a => a.x + a.y).FirstOrDefault(); // bottom left
-                    var verticesOrdered2 = allVertices.OrderByDescending(a => a.x + a.y).FirstOrDefault(); // top right
-                    var verticesOrdered1 = allVertices.Where(x => x != vertices2).OrderByDescending(a => a.x).ThenBy(a => a.y).FirstOrDefault(); // bottom right
-                    var verticesOrdered3 = allVertices.Where(x => x != vertices0).OrderBy(a => a.x).ThenByDescending(a => a.y).FirstOrDefault(); // top left
-
-                    brushSide.vertices_plus = new List<Vertices>() { verticesOrdered0, verticesOrdered1, verticesOrdered2, verticesOrdered3 };
+                    if (brushSideIdsFound.Any(x => x == brushSidesNoVertics[i].id))
+                        positionsToRemove.Add(i);
+                    else
+                        brushSideIdsFound.Add(brushSidesNoVertics[i].id);
                 }
 
-                if (!foundBrushSideInSameBrush)
+                foreach (var index in positionsToRemove)
                 {
-                    var allVertices = new List<Vertices>() { vertices0, vertices1, vertices2, vertices3 };
-
-                    var verticesOrdered0 = allVertices.OrderBy(a => a.x + a.y).FirstOrDefault(); // bottom left
-                    var verticesOrdered2 = allVertices.OrderByDescending(a => a.x + a.y).FirstOrDefault(); // top right
-                    var verticesOrdered1 = allVertices.Where(x => x != vertices2).OrderByDescending(a => a.x).ThenBy(a => a.y).FirstOrDefault(); // bottom right
-                    var verticesOrdered3 = allVertices.Where(x => x != vertices0).OrderBy(a => a.x).ThenByDescending(a => a.y).FirstOrDefault(); // top left
-
-                    brushSide.vertices_plus = new List<Vertices>() { verticesOrdered0, verticesOrdered1, verticesOrdered2, verticesOrdered3 };
+                    brushSidesNoVertics.RemoveAt(index);
                 }
-            }*/
+                //
+
+
+                for (int i = 0; i < brushSidesNoVertics.Count(); i++)
+                {
+                    brushSidesNoVertics[i].vertices_plus = CalculateBrushSideVerticesUsingPlane(brushSidesNoVertics);
+                }
+            }
         }
 
 
-        private static List<Vertices> GetBrushSideBoundingBoxFromThreeVertices(Side brushSide, int numOfBrushSidesOnBrush)
+        private static List<Vertices> CalculateBrushSideVerticesUsingPlane(List<Side> brushSidesNoVertics)
         {
-            var allVerticesInPlane = GetAllVerticesInPlane(brushSide.plane);
+            var verticesCalculated = new List<Vertices>();
+
+            Region region = new Region(new Rectangle(0, 0, Sizes.MaxHammerGridSize, Sizes.MaxHammerGridSize)); // creates a region the size of hammer's grid
+
+            var allPoints = new List<Point>();
+
+
+            var brushesSidesUsing = brushSidesNoVertics; // this should now be covered by this check further down:  'if (pointsToUse.Count() != 2)'
+            //var brushesSidesUsing = brushSidesNoVertics.Where(x => x.material.ToLower() != TextureNames.IgnoreTextureName.ToLower()).ToList(); // should use this material on bottom face
+
+            foreach (var side in brushesSidesUsing)
+            {
+                var verticesToUse = GetAllVerticesInPlane(side.plane);
+                var fourthVertices = GetFourthVerticesFromPlane(side.plane);
+                verticesToUse.Add(fourthVertices);
+
+                var pointsToUse = verticesToUse.Select(x => new Point((int)Math.Ceiling(x.x), (int)Math.Ceiling(x.y))).ToArray();
+
+                allPoints.AddRange(pointsToUse);
+            }
+
+            if (allPoints.Count() == 0)
+                return new List<Vertices>();
+
+            var maxX = allPoints.Max(a => a.X);
+            var minX = allPoints.Min(a => a.X);
+            var maxY = allPoints.Max(a => a.Y);
+            var minY = allPoints.Min(a => a.Y);
+            //var maxZ = allPoints.Max(a => a.Z);
+            //var minZ = allPoints.Min(a => a.Z);
+
+            var width = maxX - minX;
+            var height = maxY - minY;
+
+            for (int i = 0; i < brushesSidesUsing.Count(); i++)
+            {
+                GraphicsPath path = new GraphicsPath();
+                var verticesToUse = GetAllVerticesInPlane(brushesSidesUsing[i].plane);
+                var fourthVertices = GetFourthVerticesFromPlane(brushesSidesUsing[i].plane);
+                verticesToUse.Add(fourthVertices);
+
+                var pointsToUse = verticesToUse.Select(a => new Point((int)Math.Ceiling(a.x), (int)Math.Ceiling(a.y))).Distinct().ToList();
+
+                if (pointsToUse.Count() != 2)
+                {
+                    //Logger.LogImportantWarning("More than 2 points to use when calculating brush side vertices using plane for vanilla Hammer vmf, probably a top down facing brush face, ignoring");
+
+                    continue;
+                }
+
+                // find distance to all bounding box corners to see which should be used as a Point
+                var distancePointBL0 = new Point(Math.Abs(pointsToUse[0].X - minX), Math.Abs(pointsToUse[0].Y - minY));
+                var distancePointBR0 = new Point(Math.Abs(pointsToUse[0].X - maxX), Math.Abs(pointsToUse[0].Y - minY));
+                var distancePointTR0 = new Point(Math.Abs(pointsToUse[0].X - maxX), Math.Abs(pointsToUse[0].Y - maxY));
+                var distancePointTL0 = new Point(Math.Abs(pointsToUse[0].X - minX), Math.Abs(pointsToUse[0].Y - maxY));
+
+                var distancePointBL1 = new Point(Math.Abs(pointsToUse[1].X - minX), Math.Abs(pointsToUse[1].Y - minY));
+                var distancePointBR1 = new Point(Math.Abs(pointsToUse[1].X - maxX), Math.Abs(pointsToUse[1].Y - minY));
+                var distancePointTR1 = new Point(Math.Abs(pointsToUse[1].X - maxX), Math.Abs(pointsToUse[1].Y - maxY));
+                var distancePointTL1 = new Point(Math.Abs(pointsToUse[1].X - minX), Math.Abs(pointsToUse[1].Y - maxY));
+
+                /*
+                var distanceBL0 = Math.Sqrt(Math.Pow(distancePointBL0.X, 2) + Math.Pow(distancePointBL0.Y, 2)); // get hypotenuse length
+                var distanceBR0 = Math.Sqrt(Math.Pow(distancePointBR0.X, 2) + Math.Pow(distancePointBR0.Y, 2));
+                var distanceTR0 = Math.Sqrt(Math.Pow(distancePointTR0.X, 2) + Math.Pow(distancePointTR0.Y, 2));
+                var distanceTL0 = Math.Sqrt(Math.Pow(distancePointTL0.X, 2) + Math.Pow(distancePointTL0.Y, 2));
+
+                var distanceBL1 = Math.Sqrt(Math.Pow(distancePointBL1.X, 2) + Math.Pow(distancePointBL1.Y, 2));
+                var distanceBR1 = Math.Sqrt(Math.Pow(distancePointBR1.X, 2) + Math.Pow(distancePointBR1.Y, 2));
+                var distanceTR1 = Math.Sqrt(Math.Pow(distancePointTR1.X, 2) + Math.Pow(distancePointTR1.Y, 2));
+                var distanceTL1 = Math.Sqrt(Math.Pow(distancePointTL1.X, 2) + Math.Pow(distancePointTL1.Y, 2));
+                */
+
+                var distanceBL0 = distancePointBL0.X + distancePointBL0.Y;
+                var distanceBR0 = distancePointBR0.X + distancePointBR0.Y;
+                var distanceTR0 = distancePointTR0.X + distancePointTR0.Y;
+                var distanceTL0 = distancePointTL0.X + distancePointTL0.Y;
+
+                var distanceBL1 = distancePointBL1.X + distancePointBL1.Y;
+                var distanceBR1 = distancePointBR1.X + distancePointBR1.Y;
+                var distanceTR1 = distancePointTR1.X + distancePointTR1.Y;
+                var distanceTL1 = distancePointTL1.X + distancePointTL1.Y;
+
+                var verticesAlreadyOnCorner = new List<int>();
+                if (distanceBL0 == 0 || distanceBL1 == 0)
+                    verticesAlreadyOnCorner.Add(0);
+                if (distanceBR0 == 0 || distanceBR1 == 0)
+                    verticesAlreadyOnCorner.Add(1);
+                if (distanceTR0 == 0 || distanceTR1 == 0)
+                    verticesAlreadyOnCorner.Add(2);
+                if (distanceTL0 == 0 || distanceTL1 == 0)
+                    verticesAlreadyOnCorner.Add(3);
+
+                if (verticesAlreadyOnCorner.Count() > 1 ||
+                    (
+                        ((pointsToUse[0].X == minX || pointsToUse[0].X == maxX) && (pointsToUse[1].X == minX || pointsToUse[1].X == maxX)) ||
+                        ((pointsToUse[0].Y == minY || pointsToUse[0].Y == maxY) && (pointsToUse[1].Y == minY || pointsToUse[1].Y == maxY)) // ||
+                        /*((pointsToUse[0].X == minX || pointsToUse[0].X == maxX) && (pointsToUse[1].Y == minY || pointsToUse[1].Y == maxY)) ||
+                        ((pointsToUse[0].Y == minY || pointsToUse[0].Y == maxY) && (pointsToUse[1].X == minX || pointsToUse[1].X == maxX))*/
+                    )
+                )
+                {
+                    verticesAlreadyOnCorner.Clear();
+                }
+
+                var maxDistancesByCornerVerticesNum = new Dictionary<int, double>();
+                maxDistancesByCornerVerticesNum.Add(0, new List<double>() { distanceBL0, distanceBL1 }.Max());
+                maxDistancesByCornerVerticesNum.Add(1, new List<double>() { distanceBR0, distanceBR1 }.Max());
+                maxDistancesByCornerVerticesNum.Add(2, new List<double>() { distanceTR0, distanceTR1 }.Max());
+                maxDistancesByCornerVerticesNum.Add(3, new List<double>() { distanceTL0, distanceTL1 }.Max());
+
+                var closestBoundingBoxCornerVerticesNum = maxDistancesByCornerVerticesNum.Where(x => !verticesAlreadyOnCorner.Any(y => y == x.Key)).OrderBy(x => x.Value).FirstOrDefault().Key;
+                switch (closestBoundingBoxCornerVerticesNum)
+                {
+                    case 0:
+                        pointsToUse.Add(new Point(minX, minY));
+                        break;
+                    case 1:
+                        pointsToUse.Add(new Point(maxX, minY));
+                        break;
+                    case 2:
+                        pointsToUse.Add(new Point(maxX, maxY));
+                        break;
+                    case 3:
+                        pointsToUse.Add(new Point(minX, maxY));
+                        break;
+                }
+                var pointsToUseArray = pointsToUse.ToArray();
+
+
+                // temporarily change all values to start at 0 minimum
+                for (int j = 0; j < pointsToUseArray.Count(); j++)
+                {
+                    var point = pointsToUseArray[j];
+                    pointsToUseArray[j] = new Point((point.X - minX), (point.Y - minY));
+                }
+
+
+                path.AddPolygon(pointsToUseArray);
+
+                region.Exclude(path); // excludes from the region
+
+                path.Dispose();
+
+                foreach (var point in pointsToUseArray.Take(pointsToUseArray.Length - 1)) // ignores the last point that was a bounding box corner point added in the closestBoundingBoxCornerVerticesNum switch
+                {
+                    verticesCalculated.Add(new Vertices(point.X, point.Y, (float)verticesToUse.Max(a => a.z))); ////////////////// TODO: should this be min? average? Something else?
+                }
+            }
+
+
+            // change back all temporarily changed values to start at 0 minimum
+            for (int j = 0; j < verticesCalculated.Count(); j++)
+            {
+                var vert = verticesCalculated[j];
+                verticesCalculated[j] = new Vertices((vert.x + minX), (vert.y + minY), (float)vert.z);
+            }
+
+            region.Dispose();
+
+
+            var verticesCalculatedTopHeightOnly = new List<Vertices>();
+            foreach (var vertices in verticesCalculated.OrderByDescending(a => a.z).Distinct())
+            {
+                if (!verticesCalculatedTopHeightOnly.Any(a => Math.Ceiling(a.x) == Math.Ceiling(vertices.x) && Math.Ceiling(a.y) == Math.Ceiling(vertices.y)))
+                {
+                    verticesCalculatedTopHeightOnly.Add(vertices);
+                }
+            }
+
+            // order the vertices
+            var newVerticesOrder = GetAnyNumOfVerticesInPathOrder(verticesCalculatedTopHeightOnly);
+
+            return newVerticesOrder;
+        }
+
+
+        private static List<Vertices> GetAnyNumOfVerticesInPathOrder(List<Vertices> vertices)
+        {
+            List<Vertices> verticesOrdered = new List<Vertices>();
+
+            List<Vertices> verticesLeftToAddAtBeginningOfLoop = new List<Vertices>();
+            verticesLeftToAddAtBeginningOfLoop.AddRange(vertices);
+
+            List<Vertices> verticesAddedThisLoop = new List<Vertices>();
+
+            var vertices0 = vertices.OrderBy(a => a.y).ThenBy(a => a.x).FirstOrDefault();
+            verticesOrdered.Add(vertices0);
+            verticesLeftToAddAtBeginningOfLoop.RemoveAll(x => x == vertices0);
+
+            var previousMovingDirection = 0; //0 = right && right/up, 1 = up && up/left, 2 = left && left/down, 3 = down && down/right
+
+            while (verticesLeftToAddAtBeginningOfLoop.Any())
+            {
+                verticesAddedThisLoop.Clear();
+
+                foreach (var vert in verticesLeftToAddAtBeginningOfLoop)
+                {
+                    if (verticesOrdered.Any(x => x == vert))
+                        continue;
+
+                    if (previousMovingDirection >= 4)
+                        previousMovingDirection = 0;
+
+                    var previousVerticesAdded = verticesOrdered.Last();
+
+                    if ((previousMovingDirection == 0 && previousVerticesAdded.x == verticesLeftToAddAtBeginningOfLoop.Max(a => a.x)) ||
+                        (previousMovingDirection == 1 && previousVerticesAdded.y == verticesLeftToAddAtBeginningOfLoop.Max(a => a.y)) ||
+                        (previousMovingDirection == 2 && previousVerticesAdded.x == verticesLeftToAddAtBeginningOfLoop.Min(a => a.x)) ||
+                        (previousMovingDirection == 3 && previousVerticesAdded.y == verticesLeftToAddAtBeginningOfLoop.Min(a => a.y))
+                    )
+                    {
+                        previousMovingDirection++;
+                    }
+
+                    var verticesLeftToAdd = verticesLeftToAddAtBeginningOfLoop.Where(a => !verticesAddedThisLoop.Any(b => b == a));
+
+                    Vertices nextVerticesToAdd = new Vertices(0, 0, 0);
+                    switch (previousMovingDirection)
+                    {
+                        case 0:
+                            var possibleVerticesToAdd = verticesLeftToAdd.Where(a => a.x > previousVerticesAdded.x && a.y >= previousVerticesAdded.y);
+                            if (!possibleVerticesToAdd.Any())
+                            {
+                                previousMovingDirection++;
+                                continue;
+                            }
+
+                            var nextVertices = possibleVerticesToAdd.OrderBy(a => a.y).ThenByDescending(a => a.x).FirstOrDefault();
+                            //var closestVertices = verticesLeftToAdd.OrderBy(a => Math.Sqrt(Math.Pow(Math.Abs(a.x - previousVerticesAdded.x), 2) + Math.Pow(Math.Abs(a.y - previousVerticesAdded.y), 2))).FirstOrDefault();
+                            nextVerticesToAdd = nextVertices;
+                            break;
+                        case 1:
+                            possibleVerticesToAdd = verticesLeftToAdd.Where(a => a.x <= previousVerticesAdded.x && a.y > previousVerticesAdded.y);
+                            if (!possibleVerticesToAdd.Any())
+                            {
+                                previousMovingDirection++;
+                                continue;
+                            }
+
+                            nextVertices = possibleVerticesToAdd.OrderByDescending(a => a.x).ThenByDescending(a => a.y).FirstOrDefault();
+                            nextVerticesToAdd = nextVertices;
+                            break;
+                        case 2:
+                            possibleVerticesToAdd = verticesLeftToAdd.Where(a => a.x < previousVerticesAdded.x && a.y <= previousVerticesAdded.y);
+                            if (!possibleVerticesToAdd.Any())
+                            {
+                                previousMovingDirection++;
+                                continue;
+                            }
+
+                            nextVertices = possibleVerticesToAdd.OrderByDescending(a => a.y).ThenBy(a => a.x).FirstOrDefault();
+                            nextVerticesToAdd = nextVertices;
+                            break;
+                        case 3:
+                            possibleVerticesToAdd = verticesLeftToAdd.Where(a => a.x >= previousVerticesAdded.x && a.y < previousVerticesAdded.y);
+                            if (!possibleVerticesToAdd.Any())
+                            {
+                                previousMovingDirection++;
+                                continue;
+                            }
+
+                            nextVertices = possibleVerticesToAdd.OrderBy(a => a.x).ThenBy(a => a.y).FirstOrDefault();
+                            nextVerticesToAdd = nextVertices;
+                            break;
+                        default:
+                            // default should never get hit
+                            Logger.LogImportantWarning("Default hit in switch when attempting to get vertices in order, errors likely to occur");
+                            continue;
+                    }
+
+                    verticesOrdered.Add(nextVerticesToAdd);
+                    verticesAddedThisLoop.Add(nextVerticesToAdd);
+                }
+
+                foreach (var vert in verticesAddedThisLoop)
+                {
+                    verticesLeftToAddAtBeginningOfLoop.RemoveAll(x => x == vert);
+                }
+            }
+
+            return verticesOrdered;
+        }
+
+
+        private static Vertices GetFourthVerticesFromPlane(string plane)
+        {
+            var allVerticesInPlane = GetAllVerticesInPlane(plane);
 
             //var temp = allVerticesInPlane.Select(a => a.x).GroupBy(a => a);
 
@@ -153,68 +360,15 @@ namespace JERC.Constants
             float y = allVerticesInPlane.Select(a => a.y).GroupBy(a => a).OrderBy(a => a.Count()).FirstOrDefault().Key;
             float z = (float)allVerticesInPlane.Select(a => a.z).GroupBy(a => a).OrderBy(a => a.Count()).FirstOrDefault().Key;
 
-            // check if we need to guess the position of vertices3
-            if (numOfBrushSidesOnBrush < 6)
+            if (allVerticesInPlane.Distinct().Count() != 3)
             {
-                return new List<Vertices>() { allVerticesInPlane[0], allVerticesInPlane[1], allVerticesInPlane[2] };
+                Logger.LogImportantWarning("brushSide's plane does not contain 3 vertices, errors likely to occur");
             }
-            else
-            {
-                if (allVerticesInPlane.Select(a => a.x).GroupBy(a => a).Count() == 3)
-                {
-                    var xDiff01 = Math.Abs(allVerticesInPlane[0].x - allVerticesInPlane[1].x);
-                    var xDiff12 = Math.Abs(allVerticesInPlane[1].x - allVerticesInPlane[2].x);
-                    var xDiff20 = Math.Abs(allVerticesInPlane[2].x - allVerticesInPlane[0].x);
 
-                    var allXDiffs = new List<float>() { xDiff01, xDiff12, xDiff20 };
-                    allXDiffs = allXDiffs.OrderByDescending(a => a).ToList();
+            // finish
+            var vertices3 = new Vertices(x, y, (float)z);
 
-                    if (allXDiffs.FirstOrDefault() == xDiff01)
-                        x = allVerticesInPlane[0].x > allVerticesInPlane[1].x ? allVerticesInPlane[0].x : allVerticesInPlane[1].x;
-                    else if (allXDiffs.FirstOrDefault() == xDiff12)
-                        x = allVerticesInPlane[1].x > allVerticesInPlane[2].x ? allVerticesInPlane[1].x : allVerticesInPlane[2].x;
-                    else
-                        x = allVerticesInPlane[2].x > allVerticesInPlane[0].x ? allVerticesInPlane[2].x : allVerticesInPlane[0].x;
-                }
-
-                if (allVerticesInPlane.Select(a => a.y).GroupBy(a => a).Count() == 3)
-                {
-                    var yDiff01 = Math.Abs(allVerticesInPlane[0].y - allVerticesInPlane[1].y);
-                    var yDiff12 = Math.Abs(allVerticesInPlane[1].y - allVerticesInPlane[2].y);
-                    var yDiff20 = Math.Abs(allVerticesInPlane[2].y - allVerticesInPlane[0].y);
-
-                    var allYDiffs = new List<float>() { yDiff01, yDiff12, yDiff20 };
-                    allYDiffs = allYDiffs.OrderByDescending(a => a).ToList();
-
-                    if (allYDiffs.FirstOrDefault() == yDiff01)
-                        y = allVerticesInPlane[0].y > allVerticesInPlane[1].y ? allVerticesInPlane[0].y : allVerticesInPlane[1].y;
-                    else if (allYDiffs.FirstOrDefault() == yDiff12)
-                        y = allVerticesInPlane[1].y > allVerticesInPlane[2].y ? allVerticesInPlane[1].y : allVerticesInPlane[2].y;
-                    else
-                        y = allVerticesInPlane[2].y > allVerticesInPlane[0].y ? allVerticesInPlane[2].y : allVerticesInPlane[0].y;
-                }
-
-                if (allVerticesInPlane.Select(a => a.z).GroupBy(a => a).Count() == 3)
-                {
-                    var zDiff01 = Math.Abs((float)(allVerticesInPlane[0].z - allVerticesInPlane[1].z));
-                    var zDiff12 = Math.Abs((float)(allVerticesInPlane[1].z - allVerticesInPlane[2].z));
-                    var zDiff20 = Math.Abs((float)(allVerticesInPlane[2].z - allVerticesInPlane[0].z));
-
-                    var allZDiffs = new List<float>() { zDiff01, zDiff12, zDiff20 };
-                    allZDiffs = allZDiffs.OrderByDescending(a => a).ToList();
-
-                    if (allZDiffs.FirstOrDefault() == zDiff01)
-                        z = allVerticesInPlane[0].z > allVerticesInPlane[1].z ? (float)allVerticesInPlane[0].z : (float)allVerticesInPlane[1].z;
-                    else if (allZDiffs.FirstOrDefault() == zDiff12)
-                        z = allVerticesInPlane[1].z > allVerticesInPlane[2].z ? (float)allVerticesInPlane[1].z : (float)allVerticesInPlane[2].z;
-                    else
-                        z = allVerticesInPlane[2].z > allVerticesInPlane[0].z ? (float)allVerticesInPlane[2].z : (float)allVerticesInPlane[0].z;
-                }
-
-                var vertices3 = new Vertices(x, y, (float)z);
-
-                return new List<Vertices>() { allVerticesInPlane[0], allVerticesInPlane[1], allVerticesInPlane[2], vertices3 };
-            }
+            return vertices3;
         }
 
 
@@ -227,6 +381,18 @@ namespace JERC.Constants
             var vertices2 = new Vertices(planesVerticesList[6] + " " + planesVerticesList[7] + " " + planesVerticesList[8]); // 3 vertices per plane in vanilla hammer
 
             return new List<Vertices>() { vertices0, vertices1, vertices2 };
+        }
+
+
+        private static void DisposeGraphics(Graphics graphics)
+        {
+            graphics.Dispose();
+        }
+
+
+        private static void DisposeImage(Bitmap bmp)
+        {
+            bmp.Dispose();
         }
     }
 }

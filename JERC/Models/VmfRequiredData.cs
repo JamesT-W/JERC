@@ -182,13 +182,13 @@ namespace JERC.Models
             // calculate vertices_plus for every brush side for vanilla hammer vmfs, as hammer++ adds vertices itself when saving a vmf
             if (GameConfigurationValues.isVanillaHammer == true)
             {
-                VanillaHammerVmfFixer.CalculateVerticesPlusForAllBrushSides(
-                    brushesIgnore.SelectMany(x => x.side).Concat(brushesRemove.SelectMany(x => x.side)).Concat(brushesPath.SelectMany(x => x.side)).Concat(brushesCover.SelectMany(x => x.side)).Concat(brushesOverlap.SelectMany(x => x.side)).Concat(brushesDoor.SelectMany(x => x.side)).Concat(brushesLadder.SelectMany(x => x.side)).Concat(brushesDanger.SelectMany(x => x.side))
+                VanillaHammerVmfFixer.CalculateVerticesPlusForAllBrushes(
+                    brushesIgnore.Concat(brushesRemove).Concat(brushesPath).Concat(brushesCover).Concat(brushesOverlap).Concat(brushesDoor).Concat(brushesLadder).Concat(brushesDanger)
                     .ToList()
                 );
 
-                VanillaHammerVmfFixer.CalculateVerticesPlusForAllBrushSides(
-                    brushesBuyzone.SelectMany(x => x.side).Concat(brushesBombsiteA.SelectMany(x => x.side)).Concat(brushesBombsiteB.SelectMany(x => x.side)).Concat(brushesRescueZone.SelectMany(x => x.side)).Concat(brushesHostage.SelectMany(x => x.side)).Concat(brushesTSpawn.SelectMany(x => x.side)).Concat(brushesCTSpawn.SelectMany(x => x.side))
+                VanillaHammerVmfFixer.CalculateVerticesPlusForAllBrushes(
+                    brushesBuyzone.Concat(brushesBombsiteA).Concat(brushesBombsiteB).Concat(brushesRescueZone).Concat(brushesHostage).Concat(brushesTSpawn).Concat(brushesCTSpawn)
                     .ToList()
                 );
             }
@@ -229,14 +229,14 @@ namespace JERC.Models
             brushesSidesCTSpawnUnordered.RemoveAll(x => brushesCTSpawn.FirstOrDefault(y => y.id == x.brushId).side.Any(y => y.isDisplacement));*/
             //
 
-            brushesSidesIgnore = OrderListOfSidesByVerticesMin(brushesSidesIgnoreUnordered, true);
-            brushesSidesRemove = OrderListOfSidesByVerticesMin(brushesSidesRemoveUnordered);
-            brushesSidesPath = OrderListOfSidesByVerticesMin(brushesSidesPathUnordered);
-            brushesSidesCover = OrderListOfSidesByVerticesMin(brushesSidesCoverUnordered);
-            brushesSidesOverlap = OrderListOfSidesByVerticesMin(brushesSidesOverlapUnordered);
-            brushesSidesDoor = OrderListOfSidesByVerticesMin(brushesSidesDoorUnordered);
-            brushesSidesLadder = OrderListOfSidesByVerticesMin(brushesSidesLadderUnordered);
-            brushesSidesDanger = OrderListOfSidesByVerticesMin(brushesSidesDangerUnordered);
+            brushesSidesIgnore = OrderListOfSidesByVerticesMin(brushesIgnore, true);
+            brushesSidesRemove = OrderListOfSidesByVerticesMin(brushesRemove);
+            brushesSidesPath = OrderListOfSidesByVerticesMin(brushesPath);
+            brushesSidesCover = OrderListOfSidesByVerticesMin(brushesCover);
+            brushesSidesOverlap = OrderListOfSidesByVerticesMin(brushesOverlap);
+            brushesSidesDoor = OrderListOfSidesByVerticesMin(brushesDoor);
+            brushesSidesLadder = OrderListOfSidesByVerticesMin(brushesLadder);
+            brushesSidesDanger = OrderListOfSidesByVerticesMin(brushesDanger);
 
             /*brushesSidesBuyzone = OrderListOfSidesByVerticesMin(brushesSidesBuyzoneUnordered);
             brushesSidesBombsiteA = OrderListOfSidesByVerticesMin(brushesSidesBombsiteAUnordered);
@@ -268,13 +268,13 @@ namespace JERC.Models
             // calculate vertices_plus for every brush side for vanilla hammer vmfs, as hammer++ adds vertices itself when saving a vmf
             if (GameConfigurationValues.isVanillaHammer == true)
             {
-                VanillaHammerVmfFixer.CalculateVerticesPlusForAllBrushSides(
-                    displacementsIgnore.SelectMany(x => x.side).Concat(displacementsRemove.SelectMany(x => x.side)).Concat(displacementsPath.SelectMany(x => x.side)).Concat(displacementsCover.SelectMany(x => x.side)).Concat(displacementsOverlap.SelectMany(x => x.side)).Concat(displacementsDoor.SelectMany(x => x.side)).Concat(displacementsLadder.SelectMany(x => x.side)).Concat(displacementsDanger.SelectMany(x => x.side))
+                VanillaHammerVmfFixer.CalculateVerticesPlusForAllBrushes(
+                    displacementsIgnore.Concat(displacementsRemove).Concat(displacementsPath).Concat(displacementsCover).Concat(displacementsOverlap).Concat(displacementsDoor).Concat(displacementsLadder).Concat(displacementsDanger)
                     .ToList()
                 );
 
-                VanillaHammerVmfFixer.CalculateVerticesPlusForAllBrushSides(
-                    displacementsBuyzone.SelectMany(x => x.side).Concat(displacementsBombsiteA.SelectMany(x => x.side)).Concat(displacementsBombsiteB.SelectMany(x => x.side)).Concat(displacementsRescueZone.SelectMany(x => x.side)).Concat(displacementsHostage.SelectMany(x => x.side)).Concat(displacementsTSpawn.SelectMany(x => x.side)).Concat(displacementsCTSpawn.SelectMany(x => x.side))
+                VanillaHammerVmfFixer.CalculateVerticesPlusForAllBrushes(
+                    displacementsBuyzone.Concat(displacementsBombsiteA).Concat(displacementsBombsiteB).Concat(displacementsRescueZone).Concat(displacementsHostage).Concat(displacementsTSpawn).Concat(displacementsCTSpawn)
                     .ToList()
                 );
             }
@@ -315,14 +315,14 @@ namespace JERC.Models
             displacementsSidesCTSpawnUnordered.RemoveAll(x => !x.isDisplacement);*/
             //
 
-            displacementsSidesIgnore = OrderListOfSidesByVerticesMin(displacementsSidesIgnoreUnordered, true);
-            displacementsSidesRemove = OrderListOfSidesByVerticesMin(displacementsSidesRemoveUnordered);
-            displacementsSidesPath = OrderListOfSidesByVerticesMin(displacementsSidesPathUnordered);
-            displacementsSidesCover = OrderListOfSidesByVerticesMin(displacementsSidesCoverUnordered);
-            displacementsSidesOverlap = OrderListOfSidesByVerticesMin(displacementsSidesOverlapUnordered);
-            displacementsSidesDoor = OrderListOfSidesByVerticesMin(displacementsSidesDoorUnordered);
-            displacementsSidesLadder = OrderListOfSidesByVerticesMin(displacementsSidesLadderUnordered);
-            displacementsSidesDanger = OrderListOfSidesByVerticesMin(displacementsSidesDangerUnordered);
+            displacementsSidesIgnore = OrderListOfSidesByVerticesMin(displacementsIgnore, true);
+            displacementsSidesRemove = OrderListOfSidesByVerticesMin(displacementsRemove);
+            displacementsSidesPath = OrderListOfSidesByVerticesMin(displacementsPath);
+            displacementsSidesCover = OrderListOfSidesByVerticesMin(displacementsCover);
+            displacementsSidesOverlap = OrderListOfSidesByVerticesMin(displacementsOverlap);
+            displacementsSidesDoor = OrderListOfSidesByVerticesMin(displacementsDoor);
+            displacementsSidesLadder = OrderListOfSidesByVerticesMin(displacementsLadder);
+            displacementsSidesDanger = OrderListOfSidesByVerticesMin(displacementsDanger);
 
             /*displacementsSidesBuyzone = OrderListOfSidesByVerticesMin(displacementsSidesBuyzoneUnordered);
             displacementsSidesBombsiteA = OrderListOfSidesByVerticesMin(displacementsSidesBombsiteAUnordered);
@@ -379,15 +379,15 @@ namespace JERC.Models
             // calculate vertices_plus for every brush side for vanilla hammer vmfs, as hammer++ adds vertices itself when saving a vmf
             if (GameConfigurationValues.isVanillaHammer == true)
             {
-                VanillaHammerVmfFixer.CalculateVerticesPlusForAllBrushSides(
-                    buyzoneBrushEntities.SelectMany(x => x.brushes.SelectMany(y => y.side))
-                        .Concat(bombsiteBrushEntities.SelectMany(x => x.brushes.SelectMany(y => y.side)))
-                        .Concat(rescueZoneBrushEntities.SelectMany(x => x.brushes.SelectMany(y => y.side)))
-                        .Concat(hostageEntities.SelectMany(x => x.brushes.SelectMany(y => y.side)))
-                        .Concat(ctSpawnEntities.SelectMany(x => x.brushes.SelectMany(y => y.side)))
-                        .Concat(tSpawnEntities.SelectMany(x => x.brushes.SelectMany(y => y.side)))
-                        .Concat(infoOverlayEntities.SelectMany(x => x.brushes.SelectMany(y => y.side)))
-                        .Concat(jercInfoOverlayEntities.SelectMany(x => x.brushes.SelectMany(y => y.side)))
+                VanillaHammerVmfFixer.CalculateVerticesPlusForAllBrushes(
+                    buyzoneBrushEntities.SelectMany(x => x.brushes)
+                        .Concat(bombsiteBrushEntities.SelectMany(x => x.brushes))
+                        .Concat(rescueZoneBrushEntities.SelectMany(x => x.brushes))
+                        .Concat(hostageEntities.SelectMany(x => x.brushes))
+                        .Concat(ctSpawnEntities.SelectMany(x => x.brushes))
+                        .Concat(tSpawnEntities.SelectMany(x => x.brushes))
+                        .Concat(infoOverlayEntities.SelectMany(x => x.brushes))
+                        .Concat(jercInfoOverlayEntities.SelectMany(x => x.brushes))
                     .ToList()
                 );
             }
@@ -413,7 +413,7 @@ namespace JERC.Models
             // calculate vertices_plus for every brush side for vanilla hammer vmfs, as hammer++ adds vertices itself when saving a vmf
             if (GameConfigurationValues.isVanillaHammer == true)
             {
-                VanillaHammerVmfFixer.CalculateVerticesPlusForAllBrushSides(jercBoxBrushEntities.SelectMany(x => x.brushes.SelectMany(y => y.side)).ToList());
+                VanillaHammerVmfFixer.CalculateVerticesPlusForAllBrushes(jercBoxBrushEntities.SelectMany(x => x.brushes).ToList());
             }
 
             foreach (var entity in jercBoxBrushEntities)
@@ -462,20 +462,24 @@ namespace JERC.Models
 
         // Orders by descending, then uses distinct to ensure that it gets the MAX value first for each side and ignores the rest.
         // Then, it reverses, so it is ascending (MIN value first)
-        private static List<Side> OrderListOfSidesByVerticesMin(List<Side> sides, bool calculateVerticesPlus = false)
+        private static List<Side> OrderListOfSidesByVerticesMin(List<Brush> brushes, bool calculateVerticesPlus = false)
         {
-            if (sides == null || !sides.Any())
-                return sides;
+            if (brushes == null || !brushes.Any())
+                return new List<Side>();
+
+            if (brushes.Select(x => x.side) == null || !brushes.Select(x => x.side).Any())
+                return new List<Side>();
 
             if (GameConfigurationValues.isVanillaHammer == true && calculateVerticesPlus)
             {
-                VanillaHammerVmfFixer.CalculateVerticesPlusForAllBrushSides(sides);
+                VanillaHammerVmfFixer.CalculateVerticesPlusForAllBrushes(brushes);
             }
 
-            var sidesNew = (from x in sides
-                            from y in x?.vertices_plus
-                            orderby y?.z descending
-                            select x).Distinct().ToList();
+            var sidesNew = (from x in brushes.Where(a => a.side != null && a.side.Any())
+                            from y in x.side.Where(b => b.vertices_plus != null && b.vertices_plus.Any())
+                            from z in y?.vertices_plus
+                            orderby z?.y descending
+                            select y).Distinct().ToList();
 
             sidesNew.Reverse();
 
