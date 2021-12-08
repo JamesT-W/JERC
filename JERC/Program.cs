@@ -1,4 +1,4 @@
-﻿using ImageAlterer;
+using ImageAlterer;
 using JERC.Constants;
 using JERC.Enums;
 using JERC.Models;
@@ -3329,19 +3329,22 @@ namespace JERC
                 bombA_y = FlipOverviewTxtValues(yPercent1, false);
 
                 // bombsite b
-                var vertices2 = vmfRequiredData.brushesBombsiteB.Any() || vmfRequiredData.displacementsBombsiteB.Any()
-                    ? vmfRequiredData.brushesBombsiteB.Concat(vmfRequiredData.displacementsBombsiteB).SelectMany(x => x.side.SelectMany(y => y.vertices_plus))
-                    : null;
+                if (vmfRequiredData.brushesBombsiteB.Any() || vmfRequiredData.displacementsBombsiteB.Any())
+                {
+                    var vertices2 = vmfRequiredData.brushesBombsiteB.Any() || vmfRequiredData.displacementsBombsiteB.Any()
+                        ? vmfRequiredData.brushesBombsiteB.Concat(vmfRequiredData.displacementsBombsiteB).SelectMany(x => x.side.SelectMany(y => y.vertices_plus))
+                        : null;
 
-                var xAllValues2 = vertices2.Select(x => x.x);
-                var yAllValues2 = vertices2.Select(x => x.y);
-                var xAverage2 = xAllValues2.Average();
-                var yAverage2 = yAllValues2.Average();
-                var xPercent2 = Math.Abs((Math.Abs(Math.Abs(xAverage2) - Math.Abs(overviewPositionValues.brushVerticesPosMinX)) - (overviewPositionValues.radarSizeMultiplierChangeAmountWidth / 2)) / overviewPositionValues.outputResolution) + paddingPercentageEachSideX;
-                var yPercent2 = Math.Abs((Math.Abs(Math.Abs(yAverage2) - Math.Abs(overviewPositionValues.brushVerticesPosMinY)) - (overviewPositionValues.radarSizeMultiplierChangeAmountHeight / 2)) / overviewPositionValues.outputResolution) + paddingPercentageEachSideY;
+                    var xAllValues2 = vertices2.Select(x => x.x);
+                    var yAllValues2 = vertices2.Select(x => x.y);
+                    var xAverage2 = xAllValues2.Average();
+                    var yAverage2 = yAllValues2.Average();
+                    var xPercent2 = Math.Abs((Math.Abs(Math.Abs(xAverage2) - Math.Abs(overviewPositionValues.brushVerticesPosMinX)) - (overviewPositionValues.radarSizeMultiplierChangeAmountWidth / 2)) / overviewPositionValues.outputResolution) + paddingPercentageEachSideX;
+                    var yPercent2 = Math.Abs((Math.Abs(Math.Abs(yAverage2) - Math.Abs(overviewPositionValues.brushVerticesPosMinY)) - (overviewPositionValues.radarSizeMultiplierChangeAmountHeight / 2)) / overviewPositionValues.outputResolution) + paddingPercentageEachSideY;
 
-                bombB_x = FlipOverviewTxtValues(xPercent2, true);
-                bombB_y = FlipOverviewTxtValues(yPercent2, false);
+                    bombB_x = FlipOverviewTxtValues(xPercent2, true);
+                    bombB_y = FlipOverviewTxtValues(yPercent2, false);
+                }
             }
             else if (vmfRequiredData.bombsiteBrushEntities.Any()) // won't do bombsite entities if JERC bombsite materials are found on brushes
             {
