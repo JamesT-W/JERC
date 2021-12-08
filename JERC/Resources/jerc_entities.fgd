@@ -164,10 +164,11 @@
 ]
 
 
-@PointClass iconsprite("jerc/editor/jerc_divider.vmt") = jerc_divider : 
+@PointClass iconsprite("jerc/editor/jerc_divider.vmt") wirebox(mins, maxs) = jerc_divider : 
 	"JERC - A divider between different levels of the radar."
 [
-	
+	mins(vector) : "Mins" : "-16384 -16384 0"
+	maxs(vector) : "Maxs" : "16384 16384 0"
 ]
 
 
