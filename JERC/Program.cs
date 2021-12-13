@@ -1367,8 +1367,8 @@ namespace JERC
             graphics.SetClip(Rectangle.FromLTRB(0, 0, overviewPositionValues.outputResolution, overviewPositionValues.outputResolution));
 
             // get all brush sides and displacement sides to draw (brush volumes)
-            var brushRemoveList = GetBrushVolumeListWithinLevelHeight(levelHeight, vmfRequiredData.brushesRemove, JercTypes.Remove);
-            var displacementRemoveList = GetBrushVolumeListWithinLevelHeight(levelHeight, vmfRequiredData.displacementsRemove, JercTypes.Remove);
+            var brushRemoveList = GetBrushVolumeListWithinLevelHeight(levelHeight, vmfRequiredData.brushesRemove, JercTypes.Remove, true);
+            var displacementRemoveList = GetBrushVolumeListWithinLevelHeight(levelHeight, vmfRequiredData.displacementsRemove, JercTypes.Remove, true);
 
             var brushCoverList = GetBrushVolumeListWithinLevelHeight(levelHeight, vmfRequiredData.brushesCover, JercTypes.Cover);
             var displacementCoverList = GetBrushVolumeListWithinLevelHeight(levelHeight, vmfRequiredData.displacementsCover, JercTypes.Cover);
@@ -2155,7 +2155,7 @@ namespace JERC
         }
 
 
-        private static List<BrushVolume> GetBrushVolumeListWithinLevelHeight(LevelHeight levelHeight, List<Models.Brush> brushList, JercTypes jercType)
+        private static List<BrushVolume> GetBrushVolumeListWithinLevelHeight(LevelHeight levelHeight, List<Models.Brush> brushList, JercTypes jercType, bool allowInMultipleLevels = false)
         {
             var brushVolumeList = new List<BrushVolume>();
 
@@ -2163,9 +2163,17 @@ namespace JERC
             {
                 var brushVolumeUnchecked = GetBrushVolume(brush, jercType);
 
-                // may appear on more than 1 level if their brushes span across level dividers or touch edges ?
-                if (brushVolumeUnchecked.brushSides.SelectMany(a => a.vertices).All(a => a.z >= levelHeight.zMinForRadar) &&
-                    brushVolumeUnchecked.brushSides.SelectMany(a => a.vertices).All(a => a.z <= levelHeight.zMaxForRadar)
+                var brushSides = brushVolumeUnchecked.brushSides.SelectMany(a => a.vertices).ToList();
+
+                if (allowInMultipleLevels &&
+                    brushSides.Any(a => a.z >= levelHeight.zMinForRadar) &&
+                    brushSides.Any(a => a.z <= levelHeight.zMaxForRadar))
+                {
+                    brushVolumeList.Add(brushVolumeUnchecked);
+                }
+                else if (!allowInMultipleLevels &&
+                         brushSides.All(a => a.z >= levelHeight.zMinForRadar) &&
+                         brushSides.All(a => a.z <= levelHeight.zMaxForRadar) // may appear on more than 1 level if their brushes span across level dividers or touch edges ?
                 )
                 {
                     brushVolumeList.Add(brushVolumeUnchecked);
