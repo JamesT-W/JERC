@@ -1950,12 +1950,11 @@ namespace JERC
             {
                 if (!configurationValues.onlyOutputToAlternatePath)
                 {
-                    if (configurationValues.overviewGamemodeType == 0)
-                    {
-                        var outputImageFilepath = string.Concat(overviewsOutputFilepathPrefix, radarLevelString, "_radar");
-                        SaveImage(outputImageFilepath, radarLevel.bmpRadar);
-                    }
-                    else if (configurationValues.overviewGamemodeType == 1)
+                    // always output resource/overviews/ radar image, used on loading screens
+                    var outputImageFilepathRadar = string.Concat(overviewsOutputFilepathPrefix, radarLevelString, "_radar");
+                    SaveImage(outputImageFilepathRadar, radarLevel.bmpRadar);
+
+                    if (configurationValues.overviewGamemodeType == 1)
                     {
                         if (configurationValues.dangerZoneUses == 0 || configurationValues.dangerZoneUses == 1)
                             SaveImage(dzTabletOutputFilepathPrefix, radarLevel.bmpRadar, dangerZoneSpecificFile: DangerZoneSpecificFiles.TabletImage);
@@ -1980,13 +1979,12 @@ namespace JERC
 
                 if (!string.IsNullOrWhiteSpace(configurationValues.alternateOutputPath))
                 {
-                    if (configurationValues.overviewGamemodeType == 0)
-                    {
-                        var outputImageFilepath = string.Concat(configurationValues.alternateOutputPath, @"resource\overviews\", mapName, radarLevelString, "_radar");
-                        CreateDirectoryOfFileIfDoesntExist(outputImageFilepath);
-                        SaveImage(outputImageFilepath, radarLevel.bmpRadar);
-                    }
-                    else if (configurationValues.overviewGamemodeType == 1)
+                    // always output resource/overviews/ radar image, used on loading screens
+                    var outputImageFilepathRadar = string.Concat(configurationValues.alternateOutputPath, @"resource\overviews\", mapName, radarLevelString, "_radar");
+                    CreateDirectoryOfFileIfDoesntExist(outputImageFilepathRadar);
+                    SaveImage(outputImageFilepathRadar, radarLevel.bmpRadar);
+
+                    if (configurationValues.overviewGamemodeType == 1)
                     {
                         if (configurationValues.dangerZoneUses == 0 || configurationValues.dangerZoneUses == 1)
                         {
