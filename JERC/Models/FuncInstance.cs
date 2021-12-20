@@ -1,4 +1,5 @@
-﻿using System;
+﻿using JERC.Constants;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -27,7 +28,7 @@ namespace JERC.Models
             if (new string(file.TakeLast(4).ToArray()).ToLower() != ".vmf")
                 file += ".vmf";
 
-            fixup_style = int.Parse(entity.Body.FirstOrDefault(x => x.Name == "fixup_style")?.Value);
+            int.TryParse(entity.Body.FirstOrDefault(x => x.Name == "fixup_style")?.Value, Globalization.Style, Globalization.Culture, out fixup_style);
             origin = entity.Body.Where(x => x.Name == "origin")?.Select(x => new Vertices(x.Value)).FirstOrDefault();
             editor = new Editor(entity.Body.FirstOrDefault(x => x.Name == "editor"));
         }
