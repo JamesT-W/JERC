@@ -94,7 +94,7 @@ namespace JERC
             {
                 // check world brushes and entity brushes for "vertices_plus" to know if it has been saved with hammer++ or vanilla hammer
                 if (allWorldBrushes.Any(x => x.Body.Where(y => y.Name == "side").Any(y => y.Body.Any(z => z.Name == "vertices_plus"))) ||
-                    allEntities.Any(x => x.Body.Where(y => y.Name == "solid").Any(y => y.Body.Where(z => z.Name == "side").Any(z => z.Body.Any(a => a.Name == "vertices_plus"))))
+                    allEntities.Any(x => x.Body.Where(y => y.Name == "solid").Where(y => y.Body != null).Any(y => y.Body.Where(z => z.Name == "side").Any(z => z.Body.Any(a => a.Name == "vertices_plus"))))
                 )
                 {
                     GameConfigurationValues.isVanillaHammer = false;
