@@ -17,7 +17,9 @@ namespace JERC.Models
         public string uaxis;
         public string vaxis;
         public float rotation;
+        public int lightmapscale;
         public int smoothing_groups;
+        public int contents;
         public DispInfo dispinfo;
 
         public bool fakeBrushSideCreatedFromOverlay;
@@ -45,7 +47,9 @@ namespace JERC.Models
             uaxis = side.Body.FirstOrDefault(x => x.Name == "uaxis")?.Value;
             vaxis = side.Body.FirstOrDefault(x => x.Name == "vaxis")?.Value;
             rotation = float.Parse(side.Body.FirstOrDefault(x => x.Name == "rotation")?.Value, Globalization.Style, Globalization.Culture);
+            lightmapscale = int.Parse(side.Body.FirstOrDefault(x => x.Name == "lightmapscale")?.Value);
             smoothing_groups = int.Parse(side.Body.FirstOrDefault(x => x.Name == "smoothing_groups")?.Value);
+            contents = int.Parse(side.Body.FirstOrDefault(x => x.Name == "contents")?.Value);
 
             var dispinfoIVNode = side.Body.FirstOrDefault(x => x.Name == "dispinfo");
             if (dispinfoIVNode != null)
