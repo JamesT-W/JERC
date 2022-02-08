@@ -1,4 +1,6 @@
 ﻿using JERC.Constants;
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -23,9 +25,19 @@ namespace JERC.Models
         private static readonly int maxNumOfDiffArgs = 3;
         private static readonly int maxNumOfArgs = maxNumOfDiffArgs * 2;
 
+        public static readonly List<string> allArgumentNames = new List<string>() { "-software", "-g", "-game", "-vmffilepath" };
+
 
         public static void SetArgs(string[] args)
         {
+            Logger.LogMessage("---- Arguments ----");
+            Console.WriteLine("Num of arguments provided: " + args.Length);
+
+            for (int i = 0; i < args.Length; i+=2)
+            {
+                Console.WriteLine(string.Concat("** Argument: ", args[i], " ", args[i+1]));
+            }
+
             if (args.Length > maxNumOfArgs)
                 return;
 

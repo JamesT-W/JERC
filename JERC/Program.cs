@@ -10,6 +10,7 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using VMFParser;
 
@@ -50,11 +51,44 @@ namespace JERC
 
         static void Main(string[] args)
         {
+            if (args.Length < 2)
+            {
+                Logger.LogError("No argument and value given");
+                return;
+            }
+
+            // add quotes to param values if necessary
+            for (int i = 1; i < args.Length; i++)
+            {
+                if (!args[i].StartsWith("\"") && GameConfigurationValues.allArgumentNames.Any(x => x == args[i - 1].ToLower()))
+                {
+                    args[i] = "\"" + args[i];
+                }
+
+                if (!args[i].EndsWith("\"") &&
+                        (i == args.Length - 1 ||
+                        i < args.Length - 1 && GameConfigurationValues.allArgumentNames.Any(x => x == args[i + 1].ToLower())))
+                {
+                    args[i] += "\"";
+                }
+            }
+
+            // ensure the args are split by spaces (but not when spaces are within quotes)
+            var argsJoined = string.Join(" ", args);
+            args = argsJoined.Split('"')
+                     .Select((element, index) => index % 2 == 0  // If even index
+                                           ? element.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)  // Split the item
+                                           : new string[] { element })  // Keep the entire item
+                     .SelectMany(element => element).ToArray();
+            //
+
+
             GameConfigurationValues.SetArgs(args);
+
 
             if (!debugging && !GameConfigurationValues.VerifyAllValuesSet())
             {
-                Logger.LogError("Game configuration filepaths missing. Check the compile configuration's parameters.");
+                Logger.LogError("Game configuration filepaths missing. Potentially too many parameters given. Check the compile configuration's parameters.");
                 return;
             }
 
