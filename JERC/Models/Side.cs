@@ -46,10 +46,10 @@ namespace JERC.Models
             material = side.Body.FirstOrDefault(x => x.Name == "material")?.Value;
             uaxis = side.Body.FirstOrDefault(x => x.Name == "uaxis")?.Value;
             vaxis = side.Body.FirstOrDefault(x => x.Name == "vaxis")?.Value;
-            rotation = float.Parse(side.Body.FirstOrDefault(x => x.Name == "rotation")?.Value, Globalization.Style, Globalization.Culture);
-            lightmapscale = int.Parse(side.Body.FirstOrDefault(x => x.Name == "lightmapscale")?.Value);
-            smoothing_groups = int.Parse(side.Body.FirstOrDefault(x => x.Name == "smoothing_groups")?.Value);
-            contents = int.Parse(side.Body.FirstOrDefault(x => x.Name == "contents")?.Value);
+            float.TryParse(side.Body.FirstOrDefault(x => x.Name == "rotation")?.Value, Globalization.Style, Globalization.Culture, out float rotation);
+            int.TryParse(side.Body.FirstOrDefault(x => x.Name == "lightmapscale")?.Value, Globalization.Style, Globalization.Culture, out int lightmapscale);
+            int.TryParse(side.Body.FirstOrDefault(x => x.Name == "smoothing_groups")?.Value, Globalization.Style, Globalization.Culture, out int smoothing_groups);
+            int.TryParse(side.Body.FirstOrDefault(x => x.Name == "contents")?.Value, Globalization.Style, Globalization.Culture, out int contents);
 
             var dispinfoIVNode = side.Body.FirstOrDefault(x => x.Name == "dispinfo");
             if (dispinfoIVNode != null)
