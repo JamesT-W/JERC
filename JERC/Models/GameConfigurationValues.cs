@@ -42,6 +42,7 @@ namespace JERC.Models
                         softwareProvided = true;
                         break;
                     case "-g":
+                    case "-game":
                         csgoFolderPath = args[i + 1];
                         if (string.IsNullOrWhiteSpace(csgoFolderPath))
                             return;
