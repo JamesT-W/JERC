@@ -4,6 +4,8 @@ UnlitGeneric
 
 	$additive 1
 
+	$no_draw
+
 	%keywords "jerc,tool,tools,radar,overview,ignore"
 
 	%compileskip 1
