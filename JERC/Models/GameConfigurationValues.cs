@@ -141,6 +141,9 @@ namespace JERC.Models
                 !Directory.Exists(dzTabletFolderPath) ||
                 !Directory.Exists(dzSpawnselectFolderPath) ||
                 !Directory.Exists(extrasFolderPath) ||
+                !Directory.Exists(extrasFolderPath + @"Overview\") ||
+                !Directory.Exists(extrasFolderPath + @"Tablet\") ||
+                !Directory.Exists(extrasFolderPath + @"SpawnSelect\") ||
                 !File.Exists(vmfFilepath) ||
                 !Directory.Exists(vmfFilepathDirectory)
             )
@@ -160,6 +163,9 @@ namespace JERC.Models
             CreateDirectoryIfDoesntExist(dzTabletFolderPath);
             CreateDirectoryIfDoesntExist(dzSpawnselectFolderPath);
             CreateDirectoryIfDoesntExist(extrasFolderPath);
+            CreateDirectoryIfDoesntExist(extrasFolderPath + @"Overview\");
+            CreateDirectoryIfDoesntExist(extrasFolderPath + @"Tablet\");
+            CreateDirectoryIfDoesntExist(extrasFolderPath + @"SpawnSelect\");
             CreateDirectoryIfDoesntExist(vmfFilepathDirectory);
         }
 

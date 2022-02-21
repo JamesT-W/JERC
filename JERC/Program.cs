@@ -32,7 +32,14 @@ namespace JERC
         private static string outputImageBackgroundLevelsFilepath;
 
         private static string extrasOutputFilepathPrefix;
+        private static string extrasOutputFilepathPrefixOverview;
+        private static string extrasOutputFilepathPrefixTablet;
+        private static string extrasOutputFilepathPrefixSpawnSelect;
+
         private static string alternateExtrasOutputFilepathPrefix;
+        private static string alternateExtrasOutputFilepathPrefixOverview;
+        private static string alternateExtrasOutputFilepathPrefixTablet;
+        private static string alternateExtrasOutputFilepathPrefixSpawnSelect;
 
         private static string vmfcmdFilepath;
 
@@ -231,7 +238,14 @@ namespace JERC
                 dzSpawnselectWorkshopOutputFilepathPrefix = string.Concat(debuggingJercPath, @"map_workshop\", configurationValues.workshopId, @"\", mapName);
 
                 extrasOutputFilepathPrefix = string.Concat(debuggingJercPath, mapName);
+                extrasOutputFilepathPrefixOverview = string.Concat(debuggingJercPath, @"overview\", mapName);
+                extrasOutputFilepathPrefixTablet = string.Concat(debuggingJercPath, @"tablet\", mapName);
+                extrasOutputFilepathPrefixSpawnSelect = string.Concat(debuggingJercPath, @"spawnselect\", mapName);
+
                 alternateExtrasOutputFilepathPrefix = string.Concat(debuggingJercPath, @"jerc_extra\", mapName);
+                alternateExtrasOutputFilepathPrefixOverview = string.Concat(debuggingJercPath, @"jerc_extra\overview\", mapName);
+                alternateExtrasOutputFilepathPrefixTablet = string.Concat(debuggingJercPath, @"jerc_extra\tablet\", mapName);
+                alternateExtrasOutputFilepathPrefixSpawnSelect = string.Concat(debuggingJercPath, @"jerc_extra\spawnselect\", mapName);
 
                 vmfcmdFilepath = string.Concat(debuggingJercPath, @"JERC\Resources\VTFCmd\VTFCmd.exe");
             }
@@ -245,7 +259,14 @@ namespace JERC
                 dzSpawnselectWorkshopOutputFilepathPrefix = string.Concat(GameConfigurationValues.dzSpawnselectFolderPath, @"map_workshop\", configurationValues.workshopId, @"\", mapName);
 
                 extrasOutputFilepathPrefix = string.Concat(GameConfigurationValues.extrasFolderPath, mapName);
+                extrasOutputFilepathPrefixOverview = string.Concat(GameConfigurationValues.extrasFolderPath, @"overview\", mapName);
+                extrasOutputFilepathPrefixTablet = string.Concat(GameConfigurationValues.extrasFolderPath, @"tablet\", mapName);
+                extrasOutputFilepathPrefixSpawnSelect = string.Concat(GameConfigurationValues.extrasFolderPath, @"spawnselect\", mapName);
+
                 alternateExtrasOutputFilepathPrefix = string.Concat(configurationValues.alternateOutputPath, @"jerc_extras\", mapName);
+                alternateExtrasOutputFilepathPrefixOverview = string.Concat(configurationValues.alternateOutputPath, @"jerc_extras\overview\", mapName);
+                alternateExtrasOutputFilepathPrefixTablet = string.Concat(configurationValues.alternateOutputPath, @"jerc_extras\tablet\", mapName);
+                alternateExtrasOutputFilepathPrefixSpawnSelect = string.Concat(configurationValues.alternateOutputPath, @"jerc_extras\spawnselect\", mapName);
 
                 vmfcmdFilepath = string.Concat(GameConfigurationValues.binFolderPath, @"JERC\VTFCmd\VTFCmd.exe");
             }
@@ -2060,18 +2081,94 @@ namespace JERC
 
             var radarLevelString = GetRadarLevelString(radarLevel);
 
-            if (!configurationValues.onlyOutputToAlternatePath)
+
+            // set inner jerc_extras output folder name
+            var exportJercExtrasForOverview = true;
+            var exportJercExtrasForTablet = false;
+            var exportJercExtrasForSpawnSelect = false;
+
+            if (configurationValues.overviewGamemodeType == 1)
             {
-                var outputImageFilepath = string.Concat(extrasOutputFilepathPrefix, radarLevelString, "_radar_", rawMaskType, "_mask");
-                SaveImage(outputImageFilepath, bmpRawMask, forcePngOnly: true);
+                switch (configurationValues.dangerZoneUses)
+                {
+                    case (int)DangerZoneSpecificFiles.None: // Both tablet and spawn select
+                        exportJercExtrasForTablet = true;
+                        exportJercExtrasForSpawnSelect = true;
+                        break;
+                    case (int)DangerZoneSpecificFiles.TabletImage:
+                        exportJercExtrasForTablet = true;
+                        break;
+                    case (int)DangerZoneSpecificFiles.SpawnselectImage:
+                        exportJercExtrasForSpawnSelect = true;
+                        break;
+                }
             }
 
-            CreateDirectoryOfFileIfDoesntExist(alternateExtrasOutputFilepathPrefix);
+
+            if (!configurationValues.onlyOutputToAlternatePath)
+            {
+                if (exportJercExtrasForOverview)
+                {
+                    if (configurationValues.overviewGamemodeType == 0) // standard gamemode
+                    {
+                        var outputImageFilepath = string.Concat(extrasOutputFilepathPrefixOverview, radarLevelString, "_radar_", rawMaskType, "_mask");
+                        SaveImage(outputImageFilepath, bmpRawMask, forcePngOnly: true);
+                    }
+                    else if (configurationValues.overviewGamemodeType == 1) // danger zone gamemode
+                    {
+                        var outputImageFilepath = string.Concat(extrasOutputFilepathPrefixOverview, radarLevelString, "_radar_", rawMaskType, "_mask");
+                        SaveImage(outputImageFilepath, bmpRawMask, forcePngOnly: true, dangerZoneSpecificFile: DangerZoneSpecificFiles.SpawnselectImage); // uses spawnselect to make it the smaller size
+                    }
+                }
+
+                if (exportJercExtrasForTablet)
+                {
+                    var outputImageFilepath = string.Concat(extrasOutputFilepathPrefixTablet, radarLevelString, "_radar_", rawMaskType, "_mask");
+                    SaveImage(outputImageFilepath, bmpRawMask, forcePngOnly: true, dangerZoneSpecificFile: DangerZoneSpecificFiles.TabletImage);
+                }
+
+                if (exportJercExtrasForSpawnSelect)
+                {
+                    var outputImageFilepath = string.Concat(extrasOutputFilepathPrefixSpawnSelect, radarLevelString, "_radar_", rawMaskType, "_mask");
+                    SaveImage(outputImageFilepath, bmpRawMask, forcePngOnly: true, dangerZoneSpecificFile: DangerZoneSpecificFiles.SpawnselectImage);
+                }
+            }
 
             if (!string.IsNullOrWhiteSpace(alternateExtrasOutputFilepathPrefix))
             {
-                var outputImageFilepath = string.Concat(alternateExtrasOutputFilepathPrefix, radarLevelString, "_radar_", rawMaskType, "_mask");
-                SaveImage(outputImageFilepath, bmpRawMask, forcePngOnly: true);
+                CreateDirectoryOfFileIfDoesntExist(alternateExtrasOutputFilepathPrefix);
+
+                if (exportJercExtrasForOverview)
+                {
+                    CreateDirectoryOfFileIfDoesntExist(alternateExtrasOutputFilepathPrefixOverview);
+
+                    if (configurationValues.overviewGamemodeType == 0) // standard gamemode
+                    {
+                        var outputImageFilepath = string.Concat(alternateExtrasOutputFilepathPrefixOverview, radarLevelString, "_radar_", rawMaskType, "_mask");
+                        SaveImage(outputImageFilepath, bmpRawMask, forcePngOnly: true);
+                    }
+                    else if (configurationValues.overviewGamemodeType == 1) // danger zone gamemode
+                    {
+                        var outputImageFilepath = string.Concat(alternateExtrasOutputFilepathPrefixOverview, radarLevelString, "_radar_", rawMaskType, "_mask");
+                        SaveImage(outputImageFilepath, bmpRawMask, forcePngOnly: true, dangerZoneSpecificFile: DangerZoneSpecificFiles.SpawnselectImage); // uses spawnselect to make it the smaller size
+                    }
+                }
+
+                if (exportJercExtrasForTablet)
+                {
+                    CreateDirectoryOfFileIfDoesntExist(alternateExtrasOutputFilepathPrefixTablet);
+
+                    var outputImageFilepath = string.Concat(alternateExtrasOutputFilepathPrefixTablet, radarLevelString, "_radar_", rawMaskType, "_mask");
+                    SaveImage(outputImageFilepath, bmpRawMask, forcePngOnly: true, dangerZoneSpecificFile: DangerZoneSpecificFiles.TabletImage);
+                }
+
+                if (exportJercExtrasForSpawnSelect)
+                {
+                    CreateDirectoryOfFileIfDoesntExist(alternateExtrasOutputFilepathPrefixSpawnSelect);
+
+                    var outputImageFilepath = string.Concat(alternateExtrasOutputFilepathPrefixSpawnSelect, radarLevelString, "_radar_", rawMaskType, "_mask");
+                    SaveImage(outputImageFilepath, bmpRawMask, forcePngOnly: true, dangerZoneSpecificFile: DangerZoneSpecificFiles.SpawnselectImage);
+                }
             }
         }
 
@@ -3078,10 +3175,13 @@ namespace JERC
             var filepathPng = filepath + ".png";
             var filepathDds = filepath + ".dds";
 
-            // add padding around Danger Zone overview
-            if (configurationValues.overviewGamemodeType == 1)
+            // danger zone tablet or spawn select
+            if (configurationValues.overviewGamemodeType == 1 && dangerZoneSpecificFile != DangerZoneSpecificFiles.None)
             {
-                float newBitmapSizeDivider = ((float)overviewPositionValues.widthWithoutStroke + (float)overviewPositionValues.paddingSizeX) / (float)DangerZoneValues.DangerZoneOverviewSize;
+                float newBitmapSizeDivider = dangerZoneSpecificFile == DangerZoneSpecificFiles.TabletImage
+                    ? ((float)overviewPositionValues.widthWithoutStroke + (float)overviewPositionValues.paddingSizeX) / (float)DangerZoneValues.DangerZoneOverviewSize // 20480 (tablet)
+                    : ((float)overviewPositionValues.widthWithoutStroke + (float)overviewPositionValues.paddingSizeX) / (float)DangerZoneValues.DangerZonePlayareaSize; // 16384 (spawn select)
+
                 var newSizeX = (int)(Sizes.FinalOutputImageResolution / newBitmapSizeDivider);
                 var newSizeY = (int)(Sizes.FinalOutputImageResolution / newBitmapSizeDivider);
                 Bitmap bmpTemp = new Bitmap(newSizeX, newSizeY);
@@ -3148,7 +3248,7 @@ namespace JERC
                 DisposeGraphics(Graphics.FromImage(bmpTemp));
                 DisposeImage(bmpTemp);
             }
-            else
+            else // overview (danger zone or standard)
             {
                 if (configurationValues.exportDds && !forcePngOnly)
                     bmp.Save(filepathDds);
