@@ -1,4 +1,4 @@
-﻿using ImageAlterer;
+using ImageAlterer;
 using JERC.Constants;
 using JERC.Enums;
 using JERC.Models;
@@ -169,7 +169,9 @@ namespace JERC
             // add hidden stuff if applicable except when instance is hidden
             if (configurationValues.includeEvenWhenHidden)
             {
+                Logger.LogMessage("Looking through hidden brushes and entities...");
                 AddHiddenStuffToDifferentLocationInVmf(vmf);
+                Logger.LogMessage("Finished looking through hidden brushes and entities");
 
                 allWorldBrushes = vmf.World.Body.Where(x => x.Name == "solid");
                 allEntities = vmf.Body.Where(x => x.Name == "entity");
