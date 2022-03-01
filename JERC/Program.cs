@@ -1,4 +1,4 @@
-using ImageAlterer;
+﻿using ImageAlterer;
 using JERC.Constants;
 using JERC.Enums;
 using JERC.Models;
@@ -3346,12 +3346,6 @@ namespace JERC
 
         private static void GenerateTxt(List<LevelHeight> levelHeights)
         {
-            if (configurationValues.overviewGamemodeType == 1)
-            {
-                Logger.LogWarning("Skipped generating txt because the gamemode is set to Danger Zone");
-                return;
-            }
-
             Logger.LogMessage("Generating txt");
 
             var overviewTxt = GetOverviewTxt(overviewPositionValues);
@@ -3377,9 +3371,9 @@ namespace JERC
 
         private static OverviewTxt GetOverviewTxt(OverviewPositionValues overviewPositionValues)
         {
-            string scale = overviewPositionValues.scale.ToString();
-            string pos_x = overviewPositionValues.posX.ToString();
-            string pos_y = overviewPositionValues.posY.ToString();
+            string scale = configurationValues.overviewGamemodeType == 1 ? DangerZoneValues.DangerZoneOverviewTxtScale.ToString() : overviewPositionValues.scale.ToString(); // forces specific value if DZ
+            string pos_x = configurationValues.overviewGamemodeType == 1 ? DangerZoneValues.DangerZoneOverviewTxtPosX.ToString() : overviewPositionValues.posX.ToString(); // forces specific value if DZ
+            string pos_y = configurationValues.overviewGamemodeType == 1 ? DangerZoneValues.DangerZoneOverviewTxtPosY.ToString() : overviewPositionValues.posY.ToString(); // forces specific value if DZ
             string rotate = null;
             string zoom = null;
 
