@@ -103,6 +103,8 @@ namespace JERC.Models
         {
             var lines = new List<string>()
             {
+                "// Generated with JERC " + VersionValues.CurrentVersion,
+                string.Empty,
                 string.Concat("\"", mapName, "\""),
                 "{",
                     string.Concat("\t\"material\"\t\t\"overviews/", material, "\""),
