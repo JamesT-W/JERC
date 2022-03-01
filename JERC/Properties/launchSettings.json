@@ -2,7 +2,7 @@
   "profiles": {
     "JERC": {
       "commandName": "Project",
-      "commandLineArgs": "-g \"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Counter-Strike Global Offensive\\csgo\" -vmfFilepath \"G:\\Dropbox\\dz_ember\\vmf\\dz_ember.vmf\""
+      "commandLineArgs": "-g \"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Counter-Strike Global Offensive\\csgo\" -vmfFilepath \"G:\\Dropbox\\JERC\\maps\\jerc_test_map.vmf\""
     }
   }
 }
