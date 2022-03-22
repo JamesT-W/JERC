@@ -1,3 +1,3 @@
 # JERC
 
-Auto radar generator for Source Enging (only tested on CS:GO)
+Auto radar generator for Source Engine games (only tested on CS:GO)
