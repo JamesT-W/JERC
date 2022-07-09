@@ -8,6 +8,6 @@ namespace JERC.Constants
 {
     public static class VersionValues
     {
-        public static readonly string CurrentVersion = "v1.3.2";
+        public static readonly string CurrentVersion = "v1.3.3";
     }
 }

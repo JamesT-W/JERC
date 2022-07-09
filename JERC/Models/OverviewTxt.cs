@@ -201,6 +201,14 @@ namespace JERC.Models
 
             lines.Add("}");
 
+
+            // make sure no commas are used instead of decimal points
+            for (int i = 0; i < lines.Count(); i++)
+			{
+                lines[i] = lines[i].Replace(",", ".");
+			}
+
+
             return lines;
         }
     }
